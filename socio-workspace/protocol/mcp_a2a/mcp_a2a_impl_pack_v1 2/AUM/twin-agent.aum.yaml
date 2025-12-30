@@ -1,0 +1,33 @@
+apiVersion: aum.v1
+kind: AgentPackage
+metadata:
+  name: twin-agent
+  version: 0.3.0
+  authors: ["Source OS Team"]
+spec:
+  entry:
+    binary: bin/twin-agent
+    args: ["--mcp-host", "--a2a"]
+  identity:
+    spiffeID: "spiffe://sourceos/twin"
+    cosignBundle: "artifacts/twin-agent.sigstore.json"
+  capabilitiesAdvertised:
+    - server: datalake.write
+      tools: [ "put", "put_signed" ]
+    - server: replay.sim
+      tools: [ "run", "export_trace" ]
+    - server: build.pipeline
+      tools: [ "build", "sign", "verify" ]
+    - server: policy.eval
+      tools: [ "rego_eval" ]
+    - server: egress.proxy
+      tools: [ "http" ]
+    - server: c2.detector
+      tools: [ "scan" ]
+  policyBundle: "policies/twin.policy.bundle.tar.gz"
+  sandbox:
+    rootless: true
+    apparmor: "complain"
+    cgroups:
+      cpuQuota: "400m"
+      memory: "1024Mi"

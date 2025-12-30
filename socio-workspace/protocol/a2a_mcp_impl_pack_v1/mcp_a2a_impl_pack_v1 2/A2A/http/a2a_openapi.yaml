@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: A2A Control Plane
+  version: 0.1.0
+paths:
+  /hello:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Hello' } } } }
+      responses: { '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Hello' } } } } }
+  /attest:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Attest' } } } }
+      responses: { '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Attest' } } } } }
+  /discover:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Discover' } } } }
+      responses: { '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Discover' } } } } }
+  /negotiate:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Negotiate' } } } }
+      responses: { '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Grant' } } } } }
+  /revoke:
+    post:
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Revoke' } } } }
+      responses: { '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Revoke' } } } } }
+components:
+  schemas:
+    Hello:
+      type: object
+      properties:
+        agent_id: { type: string }
+        nonce: { type: string }
+        version: { type: string }
+      required: [agent_id, nonce, version]
+    Attest:
+      type: object
+      properties:
+        agent_id: { type: string }
+        tpm_quote: { type: string, format: byte }
+        cosign_bundle: { type: string, format: byte }
+      required: [agent_id, tpm_quote, cosign_bundle]
+    Capability:
+      type: object
+      properties:
+        server: { type: string }
+        tool: { type: string }
+        effect: { type: string, enum: [read, write, compute] }
+      required: [server, tool, effect]
+    Discover:
+      type: object
+      properties:
+        capabilities:
+          type: array
+          items: { $ref: '#/components/schemas/Capability' }
+    Negotiate:
+      type: object
+      properties:
+        requested:
+          type: array
+          items: { $ref: '#/components/schemas/Capability' }
+        policy_hash: { type: string }
+      required: [requested, policy_hash]
+    Grant:
+      type: object
+      properties:
+        grant_id: { type: string }
+        subject_spiffe: { type: string }
+        ttl_sec: { type: integer }
+        allowed:
+          type: array
+          items: { $ref: '#/components/schemas/Capability' }
+        policy_hash: { type: string }
+        human_signatures:
+          type: array
+          items: { type: string }
+      required: [grant_id, subject_spiffe, ttl_sec, allowed, policy_hash]
+    Revoke:
+      type: object
+      properties:
+        grant_id: { type: string }
+        reason: { type: string }
+      required: [grant_id]

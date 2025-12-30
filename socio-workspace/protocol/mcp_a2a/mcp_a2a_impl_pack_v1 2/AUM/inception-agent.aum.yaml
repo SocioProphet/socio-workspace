@@ -1,0 +1,29 @@
+apiVersion: aum.v1
+kind: AgentPackage
+metadata:
+  name: inception-agent
+  version: 0.3.0
+  authors: ["Source OS Team"]
+spec:
+  entry:
+    binary: bin/inception-agent
+    args: ["--mcp-host", "--a2a"]
+  identity:
+    spiffeID: "spiffe://sourceos/inception"
+    cosignBundle: "artifacts/inception-agent.sigstore.json"
+  capabilitiesAdvertised:
+    - server: fs.introspect
+      tools: [ "list", "hash", "glob" ]
+    - server: proc.inspect
+      tools: [ "ps", "fdlist" ]
+    - server: net.observe
+      tools: [ "flows", "dns", "tls" ]
+    - server: attest.local
+      tools: [ "tpm_quote", "fido2_attest", "pkg_hashes" ]
+  policyBundle: "policies/inception.policy.bundle.tar.gz"
+  sandbox:
+    rootless: true
+    apparmor: "complain"
+    cgroups:
+      cpuQuota: "200m"
+      memory: "512Mi"

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-api
+spec:
+  selector: { app: dev-api }
+  ports:
+    - name: http
+      port: 5175
+      targetPort: 5175
+      protocol: TCP

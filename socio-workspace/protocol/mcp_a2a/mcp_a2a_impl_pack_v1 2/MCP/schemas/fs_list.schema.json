@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "fs.introspect/list input",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string"
+    },
+    "glob": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "path"
+  ]
+}

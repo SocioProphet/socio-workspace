@@ -1,0 +1,287 @@
+{
+  "servers": [
+    {
+      "name": "fs.introspect",
+      "side": "edge",
+      "tools": [
+        {
+          "name": "list",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "path": "string",
+              "glob": true
+            },
+            "out": {
+              "paths": [
+                "string"
+              ]
+            }
+          }
+        },
+        {
+          "name": "hash",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "paths": [
+                "string"
+              ]
+            },
+            "out": {
+              "sha256": "object"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "proc.inspect",
+      "side": "edge",
+      "tools": [
+        {
+          "name": "ps",
+          "effect": "read",
+          "schema": {
+            "in": {},
+            "out": {
+              "procs": [
+                "object"
+              ]
+            }
+          }
+        },
+        {
+          "name": "fdlist",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "pid": "integer"
+            },
+            "out": {
+              "fds": [
+                "object"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "net.observe",
+      "side": "edge",
+      "tools": [
+        {
+          "name": "flows",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "window_sec": "integer"
+            },
+            "out": {
+              "flows": [
+                "object"
+              ]
+            }
+          }
+        },
+        {
+          "name": "dns",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "window_sec": "integer"
+            },
+            "out": {
+              "queries": [
+                "object"
+              ]
+            }
+          }
+        },
+        {
+          "name": "tls",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "window_sec": "integer"
+            },
+            "out": {
+              "handshakes": [
+                "object"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "attest.local",
+      "side": "edge",
+      "tools": [
+        {
+          "name": "tpm_quote",
+          "effect": "compute",
+          "schema": {
+            "in": {},
+            "out": {
+              "quote": "string"
+            }
+          }
+        },
+        {
+          "name": "fido2_attest",
+          "effect": "compute",
+          "schema": {
+            "in": {},
+            "out": {
+              "attestation": "string"
+            }
+          }
+        },
+        {
+          "name": "pkg_hashes",
+          "effect": "read",
+          "schema": {
+            "in": {},
+            "out": {
+              "packages": [
+                "object"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "datalake.write",
+      "side": "twin",
+      "tools": [
+        {
+          "name": "put",
+          "effect": "write",
+          "schema": {
+            "in": {
+              "object": "string",
+              "bytes": "string"
+            },
+            "out": {
+              "ok": "boolean",
+              "digest": "string"
+            }
+          }
+        },
+        {
+          "name": "put_signed",
+          "effect": "write",
+          "schema": {
+            "in": {
+              "object": "string",
+              "bytes": "string",
+              "signature": "string"
+            },
+            "out": {
+              "ok": "boolean",
+              "digest": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "replay.sim",
+      "side": "twin",
+      "tools": [
+        {
+          "name": "run",
+          "effect": "compute",
+          "schema": {
+            "in": {
+              "bundle": "string"
+            },
+            "out": {
+              "trace_id": "string"
+            }
+          }
+        },
+        {
+          "name": "export_trace",
+          "effect": "read",
+          "schema": {
+            "in": {
+              "trace_id": "string"
+            },
+            "out": {
+              "bytes": "string",
+              "digest": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "policy.eval",
+      "side": "twin",
+      "tools": [
+        {
+          "name": "rego_eval",
+          "effect": "compute",
+          "schema": {
+            "in": {
+              "input": "object",
+              "policy": "string"
+            },
+            "out": {
+              "allow": "boolean",
+              "reason": "string",
+              "danger": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "egress.proxy",
+      "side": "twin",
+      "tools": [
+        {
+          "name": "http",
+          "effect": "write",
+          "schema": {
+            "in": {
+              "method": "string",
+              "url": "string",
+              "headers": "object",
+              "body": "string?"
+            },
+            "out": {
+              "status": "integer",
+              "headers": "object",
+              "body": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "c2.detector",
+      "side": "twin",
+      "tools": [
+        {
+          "name": "scan",
+          "effect": "compute",
+          "schema": {
+            "in": {
+              "trace": "string"
+            },
+            "out": {
+              "alerts": [
+                "object"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

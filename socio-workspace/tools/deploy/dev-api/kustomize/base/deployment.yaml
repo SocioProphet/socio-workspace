@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: dev-api }
+  template:
+    metadata:
+      labels: { app: dev-api }
+    spec:
+      containers:
+        - name: dev-api
+          image: ghcr.io/socioprophet/dev-api:dev
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              valueFrom: { configMapKeyRef: { name: dev-api-config, key: PORT } }
+          ports:
+            - containerPort: 5175
+              name: http

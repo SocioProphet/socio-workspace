@@ -1,0 +1,1 @@
+{"ts":"2025-08-22T00:00:00Z","actor":"spiffe://sourceos/inception","action":"fs.introspect/hash","input_digest":"sha256-abc","output_digest":"sha256-def","policy_hash":"sha256-ghi","signatures":["sig1","sig2"]}

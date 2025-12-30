@@ -1,0 +1,59 @@
+[workspace]
+name = "socio-workspace"
+version = "0.1"
+
+# NOTE: This manifest supports both local materialized repos (local_path)
+# and remote repos (url + ref/rev). The lock file resolves remote inputs.
+
+[[repos]]
+name = "prophet_cli"
+role = "component"
+local_path = "components/prophet_cli"
+entry = { kind = "go", module = "./" }
+
+[[repos]]
+name = "sourceos_a2a_mcp_bootstrap"
+role = "component"
+local_path = "components/sourceos_a2a_mcp_bootstrap"
+
+[[repos]]
+name = "socioprophet-web"
+role = "component"
+local_path = "components/socioprophet-web"
+
+[[repos]]
+name = "dev-api"
+role = "component"
+local_path = "components/dev-api"
+
+[[repos]]
+name = "hdt_app"
+role = "component"
+local_path = "components/hdt_app"
+
+[[repos]]
+name = "human_digital_twin"
+role = "component"
+local_path = "components/human_digital_twin"
+
+[[repos]]
+name = "ontogenesis"
+role = "component"
+local_path = "components/ontogenesis"
+
+[[repos]]
+name = "cc"
+role = "adapter"
+local_path = "adapters/cc"
+required_capabilities = ["container_exec", "fs_ops", "deps_inventory"]
+
+[[repos]]
+name = "configs"
+role = "adapter"
+local_path = "adapters/configs"
+required_capabilities = ["policy", "defaults"]
+
+[[repos]]
+name = "socioprophet_integration"
+role = "docs"
+local_path = "components/socioprophet_integration"

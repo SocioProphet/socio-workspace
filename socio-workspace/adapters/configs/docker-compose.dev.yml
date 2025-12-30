@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  dev-api:
+    build: ./dev-api
+    image: socioprophet-dev-api:devlocal
+    environment:
+      - PORT=5175
+      - DEV_TOKEN=dev
+    ports:
+      - "5175:5175"

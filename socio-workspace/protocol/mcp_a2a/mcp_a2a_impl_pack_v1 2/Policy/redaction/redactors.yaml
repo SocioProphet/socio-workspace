@@ -1,0 +1,7 @@
+redactors:
+  - name: BearerToken
+    regex: "Bearer\s+[A-Za-z0-9._-]+"
+    replacement: "Bearer ***REDACTED***"
+  - name: Password
+    regex: "(?i)password\s*[:=]\s*[^\s]+"
+    replacement: "password=***REDACTED***"

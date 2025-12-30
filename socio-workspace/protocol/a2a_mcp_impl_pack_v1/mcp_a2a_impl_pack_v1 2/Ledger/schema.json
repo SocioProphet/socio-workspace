@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Append-only ledger event",
+  "type": "object",
+  "properties": {
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "input_digest": {
+      "type": "string"
+    },
+    "output_digest": {
+      "type": "string"
+    },
+    "policy_hash": {
+      "type": "string"
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "ts",
+    "actor",
+    "action",
+    "policy_hash"
+  ]
+}

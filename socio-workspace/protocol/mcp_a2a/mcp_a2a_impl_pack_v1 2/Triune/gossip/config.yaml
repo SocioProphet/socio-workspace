@@ -1,0 +1,4 @@
+transport: "hyperswarm"
+seedPeers: []
+rebroadcast_ms: 2000
+max_hop: 3

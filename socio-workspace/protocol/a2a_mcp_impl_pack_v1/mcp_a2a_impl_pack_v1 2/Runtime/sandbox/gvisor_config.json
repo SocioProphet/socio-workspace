@@ -1,0 +1,16 @@
+{
+  "network": "none",
+  "mounts": {
+    "ro": [
+      "/etc",
+      "/usr"
+    ],
+    "rw": [
+      "/tmp"
+    ]
+  },
+  "limits": {
+    "cpu": "1",
+    "memory": "1Gi"
+  }
+}

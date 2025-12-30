@@ -1,0 +1,39 @@
+version: 1
+identity:
+  require: [tpm_quote, cosign_bundle]
+defaults: { decision: "deny" }
+scopes:
+  fs.read:
+    allow:
+      - path: "$HOME/**"
+      - path: "/var/log/**"
+    limits:
+      bytes_max: 50000000
+      rate_per_min: 6
+    redact:
+      patterns: ["(?i)password", "(?i)secret_key", "Bearer\s+[A-Za-z0-9._-]+"]
+  proc.inspect:
+    allow: ["ps", "fdlist"]
+    limits: { rate_per_min: 10 }
+  net.observe:
+    allow: ["flows","dns","tls"]
+    limits:
+      pcap_bytes_max: 10000000
+      rate_per_min: 2
+  egress:
+    allow_domains: ["api.github.com", "packages.debian.org"]
+    deny_methods: ["PUT","DELETE"]
+    rate_per_min: 4
+quorum:
+  danger_threshold: "MEDIUM"
+  rule: "2of3-human"
+  validators:
+    - "spiffe://validators/human1"
+    - "spiffe://validators/human2"
+    - "spiffe://validators/human3"
+audit:
+  ledger: "append-only"
+  export: { twin_copy: true, format: ["jsonl","sigstore-attestation"] }
+expiry:
+  grant_ttl_sec: 900
+  refresh_window_sec: 120

@@ -1,0 +1,25 @@
+syntax = "proto3";
+package a2a;
+
+message Hello { string agent_id = 1; string nonce = 2; string version = 3; }
+message Attest { string agent_id = 1; bytes tpm_quote = 2; bytes cosign_bundle = 3; }
+message Capability { string server = 1; string tool = 2; string effect = 3; }
+message Discover { repeated Capability capabilities = 1; }
+message Negotiate { repeated Capability requested = 1; string policy_hash = 2; }
+message Grant {
+  string grant_id = 1;
+  string subject_spiffe = 2;
+  int64  ttl_sec = 3;
+  repeated Capability allowed = 4;
+  string policy_hash = 5;
+  repeated string human_signatures = 6;
+}
+message Revoke { string grant_id = 1; string reason = 2; }
+
+service A2A {
+  rpc Hello (Hello) returns (Hello);
+  rpc Attest (Attest) returns (Attest);
+  rpc Discover (Discover) returns (Discover);
+  rpc Negotiate (Negotiate) returns (Grant);
+  rpc Revoke (Revoke) returns (Revoke);
+}

@@ -1,0 +1,29 @@
+version: 1
+defaults: { decision: "deny" }
+egress:
+  allow_domains: ["slack.com","www.googleapis.com"]
+  dlp:
+    enabled: true
+    deny_patterns: ["PRIVATE_KEY", "AWS_SECRET_ACCESS_KEY", "ssh-rsa .*"]
+  rate_per_min: 5
+datalake:
+  retention_days: 365
+  immutability: "WORM"
+  per_object_caps: { bytes_max: 200000000 }
+replay:
+  sandbox: "gvisor"
+  cpu: "1"
+  memory: "1Gi"
+  network_mode: "none"
+quorum:
+  danger_threshold: "HIGH"
+  rule: "3of5"
+  validators:
+    - "spiffe://validators/human1"
+    - "spiffe://validators/human2"
+    - "spiffe://validators/human3"
+    - "spiffe://validators/human4"
+    - "spiffe://validators/human5"
+audit:
+  keep_rego_decisions: true
+  include_policy_hash: true

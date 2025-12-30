@@ -1,0 +1,21 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: twin-egress-proxy-only
+spec:
+  endpointSelector:
+    matchLabels:
+      app: twin-agent
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app: egress-proxy
+    - toFQDNs:
+        - matchName: slack.com
+        - matchName: www.googleapis.com
+  egressDeny:
+    - toEntities: ["world"]
+      toPorts:
+        - ports:
+            - port: "1"
+              protocol: ANY

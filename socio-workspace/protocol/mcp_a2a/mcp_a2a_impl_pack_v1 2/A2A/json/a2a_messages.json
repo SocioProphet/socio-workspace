@@ -1,0 +1,52 @@
+{
+  "hello": {
+    "agent_id": "spiffe://sourceos/inception",
+    "nonce": "<base64>",
+    "version": "0.1.0"
+  },
+  "attest": {
+    "agent_id": "spiffe://sourceos/inception",
+    "tpm_quote": "<b64>",
+    "cosign_bundle": "<b64>"
+  },
+  "discover": {
+    "capabilities": [
+      {
+        "server": "fs.introspect",
+        "tool": "list",
+        "effect": "read"
+      }
+    ]
+  },
+  "negotiate": {
+    "requested": [
+      {
+        "server": "fs.introspect",
+        "tool": "hash",
+        "effect": "read"
+      }
+    ],
+    "policy_hash": "sha256-REPLACE"
+  },
+  "grant": {
+    "grant_id": "grant-abc",
+    "subject_spiffe": "spiffe://sourceos/inception",
+    "ttl_sec": 900,
+    "allowed": [
+      {
+        "server": "fs.introspect",
+        "tool": "hash",
+        "effect": "read"
+      }
+    ],
+    "policy_hash": "sha256-REPLACE",
+    "human_signatures": [
+      "sig1",
+      "sig2"
+    ]
+  },
+  "revoke": {
+    "grant_id": "grant-abc",
+    "reason": "quorum revoked"
+  }
+}

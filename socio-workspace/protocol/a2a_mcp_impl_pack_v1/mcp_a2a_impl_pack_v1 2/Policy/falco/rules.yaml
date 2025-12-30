@@ -1,0 +1,11 @@
+rules:
+  - rule: Disallow Ptrace
+    desc: Detect attempts to use ptrace
+    condition: evt.type = ptrace
+    output: "Ptrace detected (user=%user.name process=%proc.name)"
+    priority: WARNING
+  - rule: Disallow Privileged Container
+    desc: Detect privileged containers
+    condition: container and container.privileged=true
+    output: "Privileged container (image=%container.image repository=%container.image.repository)"
+    priority: CRITICAL

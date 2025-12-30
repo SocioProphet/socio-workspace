@@ -1,0 +1,38 @@
+apiVersion: triune.v1
+kind: AUMDAG
+metadata:
+  name: forensic-collection-and-replay
+  version: 0.1.0
+spec:
+  nodes:
+    - id: n1
+      name: Collect Files
+      server: fs.introspect
+      tool: list
+      confidence: "confirmed"
+      sources: ["system:fs"]
+    - id: n2
+      name: Hash Files
+      server: fs.introspect
+      tool: hash
+      confidence: "confirmed"
+      sources: ["system:fs"]
+    - id: n3
+      name: Upload to Datalake
+      server: datalake.write
+      tool: put_signed
+      confidence: "confirmed"
+      sources: ["n2"]
+    - id: n4
+      name: Run Replay
+      server: replay.sim
+      tool: run
+      confidence: "inferred"
+      sources: ["n3"]
+  edges:
+    - from: n1
+      to: n2
+    - from: n2
+      to: n3
+    - from: n3
+      to: n4

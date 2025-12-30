@@ -6,3 +6,8 @@
 ## TritRPC + Trit-to-Trust (pinned)
 - tritrpc-v1-full: tag v0.1.0
 - trit-to-trust: tag v0.1.0
+
+## TritRPC + Trit-to-Trust (pinned)
+- tritrpc-v1-full: v0.1.1 @ 6091e55
+- trit-to-trust:  v0.1.1 @ 68186ab
+- Policy: do not move tags; bump patch tags for cleanup-only changes.

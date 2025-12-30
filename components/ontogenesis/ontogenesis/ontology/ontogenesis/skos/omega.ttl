@@ -1,0 +1,10 @@
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+hdt:OmegaScheme a skos:ConceptScheme ; skos:prefLabel "Ω Ladder" .
+hdt:ABSENT skos:inScheme hdt:OmegaScheme ; skos:prefLabel "ABSENT" ; skos:notation "0" .
+hdt:SEEDED skos:inScheme hdt:OmegaScheme ; skos:prefLabel "SEEDED" ; skos:broader hdt:ABSENT ; skos:notation "1" .
+hdt:NORMALIZED skos:inScheme hdt:OmegaScheme ; skos:prefLabel "NORMALIZED" ; skos:broader hdt:SEEDED ; skos:notation "2" .
+hdt:LINKED skos:inScheme hdt:OmegaScheme ; skos:prefLabel "LINKED" ; skos:broader hdt:NORMALIZED ; skos:notation "3" .
+hdt:TRUSTED skos:inScheme hdt:OmegaScheme ; skos:prefLabel "TRUSTED" ; skos:broader hdt:LINKED ; skos:notation "4" .
+hdt:ACTIONABLE skos:inScheme hdt:OmegaScheme ; skos:prefLabel "ACTIONABLE" ; skos:broader hdt:TRUSTED ; skos:notation "5" .
+hdt:DELIVERED skos:inScheme hdt:OmegaScheme ; skos:prefLabel "DELIVERED" ; skos:broader hdt:ACTIONABLE ; skos:notation "6" .

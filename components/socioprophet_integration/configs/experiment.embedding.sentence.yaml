@@ -1,0 +1,19 @@
+name: embeddings_sentence_miniLM
+task: embedding
+dataset: sentence-transformers/AllNLI
+split: validation
+metrics: [cosine]
+limit: 64
+batch_size: 8
+contenders:
+  - model_id: all-MiniLM-L6-v2
+    runtime: hf
+    hf_id: sentence-transformers/all-MiniLM-L6-v2
+    task: embedding
+    extra: { role: champion }
+  - model_id: all-distilroberta-v1
+    runtime: hf
+    hf_id: sentence-transformers/all-distilroberta-v1
+    task: embedding
+    extra: { role: challenger }
+policy: { promote_if: 0.002 }

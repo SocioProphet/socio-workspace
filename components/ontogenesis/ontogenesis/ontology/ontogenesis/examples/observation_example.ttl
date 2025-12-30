@@ -1,0 +1,11 @@
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+hdt:obs1 a hdt:Observation ;
+  hdt:hasOmegaState hdt:DELIVERED ;
+  hdt:stepsToTruth 4 ;
+  hdt:iemlCode "E.U" ;
+  hdt:hasMembership [ a hdt:MembershipVector ; hdt:mCBD 0.94 ; hdt:mCGT 0.82 ; hdt:mNHY 0.78 ] ;
+  hdt:hasReceipt hdt:receipt1 ;
+  hdt:usesPolicy hdt:policyRun1 .
+hdt:receipt1 a hdt:Receipt .
+hdt:policyRun1 a hdt:PolicyDecision .

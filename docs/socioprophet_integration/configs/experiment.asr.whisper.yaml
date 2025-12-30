@@ -1,0 +1,19 @@
+name: asr_whisper_small_demo
+task: asr
+dataset: librispeech_asr
+split: test.clean
+metrics: [wer]
+limit: 16
+batch_size: 2
+contenders:
+  - model_id: openai/whisper-small
+    runtime: hf
+    hf_id: openai/whisper-small
+    task: asr
+    extra: { role: champion }
+  - model_id: openai/whisper-base
+    runtime: hf
+    hf_id: openai/whisper-base
+    task: asr
+    extra: { role: challenger }
+policy: { promote_if: -0.01 }

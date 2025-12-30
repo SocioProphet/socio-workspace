@@ -1,0 +1,23 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: human-digital-twin }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: human-digital-twin } }
+  template:
+    metadata: { labels: { app: human-digital-twin } }
+    spec:
+      containers:
+      - name: api
+        image: hdt:dev
+        imagePullPolicy: IfNotPresent
+        env: [ { name: API_KEY, value: "test" } ]
+        ports: [ { name: http, containerPort: 8080 } ]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: human-digital-twin }
+spec:
+  selector: { app: human-digital-twin }
+  ports: [ { name: http, port: 80, targetPort: http } ]

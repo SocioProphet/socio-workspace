@@ -1,0 +1,4 @@
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ieml: <https://intlekt.org/ieml#> .
+hdt:iemlCode rdfs:seeAlso ieml:Concept .

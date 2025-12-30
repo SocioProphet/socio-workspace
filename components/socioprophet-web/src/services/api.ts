@@ -1,0 +1,7 @@
+import { getToken } from './auth'
+export function spaceMeta(){ const env:any=(import.meta as any).env; return { space: env.VITE_SPACE||'local', ns: env.VITE_NAMESPACE||'default', routerBase: env.VITE_ROUTER_BASE||'/' } }
+function headers():Headers{ const h=new Headers({'content-type':'application/json'}); const tok=getToken(); if(tok) h.set('Authorization',`Bearer ${tok}`); const k=localStorage.getItem('agent_api_key'); if(k) h.set('X-API-Key',k); const {space,ns}=spaceMeta(); h.set('X-Space',space); h.set('X-NS',ns); return h }
+export async function apiGet<T=any>(path:string):Promise<T>{ const url=path.startsWith('/api')?path:`/api${path}`; const r=await fetch(url,{headers:headers()}); if(!r.ok) throw new Error(await r.text()); return await r.json() }
+export async function apiPost<T=any>(path:string, body:any):Promise<T>{ const url=path.startsWith('/api')?path:`/api${path}`; const r=await fetch(url,{method:'POST',headers:headers(),body:JSON.stringify(body)}); if(!r.ok) throw new Error(await r.text()); return await r.json() }
+export async function apiPatch<T=any>(path:string, body:any):Promise<T>{ const url=path.startsWith('/api')?path:`/api${path}`; const r=await fetch(url,{method:'PATCH',headers:headers(),body:JSON.stringify(body)}); if(!r.ok) throw new Error(await r.text()); return await r.json() }
+export async function apiDel<T=any>(path:string):Promise<T>{ const url=path.startsWith('/api')?path:`/api${path}`; const r=await fetch(url,{method:'DELETE',headers:headers()}); if(!r.ok) throw new Error(await r.text()); return await r.json() }

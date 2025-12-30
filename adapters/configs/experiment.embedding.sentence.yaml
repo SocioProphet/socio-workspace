@@ -1,0 +1,7 @@
+name: embeddings_sentence_miniLM
+task: embedding
+model: { provider: huggingface, id: ${EMB_MODEL_ID:sentence-transformers/all-MiniLM-L6-v2} }
+data: { format: jsonl, path: ${EMB_DATA:./data/embeddings/sample.jsonl}, text_field: text }
+eval: { metric: cosine, batch_size: ${EMB_BATCH:16} }
+extra: { role: challenger }
+policy: { promote_if: 0.002 }

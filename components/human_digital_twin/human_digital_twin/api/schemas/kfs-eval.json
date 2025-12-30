@@ -1,0 +1,39 @@
+{
+  "$id": "https://socioprophet.dev/schema/kfs-eval.json",
+  "type": "object",
+  "properties": {
+    "url": {
+      "const": "https://socioprophet.dev/ext/kfs-eval"
+    },
+    "valueCoding": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "const": "\u03a9"
+        },
+        "code": {
+          "enum": [
+            "ABSENT",
+            "SEEDED",
+            "NORMALIZED",
+            "LINKED",
+            "TRUSTED",
+            "ACTIONABLE",
+            "DELIVERED"
+          ]
+        }
+      },
+      "required": [
+        "system",
+        "code"
+      ]
+    },
+    "extension": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "url",
+    "valueCoding"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "p1",
+        "birthDate": "1982-04-10",
+        "address": [
+          {
+            "postalCode": "02139"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient/p1"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2345-7"
+            }
+          ]
+        },
+        "effectiveDateTime": "2025-07-01T10:00:00Z",
+        "valueQuantity": {
+          "value": 95,
+          "unit": "mg/dL"
+        }
+      }
+    }
+  ]
+}

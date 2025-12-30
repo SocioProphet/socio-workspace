@@ -1,0 +1,5 @@
+name: vision_onnx_cls
+task: vision_classification
+model: { provider: onnx, path: ${VISION_ONNX:./models/vision/model.onnx}, input_name: ${VISION_INPUT:input}, output_name: ${VISION_OUTPUT:logits} }
+data: { csv: ${VISION_CSV:./data/vision/dev.csv}, image_size: 224 }
+eval: { metrics: [top1_acc, top5_acc], max_samples: ${VISION_MAX:50} }

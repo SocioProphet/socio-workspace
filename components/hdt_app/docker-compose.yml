@@ -1,0 +1,35 @@
+services:
+  app:
+    build: .
+    ports: [ "8080:8080" ]
+    env_file: [ .env.example ]
+    depends_on: [ linkage ]
+    volumes:
+      - ./ucum:/app/ucum:ro
+      - ./api/policies/opa:/app/api/policies/opa:ro
+      - ./linkage/api/static:/app/linkage_static:ro
+
+  linkage:
+    image: python:3.11-slim
+    working_dir: /srv
+    command: bash -lc "pip install fastapi uvicorn && python - <<'PY'
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import sqlite3, os
+DB='/tmp/linkage.db'
+app=FastAPI(title='Linkage')
+class Identity(BaseModel):
+    id:str; source:str; name_given:str|None=None; name_family:str|None=None; dob:str|None=None; phone:str|None=None; email:str|None=None
+@app.get('/')
+async def ok(): return {'ok':True}
+import uvicorn
+if __name__=='__main__': uvicorn.run(app, host='0.0.0.0', port=8081)
+PY"
+    ports: [ "8081:8081" ]
+
+  opa:
+    image: openpolicyagent/opa:0.64.1
+    command: ["run","--server","/policies/hdt_authz.rego"]
+    volumes:
+      - ./api/policies/opa:/policies:ro
+    ports: [ "8181:8181" ]

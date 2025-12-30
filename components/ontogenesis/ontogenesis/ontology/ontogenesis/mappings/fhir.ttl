@@ -1,0 +1,6 @@
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+hdt:Observation rdfs:subClassOf fhir:Observation .
+hdt:Consent     rdfs:subClassOf fhir:Consent .
+hdt:Provenance  rdfs:subClassOf fhir:Provenance .

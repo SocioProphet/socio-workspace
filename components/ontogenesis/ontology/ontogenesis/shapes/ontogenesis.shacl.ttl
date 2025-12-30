@@ -1,0 +1,17 @@
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+hdt:FHIRResourceShape a sh:NodeShape ;
+  sh:targetClass hdt:FHIRResource ;
+  sh:property [ sh:path hdt:hasOmegaState ;
+                sh:in ( hdt:ABSENT hdt:SEEDED hdt:NORMALIZED hdt:LINKED hdt:TRUSTED hdt:ACTIONABLE hdt:DELIVERED ) ;
+                sh:minCount 1 ] ;
+  sh:property [ sh:path hdt:hasMembership ; sh:class hdt:MembershipVector ; sh:minCount 1 ] ;
+  sh:property [ sh:path hdt:stepsToTruth ; sh:datatype xsd:integer ; sh:minInclusive 0 ] .
+
+hdt:MembershipVectorShape a sh:NodeShape ;
+  sh:targetClass hdt:MembershipVector ;
+  sh:property [ sh:path hdt:mCBD ; sh:datatype xsd:decimal ; sh:minInclusive 0 ; sh:maxInclusive 1 ] ;
+  sh:property [ sh:path hdt:mCGT ; sh:datatype xsd:decimal ; sh:minInclusive 0 ; sh:maxInclusive 1 ] ;
+  sh:property [ sh:path hdt:mNHY ; sh:datatype xsd:decimal ; sh:minInclusive 0 ; sh:maxInclusive 1 ] .

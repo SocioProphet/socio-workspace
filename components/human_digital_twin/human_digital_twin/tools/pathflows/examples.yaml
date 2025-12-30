@@ -1,0 +1,5 @@
+- name: hba1c_direct
+  bundle: ../examples/observation_hba1c.json
+  expect:
+    omega: DELIVERED
+    steps_max: 5

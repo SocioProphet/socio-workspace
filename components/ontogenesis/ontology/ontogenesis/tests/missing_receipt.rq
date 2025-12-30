@@ -1,0 +1,6 @@
+PREFIX hdt: <https://socioprophet.dev/ont/ontogenesis#>
+SELECT ?res WHERE {
+  ?res a hdt:FHIRResource ;
+       hdt:hasOmegaState hdt:DELIVERED .
+  FILTER NOT EXISTS { ?res hdt:hasReceipt ?r . }
+}

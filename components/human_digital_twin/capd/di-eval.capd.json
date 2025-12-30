@@ -1,0 +1,23 @@
+{
+  "name": "human-digital-twin-eval",
+  "version": "0.1.0",
+  "omega_thresholds": {
+    "cbd_norm": 0.6,
+    "cbd_link": 0.75,
+    "cgt_trust": 0.7,
+    "nhy_deliver": 0.8
+  },
+  "weight_model": "degree",
+  "policies": [
+    "omega.rego",
+    "repair.rego"
+  ],
+  "schemas": [
+    "kfs-eval.json"
+  ],
+  "semantics": {
+    "ieml_dict": true
+  },
+  "generated_at": "2025-08-28T22:15:33.660496Z",
+  "license": "MIT"
+}

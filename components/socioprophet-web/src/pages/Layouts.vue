@@ -1,0 +1,1 @@
+<template><div><h3 style='color: var(--accent);'>Layouts</h3></div></template><script setup lang='ts'></script>

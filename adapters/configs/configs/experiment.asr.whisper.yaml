@@ -1,0 +1,5 @@
+name: asr_whisper_small
+task: asr
+model: { provider: huggingface, id: ${ASR_MODEL_ID:openai/whisper-small} }
+data: { manifest: ${ASR_MANIFEST:./data/asr/dev_manifest.jsonl}, sample_rate: 16000 }
+eval: { metrics: [wer, cer], max_samples: ${ASR_MAX:20} }

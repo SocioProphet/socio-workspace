@@ -1,0 +1,36 @@
+{
+  "@version": 1.1,
+  "@vocab": "https://socioprophet.dev/ont/ontogenesis#",
+  "hdt": "https://socioprophet.dev/ont/ontogenesis#",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+  "owl": "http://www.w3.org/2002/07/owl#",
+  "xsd": "http://www.w3.org/2001/XMLSchema#",
+  "skos": "http://www.w3.org/2004/02/skos/core#",
+  "sh": "http://www.w3.org/ns/shacl#",
+  "prov": "http://www.w3.org/ns/prov#",
+  "fhir": "http://hl7.org/fhir/",
+  "ieml": "https://intlekt.org/ieml#",
+  "HumanDigitalTwin": "HumanDigitalTwin",
+  "OmegaState": "OmegaState",
+  "omegaState": "hasOmegaState",
+  "mCBD": {
+    "@id": "mCBD",
+    "@type": "xsd:decimal"
+  },
+  "mCGT": {
+    "@id": "mCGT",
+    "@type": "xsd:decimal"
+  },
+  "mNHY": {
+    "@id": "mNHY",
+    "@type": "xsd:decimal"
+  },
+  "iemlCode": "iemlCode",
+  "hasReceipt": "hasReceipt",
+  "usesPolicy": "usesPolicy",
+  "stepsToTruth": {
+    "@id": "stepsToTruth",
+    "@type": "xsd:integer"
+  }
+}

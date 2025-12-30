@@ -1,0 +1,6 @@
+remove_fields:
+  - name
+  - birthDate
+  - address
+  - telecom
+  - identifier

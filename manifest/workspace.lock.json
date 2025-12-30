@@ -1,0 +1,109 @@
+{
+  "workspace": {
+    "name": "socio-workspace",
+    "version": "0.1"
+  },
+  "generated_at": "2025-12-30T14:27:00Z",
+  "repos": [
+    {
+      "name": "prophet_cli",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/prophet_cli",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "sourceos_a2a_mcp_bootstrap",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/sourceos_a2a_mcp_bootstrap",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "socioprophet-web",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/socioprophet-web",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "dev-api",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/dev-api",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "hdt_app",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/hdt_app",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "human_digital_twin",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/human_digital_twin",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "ontogenesis",
+      "role": "component",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/ontogenesis",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "cc",
+      "role": "adapter",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "adapters/cc",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "configs",
+      "role": "adapter",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "adapters/configs",
+      "tree_hash": null,
+      "retrieved_at": null
+    },
+    {
+      "name": "socioprophet_integration",
+      "role": "docs",
+      "url": null,
+      "ref": null,
+      "rev": null,
+      "local_path": "components/socioprophet_integration",
+      "tree_hash": null,
+      "retrieved_at": null
+    }
+  ]
+}

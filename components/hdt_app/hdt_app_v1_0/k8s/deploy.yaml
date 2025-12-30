@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: hdt-app }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: hdt-app } }
+  template:
+    metadata: { labels: { app: hdt-app } }
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/socioprophet/hdt-app:1.0.0
+        ports: [ { containerPort: 8080, name: http } ]
+        env:
+        - { name: API_KEY, valueFrom: { secretKeyRef: { name: hdt-secrets, key: API_KEY } } }
+        - { name: OPA_URL, value: "http://opa:8181/v1/data/hdt/authz/allow" }
+        volumeMounts:
+        - name: ucum
+          mountPath: /app/ucum
+          readOnly: true
+      volumes:
+      - name: ucum
+        configMap: { name: hdt-ucum }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: hdt-app }
+spec:
+  selector: { app: hdt-app }
+  ports: [ { name: http, port: 80, targetPort: http } ]

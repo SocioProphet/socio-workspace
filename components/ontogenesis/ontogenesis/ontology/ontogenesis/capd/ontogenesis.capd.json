@@ -1,0 +1,24 @@
+{
+  "name": "ontogenesis",
+  "version": "0.3.0",
+  "base_iri": "https://socioprophet.dev/ont/ontogenesis#",
+  "artifacts": {
+    "owl": "ontogenesis.ttl",
+    "shapes": "shapes/ontogenesis.shacl.ttl",
+    "skos": [
+      "skos/omega.ttl",
+      "skos/triads.ttl"
+    ],
+    "mappings": [
+      "mappings/fhir.ttl",
+      "mappings/prov.ttl",
+      "mappings/ieml.ttl"
+    ],
+    "context": "context.jsonld",
+    "examples": [
+      "examples/observation_example.ttl"
+    ]
+  },
+  "generated_at": "2025-08-28T22:28:24.218856Z",
+  "license": "MIT"
+}

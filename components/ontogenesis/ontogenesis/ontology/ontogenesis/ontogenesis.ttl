@@ -1,0 +1,53 @@
+
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+hdt: a owl:Ontology ;
+  owl:versionIRI <https://socioprophet.dev/ont/ontogenesis#v0.3.0> ;
+  rdfs:label "Ontogenesis — Human Digital Twin" ;
+  rdfs:comment "Core self+world ontology for the Human Digital Twin (TL/Ω/KFS/IEML)." .
+
+hdt:HumanDigitalTwin a owl:Class ; rdfs:label "Human Digital Twin" .
+hdt:FHIRResource a owl:Class ; rdfs:label "FHIR Resource" .
+hdt:Observation a owl:Class ; rdfs:subClassOf hdt:FHIRResource ; rdfs:label "Observation" .
+hdt:Consent a owl:Class ; rdfs:subClassOf hdt:FHIRResource ; rdfs:label "Consent" .
+hdt:Provenance a owl:Class ; rdfs:subClassOf hdt:FHIRResource ; rdfs:label "Provenance" .
+hdt:EvaluationEvent a owl:Class ; rdfs:subClassOf prov:Activity ; rdfs:label "Evaluation Event" .
+hdt:PolicyDecision a owl:Class ; rdfs:subClassOf prov:Activity ; rdfs:label "Policy Decision" .
+hdt:Receipt a owl:Class ; rdfs:subClassOf prov:Entity ; rdfs:label "Signed Receipt" .
+hdt:World a owl:Class ; rdfs:label "World (TL node)" .
+hdt:OmegaState a owl:Class ; rdfs:label "Omega State" .
+hdt:MembershipVector a owl:Class ; rdfs:label "Membership Vector (KFS)" .
+hdt:TriadRole a owl:Class ; rdfs:label "Triad Role" .
+
+hdt:ABSENT a hdt:OmegaState .
+hdt:SEEDED a hdt:OmegaState .
+hdt:NORMALIZED a hdt:OmegaState .
+hdt:LINKED a hdt:OmegaState .
+hdt:TRUSTED a hdt:OmegaState .
+hdt:ACTIONABLE a hdt:OmegaState .
+hdt:DELIVERED a hdt:OmegaState .
+
+hdt:CBD a hdt:TriadRole ; rdfs:label "CBD (Cognition)" .
+hdt:CGT a hdt:TriadRole ; rdfs:label "C’GT (Values)" .
+hdt:NHY a hdt:TriadRole ; rdfs:label "NHY (Action)" .
+
+hdt:hasOmegaState a owl:ObjectProperty ; rdfs:domain hdt:FHIRResource ; rdfs:range hdt:OmegaState .
+hdt:hasMembership a owl:ObjectProperty ; rdfs:domain hdt:FHIRResource ; rdfs:range hdt:MembershipVector .
+hdt:mCBD a owl:DatatypeProperty ; rdfs:domain hdt:MembershipVector ; rdfs:range xsd:decimal .
+hdt:mCGT a owl:DatatypeProperty ; rdfs:domain hdt:MembershipVector ; rdfs:range xsd:decimal .
+hdt:mNHY a owl:DatatypeProperty ; rdfs:domain hdt:MembershipVector ; rdfs:range xsd:decimal .
+hdt:hasWorldWeight a owl:ObjectProperty ; rdfs:domain hdt:MembershipVector ; rdfs:range hdt:World .
+hdt:weight a owl:DatatypeProperty ; rdfs:domain hdt:World ; rdfs:range xsd:decimal .
+hdt:iemlCode a owl:DatatypeProperty ; rdfs:domain hdt:FHIRResource ; rdfs:range xsd:string .
+hdt:hasReceipt a owl:ObjectProperty ; rdfs:domain hdt:FHIRResource ; rdfs:range hdt:Receipt .
+hdt:usesPolicy a owl:ObjectProperty ; rdfs:domain hdt:FHIRResource ; rdfs:range hdt:PolicyDecision .
+hdt:stepsToTruth a owl:DatatypeProperty ; rdfs:domain hdt:FHIRResource ; rdfs:range xsd:integer .
+hdt:promotedFromState a owl:ObjectProperty ; rdfs:domain hdt:EvaluationEvent ; rdfs:range hdt:OmegaState .
+hdt:promotedToState a owl:ObjectProperty ; rdfs:domain hdt:EvaluationEvent ; rdfs:range hdt:OmegaState .
+

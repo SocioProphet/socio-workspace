@@ -1,0 +1,19 @@
+Unpack this archive at your repo root (SocioProphet). Then:
+1) Move/merge files:
+   - cc/runner_embeddings_hf.py
+   - cc/runner_whisper_hf.py
+   - cc/runner_vision_onnx.py
+   - configs/experiment.embedding.sentence.yaml
+   - configs/experiment.asr.whisper.yaml
+   - configs/experiment.vision_classification.yaml
+   - README_APPEND_SOCIOPROPHET.md (append to your README.md)
+
+2) Ensure Python deps:
+   transformers, torch, onnxruntime, soundfile, librosa
+
+3) Validate with a quick run:
+   python cc/run_eval.py --config configs/experiment.embedding.sentence.yaml --key-metric cosine
+
+4) Commit:
+   git add cc configs README_APPEND_SOCIOPROPHET.md
+   git commit -m "Add SocioProphet runners (HF embeddings, Whisper ASR, Vision ONNX) and sample configs"

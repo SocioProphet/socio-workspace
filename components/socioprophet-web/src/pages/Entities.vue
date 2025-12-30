@@ -1,0 +1,1 @@
+<template><div><h3 style='color: var(--accent);'>Entities</h3></div></template><script setup lang='ts'></script>

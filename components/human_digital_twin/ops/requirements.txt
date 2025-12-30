@@ -1,0 +1,6 @@
+fastapi>=0.112
+uvicorn>=0.30
+pydantic>=2.6
+pyyaml>=6.0
+cryptography>=42.0
+uvloop>=0.19 ; sys_platform != 'win32'

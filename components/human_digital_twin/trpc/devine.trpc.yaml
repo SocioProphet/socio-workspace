@@ -1,0 +1,9 @@
+
+version: 0.2
+service: HumanDigitalTwin
+transport: { kind: tritrpc, address: unix:///tmp/human_digital_twin.sock }
+rpcs:
+  - { name: Evaluate, req: {resource_id: string}, res: {omega: string, m_cbd: number, m_cgt: number, m_nhy: number, reasons: [string]} }
+  - { name: Promote,  req: {resource_id: string}, res: {prev: string, next: string, repair: [string]} }
+  - { name: WorldWeights, req: {}, res: {w_model: string, worlds: [{id: string, w: number}] } }
+  - { name: MirrorSelf, req: {agent_id: string, snapshot: bytes}, res: {ack: bool, omega_self: string} }

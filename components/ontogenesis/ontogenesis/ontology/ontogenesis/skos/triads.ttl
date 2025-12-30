@@ -1,0 +1,6 @@
+@prefix hdt: <https://socioprophet.dev/ont/ontogenesis#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+hdt:TriadScheme a skos:ConceptScheme ; skos:prefLabel "TL Triads" .
+hdt:CBD skos:inScheme hdt:TriadScheme ; skos:prefLabel "CBD (Cognition)" .
+hdt:CGT skos:inScheme hdt:TriadScheme ; skos:prefLabel "C’GT (Values)" ; skos:related hdt:CBD, hdt:NHY .
+hdt:NHY skos:inScheme hdt:TriadScheme ; skos:prefLabel "NHY (Action)" .

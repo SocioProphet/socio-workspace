@@ -1,0 +1,19 @@
+name: vision_imagenet_like_demo
+task: classification
+dataset: imagenet-1k
+split: validation
+metrics: [accuracy]
+limit: 128
+batch_size: 16
+contenders:
+  - model_id: vit-base-onnx
+    runtime: onnx
+    local_path: /models/vit_base.onnx
+    task: classification
+    extra: { role: champion }
+  - model_id: swin-tiny-onnx
+    runtime: onnx
+    local_path: /models/swin_tiny.onnx
+    task: classification
+    extra: { role: challenger }
+policy: { promote_if: 0.005 }

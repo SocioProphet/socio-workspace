@@ -1,0 +1,11 @@
+
+services:
+  hdt:
+    build: .
+    environment: { API_KEY: ${API_KEY:-test} }
+    ports: [ "8080:8080" ]
+  opa:
+    image: openpolicyagent/opa:latest
+    command: ["run","--server","--addr=0.0.0.0:8181","/policies"]
+    volumes: [ "./api/policies/opa:/policies:ro" ]
+    ports: [ "8181:8181" ]

@@ -1,0 +1,43 @@
+{
+  "id": "prog:crystal-atlas:topic-adaptation:v1",
+  "project_id": "proj:crystal-atlas",
+  "baseline": {
+    "pipeline_ref": "pipeline:baseline:v1",
+    "notes": "Baseline extraction without topic-scoped artifacts."
+  },
+  "treatment": {
+    "activation_plan_id": "plan:crystal-atlas:topic-aware-extract:v1",
+    "overrides": {
+      "notes": "Treatment enables topic-space artifacts gated by membership threshold."
+    }
+  },
+  "datasets": {
+    "train": ["ds:crystal-atlas:train:v1"],
+    "dev": ["ds:crystal-atlas:dev:v1"],
+    "test": ["ds:crystal-atlas:test:v1"]
+  },
+  "metrics": [
+    { "name": "f1.entity", "aggregate": "per_class", "constraints": { "min_overall": 0.0 } },
+    { "name": "precision.entity", "aggregate": "per_class", "constraints": { "min_overall": 0.90 } },
+    { "name": "recall.entity", "aggregate": "per_class" },
+
+    { "name": "f1.relation", "aggregate": "per_class" },
+    { "name": "precision.relation", "aggregate": "per_class", "constraints": { "min_overall": 0.88 } },
+    { "name": "recall.relation", "aggregate": "per_class" },
+
+    { "name": "annotation.minutes_per_doc", "aggregate": "per_topic" },
+    { "name": "drift.topic_signature_kl", "aggregate": "per_topic" }
+  ],
+  "decision_rule": {
+    "promote_if": {
+      "f1.entity.delta_gte": 0.02,
+      "precision.entity.min_gte": 0.90,
+      "precision.relation.min_gte": 0.88
+    },
+    "rollback_if": {
+      "precision.entity.min_lt": 0.90,
+      "precision.relation.min_lt": 0.88
+    }
+  },
+  "runs": []
+}

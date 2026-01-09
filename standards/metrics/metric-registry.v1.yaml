@@ -1,0 +1,74 @@
+# Metric Registry (v1)
+# Canonical metric IDs used by Adaptation Programs.
+# Programs MUST NOT invent new metric IDs; add them here first.
+
+version: 1
+namespace: socios.adaptation.metrics
+metrics:
+  - id: f1.entity
+    kind: score
+    range: [0.0, 1.0]
+    dimensions: [entity_type, dataset_split, topic_id]
+    description: F1 for entity extraction (per type, optionally per topic).
+    shape:
+      type: object
+      properties:
+        overall: { type: number }
+        per_entity_type: { type: object }
+        per_topic: { type: object }
+      required: [overall]
+
+  - id: precision.entity
+    kind: score
+    range: [0.0, 1.0]
+    dimensions: [entity_type, dataset_split, topic_id]
+    description: Precision for entity extraction.
+    shape: { type: number }
+
+  - id: recall.entity
+    kind: score
+    range: [0.0, 1.0]
+    dimensions: [entity_type, dataset_split, topic_id]
+    description: Recall for entity extraction.
+    shape: { type: number }
+
+  - id: f1.relation
+    kind: score
+    range: [0.0, 1.0]
+    dimensions: [relation_type, dataset_split, topic_id]
+    description: F1 for relation extraction (per relation, optionally per topic).
+    shape:
+      type: object
+      properties:
+        overall: { type: number }
+        per_relation_type: { type: object }
+        per_topic: { type: object }
+      required: [overall]
+
+  - id: precision.relation
+    kind: score
+    range: [0.0, 1.0]
+    dimensions: [relation_type, dataset_split, topic_id]
+    description: Precision for relation extraction.
+    shape: { type: number }
+
+  - id: recall.relation
+    kind: score
+    range: [0.0, 1.0]
+    dimensions: [relation_type, dataset_split, topic_id]
+    description: Recall for relation extraction.
+    shape: { type: number }
+
+  - id: annotation.minutes_per_doc
+    kind: cost
+    unit: minutes
+    dimensions: [dataset_split, topic_id]
+    description: Median annotation minutes per document (human time).
+    shape: { type: number }
+
+  - id: drift.topic_signature_kl
+    kind: drift
+    range: [0.0, null]
+    dimensions: [topic_id, window]
+    description: KL divergence of topic signature distribution across time windows.
+    shape: { type: number }

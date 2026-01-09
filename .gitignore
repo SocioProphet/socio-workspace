@@ -1,26 +1,21 @@
 # local overrides
 manifest/overrides.toml
 manifest/overrides.*
-
 # runner artifacts
 .workspace/
 reports/
 *.log
-
 # python
 __pycache__/
 *.pyc
-
 # node
 node_modules/
-
 # go
 bin/
-
 # materialized workspace checkouts
 /components/
 /adapters/
-
 # macOS cruft
 .DS_Store
 **/.DS_Store
+**/node_modules/

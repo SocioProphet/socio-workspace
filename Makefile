@@ -33,3 +33,10 @@ validate: validate-standards
 validate-standards:
 	@ok=1; if [ -f tools/validate_adaptation_program.py ]; then python3 tools/validate_adaptation_program.py standards/examples/adaptation/program.example.v1.json || ok=0; else echo "ERR: tools/validate_adaptation_program.py missing"; ok=0; fi; if [ -f standards/qes/tools/validate_qes_contracts.py ]; then python3 standards/qes/tools/validate_qes_contracts.py || ok=0; else echo "WARN: standards/qes/tools/validate_qes_contracts.py missing (skipping)"; fi; test $$ok -eq 1
 
+
+# standards helpers
+schemas-fp:
+	python3 tools/schema_fp.py schemas/avro/trirpc/*.avsc > schemas/avro/trirpc/FINGERPRINTS.v0.txt
+
+conformance:
+	@echo "TODO: wire real conformance runner entrypoint under tools/conformance/trirpc-v0"

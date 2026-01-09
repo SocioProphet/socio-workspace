@@ -1,0 +1,3 @@
+0a48fc6b8841db6ca71e10e508b7c0a582d24098a28903fbb0d429b822960ee8  schemas/avro/trirpc/envelope.v0.avsc
+179672492eb0b4ad9676f9bbbefbef6dc9874fc4b8aa306a5638dddad8f01d61  schemas/avro/trirpc/error.v0.avsc
+063ab6b234885955147babe8ce78ae32c2de3adfd807d49d45bd543738091b5e  schemas/avro/trirpc/value.v0.avsc

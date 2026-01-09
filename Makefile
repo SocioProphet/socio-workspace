@@ -6,7 +6,6 @@ UI_DIR := apps/ui-workbench
 
 # (removed) @echo "OK: ui build passed"
 # --- ui-workbench targets ---
-UI_DIR := apps/ui-workbench
 
 .PHONY: ui-preflight ui-install ui-build ui-check ui-dev
 
@@ -25,3 +24,12 @@ ui-check: ui-preflight ui-build
 ui-dev: ui-preflight
 	cd $(UI_DIR) && npm run dev
 # --- end ui-workbench targets ---
+# --- standards validation targets ---
+.PHONY: validate validate-standards
+
+validate: validate-standards
+	@echo "OK: validate"
+
+validate-standards:
+	@ok=1; if [ -f tools/validate_adaptation_program.py ]; then python3 tools/validate_adaptation_program.py standards/examples/adaptation/program.example.v1.json || ok=0; else echo "ERR: tools/validate_adaptation_program.py missing"; ok=0; fi; if [ -f standards/qes/tools/validate_qes_contracts.py ]; then python3 standards/qes/tools/validate_qes_contracts.py || ok=0; else echo "WARN: standards/qes/tools/validate_qes_contracts.py missing (skipping)"; fi; test $$ok -eq 1
+

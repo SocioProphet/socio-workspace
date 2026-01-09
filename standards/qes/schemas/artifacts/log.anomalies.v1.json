@@ -1,0 +1,49 @@
+{
+  "$id": "qes/artifacts/log.anomalies.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "anomaly_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attributes": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "detected_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "detector": {
+      "type": "string"
+    },
+    "explanation": {
+      "type": "string"
+    },
+    "features": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "ref_ids": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "score": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "anomaly_id",
+    "detected_at",
+    "ref_ids",
+    "score"
+  ],
+  "title": "log.anomalies.v1",
+  "type": "object"
+}

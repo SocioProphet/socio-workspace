@@ -1,0 +1,130 @@
+{
+  "$id": "qes/runspec.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertions": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "artifact": {
+            "type": "string"
+          },
+          "golden_ref": {
+            "type": "string"
+          },
+          "gte": {
+            "type": "number"
+          },
+          "metric": {
+            "type": "string"
+          },
+          "min": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": {
+            "enum": [
+              "counts_min",
+              "match_golden",
+              "metric_threshold"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "dataset": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "inject",
+            "replay"
+          ],
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "mode"
+      ],
+      "type": "object"
+    },
+    "pipelines": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 1,
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": true,
+      "description": "Optional hints; runner MUST populate full provenance at execution time.",
+      "properties": {
+        "embedding_model": {
+          "type": "string"
+        },
+        "git": {
+          "type": "object"
+        },
+        "images": {
+          "type": "object"
+        },
+        "offsets": {
+          "type": "object"
+        },
+        "schemas": {
+          "type": "object"
+        },
+        "topology_snapshot": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "run_id": {
+      "description": "Optional. If omitted, runner assigns one.",
+      "type": "string"
+    },
+    "scenario": {
+      "type": "string"
+    },
+    "time_window": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "dataset",
+    "scenario",
+    "pipelines",
+    "time_window",
+    "assertions"
+  ],
+  "title": "QES RunSpec v1",
+  "type": "object"
+}

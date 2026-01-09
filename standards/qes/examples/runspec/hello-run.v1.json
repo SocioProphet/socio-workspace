@@ -1,0 +1,29 @@
+{
+  "assertions": [
+    {
+      "artifact": "normalized.logs.v1",
+      "min": 1,
+      "type": "counts_min"
+    },
+    {
+      "artifact": "normalized.alerts.v1",
+      "min": 1,
+      "type": "counts_min"
+    }
+  ],
+  "dataset": {
+    "mode": "inject",
+    "ref": "examples/fixtures/tiny"
+  },
+  "pipelines": {
+    "group_localize": "dev",
+    "ingest": "dev",
+    "log_anomaly": "dev",
+    "similar_incidents": "dev"
+  },
+  "scenario": "hello_smoke",
+  "time_window": {
+    "end": "2026-01-01T00:01:00Z",
+    "start": "2026-01-01T00:00:00Z"
+  }
+}

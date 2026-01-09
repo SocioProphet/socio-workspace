@@ -1,0 +1,46 @@
+flowchart LR
+  A[Customer Datasets] --> QES[QES\nEvaluator + Orchestrator]
+
+  subgraph ING[Ingest & Normalize]
+    DI[Data Ingest\n(Benthos / Vector / Fluent Bit)]
+  end
+
+  subgraph BUS[Event Bus\n(Redpanda/Kafka + CloudEvents)]
+    T1[normalized.alerts.v1]
+    T2[normalized.logs.v1]
+    T3[derived.stories.v1]
+  end
+
+  QES -->|inject fixtures| DI
+  DI --> T1
+  DI --> T2
+
+  subgraph P1[Similar Incidents Pipeline]
+    SI[Embed + Search\n(Vector Index)]
+  end
+
+  subgraph P2[Event Grouping & Localization Pipeline]
+    GL[Correlate + Group]
+    TOP[Topology Service\n(NetBox/Nautobot + Postgres)]
+    GL <--> TOP
+  end
+
+  subgraph P3[Log Anomaly Pipeline]
+    LA[Detect anomalies]
+  end
+
+  T3 --> SI
+  T1 --> GL
+  T2 --> LA
+
+  subgraph OUT[Persistence + Notifications]
+    PS[Persistence Service\n(Postgres)]
+    BOT[Bot Service\n(Matrix/Mattermost/Zulip)]
+  end
+
+  SI --> PS
+  GL --> PS
+  LA --> PS
+  PS --> QES
+  QES -->|assertions + diffs| PS
+  QES --> BOT

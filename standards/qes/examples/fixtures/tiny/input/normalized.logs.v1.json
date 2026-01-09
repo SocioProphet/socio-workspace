@@ -1,0 +1,20 @@
+[
+  {
+    "entities": [
+      {
+        "id": "host-1",
+        "kind": "host",
+        "name": "demo-host"
+      }
+    ],
+    "fields": {
+      "app": "demo",
+      "env": "test"
+    },
+    "log_id": "log-1",
+    "message": "hello world log",
+    "observed_at": "2026-01-01T00:00:10Z",
+    "severity": "info",
+    "source": "fixture"
+  }
+]

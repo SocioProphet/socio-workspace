@@ -1,6 +1,9 @@
 # UI Inventory (auto-generated)
+
+Generated from the repository filesystem. Treat as truth baseline.
+
 ## Apps
-### ui-workbench
+### apps/ui-workbench
 - package.json: yes
 - routes:
   - apps/ui-workbench/src/routes/EntityProfilePage.vue
@@ -14,7 +17,7 @@
   - apps/ui-workbench/src/routes/admin/TrustRegistryPage.vue
 - router:
   - apps/ui-workbench/src/router/index.ts
-- components:
+- components (sample):
   - apps/ui-workbench/src/components/HelloWorld.vue
   - apps/ui-workbench/src/components/search/ResultCard.vue
 - api:
@@ -25,7 +28,7 @@
   - apps/ui-workbench/src/stores/search.ts
 
 ## Packages
-### ui-kit
+### packages/ui-kit
 - package.json: no
 - vue:
   - packages/ui-kit/src/TrustBadge.vue

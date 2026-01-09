@@ -1,0 +1,88 @@
+{
+  "$id": "qes/artifacts/derived.stories.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attributes": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "entities": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "description": "host|service|cluster|user|ticket|trace|span|custom",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "evidence_refs": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "severity": {
+      "enum": [
+        "debug",
+        "info",
+        "notice",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "type": "string"
+    },
+    "story_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "story_id",
+    "created_at",
+    "title",
+    "evidence_refs"
+  ],
+  "title": "derived.stories.v1",
+  "type": "object"
+}

@@ -1,0 +1,129 @@
+{
+  "$id": "qes/artifacts/event.localized.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attributes": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "localized_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "location": {
+      "additionalProperties": false,
+      "properties": {
+        "neighbors": {
+          "items": {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "description": "host|service|cluster|user|ticket|trace|span|custom",
+                "type": "string"
+              },
+              "labels": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "path": {
+          "description": "Topology path used to resolve location",
+          "items": {
+            "additionalProperties": true,
+            "properties": {
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "description": "host|service|cluster|user|ticket|trace|span|custom",
+                "type": "string"
+              },
+              "labels": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "primary": {
+          "additionalProperties": true,
+          "properties": {
+            "id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "kind": {
+              "description": "host|service|cluster|user|ticket|trace|span|custom",
+              "type": "string"
+            },
+            "labels": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "primary"
+      ],
+      "type": "object"
+    },
+    "ref_id": {
+      "description": "ID of group/story/alert being localized",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "ref_id",
+    "localized_at",
+    "location"
+  ],
+  "title": "event.localized.v1",
+  "type": "object"
+}

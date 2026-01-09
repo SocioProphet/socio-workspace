@@ -1,0 +1,38 @@
+version: 1
+namespace: qes
+envelope: cloudevents/1.0
+compatibility:
+  policy: backward
+  notes:
+    - Producers MUST NOT break existing required fields.
+    - Consumers MUST ignore unknown fields.
+
+topics:
+  - name: normalized.alerts.v1
+    kind: input
+    retention: 7d
+    schema: artifacts/normalized.alerts.v1.json
+  - name: normalized.logs.v1
+    kind: input
+    retention: 7d
+    schema: artifacts/normalized.logs.v1.json
+  - name: derived.stories.v1
+    kind: artifact
+    retention: 30d
+    schema: artifacts/derived.stories.v1.json
+  - name: event.groups.v1
+    kind: artifact
+    retention: 30d
+    schema: artifacts/event.groups.v1.json
+  - name: event.localized.v1
+    kind: artifact
+    retention: 30d
+    schema: artifacts/event.localized.v1.json
+  - name: similar.incidents.v1
+    kind: artifact
+    retention: 30d
+    schema: artifacts/similar.incidents.v1.json
+  - name: log.anomalies.v1
+    kind: artifact
+    retention: 30d
+    schema: artifacts/log.anomalies.v1.json

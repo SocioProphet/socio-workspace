@@ -1,0 +1,80 @@
+{
+  "$id": "qes/artifacts/normalized.logs.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "entities": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "description": "host|service|cluster|user|ticket|trace|span|custom",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "fields": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "log_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "message": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "raw_ref": {
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "debug",
+        "info",
+        "notice",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "type": "string"
+    },
+    "source": {
+      "description": "Collector/agent/source",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "log_id",
+    "observed_at",
+    "source",
+    "message"
+  ],
+  "title": "normalized.logs.v1",
+  "type": "object"
+}

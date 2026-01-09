@@ -1,0 +1,91 @@
+{
+  "$id": "qes/artifacts/normalized.alerts.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alert_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "attributes": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "description": {
+      "type": "string"
+    },
+    "entities": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "description": "host|service|cluster|user|ticket|trace|span|custom",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "raw_ref": {
+      "description": "Pointer to raw event/log blob if retained elsewhere",
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "debug",
+        "info",
+        "notice",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "type": "string"
+    },
+    "source": {
+      "description": "Producer identity / detector name",
+      "minLength": 1,
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "alert_id",
+    "observed_at",
+    "severity",
+    "title",
+    "source"
+  ],
+  "title": "normalized.alerts.v1",
+  "type": "object"
+}

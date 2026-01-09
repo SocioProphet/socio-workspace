@@ -1,0 +1,63 @@
+{
+  "$id": "qes/cloudevents.envelope.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "data": {
+      "description": "Payload object (schema depends on topic/artifact)"
+    },
+    "datacontenttype": {
+      "const": "application/json",
+      "type": "string"
+    },
+    "dataschema": {
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source": {
+      "description": "URI-reference identifying the event source",
+      "minLength": 1,
+      "type": "string"
+    },
+    "specversion": {
+      "const": "1.0",
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "time": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "traceparent": {
+      "type": "string"
+    },
+    "tracestate": {
+      "type": "string"
+    },
+    "type": {
+      "description": "Event type, e.g., qes.normalized.logs.v1",
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "specversion",
+    "id",
+    "source",
+    "type",
+    "time",
+    "datacontenttype",
+    "data"
+  ],
+  "title": "CloudEvents Envelope v1 (minimal)",
+  "type": "object"
+}

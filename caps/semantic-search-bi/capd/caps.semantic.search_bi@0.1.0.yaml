@@ -1,0 +1,65 @@
+api_version: "capd.socios@1"
+kind: "CapabilityPackage"
+name: "caps.semantic.search_bi"
+version: "0.1.0"
+summary: "Open Semantic Search & BI Platform (Xapian + AtomSpace + FAISS) wired over triRPC with membranes + governance + audit evidence."
+license: "MIT"
+stability: "experimental"
+
+invariants:
+  - "All RPC calls MUST be triRPC-envelope wrapped (trace_id, principal, locale, schema_ref)."
+  - "All state-changing operations MUST emit audit evidence to topic.audit.events.v1."
+  - "All store access MUST traverse a membrane (policy decision + enforcement reporting)."
+
+provides:
+  tritrpc_services:
+    - "semantic.search.v0.Ingest"
+    - "semantic.search.v0.Crawl"
+    - "semantic.search.v0.LexicalIndex"
+    - "semantic.search.v0.SemanticGraph"
+    - "semantic.search.v0.VectorStore"
+    - "semantic.search.v0.HybridSearch"
+    - "semantic.search.v0.MembraneGuard"
+    - "semantic.search.v0.Governance"
+    - "semantic.search.v0.Audit"
+  schemas:
+    - "schemas/tritrpc_envelope.schema.json"
+    - "schemas/semantic_document.schema.json"
+    - "schemas/search_request.schema.json"
+    - "schemas/search_response.schema.json"
+    - "schemas/audit_event.avsc"
+    - "schemas/semantic_context.jsonld"
+  topics:
+    - "topic.semantic.ingest.v1"
+    - "topic.semantic.crawl.v1"
+    - "topic.semantic.index.v1"
+    - "topic.semantic.graph.v1"
+    - "topic.semantic.vector.v1"
+    - "topic.semantic.search.v1"
+    - "topic.audit.events.v1"
+    - "topic.governance.decisions.v1"
+
+dependencies:
+  - cap: "caps.bus.tritrpc"
+    version: ">=0.1.0"
+  - cap: "caps.membrane.policy"
+    version: ">=0.1.0"
+  - cap: "caps.audit.appendonly"
+    version: ">=0.1.0"
+
+security:
+  membranes_required: true
+  evidence_required: true
+  default_decision: "deny"
+  required_claims:
+    - "principal.sub"
+    - "principal.roles"
+    - "trace.trace_id"
+
+artifacts:
+  - type: "contract"
+    path: "docs/CONTRACT.md"
+  - type: "diagram"
+    path: "docs/architecture.mmd"
+  - type: "rpc"
+    path: "rpc/semantic_search.tritrpc.v0.yaml"

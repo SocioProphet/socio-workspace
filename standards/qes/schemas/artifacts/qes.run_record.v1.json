@@ -1,0 +1,136 @@
+{
+  "$id": "qes/artifacts/qes.run_record.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assertions": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "artifact": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "diff_ref": {
+            "type": "string"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "outcome": {
+            "enum": [
+              "passed",
+              "failed",
+              "skipped"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "outcome"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "finished_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "pipelines": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 1,
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": true,
+      "properties": {
+        "embedding_model": {
+          "type": "string"
+        },
+        "git": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "images": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "offsets": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "schemas": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "topology_snapshot": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "git",
+        "images",
+        "schemas",
+        "offsets"
+      ],
+      "type": "object"
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "runspec": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "description": "Path/registry ref to the RunSpec used",
+          "type": "string"
+        },
+        "sha256": {
+          "minLength": 16,
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "started_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "failed"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "status",
+    "started_at",
+    "runspec",
+    "pipelines",
+    "provenance",
+    "assertions"
+  ],
+  "title": "qes.run_record.v1",
+  "type": "object"
+}

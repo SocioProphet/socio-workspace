@@ -1,0 +1,42 @@
+{
+  "$id": "qes/artifacts/event.groups.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attributes": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "group_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "member_refs": {
+      "description": "IDs of alerts/logs/stories included",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "score": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "group_id",
+    "created_at",
+    "member_refs"
+  ],
+  "title": "event.groups.v1",
+  "type": "object"
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "alert_id": "alert-1",
+    "description": "fixture alert",
+    "entities": [
+      {
+        "id": "svc-1",
+        "kind": "service",
+        "name": "demo-service"
+      }
+    ],
+    "observed_at": "2026-01-01T00:00:20Z",
+    "severity": "warning",
+    "source": "fixture",
+    "tags": [
+      "fixture",
+      "hello"
+    ],
+    "title": "hello world alert"
+  }
+]

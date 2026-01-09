@@ -1,0 +1,60 @@
+{
+  "$id": "qes/artifacts/similar.incidents.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attributes": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "computed_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "model": {
+      "description": "Embedding/model identifier",
+      "type": "string"
+    },
+    "neighbors": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "features": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "score": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "score"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "ref_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "ref_id",
+    "computed_at",
+    "neighbors"
+  ],
+  "title": "similar.incidents.v1",
+  "type": "object"
+}

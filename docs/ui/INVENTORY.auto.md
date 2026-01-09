@@ -1,6 +1,6 @@
 # UI Inventory (auto-generated)
 
-Generated from the repository filesystem. Treat as truth baseline.
+Generated from the repository filesystem (excluding node_modules/dist/build).
 
 ## Apps
 ### apps/ui-workbench

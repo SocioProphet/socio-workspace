@@ -1,8 +1,8 @@
 # UI diff cues (auto-generated)
 
-Red flags and overlap indicators.
+Counts computed only across apps/ and packages/ (excluding node_modules/dist/build).
 
 ## Counts
-- Files referencing '@ui-kit': 5
-- Files referencing 'zod': 182
-- Files referencing 'vue-router': 5
+- Files referencing '@ui-kit': 2
+- Files referencing 'zod': 1
+- Files referencing 'vue-router': 4

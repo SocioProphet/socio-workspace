@@ -7,6 +7,10 @@ Workspace controller repo.
 - Runner (Python): `tools/runner/runner.py`
 - Protocol + fixtures: `protocol/`
 
+## Scope and backlog
+
+See `docs/SCOPE_PURPOSE_STATUS_BACKLOG.md` for scope, current state, and the rolling backlog.
+
 ## Quickstart
 
 ```bash

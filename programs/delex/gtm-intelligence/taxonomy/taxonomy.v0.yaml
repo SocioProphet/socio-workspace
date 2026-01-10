@@ -1,0 +1,19 @@
+version: v0
+industries: []
+offerings:
+  software: []
+  services: []
+  artifacts: []
+motions:
+  - enterprise_direct
+  - midmarket_direct
+  - smb_velocity
+  - partner_channel
+  - agency_ecosystem
+roles:
+  - enterprise_ae
+  - channel_sales
+  - smb_ae
+  - sales_ops
+  - solutions_engineering
+  - delivery_pm

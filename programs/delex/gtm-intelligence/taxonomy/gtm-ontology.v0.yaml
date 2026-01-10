@@ -1,0 +1,5 @@
+version: v0
+boundaries: [syntactic, semantic, pragmatic, value, ecosystem]
+segment_families: [growth, relationship, risk]
+motions: [enterprise_direct, partner_channel, smb_velocity]
+lifecycle_stages: [briefing, discovery, assessment, use_cases_value, architecture, mvp, production, expansion, reference]

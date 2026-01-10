@@ -2,21 +2,7 @@ from pathlib import Path
 import hashlib
 import sys
 
-
-def find_repo_root(start: Path) -> Path:
-    # Prefer a repo root marker + schemas directory
-    for d in [start, *start.parents]:
-        if (d / "schemas").is_dir() and (
-            (d / ".git").exists()
-            or (d / "pyproject.toml").exists()
-            or (d / "WORKSPACE.yaml").exists()
-        ):
-            return d
-    # Fallback: nearest ancestor that has schemas/
-    for d in [start, *start.parents]:
-        if (d / "schemas").is_dir():
-            return d
-    return start.parents[0]
+from .util import find_repo_root
 
 
 HERE = Path(__file__).resolve()

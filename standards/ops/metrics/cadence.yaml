@@ -1,0 +1,21 @@
+cadence:
+  weekly:
+    - pod.scorecards
+    - stage_velocity
+    - handoff.defects
+    - coaching.cadence_aggregate
+    - evidence_pack.compliance
+  monthly:
+    - conversion.rates
+    - partner.leverage
+    - referenceability.rate
+    - skills.coverage
+  quarterly:
+    - okr.outcomes
+    - vertical.penetration
+    - retention.expansion
+    - regretted_attrition
+privacy:
+  default_view: aggregate
+  restricted_domains: [hr]
+  audit_log: true

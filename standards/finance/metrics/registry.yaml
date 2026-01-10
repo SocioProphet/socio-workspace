@@ -1,0 +1,10 @@
+version: 1
+metrics:
+  - metric_id: arr
+    name: Annual Recurring Revenue
+    version: v1
+    classification: non_gaap
+    definition_markdown: "Annualized recurring revenue from active subscriptions, excluding taxes and one-time fees."
+    formula_ref: "pipelines/finance/sql/metrics/arr.sql"
+    owner: "finance"
+    effective_from: "2026-01-01"

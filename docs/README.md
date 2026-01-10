@@ -21,3 +21,5 @@
 ## Standards
 - [QES (Quality Evidence Standard)](../standards/qes/README.md)
 - [Adaptation README](standards/adaptation/README.md)
+- [SourceOS Build Plane Standard v0.1](../standards/build-plane/README.md)
+- [TriRPC v0 Conformance Standard v0.1](../standards/conformance/trirpc-v0/README.md)

@@ -1,0 +1,63 @@
+name: decision-planes
+
+on:
+  pull_request:
+    paths:
+      - "registry/decision-planes.yaml"
+      - "registry/decision-plane-ownership-matrix.csv"
+      - "schema/decision-planes.schema.json"
+      - "scripts/validate_decision_planes.py"
+      - ".github/workflows/decision-planes.yml"
+  push:
+    branches: [main]
+    paths:
+      - "registry/decision-planes.yaml"
+      - "registry/decision-plane-ownership-matrix.csv"
+      - "schema/decision-planes.schema.json"
+      - "scripts/validate_decision_planes.py"
+      - ".github/workflows/decision-planes.yml"
+
+jobs:
+  validate-decision-planes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install validator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyyaml jsonschema
+
+      - name: Validate registry + ownership matrix
+        run: |
+          mkdir -p out
+          python scripts/validate_decision_planes.py             --registry registry/decision-planes.yaml             --schema schema/decision-planes.schema.json             --matrix registry/decision-plane-ownership-matrix.csv             --report-md out/decision-planes-validation.md             --report-json out/decision-planes-validation.json
+
+      - name: Publish validation summary
+        if: always()
+        run: |
+          if [ -f out/decision-planes-validation.md ]; then
+            cat out/decision-planes-validation.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload validation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: decision-planes-validation
+          path: out/
+
+  # Optional future extension:
+  # - add a second job that checks whether the umbrella narrative doc
+  #   (for example in SocioProphet/socioprophet) references only plane ids
+  #   and names that exist in the registry.
+  # - add a third job that enforces per-plane release gates against concrete
+  #   repo-local evidence sources.

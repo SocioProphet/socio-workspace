@@ -1,0 +1,290 @@
+version: 0.2.0
+updated_at: '2026-04-11'
+status: review
+source_of_truth:
+  narrative_repo: SocioProphet/socioprophet
+  narrative_path: docs/strategy/CANONICAL_TECH_STRATEGY.md
+  registry_repo: SocioProphet/sociosphere
+  registry_path: registry/decision-planes.yaml
+planes:
+- id: SDP-1
+  name: Governance and Human Safeguards
+  thesis: No consequential capability executes without explicit authority, policy
+    validation, bounded scope, visible review, and reversibility.
+  primary_anchor:
+    repo: policy-fabric
+    type: policy_control_repository
+  supporting_anchors:
+  - repo: socioprophet
+    role: public_strategy_and_safeguarding_docs
+  - repo: human-digital-twin
+    role: trust_protocol
+  - surface: organizations-governance-and-institutional-safety
+    role: institutional_entry
+  - surface: platform-human-protection-and-safeguarding
+    role: safeguarding_doctrine
+  owner_role: governance_steward
+  maturity:
+    current: policy_control_repo_exists_but_is_not_yet_portfolio_canonical
+    target_90d: cross_surface_governance_language_and_policy_control_aligned
+    target_12m: policy_enforced_release_and_approval_model
+  release_source_of_truth:
+    repo: sociosphere
+    path: registry/decision-planes.yaml
+  gates:
+  - id: policy-bundle-validation-green
+    description: Governance and protection policy bundles validate cleanly in the
+      control repo.
+  - id: approval-rule-coverage
+    description: High-consequence transitions have documented approval logic and testable
+      policy expectations.
+  metrics:
+  - policy_bundle_validation_pass_rate
+  - surface_trust_boundary_coverage
+  - approval_rule_coverage
+  - policy_inconsistency_count
+  risks:
+  - doctrine_packaging_confusion
+  - policy_repo_not_yet_treated_as_portfolio_anchor
+  - uneven_surface_language
+- id: SDP-2
+  name: Deterministic Transport and Evidence
+  thesis: Trust comes from deterministic protocol behavior and evidence-bearing artifacts,
+    not opaque runtime claims.
+  primary_anchor:
+    repo: TriTRPC
+    type: normative_transport
+  supporting_anchors:
+  - repo: agentplane
+    role: lifecycle_artifacts
+  - repo: socioprophet-standards-knowledge
+    role: payload_contracts
+  - repo: prophet-platform
+    role: deployment_binding
+  owner_role: transport_steward
+  maturity:
+    current: strong_repo_posture
+    target_90d: stable_v1_adoption_profile
+    target_12m: platform_wide_transport_conformance
+  release_source_of_truth:
+    repo: TriTRPC
+    path: README.md
+  gates:
+  - id: v1-parity-green
+    description: Stable v1 fixtures and Rust/Go parity remain green.
+  - id: replay-artifacts-emitted
+    description: Consequential workflows emit replay-suitable evidence.
+  metrics:
+  - fixture_parity_rate
+  - cross_language_verification_rate
+  - replay_artifact_completeness
+  risks:
+  - v1_vnext_confusion
+  - uneven_downstream_binding_adoption
+- id: SDP-3
+  name: Governed Execution and Capability Routing
+  thesis: Operational intelligence is governable only when intent, policy, role, capability,
+    workflow state, placement, and evidence are explicit.
+  primary_anchor:
+    repo: agentplane
+    type: execution_control_plane
+  supporting_anchors:
+  - repo: sociosphere
+    role: workspace_and_release_governance
+  - repo: prophet-platform
+    role: runtime_reference
+  - repo: cloudshell-fog
+    role: fog_edge_execution_gateway
+  - surface: agent-plane-and-operator-workflows
+    role: public_manual
+  owner_role: execution_plane_steward
+  maturity:
+    current: architecturally_strong_with_cloud_edge_runtime_seed
+    target_90d: visible_operating_model_with_cloud_edge_binding
+    target_12m: lifecycle_evidence_bound_release_trains
+  release_source_of_truth:
+    repo: sociosphere
+    path: manifest/workspace.lock.json
+  gates:
+  - id: lifecycle-artifact-coverage
+    description: Validation, placement, run, replay, and lifecycle artifacts exist
+      for primary execution paths.
+  - id: lock-drift-zero
+    description: Workspace lock drift is detected and resolved within policy.
+  - id: placement-policy-surface-coverage
+    description: Placement and policy behavior are documented across core runtime
+      and cloud-edge execution paths.
+  metrics:
+  - bundle_validation_pass_rate
+  - lifecycle_artifact_coverage
+  - lock_drift_incidents
+  - placement_policy_coverage
+  risks:
+  - generic_agent_platform_drift
+  - cloud_edge_packaging_underweighted
+  - unclear_operator_maturity_tiers
+- id: SDP-4
+  name: Knowledge, Context, and Semantic Systems
+  thesis: Knowledge must be executable, scoped, provenance-preserving, ontology-governed,
+    memory-backed, and benchmarked across search, vector, graph, and storage channels.
+  primary_anchor:
+    repo: socioprophet-standards-storage
+    type: standards_measurement_portfolio
+  supporting_anchors:
+  - repo: socioprophet-standards-knowledge
+    role: canonical_knowledge_artifacts
+  - repo: ontogenesis
+    role: ontology_governance_and_shacl_gates
+  - repo: memory-mesh
+    role: memory_runtime_and_adapter_baseline
+  - repo: semantic-serdes
+    role: event_context_surface_contracts
+  - repo: slash-topics
+    role: governed_scope_membranes
+  - surface: semantic-vector-stack
+    role: target_state_manual
+  owner_role: knowledge_standards_steward
+  maturity:
+    current: rich_sample_now_includes_runtime_memory_and_ontology_governance
+    target_90d: explicit_authority_chain_across_standards_runtime_and_ontology
+    target_12m: benchmark_backed_semantic_governance
+  release_source_of_truth:
+    repo: sociosphere
+    path: registry/decision-planes.yaml
+  gates:
+  - id: semantic-ci-gate
+    description: Champion-challenger embeddings and semantic regressions are enforced
+      in CI.
+  - id: standards-roundtrip-green
+    description: Schema, fixture, and round-trip semantic checks remain green.
+  - id: ontology-policy-gates-green
+    description: SHACL and ontology promotion gates validate cleanly for governed
+      semantic assets.
+  metrics:
+  - benchmark_coverage
+  - semantic_regression_detections
+  - standards_roundtrip_pass_rate
+  - ontology_gate_pass_rate
+  - memory_runtime_validation_coverage
+  risks:
+  - repo_overlap
+  - runtime_vs_standard_authority_blur
+  - claims_outrunning_measurement
+- id: SDP-5
+  name: Identity, Entity, and Human API Surfaces
+  thesis: Identity, linkage, merge, export, recovery, and trust should be governed
+    as first-class system behavior.
+  primary_anchor:
+    repo: human-digital-twin
+    type: trust_protocol
+  supporting_anchors:
+  - surface: entity-analytics-overview
+    role: public_identity_manual
+  - surface: entity-analytics
+    role: product_surface
+  - surface: digital-trust
+    role: active_surface_boundary
+  - repo: policy-fabric
+    role: data_protection_policy_contracts
+  owner_role: identity_trust_steward
+  maturity:
+    current: conceptually_strong_with_active_digital_trust_surface_but_contracts_fragmented
+    target_90d: shared_packaging_language_across_hdt_entity_and_digital_trust
+    target_12m: pinned_contracts_and_explainable_proof_exports
+  release_source_of_truth:
+    repo: human-digital-twin
+    path: README.md
+  gates:
+  - id: merge-export-proof-rules
+    description: Merge, export, and proof rules are explicit and testable.
+  - id: safe-export-tests
+    description: Policy tests cover safe or coarsened export behavior.
+  - id: identity-recovery-routing-alignment
+    description: Identity, capability routing, and recovery semantics align across
+      docs and active trust surfaces.
+  metrics:
+  - proof_artifact_coverage
+  - safe_export_test_pass_rate
+  - merge_unmerge_explainability_coverage
+  - identity_route_coherence
+  risks:
+  - hdt_entity_split_staying_conceptual
+  - digital_trust_surface_underpackaged
+- id: SDP-6
+  name: Authorized Defensive Operations
+  thesis: Security value comes from bounded, authorized, defense-first validation
+    and hardening loops, not unrestricted offensive capability.
+  primary_anchor:
+    repo: socioprophet
+    type: public_defensive_boundary_docs
+  supporting_anchors:
+  - repo: policy-fabric
+    role: policy_control_surface
+  - repo: agentplane
+    role: evidence_replay_execution
+  - repo: socioprophet-standards-storage
+    role: incident_intelligence_contracts
+  - surface: organizations-governance-and-institutional-safety
+    role: institutional_packaging
+  owner_role: defensive_operations_steward
+  maturity:
+    current: public_boundary_clear_but_policy_and_runtime_operationalization_split
+    target_90d: public_safe_deployment_package
+    target_12m: restricted_operator_workflow_operationalized
+  release_source_of_truth:
+    repo: sociosphere
+    path: registry/decision-planes.yaml
+  gates:
+  - id: authorization-record-coverage
+    description: Defensive workflows have explicit authorization records.
+  - id: no-public-misuse-leakage
+    description: Public docs avoid tactical details that materially increase misuse
+      value.
+  - id: defensive-policy-bundle-alignment
+    description: Defensive workflows align to explicit policy contracts and validation
+      artifacts.
+  metrics:
+  - authorization_coverage
+  - evidence_bearing_remediation_ratio
+  - public_restricted_leak_count
+  - defensive_policy_alignment_rate
+  risks:
+  - offensive_platform_misread
+  - policy_runtime_split_creating_control_gaps
+  - oversharing_or_undersharing_boundary
+- id: SDP-7
+  name: Learning and Institutional Delivery
+  thesis: The platform differentiates by converting governed knowledge into durable
+    human capability and institutional outcomes.
+  primary_anchor:
+    repo: alexandrian-academy
+    type: governed_learning_architecture
+  supporting_anchors:
+  - surface: academy
+    role: flagship_surface
+  - surface: organizations
+    role: institutional_packaging
+  - repo: delivery-excellence
+    role: operating_system_governance
+  - repo: delivery-excellence-automation
+    role: automation_bindings
+  owner_role: learning_delivery_steward
+  maturity:
+    current: strong_flagship_plus_hidden_ops_substrate
+    target_90d: organizations_to_academy_quality
+    target_12m: coherent_institutional_offer
+  release_source_of_truth:
+    repo: alexandrian-academy
+    path: README.md
+  gates:
+  - id: academy-organizations-narrative-alignment
+    description: Academy and Organizations share one credible institutional narrative.
+  - id: delex-automation-integrity
+    description: Delivery Excellence automation bindings validate cleanly.
+  metrics:
+  - promotion_governance_pass_rate
+  - intake_to_qualified_deployment_conversion
+  - automation_integrity_checks
+  risks:
+  - organizations_packaging_gap
+  - delex_remaining_invisible_infrastructure

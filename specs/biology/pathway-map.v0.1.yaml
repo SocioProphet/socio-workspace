@@ -1,0 +1,168 @@
+spec_version: "0.1"
+name: "SourceOS Agentic Stack — Biological Pathway Analog Map"
+status: "draft"
+principles:
+  - id: receptor_only_ingress
+    rule: "All external inputs MUST enter through typed receptors (adapters) with authn/z, schema validation, rate-limits, and evidence."
+  - id: separate_interpret_from_commit
+    rule: "Probabilistic interpretation may occur in the signal field; irreversible commits MUST be deterministic, signed, replayable."
+  - id: negative_feedback_everywhere
+    rule: "Every powerful mode MUST include explicit dampening: decay timers, rollback triggers, rate limits, and circuit breakers."
+  - id: apoptosis_is_success_path
+    rule: "Quarantine/self-disable is a first-class success outcome for compromised or mismatched components."
+  - id: anchoring_required
+    rule: "Agents MUST be substrate-anchored via attestation (or explicitly sandboxed as detached) before privileged action."
+
+planes:
+  membrane_ingress:
+    description: "Typed entry points (receptors) that bind external signals and produce validated internal events."
+  cytosol_signal_field:
+    description: "Event fabric + deterministic transforms; amplifies, filters, branches; holds short-lived state."
+  nucleus_commit_core:
+    description: "Policy-heavy irreversible commit layer: promotions, signing, audited replay, governance enforcement."
+  immune_apoptosis:
+    description: "Incident response, quarantine, revocation, kill-switch DAGs, and evidence emission."
+
+receptors:
+  - id: tritrpc_adapter
+    biological_analog: "Receptor (general)"
+    inputs: ["rpc_call", "capability_request"]
+    invariants:
+      - "capability_descriptor (CapD) must match requested op"
+      - "authn/z verified (signatures / policy)"
+      - "rate_limit applied"
+    emits_events: ["evt.ingress.accepted", "evt.ingress.rejected", "evt.capability.invoked"]
+  - id: git_adapter
+    biological_analog: "Cytokine receptor (coordination signals)"
+    inputs: ["push", "pr_opened", "issue_created", "workflow_result"]
+    invariants:
+      - "event schema validated"
+      - "repo identity verified"
+      - "supply-chain policy enforced (signing, provenance)"
+    emits_events: ["evt.git.webhook"]
+  - id: filesystem_adapter
+    biological_analog: "Integrin/ECM contact (local substrate truth)"
+    inputs: ["fs_change", "mount_change", "integrity_alert"]
+    invariants:
+      - "path allowlist"
+      - "evidence hash recorded"
+    emits_events: ["evt.fs.delta"]
+  - id: human_approval
+    biological_analog: "Checkpoint gate"
+    inputs: ["approve", "deny", "timeout"]
+    invariants:
+      - "human identity verified"
+      - "decision recorded with evidence"
+    emits_events: ["evt.gate.decision"]
+
+pathways:
+  - id: mapk_growth_scale
+    biological_analog: "Ras/Raf/MEK/ERK"
+    purpose: "Scale/replicate workflows (but only through checkpoints)."
+    sources: ["evt.ingress.accepted", "evt.git.webhook"]
+    transforms:
+      - "classify_intent"
+      - "estimate_cost"
+      - "propose_plan"
+    checkpoints:
+      - "resource_budget_gate"
+      - "human_approval (for privileged ops)"
+    outputs:
+      - "evt.plan.proposed"
+      - "evt.scale.requested"
+    negative_feedback:
+      - "cooldown_timer"
+      - "max_concurrency"
+      - "rollback_on_error_rate"
+
+  - id: pi3k_akt_survival
+    biological_analog: "PI3K/Akt"
+    purpose: "Maintain continuity under transient failure (retry/backoff, degrade modes)."
+    sources: ["evt.fs.delta", "evt.runtime.health"]
+    transforms:
+      - "retry_policy_eval"
+      - "degrade_mode_select"
+    outputs:
+      - "evt.degrade.enabled"
+      - "evt.retry.scheduled"
+    negative_feedback:
+      - "retry_budget"
+      - "exponential_backoff"
+      - "trip_circuit_breaker"
+
+  - id: jak_stat_coordination
+    biological_analog: "JAK/STAT"
+    purpose: "Propagate coordination/alerts across the mesh (gossip/quorum)."
+    sources: ["evt.alert.raised", "evt.policy.changed"]
+    transforms:
+      - "quorum_select"
+      - "gossip_broadcast"
+    outputs:
+      - "evt.mesh.broadcast"
+      - "evt.quorum.vote"
+    negative_feedback:
+      - "ttl_hops"
+      - "dedupe_by_hash"
+      - "rate_limit_by_topic"
+
+  - id: nfkb_incident_response
+    biological_analog: "NF-κB"
+    purpose: "Emergency response mode: containment, credential revocation, high-signal broadcast."
+    sources: ["evt.security.compromise_suspected", "evt.integrity.alert"]
+    transforms:
+      - "containment_plan"
+      - "revoke_tokens"
+      - "raise_priority"
+    checkpoints:
+      - "two_person_rule (optional, configurable)"
+    outputs:
+      - "evt.quarantine.activated"
+      - "evt.revocation.issued"
+      - "evt.mesh.broadcast"
+    negative_feedback:
+      - "auto_expire_emergency_mode"
+      - "postmortem_required"
+
+  - id: wnt_hedgehog_policy_programs
+    biological_analog: "Wnt / Hedgehog (β-catenin/TCF, Gli)"
+    purpose: "Long-horizon policy programs (governance/promotion rules)."
+    sources: ["evt.gate.decision", "evt.audit.finding"]
+    transforms:
+      - "policy_compile"
+      - "promotion_rule_update"
+    outputs:
+      - "evt.policy.proposed"
+      - "evt.policy.enforced"
+    negative_feedback:
+      - "staged_rollout"
+      - "canary_required"
+      - "rollback_on_regression"
+
+checkpoints:
+  - id: resource_budget_gate
+    biological_analog: "Cyclin/CDK control"
+    rule: "No scaling/replication without explicit budget approval and concurrency caps."
+  - id: integrity_gate
+    biological_analog: "DNA damage checkpoint"
+    rule: "If integrity alerts are active, block commits and require quarantine/diagnostic path."
+  - id: promotion_gate
+    biological_analog: "Nuclear envelope / transcriptional commitment"
+    rule: "Irreversible changes require signed artifacts, passing CI, and recorded evidence."
+
+apoptosis_quarantine:
+  biological_analog: "p53 → apoptosis / cell-cycle arrest"
+  triggers:
+    - "evt.security.compromise_confirmed"
+    - "evt.integrity.alert.severe"
+    - "attestation_mismatch"
+  actions:
+    - "revoke_credentials"
+    - "isolate_network"
+    - "freeze_promotions"
+    - "emit_cairn_evidence"
+    - "self_disable_agent"
+  evidence_requirements:
+    - "event_chain_hash"
+    - "artifact_hashes"
+    - "policy_snapshot"
+    - "attestation_snapshot"

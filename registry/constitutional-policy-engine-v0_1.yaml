@@ -1,0 +1,44 @@
+schema_version: 1
+name: constitutional-policy-engine-v0_1
+status: draft-registration
+created_from: policy-fabric-pr-80
+
+canonical_ownership:
+  policy_contracts:
+    repo: policy-fabric
+    path: contracts/constitutional
+    role: canonical policy contract and validation surface
+  execution_consumer:
+    repo: agentplane
+    role: consume verdicts before governed execution and emit verdict evidence
+  cognition_consumer:
+    repo: superconscious
+    role: request policy admission before governed cognition-loop actions
+  doctrine_surface:
+    repo: ProCybernetica
+    role: public cybernetic doctrine and control-law positioning
+  platform_runtime:
+    repo: prophet-platform
+    role: future deployable service wrapper after solver tranche
+  workspace_governance:
+    repo: sociosphere
+    role: registry, dependency direction, canonical-source registration
+
+non_owners:
+  socioprophet:
+    role: public UI and integration surface only
+  plane:
+    role: upstream project-management fork, not policy-plane authority
+
+blocked_decisions:
+  - HTTP framework selection
+  - schema registry hosting
+  - sync versus async axiom dispatch
+  - audit-log substrate
+  - LTL-to-SMT-LIB translator backend
+
+next_required_work:
+  - materialize exact OpenAPI and Python reference engine in policy-fabric
+  - add policy verdict artifact seam in agentplane
+  - add doctrine pointer in ProCybernetica
+  - add admission-call semantics in superconscious

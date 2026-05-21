@@ -1,0 +1,106 @@
+{
+  "schema_version": "hell-er.release-pack.v1",
+  "release_pack_id": "rp_demo_michael_heller_grant_review_001",
+  "release_class": "internal_operational",
+  "audience": {
+    "audience_type": "internal_service",
+    "audience_ref": "grant-review-access-controller.synthetic",
+    "purpose": "approve limited read-only grant-review workspace access"
+  },
+  "context": {
+    "context_ref": "ctx_grant_review_synthetic_2026",
+    "context_type": "grant_review",
+    "served_population": "synthetic reviewers",
+    "policy_regime": "policy://identity-prime/hell-er/synthetic-demo"
+  },
+  "hazard_profile": {
+    "hazard_classes": [
+      "role_or_entitlement",
+      "contextual_event",
+      "artifact_or_provenance",
+      "synthetic_demo_value"
+    ],
+    "minimum_necessary": true,
+    "release_risk": "low",
+    "abuse_modes": [
+      "role_overgrant",
+      "stale_affiliation_reuse",
+      "civil_proof_escalation"
+    ]
+  },
+  "subject_graph_summary": {
+    "subject_state": "context_resolved",
+    "subject_ref": "subject:michael-heller.synthetic",
+    "graph_snapshot_ref": "graph://regis/synthetic/michael-heller/grant-review/001",
+    "node_count": 8,
+    "edge_count": 12
+  },
+  "prime_atom_ledger": [
+    {
+      "atom_ref": "pa_role_reviewer_invitation_001",
+      "released": true,
+      "redaction_state": "not_redacted",
+      "reason": "required for access decision",
+      "policy_tags": [
+        "minimum_necessary",
+        "internal_operational"
+      ]
+    },
+    {
+      "atom_ref": "pa_affiliation_legacy_001",
+      "released": false,
+      "redaction_state": "withheld",
+      "reason": "stale and not required for access decision",
+      "policy_tags": [
+        "stale",
+        "withhold_external"
+      ]
+    }
+  ],
+  "contradiction_ledger": [
+    {
+      "contradiction_ref": "co_affiliation_stale_001",
+      "released": true,
+      "summary_state": "summary_only",
+      "reason": "internal reviewer must know stale affiliation contradiction exists"
+    }
+  ],
+  "assurance_vector": {
+    "identity_state": "context_resolved",
+    "evidence_state": "moderate",
+    "authenticator_state": "pending_binding",
+    "civil_identity_state": "not_proofed",
+    "federation_state": "not_applicable"
+  },
+  "release_policy": {
+    "policy_ref": "policy://identity-prime/hell-er/grant-review/internal-operational/v1",
+    "allowed_actions": [
+      "read_grant_materials",
+      "submit_review_notes"
+    ],
+    "denied_actions": [
+      "export_bulk_applicant_data",
+      "change_award_status",
+      "access_financial_disbursement_records"
+    ],
+    "review_required": false,
+    "review_ref": null
+  },
+  "lifecycle": {
+    "state": "active",
+    "retention_policy_ref": "retention://synthetic-demo/30d",
+    "expires_at": "2026-06-07T00:00:00Z",
+    "revoked_at": null
+  },
+  "redress_queue": [],
+  "machine_annex": {
+    "annex_ref": "artifact://hell-er/demo/release-pack-annex-001.json",
+    "annex_hash": "sha256:synthetic-placeholder",
+    "format": "json"
+  },
+  "created_at": "2026-05-08T00:00:00Z",
+  "signed_by": [
+    "heller.synthetic.verifier"
+  ],
+  "notes": "Synthetic demo fixture using Michael Heller as permitted demonstrative subject name; all attributes are synthetic placeholders."
+}

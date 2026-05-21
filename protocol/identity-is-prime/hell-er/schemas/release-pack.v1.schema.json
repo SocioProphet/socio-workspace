@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/hell-er/release-pack.v1.schema.json",
+  "title": "HELL-ER Release Pack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "release_pack_id",
+    "release_class",
+    "audience",
+    "context",
+    "hazard_profile",
+    "subject_graph_summary",
+    "prime_atom_ledger",
+    "contradiction_ledger",
+    "assurance_vector",
+    "release_policy",
+    "lifecycle",
+    "redress_queue",
+    "machine_annex",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "hell-er.release-pack.v1" },
+    "release_pack_id": { "type": "string", "pattern": "^rp_[a-zA-Z0-9_.:-]+$" },
+    "release_class": { "type": "string", "enum": ["self_view_unredacted", "internal_operational", "partner_federated", "external_redacted", "public_synthetic"] },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audience_type", "audience_ref", "purpose"],
+      "properties": {
+        "audience_type": { "type": "string", "enum": ["self", "internal_service", "partner", "public", "synthetic_demo", "steward", "agent"] },
+        "audience_ref": { "type": "string" },
+        "purpose": { "type": "string" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_ref", "context_type", "served_population", "policy_regime"],
+      "properties": {
+        "context_ref": { "type": "string" },
+        "context_type": { "type": "string", "enum": ["recruiting", "travel_booking", "regulated_proofing", "federated_access", "authorship_provenance", "grant_review", "platform_administration", "synthetic_demo", "other"] },
+        "served_population": { "type": "string" },
+        "policy_regime": { "type": "string" }
+      }
+    },
+    "hazard_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hazard_classes", "minimum_necessary", "release_risk", "abuse_modes"],
+      "properties": {
+        "hazard_classes": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["direct_identifier", "quasi_identifier", "authenticator_material", "civil_proof_material", "institutional_attribute", "role_or_entitlement", "contextual_event", "artifact_or_provenance", "behavioral_or_derived_signal", "sensitive_preference", "restricted_professional_or_ip", "regulated_data_element", "synthetic_demo_value"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "minimum_necessary": { "type": "boolean" },
+        "release_risk": { "type": "string", "enum": ["none", "low", "medium", "high", "critical"] },
+        "abuse_modes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "subject_graph_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_state", "graph_snapshot_ref", "node_count", "edge_count"],
+      "properties": {
+        "subject_state": { "type": "string", "enum": ["unresolved", "candidate", "context_resolved", "validated_core", "verified_subject", "enrolled", "contested", "revoked", "expired"] },
+        "subject_ref": { "type": ["string", "null"] },
+        "graph_snapshot_ref": { "type": "string" },
+        "node_count": { "type": "integer", "minimum": 0 },
+        "edge_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "prime_atom_ledger": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["atom_ref", "released", "redaction_state", "policy_tags"],
+        "properties": {
+          "atom_ref": { "type": "string" },
+          "released": { "type": "boolean" },
+          "redaction_state": { "type": "string", "enum": ["not_redacted", "redacted", "withheld", "synthetic", "derived_only"] },
+          "reason": { "type": ["string", "null"] },
+          "policy_tags": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true }
+        }
+      }
+    },
+    "contradiction_ledger": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contradiction_ref", "released", "summary_state"],
+        "properties": {
+          "contradiction_ref": { "type": "string" },
+          "released": { "type": "boolean" },
+          "summary_state": { "type": "string", "enum": ["full", "summary_only", "existence_only", "withheld", "not_applicable"] },
+          "reason": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "assurance_vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity_state", "evidence_state", "authenticator_state", "civil_identity_state", "federation_state"],
+      "properties": {
+        "identity_state": { "type": "string", "enum": ["unresolved", "candidate", "context_resolved", "validated_core", "verified_subject", "enrolled", "contested", "revoked", "expired"] },
+        "evidence_state": { "type": "string", "enum": ["none", "weak", "moderate", "strong", "authoritative", "conflicted"] },
+        "authenticator_state": { "type": "string", "enum": ["not_bound", "pending_binding", "bound", "revoked", "expired", "not_applicable"] },
+        "civil_identity_state": { "type": "string", "enum": ["not_proofed", "self_asserted", "validated", "verified", "not_applicable"] },
+        "federation_state": { "type": "string", "enum": ["not_applicable", "asserted", "federated", "revoked", "expired"] }
+      }
+    },
+    "release_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_ref", "allowed_actions", "denied_actions", "review_required"],
+      "properties": {
+        "policy_ref": { "type": "string" },
+        "allowed_actions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "denied_actions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "review_required": { "type": "boolean" },
+        "review_ref": { "type": ["string", "null"] }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "retention_policy_ref"],
+      "properties": {
+        "state": { "type": "string", "enum": ["active", "pending", "revoked", "expired", "superseded", "redacted", "synthetic"] },
+        "retention_policy_ref": { "type": "string" },
+        "expires_at": { "type": ["string", "null"], "format": "date-time" },
+        "revoked_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "redress_queue": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["redress_id", "redress_type", "status"],
+        "properties": {
+          "redress_id": { "type": "string" },
+          "redress_type": { "type": "string", "enum": ["correction", "appeal", "review", "deletion_request", "revocation_request", "access_request"] },
+          "status": { "type": "string", "enum": ["open", "pending", "resolved", "rejected", "escalated"] }
+        }
+      }
+    },
+    "machine_annex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["annex_ref", "annex_hash", "format"],
+      "properties": {
+        "annex_ref": { "type": "string" },
+        "annex_hash": { "type": "string" },
+        "format": { "type": "string", "enum": ["json", "jsonld", "cbor", "yaml"] }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "signed_by": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "notes": { "type": ["string", "null"] }
+  }
+}

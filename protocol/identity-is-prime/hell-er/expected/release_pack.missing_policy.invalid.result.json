@@ -1,0 +1,6 @@
+{
+  "fixture": "protocol/identity-is-prime/hell-er/fixtures/release_pack.missing_policy.invalid.json",
+  "expected_result": "REFUTED",
+  "expected_violation": "MISSING_RELEASE_POLICY",
+  "reason": "HELL-ER release packs must not be emitted without release_policy."
+}

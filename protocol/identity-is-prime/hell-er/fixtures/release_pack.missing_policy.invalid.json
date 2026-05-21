@@ -1,0 +1,23 @@
+{
+  "fixture_id": "hell-er.release-pack.missing-policy.invalid.v0.1",
+  "fixture_version": "0.1",
+  "expected_result": "REFUTED",
+  "expected_violation": "MISSING_RELEASE_POLICY",
+  "candidate_release_pack": {
+    "schema_version": "hell-er.release-pack.v1",
+    "release_pack_id": "rp_invalid_missing_policy_001",
+    "release_class": "internal_operational",
+    "audience": {
+      "audience_type": "internal_service",
+      "audience_ref": "grant-review-access-controller.synthetic",
+      "purpose": "approve limited read-only grant-review workspace access"
+    },
+    "context": {
+      "context_ref": "ctx_grant_review_synthetic_2026",
+      "context_type": "grant_review",
+      "served_population": "synthetic reviewers",
+      "policy_regime": "policy://identity-prime/hell-er/synthetic-demo"
+    },
+    "notes": "Invalid by construction: release_policy is omitted."
+  }
+}

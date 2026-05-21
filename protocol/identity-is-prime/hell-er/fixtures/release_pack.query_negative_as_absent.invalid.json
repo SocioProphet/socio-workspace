@@ -1,0 +1,37 @@
+{
+  "fixture_id": "hell-er.query-negative-as-absent.invalid.v0.1",
+  "fixture_version": "0.1",
+  "expected_result": "REFUTED",
+  "expected_violation": "QUERY_NEGATIVE_AS_FACT_ABSENT",
+  "query_negative_handling": {
+    "query_ref": "query://synthetic/missing-affiliation-search/001",
+    "searched_scope": "synthetic-volunteer-registry-v1",
+    "query_negative_interpreted_as_absent": true,
+    "incorrect_output_state": "fact_absent",
+    "correct_state": "query_negative"
+  },
+  "candidate_release_pack": {
+    "schema_version": "hell-er.release-pack.v1",
+    "release_pack_id": "rp_invalid_query_negative_absent_001",
+    "release_class": "internal_operational",
+    "audience": {
+      "audience_type": "internal_service",
+      "audience_ref": "grant-review-access-controller.synthetic",
+      "purpose": "approve limited read-only grant-review workspace access"
+    },
+    "context": {
+      "context_ref": "ctx_grant_review_synthetic_2026",
+      "context_type": "grant_review",
+      "served_population": "synthetic reviewers",
+      "policy_regime": "policy://identity-prime/hell-er/synthetic-demo"
+    },
+    "release_policy": {
+      "policy_ref": "policy://identity-prime/hell-er/grant-review/internal-operational/v1",
+      "allowed_actions": ["read_grant_materials"],
+      "denied_actions": ["export_bulk_applicant_data"],
+      "review_required": true,
+      "review_ref": "review://synthetic/query-negative-misuse"
+    },
+    "notes": "Invalid by construction: a query-negative is interpreted as authoritative absence."
+  }
+}

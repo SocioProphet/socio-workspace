@@ -1,0 +1,18 @@
+{
+  "fixture": "protocol/identity-is-prime/hell-er/fixtures/release_pack.internal_operational.synthetic.valid.json",
+  "expected_result": "VERIFIED",
+  "schema_version": "hell-er.release-pack.v1",
+  "policy_version": "policy://identity-prime/hell-er/grant-review/internal-operational/v1",
+  "resolver_version": "hell-er.synthetic.resolver.v0.1",
+  "release_template_version": "hell-er.release-template.internal-operational.v0.1",
+  "hazard_classifier_version": "hell-er.hazard-classifier.synthetic.v0.1",
+  "result_requirements": {
+    "context_resolved_access": true,
+    "civil_identity_not_proofed": true,
+    "stale_affiliation_contradiction_retained": true,
+    "minimum_necessary": true,
+    "bulk_export_denied": true,
+    "release_pack_has_machine_annex": true
+  },
+  "notes": "Expected conformance result for synthetic HELL-ER internal operational release pack."
+}

@@ -1,0 +1,113 @@
+schema_version: "0.1"
+standard_ref:
+  repo: SocioProphet/prophet-platform-standards
+  schemas:
+    - schemas/evidence-artifact.schema.json
+    - schemas/claim-mode.schema.json
+contracts:
+  proof_artifact:
+    owner: SocioProphet/prophet-platform
+    purpose: Replayable proof/checker result for runtime, security, or platform claims.
+    required_fields:
+      - schema_version
+      - artifact_id
+      - producer_boundary
+      - claim
+      - assumptions
+      - inputs_hash
+      - result
+      - sufficiency_type
+    verdicts:
+      PROVED: Claim holds for all traces consistent with observed window and assumptions.
+      VIOLATION: Counterexample or witness slice demonstrates forbidden state or transition.
+      INCONCLUSIVE: Required evidence, trust roots, precision, or budget are insufficient.
+    required_trust_roots:
+      - input hash canonicalization
+      - policy bundle hash/signature
+      - checker version pinning
+    downgrade_rules:
+      - Missing required coverage family -> INCONCLUSIVE
+      - Input hash mismatch -> reject artifact
+      - Unknown schema version -> reject artifact
+
+  boundary_record:
+    owner: SocioProphet/prophet-platform-standards
+    purpose: Machine-readable repo jurisdiction and evidence contract declaration.
+    required_fields:
+      - schema_version
+      - repo
+      - jurisdiction
+      - owned_artifacts
+      - non_goals
+      - upstream_inputs
+      - downstream_outputs
+      - claim_modes
+      - sufficiency_types
+      - trust_roots
+      - evidence_required
+      - allowed_crossings
+      - forbidden_crossings
+      - promotion_gates
+      - maturity
+    required_trust_roots:
+      - schema version pinning
+      - source repo commit hash
+    downgrade_rules:
+      - Missing boundary record -> boundary coverage gap
+      - Invalid boundary schema -> INCONCLUSIVE for atlas ingestion
+
+  governance_evidence_packet:
+    owner: SocioProphet/model-governance-ledger
+    purpose: Frozen evidence packet and adjudication material for model/service documentation sufficiency claims.
+    required_fields:
+      - artifact identifier
+      - surface type
+      - vector family
+      - field index
+      - raw tri-state code
+      - conservative collapsed code
+      - source URL or artifact hash
+      - evidence note
+      - scope note
+    required_trust_roots:
+      - frozen packet hash
+      - codebook version
+      - rater/adjudication identity for stronger modes
+    downgrade_rules:
+      - Raw U on required field collapses to 0
+      - Single-team packet cannot claim independently_reproduced
+      - Missing source evidence blocks governance-ready classification
+
+  boot_trust_evidence:
+    owner: SourceOS-Linux/sourceos-boot
+    purpose: BootReleaseSet and attestation evidence for substrate trust claims.
+    required_fields:
+      - release set hash
+      - boot measurement evidence
+      - policy version
+      - rollback status
+      - verifier result
+    required_trust_roots:
+      - TPM/PCR measurement
+      - signed BootReleaseSet
+      - build provenance
+    downgrade_rules:
+      - Missing attestation -> INCONCLUSIVE
+      - Unsigned release set -> reject as trust root failure
+
+  local_state_integrity_evidence:
+    owner: SourceOS-Linux/sourceos-syncd
+    purpose: Local-first state sync, repair, replication, and provenance evidence.
+    required_fields:
+      - state object hash
+      - actor or node identity
+      - replication event
+      - repair receipt if applicable
+      - policy gate result
+    required_trust_roots:
+      - local state hash chain
+      - signed repair receipt
+      - policy-governed replication log
+    downgrade_rules:
+      - Missing repair receipt for repair claim -> INCONCLUSIVE
+      - Unsigned state mutation -> violation or trust-root failure depending on context

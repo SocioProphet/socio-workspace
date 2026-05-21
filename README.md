@@ -4,13 +4,16 @@ Platform meta-workspace controller for the SocioProphet ecosystem.
 
 Sociosphere owns the canonical workspace manifest + lock, runner semantics,
 protocol fixtures, deterministic multi-repo materialization, source-exposure
-governance, adversarial hardening critique, and validation lanes for platform
-build and release readiness.
+governance, adversarial hardening critique, validation lanes for platform
+build and release readiness, and the estate Boundary Atlas for typed repo
+jurisdictions and evidence contracts.
 
 ## Governance references
 
 - [Repository topology and dependency rules](docs/TOPOLOGY.md) — canonical source for repo roles, directionality, and the submodule update playbook.
 - [Naming and versioning policy](docs/NAMING_VERSIONING.md) — single source of truth for repo naming, SemVer discipline, and submodule pin-bump rules.
+- [Boundary Atlas v0.1](docs/boundary-atlas-v0.1.md) — typed repo jurisdiction map, claim modes, evidence contracts, sufficiency labels, and boundary maturity.
+- [Boundary Coverage Report](docs/boundary-coverage-report.md) — bootstrap report of boundary-governed repo coverage and hardening gaps.
 - [Angel of the Lord Hardening Regime](standards/angel-of-the-lord/README.md) — adversarial CI and workspace critique regime for repository, boundary, release, and evidence hardening.
 - [Source Exposure Governance Standard](standards/source-exposure/README.md) — publication-safety rules for public source, public release mirrors, inner-source development, and restricted security/operations material.
 
@@ -23,6 +26,7 @@ Sociosphere is responsible for:
 - Materializing and validating the workspace with `tools/runner/runner.py`.
 - Enforcing topology and dependency-direction policies via `tools/check_topology.py`.
 - Maintaining cross-repo governance and registry metadata in `registry/` + `governance/`.
+- Maintaining the Boundary Atlas in `catalog/` + `docs/boundary-atlas-v0.1.md`.
 - Owning the Angel of the Lord adversarial hardening regime across workspace CI lanes.
 - Validating source-exposure publication safety with `tools/check_source_exposure.py`.
 
@@ -36,6 +40,9 @@ component repositories.
 - Upstream bindings (edge capabilities): `docs/architecture/upstream-bindings-edge-capabilities.md`
 - Scope/current state/backlog: `docs/SCOPE_PURPOSE_STATUS_BACKLOG.md`
 - Integration ledger: `docs/INTEGRATION_STATUS.md`
+- Boundary Atlas: `docs/boundary-atlas-v0.1.md`
+- Repo jurisdiction model: `docs/repo-jurisdiction-model.md`
+- Boundary coverage report: `docs/boundary-coverage-report.md`
 - Namespace ownership map: `governance/CANONICAL_SOURCES.yaml`
 - Angel of the Lord hardening regime: `standards/angel-of-the-lord/README.md`
 - Source exposure standard: `standards/source-exposure/README.md`
@@ -44,6 +51,14 @@ component repositories.
 - Proof workspace manifest: `manifest/proof-workspace.toml`
 
 ## Repository intelligence assets
+
+### Boundary catalog layer
+
+| File | Description |
+|---|---|
+| `catalog/boundaries.yaml` | Estate typed boundary atlas: repo jurisdictions, maturity, claim modes, sufficiency labels, trust roots, and next hardening steps |
+| `catalog/claim-modes.yaml` | Claim-mode registry and evidence requirements |
+| `catalog/evidence-contracts.yaml` | Evidence contract catalog for proof artifacts, boundary records, governance evidence packets, boot trust, and local state integrity |
 
 ### Registry layer
 

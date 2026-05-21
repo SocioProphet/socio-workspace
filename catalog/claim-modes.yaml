@@ -1,0 +1,57 @@
+schema_version: "0.1"
+standard_ref:
+  repo: SocioProphet/prophet-platform-standards
+  docs:
+    - docs/claim-modes.md
+modes:
+  formal_construction:
+    rank: 1
+    description: Definition, schema, theorem statement, proof sketch, or architecture doctrine. No executed run implied.
+    minimum_evidence:
+      - versioned document or schema
+      - explicit assumptions
+      - explicit non-claims
+  illustrative_schema:
+    rank: 2
+    description: Example packet, artifact, or config illustrating expected shape. Not executed evidence.
+    minimum_evidence:
+      - example artifact
+      - statement that values are illustrative
+      - schema validation when applicable
+  fixture_validated:
+    rank: 3
+    description: Deterministic fixture or toy run was executed and replayed.
+    minimum_evidence:
+      - fixture input artifact
+      - expected result
+      - verification output
+      - pinned tool and schema versions
+  experimental_run:
+    rank: 4
+    description: Real or realistic run executed under declared assumptions.
+    minimum_evidence:
+      - input hashes
+      - environment or runtime metadata
+      - result artifact
+      - assumptions and coverage contract
+      - failure or uncertainty handling
+  independently_reproduced:
+    rank: 5
+    description: Second rater, implementation, environment, or verifier reproduced the result.
+    minimum_evidence:
+      - independent run artifact
+      - comparison report
+      - disagreement or adjudication notes
+  audited_run:
+    rank: 6
+    description: Internal or external reviewer accepted the evidence bundle under an audit protocol.
+    minimum_evidence:
+      - evidence bundle manifest
+      - audit or review record
+      - scope of acceptance
+      - unresolved findings if any
+promotion_rules:
+  - A claim cannot be presented at a stronger mode than its evidence supports.
+  - INCONCLUSIVE blocks claim promotion but may support investigation.
+  - VIOLATION blocks promotion and routes a counterexample.
+  - PROVED only supports the mode matched by its evidence context; a PROVED fixture is not an audited run.

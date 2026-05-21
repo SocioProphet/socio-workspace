@@ -1,0 +1,294 @@
+schema_version: "0.1"
+standard_ref:
+  repo: SocioProphet/prophet-platform-standards
+  issue: 15
+  pull_request: 16
+  schema: schemas/boundary.schema.json
+atlas:
+  purpose: Estate-level typed boundary map for repo jurisdictions, evidence contracts, sufficiency labels, and permitted crossings.
+  owner: SocioProphet/sociosphere
+  claim_mode: formal_construction
+  sufficiency_type: governance_sufficient
+entries:
+  - repo: SocioProphet/prophet-platform-standards
+    boundary_class: standards
+    jurisdiction: Normative typed-boundary standard, claim modes, sufficiency taxonomy, and evidence artifact schemas.
+    owned_artifacts:
+      - docs/typed-boundary-standard.md
+      - schemas/boundary.schema.json
+      - schemas/claim-mode.schema.json
+      - schemas/evidence-artifact.schema.json
+      - templates/BOUNDARY.md
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+    sufficiency_types:
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - schema version pinning
+      - standards review
+    maturity: L2
+    current_status: PR open for typed-boundary standard v0.1.
+    next_step: Merge standard and consume schemas in Sociosphere validator.
+
+  - repo: SocioProphet/sociosphere
+    boundary_class: estate_registry
+    jurisdiction: Boundary atlas, repo jurisdiction registry, transition reporting, and boundary coverage status.
+    owned_artifacts:
+      - catalog/boundaries.yaml
+      - catalog/claim-modes.yaml
+      - catalog/evidence-contracts.yaml
+      - docs/boundary-atlas-v0.1.md
+      - docs/boundary-coverage-report.md
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - boundary schema version
+      - source repo commit hash
+      - policy-fabric admissibility decisions
+    maturity: L2
+    current_status: Atlas bootstrap.
+    next_step: Add ingestion/validation tool and coverage report automation.
+
+  - repo: SocioProphet/prophet-platform
+    boundary_class: runtime_verifier
+    jurisdiction: Platform runtime verification, Event-IR, proof artifacts, run bundles, and checker contract.
+    owned_artifacts:
+      - schemas/event-ir.schema.json
+      - schemas/proof-artifact.schema.json
+      - docs/checker-contract.md
+      - examples/kms-key-usage-*.json
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+      - experimental_run
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - inputs hash
+      - policy bundle hash
+      - checker version
+    maturity: L1
+    current_status: Implementation issue open for Trust-First proof artifact/checker contract.
+    next_step: Add proof artifact and Event-IR schemas.
+
+  - repo: SocioProphet/policy-fabric
+    boundary_class: admissibility_policy
+    jurisdiction: Claim-mode promotion, proof-artifact verdict interpretation, and boundary-crossing admissibility.
+    owned_artifacts:
+      - docs/boundary-admissibility.md
+      - policies/boundary/claim_mode_promotion.rego
+      - policies/boundary/proof_artifact_verdicts.rego
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - signed policy bundle
+      - approved schema versions
+    maturity: L1
+    current_status: Implementation issue open for boundary admissibility gates.
+    next_step: Add policy skeletons and fixture tests.
+
+  - repo: SocioProphet/ontogenesis
+    boundary_class: law_compiler
+    jurisdiction: Schema, ontology, SHACL, CRD, and constraint compilation into executable law surfaces.
+    owned_artifacts:
+      - ontology-to-schema pipelines
+      - SHACL or validation contracts
+      - generated law/constraint artifacts
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+    trust_roots:
+      - ontology source hashes
+      - schema compiler version
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Add BOUNDARY.md and boundary.yaml mapping schema-to-law obligations.
+
+  - repo: SocioProphet/model-governance-ledger
+    boundary_class: governance_evidence
+    jurisdiction: Model and service documentation evidence packets, sufficiency rubrics, adjudication worksheets, and governance scoring.
+    owned_artifacts:
+      - schemas/evidence-packet.schema.json
+      - schemas/adjudication.schema.json
+      - examples/frozen-evidence-packets
+      - tools/sufficiency scoring
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+      - independently_reproduced
+    sufficiency_types:
+      - semantic_sufficient
+      - task_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - frozen packet hash
+      - codebook version
+      - rater/adjudication identity
+    maturity: L1
+    current_status: Implementation issue open for evidence-packet and sufficiency-rubric tooling.
+    next_step: Add packet schema, examples, and deterministic scorer.
+
+  - repo: SocioProphet/sherlock-search
+    boundary_class: evidentiary_retrieval
+    jurisdiction: Search, source attribution, evidence retrieval, query surfaces, and claim-support traces.
+    owned_artifacts:
+      - indexed evidence surfaces
+      - search result traces
+      - source attribution bundles
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - experimental_run
+    sufficiency_types:
+      - semantic_sufficient
+      - task_sufficient
+      - governance_sufficient
+    trust_roots:
+      - index build manifests
+      - source hashes
+      - retrieval logs
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Define evidentiary retrieval boundary and source-trace artifacts.
+
+  - repo: SocioProphet/gaia-world-model
+    boundary_class: world_model_trace
+    jurisdiction: Geospatial/world-model traces, layer provenance, reconstruction-limited access, and uncertainty evidence.
+    owned_artifacts:
+      - feature manifests
+      - tile/layer manifests
+      - observation evidence
+      - provenance chains
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+      - experimental_run
+    sufficiency_types:
+      - reconstruction_sufficient
+      - semantic_sufficient
+      - task_sufficient
+      - governance_sufficient
+    trust_roots:
+      - source receipts
+      - geometry validation
+      - provenance hashes
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Define GAIA trace/provenance boundary.
+
+  - repo: SocioProphet/agentplane
+    boundary_class: agent_runtime
+    jurisdiction: Agent execution boundary, lifecycle, sandboxing, resource limits, and output attestation.
+    owned_artifacts:
+      - runtime contracts
+      - sandbox policy
+      - agent output attestations
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+      - experimental_run
+    sufficiency_types:
+      - task_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - runtime attestation
+      - sandbox logs
+      - output artifact hashes
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Define agent runtime boundary and proof-carrying output contract.
+
+  - repo: SocioProphet/agent-registry
+    boundary_class: agent_identity_capability
+    jurisdiction: Agent identity, capability manifests, versioned admission, and revocation records.
+    owned_artifacts:
+      - agent manifests
+      - capability records
+      - revocation events
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - manifest signatures
+      - registry version pinning
+      - revocation logs
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Define identity/capability boundary.
+
+  - repo: SourceOS-Linux/sourceos-boot
+    boundary_class: boot_trust
+    jurisdiction: BootReleaseSet, boot attestation, TPM/PCR evidence, rollback, and host trust anchor boundary.
+    owned_artifacts:
+      - boot manifests
+      - attestation evidence
+      - rollback records
+      - boot trust reports
+    claim_modes:
+      - formal_construction
+      - fixture_validated
+      - experimental_run
+      - audited_run
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - TPM PCR measurements
+      - signed BootReleaseSet
+      - build provenance
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Add SourceOS boot trust boundary declaration.
+
+  - repo: SourceOS-Linux/sourceos-syncd
+    boundary_class: local_state_integrity
+    jurisdiction: Local-first state replication, repair, provenance-preserving sync, and reconciliation boundary.
+    owned_artifacts:
+      - replication manifests
+      - repair receipts
+      - provenance chains
+      - sync integrity reports
+    claim_modes:
+      - formal_construction
+      - fixture_validated
+      - experimental_run
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - local state hashes
+      - signed repair receipts
+      - policy-governed replication logs
+    maturity: L0
+    current_status: Boundary record not yet native in repo.
+    next_step: Add local-first state integrity boundary declaration.

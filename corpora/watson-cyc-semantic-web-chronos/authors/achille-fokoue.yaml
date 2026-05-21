@@ -1,0 +1,29 @@
+id: achille-fokoue
+name: Achille Fokoue
+layer: promoted_coauthor
+status: source_normalization_pending
+primary_clusters:
+  - chronos_kairos_event_schemas
+  - temporal_logic_neurosymbolics
+  - kgqa_language_to_knowledge
+  - knowledge_infused_nli
+  - policy_decomposition
+socioprophet_targets:
+  - Holmes
+  - Sherlock
+  - Ontogenesis
+  - Policy Fabric
+  - GAIA
+known_works_seed:
+  - title: "CHRONOS: A Schema-Based Event Understanding and Prediction System"
+    status: confirmed_bibliographic
+  - title: "STONE: Signal Temporal Logic Neural Network for Time Series Classification"
+    status: confirmed_bibliographic
+capture_gaps:
+  - full DBLP/OpenAlex/Semantic Scholar export
+  - KGQA and NLI bibliography
+  - scalable reasoning infrastructure records
+  - policy decomposition works
+notes: >-
+  Promoted cross-cluster bridge for CHRONOS, temporal logic, KGQA,
+  knowledge-infused NLI, and IBM neuro-symbolic reasoning lineage.

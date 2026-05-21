@@ -1,0 +1,13 @@
+year,lineage,event,source_quality,status
+1980s,cyc_commonsense,"Cyc commonsense and microtheory program emerges",plausible_needs_source,needs_normalization
+2005,cyc_commonsense,"Searching for Common Sense: Populating Cyc from the Web",confirmed_bibliographic,seeded
+2005,cyc_commonsense,"Knowledge Begets Knowledge: Assisted Knowledge Acquisition in Cyc",confirmed_bibliographic,seeded
+2000s,semantic_web,"Ontology design patterns and semantic domains lineage",plausible_needs_source,needs_normalization
+2010s,watson_deepqa,"Watson/DeepQA evidence-ranked QA lineage",plausible_needs_source,needs_normalization
+2010s,kgqa,"KGQA, AMR, relation linking, semantic parsing expansion",plausible_needs_source,needs_normalization
+2020,causal_kg,"Causal Knowledge Extraction through Large-Scale Text Mining",confirmed_bibliographic,seeded
+2021,temporal_logic,"STONE temporal-logic neuro-symbolic monitoring",confirmed_bibliographic,seeded
+2024,chronos_kairos,"CHRONOS event-schema system",confirmed_bibliographic,seeded
+2024,trustworthy_ai,"Alignment Studio contextual regulation lineage",confirmed_official,seeded
+2024,causal_tables,"WikiCausal, TabSketchFM, semantic-table/data-lake lineage",confirmed_bibliographic,seeded
+2025,kg_llm_diagnostics,"Conceptual Diagnostics for Knowledge Graphs and Large Language Models",confirmed_bibliographic,seeded

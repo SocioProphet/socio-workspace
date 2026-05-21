@@ -1,0 +1,13 @@
+institution,lineage,status
+IBM Research,chronos_kairos,confirmed
+IBM Research,trustworthy_ai_alignment,confirmed
+IBM Research,watson_nlp_kgqa,confirmed
+IBM Research,causal_event_kg,confirmed
+Cycorp,cyc_commonsense,confirmed
+AAAI,conference_ecosystem,confirmed
+ACL,conference_ecosystem,confirmed
+IEEE,conference_ecosystem,confirmed
+ISWC,semantic_web_ecosystem,confirmed
+NeurIPS,ml_governance_ecosystem,confirmed
+Dagstuhl,semantic_table_benchmark_ecosystem,confirmed
+Zenodo,artifact_hosting_ecosystem,confirmed

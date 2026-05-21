@@ -1,0 +1,9 @@
+program_or_funder,target_lineage,status,notes
+DARPA KAIROS,chronos_kairos,confirmed_bibliographic,"CHRONOS/KAIROS lineage identified in corpus synthesis."
+IBM Research,watson_nlp_kgqa,confirmed,"Primary institutional sponsor and publication source for Watson/KGQA branch."
+IBM Research,trustworthy_ai_alignment,confirmed,"Primary institutional sponsor for Alignment Studio, attribution, and diagnostics lineage."
+IBM Research,causal_event_kg,confirmed,"Primary institutional sponsor for WikiCausal, semantic table, and data-lake work."
+AAAI,cyc_commonsense,confirmed_bibliographic,"AAAI and AAAI Spring Symposium contexts for Cyc acquisition lineage."
+ACL,kg_llm_diagnostics,confirmed_bibliographic,"ACL Industry Track context for Conceptual Diagnostics lineage."
+NeurIPS,trustworthy_ai_alignment,confirmed_bibliographic,"Workshop/conference lineage for attribution and table representation work."
+ISWC,semantic_web_and_causal_kg,confirmed_bibliographic,"Semantic Web, causal KG, and event-sequence lineage."

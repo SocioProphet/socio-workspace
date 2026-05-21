@@ -1,0 +1,27 @@
+id: pavan-kapanipathi
+name: Pavan Kapanipathi
+layer: promoted_coauthor
+status: source_normalization_pending
+primary_clusters:
+  - kgqa_language_to_knowledge
+  - amr_semantic_parsing
+  - relation_linking
+  - watson_nlp
+socioprophet_targets:
+  - Holmes
+  - Sherlock
+  - Ontogenesis
+  - DataHub
+known_works_seed:
+  - title: "AMR for Knowledge-Base Question Answering"
+    status: needs_source_confirmation
+  - title: "Relation Linking for Knowledge-Base Question Answering"
+    status: needs_source_confirmation
+capture_gaps:
+  - exact KGQA bibliography
+  - AMR records
+  - relation-linking records
+  - Text-to-SQL and schema-grounding adjacency
+notes: >-
+  Promoted author for KGQA, AMR, relation linking, semantic parsing,
+  and language-to-knowledge translation.

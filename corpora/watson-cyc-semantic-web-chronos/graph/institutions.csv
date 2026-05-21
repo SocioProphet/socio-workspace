@@ -1,0 +1,12 @@
+institution_id,name,type,status,notes
+ibm-research,IBM Research,research_lab,confirmed,"Primary institutional hub for CHRONOS, Watson/KGQA, trustworthy AI, causal KG, semantic table, and alignment records."
+cycorp,Cycorp,company,confirmed,"Primary institutional hub for Cyc commonsense and knowledge acquisition lineage. Rights and licensing require review."
+carnegie-mellon-university,Carnegie Mellon University,university,provisional,"Relevant to ACT-R, cognitive architecture background, and historical AI lineage; not yet source-normalized in corpus."
+university-of-michigan,University of Michigan,university,provisional,"Relevant to Soar lineage; not yet source-normalized in corpus."
+w3c,W3C,standards_body,confirmed,"Relevant to PROV-O, RDF, and semantic-web substrate patterns."
+aaai,AAAI,professional_society,confirmed,"Venue and program context for CHRONOS, Cyc acquisition, AI Explainability 360, and related works."
+acl,Association for Computational Linguistics,professional_society,confirmed,"Venue context for Conceptual Diagnostics and NLP/KGQA lineage."
+ieee,IEEE,professional_society,confirmed,"Venue context for Alignment Studio and trustworthy AI systems papers."
+iswc,International Semantic Web Conference,conference_ecosystem,confirmed,"Semantic Web, causal KG, and event-sequence knowledge lineage."
+dagstuhl,Dagstuhl / TGDK,publisher_or_research_center,confirmed,"TGDK / graph data and knowledge benchmark lineage."
+zenodo,Zenodo,artifact_repository,confirmed,"Artifact host for table benchmark datasets and generator artifacts."

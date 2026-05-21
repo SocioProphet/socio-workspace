@@ -1,0 +1,39 @@
+id: alfio-gliozzo
+name: Alfio Gliozzo
+layer: anchor
+status: source_normalization_pending
+primary_clusters:
+  - watson_nlp
+  - semantic_domains
+  - kgqa_language_to_knowledge
+  - document_table_qa
+  - ontology_alignment
+socioprophet_targets:
+  - Holmes
+  - Sherlock
+  - Ontogenesis
+  - DataHub
+  - Agentplane
+known_works_seed:
+  - title: "Semantic Domains in Computational Linguistics"
+    status: confirmed_bibliographic
+  - title: "Natural Language Processing in Watson"
+    status: needs_source_confirmation
+  - title: "AMR for Knowledge-Base Question Answering"
+    status: needs_source_confirmation
+  - title: "Relation Linking for Knowledge-Base Question Answering"
+    status: needs_source_confirmation
+  - title: "KAAPA: Knowledge Aware Answers from PDF Analysis"
+    status: needs_source_confirmation
+capture_gaps:
+  - full DBLP/OpenAlex/Semantic Scholar export
+  - exact Watson NLP architecture records
+  - exact KGQA/AMR/relation-linking bibliography
+  - KAAPA metadata and artifact availability
+  - table QA and Text-to-SQL lineage
+  - ontology alignment and semantic automation records
+notes: >-
+  Anchor author for Watson NLP, semantic domains, KGQA, document/table QA,
+  and language-to-knowledge translation. This is currently the weakest anchor
+  branch bibliographically and remains blocked from implementation issue use
+  until exact records are normalized.

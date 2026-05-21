@@ -1,0 +1,42 @@
+id: maria-chang
+name: Maria Chang
+layer: anchor
+status: source_normalization_pending
+primary_clusters:
+  - chronos_kairos_event_schemas
+  - alignment_governance_trustworthy_ai
+  - kg_llm_conceptual_diagnostics
+  - temporal_logic_neurosymbolics
+  - tutoring_cognitive_systems
+socioprophet_targets:
+  - Policy Fabric
+  - Agentplane
+  - GAIA
+  - Ontogenesis
+  - Sherlock
+  - Holmes
+  - Model Governance Ledger
+known_works_seed:
+  - title: "CHRONOS: A Schema-Based Event Understanding and Prediction System"
+    status: confirmed_bibliographic
+  - title: "Conceptual Diagnostics for Knowledge Graphs and Large Language Models"
+    status: confirmed_bibliographic
+  - title: "Alignment Studio: Aligning Large Language Models to Particular Contextual Regulations"
+    status: confirmed_official
+  - title: "STONE: Signal Temporal Logic Neural Network for Time Series Classification"
+    status: confirmed_bibliographic
+  - title: "Final-Model-Only Data Attribution with a Unifying View of Gradient-Based Methods"
+    status: confirmed_bibliographic
+  - title: "Mitigating Misalignment Contagion by Steering with Implicit Traits"
+    status: needs_source_confirmation
+capture_gaps:
+  - full official profile export
+  - DBLP/OpenAlex/Semantic Scholar IDs
+  - arXiv normalization for trigger paper
+  - patents
+  - tutoring and CogSketch lineage
+  - datasets and artifacts
+notes: >-
+  Anchor author for alignment, event-schema intelligence, KG/LLM diagnostics,
+  temporal-logic neuro-symbolics, and tutoring lineage. This record is a seed,
+  not a complete bibliography.

@@ -1,0 +1,38 @@
+id: rosario-uceda-sosa
+name: Rosario Uceda-Sosa
+layer: anchor
+status: source_normalization_pending
+primary_clusters:
+  - chronos_kairos_event_schemas
+  - formal_kg_reasoning
+  - conceptual_diagnostics
+  - policy_decomposition
+  - semantic_web_reasoning
+socioprophet_targets:
+  - Ontogenesis
+  - Holmes
+  - Sherlock
+  - Policy Fabric
+  - GAIA
+known_works_seed:
+  - title: "CHRONOS: A Schema-Based Event Understanding and Prediction System"
+    status: confirmed_bibliographic
+  - title: "Conceptual Diagnostics for Knowledge Graphs and Large Language Models"
+    status: confirmed_bibliographic
+  - title: "Reasoning about concepts with LLMs: Inconsistencies abound"
+    status: confirmed_bibliographic
+  - title: "ULKB Logic: A HOL-based Framework for Reasoning over Knowledge Graphs"
+    status: confirmed_bibliographic
+  - title: "Alignment Studio: Aligning Large Language Models to Particular Contextual Regulations"
+    status: confirmed_official
+capture_gaps:
+  - full ULKB lineage and artifact audit
+  - formal KG reasoning bibliography
+  - ConceptNet/SPARQL lineage
+  - temporal reasoning works
+  - multimodal semantic concept learning works
+  - policy decomposition expansion
+notes: >-
+  Anchor author bridging CHRONOS event intelligence, conceptual diagnostics,
+  formal KG reasoning, and policy decomposition. Formal logic and code/artifact
+  lineage remain underdeveloped in the corpus.

@@ -1,0 +1,12 @@
+source,target,weight,status,cluster
+Maria Chang,Rosario Uceda-Sosa,5,provisional,chronos_diagnostics
+Maria Chang,Achille Fokoue,5,provisional,chronos_temporal_logic
+Maria Chang,Oktie Hassanzadeh,4,provisional,chronos_event_schemas
+Maria Chang,Karthikeyan Natesan Ramamurthy,5,provisional,alignment_diagnostics
+Rosario Uceda-Sosa,Karthikeyan Natesan Ramamurthy,4,provisional,conceptual_diagnostics
+Oktie Hassanzadeh,Kavitha Srinivas,4,provisional,causal_extraction
+Oktie Hassanzadeh,Aamod Khatiwada,4,provisional,semantic_tables
+Alfio Gliozzo,Carlo Strapparava,5,provisional,semantic_domains
+Alfio Gliozzo,Pavan Kapanipathi,4,provisional,kgqa
+Michael Witbrock,Douglas Lenat,5,provisional,cyc
+Michael Witbrock,Cynthia Matuszek,5,provisional,commonsense_acquisition

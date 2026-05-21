@@ -1,0 +1,5 @@
+{"paper_id":"gliozzo-watson-nlp","reason":"Exact metadata unresolved","source_quality":"plausible_needs_source","blocked_from":"implementation_issue_generation"}
+{"paper_id":"gliozzo-amr-kbqa","reason":"Exact title, venue, authors, and year unresolved","source_quality":"plausible_needs_source","blocked_from":"implementation_issue_generation"}
+{"paper_id":"gliozzo-relation-linking-kbqa","reason":"Exact title, venue, authors, and year unresolved","source_quality":"plausible_needs_source","blocked_from":"implementation_issue_generation"}
+{"paper_id":"witbrock-inference-control-large-kbs","reason":"Exact bibliography unresolved","source_quality":"plausible_needs_source","blocked_from":"implementation_issue_generation"}
+{"paper_id":"chang-2026-misalignment-contagion","reason":"Trigger paper not yet fully normalized from arXiv source","source_quality":"plausible_needs_source","blocked_from":"implementation_issue_generation"}

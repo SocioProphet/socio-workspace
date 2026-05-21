@@ -1,0 +1,40 @@
+id: oktie-hassanzadeh
+name: Oktie Hassanzadeh
+layer: anchor
+status: source_normalization_in_progress
+primary_clusters:
+  - causal_event_kg
+  - semantic_tables
+  - data_lake_discovery
+  - information_integration
+  - data_curation
+socioprophet_targets:
+  - Ontogenesis
+  - Sherlock
+  - GAIA
+  - DataHub
+  - Model Governance Ledger
+known_works_seed:
+  - title: "WikiCausal: Corpus and Evaluation Framework for Causal Knowledge Graph Construction"
+    status: confirmed_bibliographic
+  - title: "Causal Knowledge Extraction through Large-Scale Text Mining"
+    status: confirmed_bibliographic
+  - title: "Knowledge Graph Embeddings for Causal Relation Prediction"
+    status: confirmed_bibliographic
+  - title: "TOPJoin: A Context-Aware Multi-Criteria Approach for Joinable Column Search"
+    status: confirmed_bibliographic
+  - title: "TabSketchFM: Sketch-based Tabular Representation Learning for Data Discovery over Data Lakes"
+    status: confirmed_bibliographic
+  - title: "KG2Tables: A Domain-Specific Tabular Data Generator to Evaluate Semantic Table Interpretation Systems"
+    status: confirmed_bibliographic
+capture_gaps:
+  - patent normalization
+  - artifact license verification
+  - SemTab benchmark inventory
+  - dataset lineage and access review
+  - final venue normalization for workshop/preprint trajectories
+notes: >-
+  Anchor author for causal/event KGs, semantic tables, semantic data lakes,
+  and enterprise information integration. Stronger source coverage than the
+  Gliozzo and Witbrock branches, but patent and artifact governance remain
+  incomplete.

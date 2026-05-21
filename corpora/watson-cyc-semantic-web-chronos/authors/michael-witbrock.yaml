@@ -1,0 +1,33 @@
+id: michael-witbrock
+name: Michael Witbrock
+layer: anchor
+status: source_normalization_pending
+primary_clusters:
+  - cyc_commonsense_acquisition
+  - inference_control
+  - open_knowledge_resource
+  - microtheory_reasoning
+socioprophet_targets:
+  - Holmes
+  - Ontogenesis
+  - Sociosphere
+  - Sherlock
+  - Policy Fabric
+  - Superconscious
+known_works_seed:
+  - title: "Searching for Common Sense: Populating Cyc from the Web"
+    status: confirmed_bibliographic
+  - title: "Knowledge Begets Knowledge: Steps towards Assisted Knowledge Acquisition in Cyc"
+    status: confirmed_bibliographic
+  - title: "Machine Learning for Inference Control in Large Knowledge-Based Systems"
+    status: needs_source_confirmation
+capture_gaps:
+  - full Cyc bibliography
+  - exact inference-control records
+  - patents and licensing
+  - Nooscape/intelligence-analysis lineage
+  - public artifact rights review
+notes: >-
+  Anchor author for commonsense acquisition, microtheories, inference control,
+  and open knowledge-resource doctrine. Current record is conceptual and
+  bibliographically incomplete.

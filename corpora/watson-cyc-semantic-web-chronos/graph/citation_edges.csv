@@ -1,0 +1,4 @@
+source_paper_id,target_paper_id,edge_type,status,notes
+chang-2026-misalignment-contagion,achintalwar-2024-alignment-studio,conceptual_alignment,provisional,"Alignment Studio contextual regulation lineage likely relevant; exact citation relation not yet confirmed."
+chang-2026-misalignment-contagion,uceda-sosa-2025-conceptual-diagnostics,conceptual_alignment,provisional,"Both involve alignment/diagnostics; exact citation relation not yet confirmed."
+uceda-sosa-2025-conceptual-diagnostics,uceda-sosa-2024-reasoning-about-concepts,version_or_lineage,confirmed_bibliographic,"Preprint-to-industry-track lineage requires final verification."

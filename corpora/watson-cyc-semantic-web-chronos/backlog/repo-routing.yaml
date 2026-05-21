@@ -1,0 +1,95 @@
+# Status: scaffold.
+# This file maps corpus-derived work to downstream repositories.
+# Routing remains provisional until repository state and naming are verified.
+
+sociosphere:
+  status: confirmed_repo
+  responsibilities:
+    - corpus governance
+    - source-quality enforcement
+    - blocked queues
+    - issue routing
+    - release review
+
+holmes:
+  status: unresolved_repo_state
+  responsibilities:
+    - KGQA
+    - semantic parsing
+    - formal reasoning
+    - commonsense reasoning
+    - inference control
+    - proof obligations
+  blocked_by:
+    - exact KGQA bibliography normalization
+    - Cyc inference-control normalization
+
+sherlock:
+  status: unresolved_repo_state
+  responsibilities:
+    - evidence retrieval
+    - GraphRAG
+    - diagnostics
+    - document/table QA
+    - source-quality propagation
+
+ontogenesis:
+  status: unresolved_repo_state
+  responsibilities:
+    - schema compilation
+    - ontology design patterns
+    - semantic table schemas
+    - SHACL-like validation
+    - provenance-bearing graph structures
+
+gaia:
+  status: unresolved_repo_state
+  responsibilities:
+    - event schemas
+    - causal event graphs
+    - temporal world modeling
+    - provenance-bearing event records
+
+policy_fabric:
+  status: unresolved_repo_state
+  responsibilities:
+    - contextual regulation
+    - policy decomposition
+    - authorization
+    - trait-drift thresholds
+    - runtime governance
+  aliases:
+    - guardrail-fabric
+
+agentplane:
+  status: unresolved_repo_state
+  responsibilities:
+    - Behavior Trees
+    - BDI planning
+    - runtime orchestration
+    - intervention workflows
+    - multi-agent safety
+
+model_governance_ledger:
+  status: unresolved_repo_state
+  responsibilities:
+    - attribution records
+    - trust metrics
+    - audit trails
+    - intervention outcomes
+    - regulatory evidence
+
+datahub:
+  status: unresolved_repo_state
+  responsibilities:
+    - semantic data lakes
+    - Text-to-SQL
+    - semantic table interpretation
+    - joinable-column search
+    - table embeddings
+
+execution_rules:
+  - no implementation issue from blocked records
+  - no patent-sensitive implementation without design-around review
+  - no reusable artifact dependency without license review
+  - all downstream issues require source-quality labels

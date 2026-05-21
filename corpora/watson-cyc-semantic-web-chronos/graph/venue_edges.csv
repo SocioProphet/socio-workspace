@@ -1,0 +1,11 @@
+venue,lineage,status
+AAAI,chronos_kairos,confirmed
+AAAI,cyc_commonsense,confirmed
+ACL,kg_llm_diagnostics,confirmed
+IEEE,alignment_governance,confirmed
+ISWC,causal_event_kg,confirmed
+NeurIPS,trustworthy_ai,confirmed
+VLDB,semantic_tables,provisional
+ICDE,data_lake_discovery,provisional
+TGDK,semantic_table_benchmarks,confirmed
+Zenodo,artifact_hosting,confirmed

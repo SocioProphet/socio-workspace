@@ -1,0 +1,9 @@
+program,lineage,status,notes
+DARPA KAIROS,chronos_kairos,confirmed_bibliographic,"CHRONOS identified as KAIROS-aligned lineage in corpus synthesis"
+AAAI IAAI Emerging Applications,chronos_kairos,confirmed_bibliographic,"CHRONOS publication context"
+ACL Industry Track,kg_llm_diagnostics,confirmed_bibliographic,"Conceptual Diagnostics publication context"
+ISWC,semantic_web_and_causal_kg,confirmed_bibliographic,"WikiCausal, KG embeddings, semantic table ecosystem"
+NeurIPS Workshop,trustworthy_ai_alignment,confirmed_bibliographic,"Final-model attribution and table representation lineage"
+VLDB Workshop,data_lake_discovery,provisional,"TOPJoin workshop trajectory pending final normalization"
+ICDE,data_lake_discovery,provisional,"TabSketchFM ICDE trajectory pending normalization"
+AAAI Spring Symposium,cyc_commonsense,confirmed_bibliographic,"Knowledge acquisition and Cyc syntax lineage"

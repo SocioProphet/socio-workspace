@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/sociosphere/schemas/corpus-loop-v0.schema.json",
+  "title": "Corpus Loop v0 Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "loop_id",
+    "source_corpus",
+    "components",
+    "positive_acceptance",
+    "negative_acceptance",
+    "sociosphere_boundary"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "kind": {"const": "corpus_loop_v0_manifest"},
+    "loop_id": {"type": "string", "minLength": 3},
+    "source_corpus": {"type": "string", "minLength": 1},
+    "components": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"$ref": "#/$defs/component"}
+    },
+    "positive_acceptance": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "negative_acceptance": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "sociosphere_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owns_coordination", "owns_downstream_implementation"],
+      "properties": {
+        "owns_coordination": {"const": true},
+        "owns_downstream_implementation": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plane", "repo", "issue_ref", "merged_ref", "artifact_refs"],
+      "properties": {
+        "plane": {"enum": ["evidence", "ontology", "policy", "runtime", "ledger"]},
+        "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "issue_ref": {"type": "string", "minLength": 1},
+        "merged_ref": {"type": "string", "minLength": 1},
+        "artifact_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

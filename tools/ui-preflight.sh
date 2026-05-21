@@ -18,6 +18,15 @@ req_files=(
   "$APP/src/components/search/ResultCard.vue"
   "$APP/src/api/search.ts"
   "$APP/src/schemas/search.ts"
+  "$APP/src/schemas/operation.ts"
+  "$APP/src/stores/operation.ts"
+  "$APP/src/api/operation.ts"
+  "$APP/src/components/operation/OperationTray.vue"
+  "$APP/src/components/operation/OperationInspector.vue"
+  "$APP/src/components/operation/DecisionCard.vue"
+  "$APP/src/components/operation/ActivityFeed.vue"
+  "$APP/src/routes/operations/OperationsPage.vue"
+  "$APP/src/routes/admin/OperationSearchPage.vue"
 )
 
 for f in "${req_files[@]}"; do

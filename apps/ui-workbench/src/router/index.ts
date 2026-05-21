@@ -9,6 +9,8 @@ import SettingsPage from '../routes/SettingsPage.vue'
 import ConnectorsPage from '../routes/admin/ConnectorsPage.vue'
 import CurationPage from '../routes/admin/CurationPage.vue'
 import TrustRegistryPage from '../routes/admin/TrustRegistryPage.vue'
+import OperationsPage from '../routes/operations/OperationsPage.vue'
+import OperationSearchPage from '../routes/admin/OperationSearchPage.vue'
 
 export default createRouter({
   history: createWebHashHistory(),
@@ -22,6 +24,8 @@ export default createRouter({
     { path: '/connectors', name: 'connectors', component: ConnectorsPage },
     { path: '/curation', name: 'curation', component: CurationPage },
     { path: '/admin/trust', name: 'trust', component: TrustRegistryPage },
+    { path: '/operations', name: 'operations', component: OperationsPage },
+    { path: '/admin/operations', name: 'admin-operations', component: OperationSearchPage },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })

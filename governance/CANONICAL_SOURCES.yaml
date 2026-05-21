@@ -9,6 +9,7 @@ namespaces:
   workspace-controller: { canonical_repo: sociosphere }
   workspace/manifest: { canonical_repo: sociosphere }
   workspace/registry: { canonical_repo: sociosphere }
+  workspace/orggov-topology: { canonical_repo: sociosphere }
   workspace/compliance: { canonical_repo: sociosphere }
 
   # OS provisioning / bootstrap (Butane, Ignition, installers)
@@ -26,6 +27,8 @@ namespaces:
   # Standards
   standards/platform: { canonical_repo: prophet-platform-standards }
   standards/storage: { canonical_repo: socioprophet-standards-storage }
+  standards/control-plane: { canonical_repo: prophet-platform-standards }
+  standards/control-plane-contracts: { canonical_repo: socioprophet-standards-storage }
   standards/market-data: { canonical_repo: prophet-platform-standards, upstream_standard: socioprophet-standards-storage, note: "runtime market-data profile authority; storage semantics remain upstream" }
   standards/knowledge: { canonical_repo: socioprophet-standards-knowledge }
   standards/sourceos-spec: { canonical_repo: sourceos-spec, note: "Typed contracts spec (SourceOS-Linux/sourceos-spec)" }
@@ -34,6 +37,7 @@ namespaces:
   # Transport & protocol
   protocol/tritrpc: { canonical_repo: TriTRPC }
   protocol/execution: { canonical_repo: agentplane }
+  protocol/execution-admission: { canonical_repo: agentplane }
   protocol/serdes: { canonical_repo: semantic-serdes }
   protocol/replay: { canonical_repo: cairnpath-mesh }
   protocol/epistemic-governance/v1: { canonical_repo: sociosphere, note: "Epistemic Governance topic catalog, run spec, fixture contracts, and compatibility expectations" }
@@ -66,6 +70,7 @@ namespaces:
 
   # Prophet core cluster
   prophet/platform: { canonical_repo: prophet-platform }
+  prophet/control-plane-runtime: { canonical_repo: prophet-platform }
   prophet/market-data: { canonical_repo: prophet-platform, note: "runtime adoption surface for market-data profile v0" }
   prophet/libs: { canonical_repo: prophet-platform, consolidation_note: "collapse prophet-core-libs into prophet-platform/libs" }
   prophet/contracts: { canonical_repo: gaia-world-model, consolidation_note: "collapse prophet-core-contracts into gaia-world-model/contracts" }
@@ -79,9 +84,17 @@ namespaces:
 
   # Identity & security
   identity/zero-trust: { canonical_repo: mcp-a2a-zero-trust }
+  identity/capability-broker: { canonical_repo: mcp-a2a-zero-trust }
+  identity/capability-registry: { canonical_repo: agent-registry }
+  identity/grants: { canonical_repo: agent-registry }
+  identity/runtime-authority: { canonical_repo: agent-registry }
+  identity/delegation: { canonical_repo: HolographMe }
   identity/a2a-bootstrap: { canonical_repo: sourceos-a2a-mcp-bootstrap }
   identity/reference: { canonical_repo: identity-is-prime-reference }
   identity/reputation: { canonical_repo: ReputationVault }
+
+  # Collaboration
+  collaboration/matrix: { canonical_repo: prophet-platform }
 
   # Delivery excellence
   delivery/core: { canonical_repo: delivery-excellence }

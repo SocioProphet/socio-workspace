@@ -1,0 +1,44 @@
+{
+  "id": "agentplane-guarded-invocation-to-sourceos-network-door",
+  "owner_repo": "SocioProphet/sociosphere",
+  "status": "draft",
+  "source": {
+    "repo": "SocioProphet/agentplane",
+    "component": "guarded-invocation",
+    "kind": "execution-control-plane"
+  },
+  "target": {
+    "repo": "SourceOS-Linux/sourceos-syncd",
+    "component": "network-door-plan",
+    "kind": "local-control-plane-plan"
+  },
+  "authority_surface_refs": [
+    "SocioProphet/superconscious#TRUST_SURFACE.yaml:agent_orchestrator"
+  ],
+  "control_effects": [
+    "route",
+    "network_egress"
+  ],
+  "policy_refs": [
+    "SocioProphet/policy-fabric#sourceos.repo_context.read_only"
+  ],
+  "evidence_refs": [
+    "SocioProphet/agentplane#NetworkDoorPlanEvidence"
+  ],
+  "cancellation_binding_refs": [
+    "SocioProphet/policy-fabric#75:cancellation-binding-v1",
+    "SourceOS-Linux/sourceos-syncd#27:state-integrity-unsafe"
+  ],
+  "recovery_refs": [
+    "SourceOS-Linux/sourceos-syncd#27:state-integrity-recovery",
+    "SocioProphet/superconscious#10:prove-clean-binding"
+  ],
+  "related_refs": [
+    "SocioProphet/ProCybernetica#49",
+    "SocioProphet/sociosphere#326",
+    "SocioProphet/superconscious#10",
+    "SocioProphet/policy-fabric#75",
+    "SocioProphet/agentplane#157",
+    "SourceOS-Linux/sourceos-syncd#27"
+  ]
+}

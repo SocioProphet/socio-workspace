@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/sociosphere/schemas/corpus-loop-v1.schema.json",
+  "title": "Corpus Loop v1 Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "loop_id",
+    "source_corpus",
+    "resolution_mode",
+    "components",
+    "sociosphere_boundary"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "kind": {"const": "corpus_loop_v1_manifest"},
+    "loop_id": {"type": "string", "minLength": 3},
+    "source_corpus": {"type": "string", "minLength": 1},
+    "resolution_mode": {"enum": ["pinned_declared", "pinned_verified"]},
+    "components": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/component"}
+    },
+    "sociosphere_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owns_coordination", "owns_downstream_implementation"],
+      "properties": {
+        "owns_coordination": {"const": true},
+        "owns_downstream_implementation": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plane", "repo", "issue_ref", "merged_ref", "pinned_commit", "artifact_refs"],
+      "properties": {
+        "plane": {"enum": ["evidence", "ontology", "policy", "runtime", "ledger"]},
+        "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "issue_ref": {"type": "string", "minLength": 1},
+        "merged_ref": {"type": "string", "minLength": 1},
+        "pinned_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "artifact_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

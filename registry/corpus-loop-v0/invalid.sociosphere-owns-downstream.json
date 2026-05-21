@@ -1,0 +1,49 @@
+{
+  "schema_version": "0.1",
+  "kind": "corpus_loop_v0_manifest",
+  "loop_id": "watson-cyc-semantic-web-chronos-invalid-boundary",
+  "source_corpus": "SocioProphet/sociosphere#334",
+  "components": [
+    {
+      "plane": "evidence",
+      "repo": "SocioProphet/sherlock-search",
+      "issue_ref": "SocioProphet/sherlock-search#56",
+      "merged_ref": "SocioProphet/sherlock-search#58",
+      "artifact_refs": ["schemas/source-quality-answer-trace.v0.schema.json"]
+    },
+    {
+      "plane": "ontology",
+      "repo": "SocioProphet/ontogenesis",
+      "issue_ref": "SocioProphet/ontogenesis#89",
+      "merged_ref": "SocioProphet/ontogenesis#103",
+      "artifact_refs": ["Platform/corpus-event-semantics.ttl"]
+    },
+    {
+      "plane": "policy",
+      "repo": "SocioProphet/policy-fabric",
+      "issue_ref": "SocioProphet/policy-fabric#78",
+      "merged_ref": "SocioProphet/policy-fabric#85",
+      "artifact_refs": ["contracts/governed-action-policy-decision.v0.schema.json"]
+    },
+    {
+      "plane": "runtime",
+      "repo": "SocioProphet/agentplane",
+      "issue_ref": "SocioProphet/agentplane#162",
+      "merged_ref": "SocioProphet/agentplane#184",
+      "artifact_refs": ["schemas/bounded-action-loop.v0.schema.json"]
+    },
+    {
+      "plane": "ledger",
+      "repo": "SocioProphet/model-governance-ledger",
+      "issue_ref": "SocioProphet/model-governance-ledger#19",
+      "merged_ref": "SocioProphet/model-governance-ledger#20",
+      "artifact_refs": ["schemas/governance-audit-record.v0.schema.json"]
+    }
+  ],
+  "positive_acceptance": ["Evidence carrier validates", "Event semantics carrier validates", "Policy decision carrier validates", "Bounded action loop carrier validates", "Ledger record carrier validates"],
+  "negative_acceptance": ["Event without provenance fails", "Claim without evidence fails", "Research-only evidence cannot produce implementation-safe admission", "Loop without policy decision fails", "Ledger record without policy decision fails"],
+  "sociosphere_boundary": {
+    "owns_coordination": true,
+    "owns_downstream_implementation": true
+  }
+}

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
+import OperationTray from './components/operation/OperationTray.vue'
+import OperationInspector from './components/operation/OperationInspector.vue'
 </script>
 
 <template>
@@ -12,6 +14,8 @@ import HelloWorld from './components/HelloWorld.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+  <OperationTray />
+  <OperationInspector />
 </template>
 
 <style scoped>

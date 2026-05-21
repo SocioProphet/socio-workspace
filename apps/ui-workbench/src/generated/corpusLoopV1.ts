@@ -1,0 +1,57 @@
+export const corpusLoopV1 = {
+  loopId: 'watson-cyc-semantic-web-chronos-v1',
+  sourceCorpus: 'SocioProphet/sociosphere#334',
+  validationTarget: 'make corpus-loop-v1-validate',
+  status: 'Pinned carrier manifest declared',
+  components: [
+    {
+      plane: 'Evidence',
+      repo: 'SocioProphet/sherlock-search',
+      merged: '#58',
+      commit: 'fca062b9302d24be58cbea55885720b2e143b276',
+      artifact: 'source-quality answer trace',
+    },
+    {
+      plane: 'Ontology',
+      repo: 'SocioProphet/ontogenesis',
+      merged: '#103',
+      commit: 'b67f458fe8f19fa37505784e4e072c7b954a04dd',
+      artifact: 'corpus event semantics',
+    },
+    {
+      plane: 'Policy',
+      repo: 'SocioProphet/policy-fabric',
+      merged: '#85',
+      commit: '90b08a76c0c6e6c0216eefe2591990081714c559',
+      artifact: 'governed decision record',
+    },
+    {
+      plane: 'Agent carrier',
+      repo: 'SocioProphet/agentplane',
+      merged: '#184',
+      commit: '480fcb7ce4dfca124f6b893306348b76b9103938',
+      artifact: 'bounded loop carrier',
+    },
+    {
+      plane: 'Ledger',
+      repo: 'SocioProphet/model-governance-ledger',
+      merged: '#20',
+      commit: '9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0',
+      artifact: 'v0 ledger record',
+    },
+  ],
+  positive: [
+    'Evidence carrier validates',
+    'Event semantics carrier validates',
+    'Policy decision carrier validates',
+    'Agent carrier validates',
+    'Ledger record validates',
+  ],
+  negative: [
+    'Missing provenance is rejected',
+    'Claim without evidence is rejected',
+    'Review-only source cannot be marked implementation-safe',
+    'Missing decision reference is rejected',
+    'Missing ledger reference is rejected',
+  ],
+} as const

@@ -2,6 +2,7 @@
 import HelloWorld from './components/HelloWorld.vue'
 import OperationTray from './components/operation/OperationTray.vue'
 import OperationInspector from './components/operation/OperationInspector.vue'
+import CorpusLoopPanel from './components/corpus/CorpusLoopPanel.vue'
 </script>
 
 <template>
@@ -14,6 +15,7 @@ import OperationInspector from './components/operation/OperationInspector.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+  <CorpusLoopPanel />
   <OperationTray />
   <OperationInspector />
 </template>

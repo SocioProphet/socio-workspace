@@ -1,7 +1,7 @@
 # registry/change-propagation-rules.yaml
 # Automation rules for cascading changes through the dependency graph
 version: "1.0.0"
-updated_at: "2026-04-06"
+updated_at: "2026-05-05"
 
 # When a repository is updated, these rules determine which downstream
 # repositories should be notified or auto-updated.
@@ -136,6 +136,55 @@ rules:
       - repo: connector-github
         action: notify
         message: "Event schema updated — review GitHub connector events"
+
+  # ── Knowledge Context contract and ontology changes cascade to governance ──
+  - id: knowledge-context-contract-change
+    trigger:
+      repo: socioprophet-standards-knowledge
+      events: [push, release]
+      branches: [main]
+      paths:
+        - "schemas/**"
+        - "rpc/**"
+        - "fixtures/**"
+        - "docs/standards/**"
+        - ".github/workflows/knowledge-context-verify.yml"
+    propagate_to:
+      - repo: socioprophet-standards-storage
+        action: notify
+        message: "Knowledge Context contracts changed — review storage context pointers and graph/vector workload guidance"
+      - repo: ontogenesis
+        action: notify
+        message: "Knowledge Context contracts changed — review ontology module, JSON-LD context, and SHACL promotion gates"
+      - repo: sociosphere
+        action: trigger_ci
+        message: "Knowledge Context contracts changed — run workspace policy and topology validation"
+      - repo: prophet-platform
+        action: notify
+        message: "Knowledge Context contracts changed — review platform knowledge-store consumers and event bus integrations"
+    max_cascade_depth: 2
+
+  - id: knowledge-context-ontology-change
+    trigger:
+      repo: ontogenesis
+      events: [push, release]
+      branches: [main]
+      paths:
+        - "Platform/knowledge-context.ttl"
+        - "shapes/knowledge-context.shacl.ttl"
+        - "contexts/knowledge-context.context.jsonld"
+        - "catalog/registry.*"
+    propagate_to:
+      - repo: socioprophet-standards-knowledge
+        action: notify
+        message: "Knowledge Context ontology changed — verify JSON-LD context alignment, SHACL fixtures, and v1 semantic overlays"
+      - repo: sociosphere
+        action: trigger_ci
+        message: "Knowledge Context ontology changed — run workspace policy, topology, and registry validation"
+      - repo: socioprophet-standards-storage
+        action: notify
+        message: "Knowledge Context ontology changed — review graph/RDF/hypergraph storage guidance"
+    max_cascade_depth: 2
 
   # ── Design system changes cascade to UI repos ──────────────────────────────
   - id: design-system-change

@@ -1,0 +1,26 @@
+{
+  "id": "prose-only-authority",
+  "owner_repo": "SocioProphet/sociosphere",
+  "status": "draft",
+  "source": {
+    "repo": "SocioProphet/agentplane",
+    "component": "guarded-invocation",
+    "kind": "execution-control-plane"
+  },
+  "target": {
+    "repo": "SourceOS-Linux/sourceos-syncd",
+    "component": "network-door-plan",
+    "kind": "local-control-plane-plan"
+  },
+  "authority_surface_refs": [],
+  "control_effects": [
+    "network_egress"
+  ],
+  "policy_refs": [],
+  "evidence_refs": [],
+  "cancellation_binding_refs": [],
+  "recovery_refs": [],
+  "related_refs": [
+    "This should fail because it tries to rely on prose and omits machine-readable authority, policy, evidence, and cancellation references."
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/sociosphere/schemas/authority-dependency.schema.json",
+  "title": "SocioSphere Authority Dependency Graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "authority_dependencies"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^0\\.1$"
+    },
+    "kind": {
+      "type": "string",
+      "const": "AuthorityDependencyGraph"
+    },
+    "authority_dependencies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/authorityDependency"
+      }
+    }
+  },
+  "$defs": {
+    "repoRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "component",
+        "kind"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "component": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "authorityDependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "owner_repo",
+        "status",
+        "source",
+        "target",
+        "authority_surface_refs",
+        "control_effects",
+        "policy_refs",
+        "evidence_refs",
+        "cancellation_binding_refs",
+        "recovery_refs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_.-]*$"
+        },
+        "owner_repo": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "active",
+            "deprecated",
+            "blocked"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/repoRef"
+        },
+        "target": {
+          "$ref": "#/$defs/repoRef"
+        },
+        "authority_surface_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "control_effects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "read",
+              "write",
+              "execute",
+              "route",
+              "publish",
+              "persist_memory",
+              "promote",
+              "merge",
+              "deploy",
+              "replicate",
+              "quarantine",
+              "revoke",
+              "repair",
+              "model_route",
+              "network_egress",
+              "credential_access",
+              "browser_control",
+              "terminal_control",
+              "host_mutation"
+            ]
+          }
+        },
+        "policy_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "cancellation_binding_refs": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recovery_refs": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

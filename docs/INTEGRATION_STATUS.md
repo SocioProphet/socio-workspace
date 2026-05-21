@@ -22,6 +22,21 @@ facts that were previously repeated in multiple places.
   - `SocioProphet/delivery-excellence` for evidence coverage, repair success, false-positive appeal rate, contradiction half-life, review fatigue, and release-readiness metrics
   - `SocioProphet/ontogenesis` for claim ontology, evidence classes, detector vocabulary, counter-test vocabulary, contradiction semantics, and repair-action semantics
 
+### Agent Harness Delivery Routing
+- Routing doc: `docs/integration/agent-harness-delivery-routing.md`
+- Workspace topology owner: `SocioProphet/sociosphere`
+- Delivery-performance owner: `SocioProphet/delivery-excellence`
+- Delivery-automation owner: `SocioProphet/delivery-excellence-automation`
+- Runtime evidence owner: `SocioProphet/agentplane`
+- Policy/guardrail owners: `SocioProphet/policy-fabric` and `SocioProphet/guardrail-fabric`
+- Security validation owners: `SocioProphet/SCOPE-D` and `SocioProphet/global-devsecops-intelligence`
+- Status: routing baseline captured
+- Current scope in SocioSphere: topology, dependency direction, source exposure, and integration status
+- Non-scope in SocioSphere: scoreboards, KPI/OKR definitions, delivery operating cadence, runtime execution, and customer proof dashboards
+- Downstream artifacts:
+  - `SocioProphet/delivery-excellence#9` for the delivery operating model
+  - `SocioProphet/delivery-excellence-automation#7` for machine-readable metric contracts and examples
+
 ### TritRPC
 - Canonical upstream: `SocioProphet/TriTRPC`
 - Workspace declaration: `manifest/workspace.toml` repo `tritrpc`
@@ -66,3 +81,7 @@ For Epistemic Governance, treat `standards/epistemic-governance/` plus
 `registry/epistemic-governance.yaml` as the SocioSphere standard/ownership
 baseline. Downstream repos own implementation according to their canonical
 namespace responsibilities.
+
+For Agent Harness Delivery Routing, treat `docs/integration/agent-harness-delivery-routing.md`
+as the routing baseline. SocioSphere records topology and owner-plane routing;
+Delivery Excellence owns delivery metrics and scoreboards.

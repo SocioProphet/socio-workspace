@@ -1,0 +1,72 @@
+{
+  "schema_version": "0.1",
+  "kind": "corpus_loop_demo_packet",
+  "packet_id": "watson-cyc-semantic-web-chronos-demo-v0",
+  "source_manifest": "registry/corpus-loop-v1/valid.watson-cyc-chronos.pinned.json",
+  "source_report": "reports/corpus-loop-v1-resolution-report.json",
+  "loop_id": "watson-cyc-semantic-web-chronos-v1",
+  "status": "ready_read_only",
+  "components": [
+    {
+      "plane": "evidence",
+      "repo": "SocioProphet/sherlock-search",
+      "merged_ref": "SocioProphet/sherlock-search#58",
+      "pinned_commit": "fca062b9302d24be58cbea55885720b2e143b276",
+      "status": "found",
+      "artifact_count": 3
+    },
+    {
+      "plane": "ontology",
+      "repo": "SocioProphet/ontogenesis",
+      "merged_ref": "SocioProphet/ontogenesis#103",
+      "pinned_commit": "b67f458fe8f19fa37505784e4e072c7b954a04dd",
+      "status": "found",
+      "artifact_count": 3
+    },
+    {
+      "plane": "policy",
+      "repo": "SocioProphet/policy-fabric",
+      "merged_ref": "SocioProphet/policy-fabric#85",
+      "pinned_commit": "90b08a76c0c6e6c0216eefe2591990081714c559",
+      "status": "found",
+      "artifact_count": 3
+    },
+    {
+      "plane": "runtime",
+      "repo": "SocioProphet/agentplane",
+      "merged_ref": "SocioProphet/agentplane#184",
+      "pinned_commit": "480fcb7ce4dfca124f6b893306348b76b9103938",
+      "status": "found",
+      "artifact_count": 3
+    },
+    {
+      "plane": "ledger",
+      "repo": "SocioProphet/model-governance-ledger",
+      "merged_ref": "SocioProphet/model-governance-ledger#20",
+      "pinned_commit": "9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0",
+      "status": "found",
+      "artifact_count": 3
+    }
+  ],
+  "checks": {
+    "positive": [
+      "Five owner planes present",
+      "All carrier commits pinned",
+      "All referenced carrier artifacts found",
+      "Workbench has generated v1 data",
+      "SocioSphere remains coordination owner only"
+    ],
+    "negative": [
+      "Missing carrier plane rejected",
+      "Missing pinned commit rejected",
+      "Downstream ownership claim rejected",
+      "Missing artifact reported by resolver",
+      "Review-only evidence remains non-admissible for implementation-safe status"
+    ]
+  },
+  "boundary": {
+    "read_only": true,
+    "coordination_owner": "SocioProphet/sociosphere",
+    "downstream_owner_policy": "owner_repos_retain_authority"
+  }
+}

@@ -1,75 +1,30 @@
 <script setup lang="ts">
-const components = [
-  {
-    plane: 'Evidence',
-    repo: 'SocioProphet/sherlock-search',
-    merged: '#58',
-    artifact: 'source-quality answer trace',
-  },
-  {
-    plane: 'Ontology',
-    repo: 'SocioProphet/ontogenesis',
-    merged: '#103',
-    artifact: 'corpus event semantics',
-  },
-  {
-    plane: 'Decision',
-    repo: 'SocioProphet/policy-fabric',
-    merged: '#85',
-    artifact: 'governed decision record',
-  },
-  {
-    plane: 'Agent carrier',
-    repo: 'SocioProphet/agentplane',
-    merged: '#184',
-    artifact: 'bounded loop carrier',
-  },
-  {
-    plane: 'Ledger',
-    repo: 'SocioProphet/model-governance-ledger',
-    merged: '#20',
-    artifact: 'v0 ledger record',
-  },
-]
+import { corpusLoopV1 } from '../../generated/corpusLoopV1'
 
-const positive = [
-  'Evidence carrier validates',
-  'Event semantics carrier validates',
-  'Decision carrier validates',
-  'Agent carrier validates',
-  'Ledger record validates',
-]
-
-const negative = [
-  'Missing provenance is rejected',
-  'Claim without evidence is rejected',
-  'Review-only source cannot be marked implementation-safe',
-  'Missing decision reference is rejected',
-  'Missing ledger reference is rejected',
-]
+const shortCommit = (sha: string) => sha.slice(0, 8)
 </script>
 
 <template>
   <section class="corpus-panel" aria-labelledby="corpus-loop-title">
     <div class="corpus-kicker">Watson / Cyc / Semantic Web / CHRONOS</div>
-    <h2 id="corpus-loop-title">Corpus loop v0 coordination</h2>
+    <h2 id="corpus-loop-title">Corpus loop v1 coordination</h2>
     <p class="corpus-summary">
-      Read-only SocioSphere coordination view for the five merged v0 carriers.
+      Read-only SocioSphere coordination view for the five pinned carrier surfaces.
       SocioSphere records topology and validation status; each downstream repo owns its own carrier.
     </p>
 
     <div class="corpus-meta">
-      <span>Source corpus: <strong>SocioProphet/sociosphere#334</strong></span>
-      <span>Validation: <code>make corpus-loop-v0-validate</code></span>
-      <span class="boundary">Coordination only</span>
+      <span>Source corpus: <strong>{{ corpusLoopV1.sourceCorpus }}</strong></span>
+      <span>Validation: <code>{{ corpusLoopV1.validationTarget }}</code></span>
+      <span class="boundary">{{ corpusLoopV1.status }}</span>
     </div>
 
     <div class="component-grid">
-      <article v-for="item in components" :key="item.repo" class="component-card">
+      <article v-for="item in corpusLoopV1.components" :key="item.repo" class="component-card">
         <div class="component-plane">{{ item.plane }}</div>
         <div class="component-repo">{{ item.repo }}</div>
         <div class="component-artifact">{{ item.artifact }}</div>
-        <div class="component-merge">Merged {{ item.merged }}</div>
+        <div class="component-merge">Merged {{ item.merged }} · {{ shortCommit(item.commit) }}</div>
       </article>
     </div>
 
@@ -77,13 +32,13 @@ const negative = [
       <section>
         <h3>Positive checks</h3>
         <ul>
-          <li v-for="item in positive" :key="item">{{ item }}</li>
+          <li v-for="item in corpusLoopV1.positive" :key="item">{{ item }}</li>
         </ul>
       </section>
       <section>
         <h3>Negative checks</h3>
         <ul>
-          <li v-for="item in negative" :key="item">{{ item }}</li>
+          <li v-for="item in corpusLoopV1.negative" :key="item">{{ item }}</li>
         </ul>
       </section>
     </div>

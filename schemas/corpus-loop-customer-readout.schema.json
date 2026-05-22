@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/sociosphere/schemas/corpus-loop-customer-readout.schema.json",
+  "title": "Corpus Loop Customer Readout",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "readout_id",
+    "source_packet",
+    "title",
+    "summary",
+    "proof_points",
+    "safe_claims",
+    "non_claims",
+    "next_step"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "kind": {"const": "corpus_loop_customer_readout"},
+    "readout_id": {"type": "string", "minLength": 3},
+    "source_packet": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1},
+    "proof_points": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "safe_claims": {
+      "type": "array",
+      "minItems": 3,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 5,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "next_step": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,6 +1,7 @@
 name: corpus-loop
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'schemas/corpus-loop-v*.schema.json'

@@ -7,7 +7,7 @@ const shortCommit = (sha: string) => sha.slice(0, 8)
 <template>
   <section class="corpus-panel" aria-labelledby="corpus-loop-title">
     <div class="corpus-kicker">Watson / Cyc / Semantic Web / CHRONOS</div>
-    <h2 id="corpus-loop-title">Corpus loop v1 coordination</h2>
+    <h2 id="corpus-loop-title">CHRONOS Evidence Loop</h2>
     <p class="corpus-summary">
       Read-only SocioSphere coordination view for the five pinned carrier surfaces.
       SocioSphere records topology and validation status; each downstream repo owns its own carrier.

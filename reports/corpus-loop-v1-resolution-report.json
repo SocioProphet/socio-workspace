@@ -1,0 +1,134 @@
+{
+  "schema_version": "0.1",
+  "kind": "corpus_loop_v1_resolution_report",
+  "loop_id": "watson-cyc-semantic-web-chronos-v1",
+  "source_corpus": "SocioProphet/sociosphere#334",
+  "generated_at": "2026-05-22T00:10:00Z",
+  "resolution_mode": "live_github_raw",
+  "components": [
+    {
+      "plane": "evidence",
+      "repo": "SocioProphet/sherlock-search",
+      "merged_ref": "SocioProphet/sherlock-search#58",
+      "pinned_commit": "fca062b9302d24be58cbea55885720b2e143b276",
+      "status": "found",
+      "artifacts": [
+        {
+          "path": "schemas/source-quality-answer-trace.v0.schema.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/sherlock-search/fca062b9302d24be58cbea55885720b2e143b276/schemas/source-quality-answer-trace.v0.schema.json",
+          "status": "found"
+        },
+        {
+          "path": "fixtures/source-quality-answer-trace/valid.confirmed-bibliographic.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/sherlock-search/fca062b9302d24be58cbea55885720b2e143b276/fixtures/source-quality-answer-trace/valid.confirmed-bibliographic.json",
+          "status": "found"
+        },
+        {
+          "path": "tools/validate_source_quality_answer_trace.py",
+          "url": "https://raw.githubusercontent.com/SocioProphet/sherlock-search/fca062b9302d24be58cbea55885720b2e143b276/tools/validate_source_quality_answer_trace.py",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "plane": "ontology",
+      "repo": "SocioProphet/ontogenesis",
+      "merged_ref": "SocioProphet/ontogenesis#103",
+      "pinned_commit": "b67f458fe8f19fa37505784e4e072c7b954a04dd",
+      "status": "found",
+      "artifacts": [
+        {
+          "path": "Platform/corpus-event-semantics.ttl",
+          "url": "https://raw.githubusercontent.com/SocioProphet/ontogenesis/b67f458fe8f19fa37505784e4e072c7b954a04dd/Platform/corpus-event-semantics.ttl",
+          "status": "found"
+        },
+        {
+          "path": "shapes/corpus-event-semantics.shacl.ttl",
+          "url": "https://raw.githubusercontent.com/SocioProphet/ontogenesis/b67f458fe8f19fa37505784e4e072c7b954a04dd/shapes/corpus-event-semantics.shacl.ttl",
+          "status": "found"
+        },
+        {
+          "path": "scripts/validate_corpus_event_semantics.py",
+          "url": "https://raw.githubusercontent.com/SocioProphet/ontogenesis/b67f458fe8f19fa37505784e4e072c7b954a04dd/scripts/validate_corpus_event_semantics.py",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "plane": "policy",
+      "repo": "SocioProphet/policy-fabric",
+      "merged_ref": "SocioProphet/policy-fabric#85",
+      "pinned_commit": "90b08a76c0c6e6c0216eefe2591990081714c559",
+      "status": "found",
+      "artifacts": [
+        {
+          "path": "contracts/governed-action-policy-decision.v0.schema.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/policy-fabric/90b08a76c0c6e6c0216eefe2591990081714c559/contracts/governed-action-policy-decision.v0.schema.json",
+          "status": "found"
+        },
+        {
+          "path": "examples/governed-action-policy/valid.low-risk-allow.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/policy-fabric/90b08a76c0c6e6c0216eefe2591990081714c559/examples/governed-action-policy/valid.low-risk-allow.json",
+          "status": "found"
+        },
+        {
+          "path": "tools/validate_governed_action_policy_decision.py",
+          "url": "https://raw.githubusercontent.com/SocioProphet/policy-fabric/90b08a76c0c6e6c0216eefe2591990081714c559/tools/validate_governed_action_policy_decision.py",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "plane": "runtime",
+      "repo": "SocioProphet/agentplane",
+      "merged_ref": "SocioProphet/agentplane#184",
+      "pinned_commit": "480fcb7ce4dfca124f6b893306348b76b9103938",
+      "status": "found",
+      "artifacts": [
+        {
+          "path": "schemas/bounded-action-loop.v0.schema.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/agentplane/480fcb7ce4dfca124f6b893306348b76b9103938/schemas/bounded-action-loop.v0.schema.json",
+          "status": "found"
+        },
+        {
+          "path": "tests/fixtures/bounded-action-loop/valid.record-event-instance.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/agentplane/480fcb7ce4dfca124f6b893306348b76b9103938/tests/fixtures/bounded-action-loop/valid.record-event-instance.json",
+          "status": "found"
+        },
+        {
+          "path": "tools/check_bounded_action_loop.py",
+          "url": "https://raw.githubusercontent.com/SocioProphet/agentplane/480fcb7ce4dfca124f6b893306348b76b9103938/tools/check_bounded_action_loop.py",
+          "status": "found"
+        }
+      ]
+    },
+    {
+      "plane": "ledger",
+      "repo": "SocioProphet/model-governance-ledger",
+      "merged_ref": "SocioProphet/model-governance-ledger#20",
+      "pinned_commit": "9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0",
+      "status": "found",
+      "artifacts": [
+        {
+          "path": "schemas/governance-audit-record.v0.schema.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/model-governance-ledger/9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0/schemas/governance-audit-record.v0.schema.json",
+          "status": "found"
+        },
+        {
+          "path": "examples/governance-audit-record.valid.json",
+          "url": "https://raw.githubusercontent.com/SocioProphet/model-governance-ledger/9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0/examples/governance-audit-record.valid.json",
+          "status": "found"
+        },
+        {
+          "path": "tools/check_record_v0.py",
+          "url": "https://raw.githubusercontent.com/SocioProphet/model-governance-ledger/9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0/tools/check_record_v0.py",
+          "status": "found"
+        }
+      ]
+    }
+  ],
+  "boundary": {
+    "sociosphere_owns_coordination": true,
+    "sociosphere_owns_downstream_implementation": false
+  }
+}

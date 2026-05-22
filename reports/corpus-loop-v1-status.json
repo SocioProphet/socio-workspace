@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1",
+  "kind": "corpus_loop_v1_status_report",
+  "loop_id": "watson-cyc-semantic-web-chronos-v1",
+  "source_corpus": "SocioProphet/sociosphere#334",
+  "status": "pinned_declared",
+  "validation_target": "make corpus-loop-v1-validate",
+  "live_artifact_resolution": "not_enabled_in_this_tranche",
+  "reason": "SocioSphere v1 records pinned carrier refs and validates manifest polarity locally. Cross-repo file existence checks require a GitHub-fetching CI step or connector-backed resolver and are deferred.",
+  "components": [
+    {
+      "plane": "evidence",
+      "repo": "SocioProphet/sherlock-search",
+      "merged_ref": "SocioProphet/sherlock-search#58",
+      "pinned_commit": "fca062b9302d24be58cbea55885720b2e143b276",
+      "resolution_status": "declared_not_live_verified"
+    },
+    {
+      "plane": "ontology",
+      "repo": "SocioProphet/ontogenesis",
+      "merged_ref": "SocioProphet/ontogenesis#103",
+      "pinned_commit": "b67f458fe8f19fa37505784e4e072c7b954a04dd",
+      "resolution_status": "declared_not_live_verified"
+    },
+    {
+      "plane": "policy",
+      "repo": "SocioProphet/policy-fabric",
+      "merged_ref": "SocioProphet/policy-fabric#85",
+      "pinned_commit": "90b08a76c0c6e6c0216eefe2591990081714c559",
+      "resolution_status": "declared_not_live_verified"
+    },
+    {
+      "plane": "runtime",
+      "repo": "SocioProphet/agentplane",
+      "merged_ref": "SocioProphet/agentplane#184",
+      "pinned_commit": "480fcb7ce4dfca124f6b893306348b76b9103938",
+      "resolution_status": "declared_not_live_verified"
+    },
+    {
+      "plane": "ledger",
+      "repo": "SocioProphet/model-governance-ledger",
+      "merged_ref": "SocioProphet/model-governance-ledger#20",
+      "pinned_commit": "9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0",
+      "resolution_status": "declared_not_live_verified"
+    }
+  ],
+  "boundary": {
+    "sociosphere_owns_coordination": true,
+    "sociosphere_owns_downstream_implementation": false
+  }
+}

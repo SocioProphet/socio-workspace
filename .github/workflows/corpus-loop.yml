@@ -4,22 +4,28 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'schemas/corpus-loop-v*.schema.json'
+      - 'schemas/corpus-loop*.schema.json'
       - 'registry/corpus-loop-v*/**'
-      - 'reports/corpus-loop-v*'
+      - 'reports/corpus-loop*'
       - 'tools/check_clv*.py'
       - 'tools/resolve_clv1.py'
+      - 'tools/assemble_corpus_loop_demo.py'
+      - 'tools/check_corpus_loop_demo_packet.py'
+      - 'tools/check_corpus_loop_customer_readout.py'
       - 'apps/ui-workbench/src/generated/corpusLoopV1.ts'
       - 'apps/ui-workbench/src/components/corpus/CorpusLoopPanel.vue'
       - 'Makefile'
       - '.github/workflows/corpus-loop.yml'
   pull_request:
     paths:
-      - 'schemas/corpus-loop-v*.schema.json'
+      - 'schemas/corpus-loop*.schema.json'
       - 'registry/corpus-loop-v*/**'
-      - 'reports/corpus-loop-v*'
+      - 'reports/corpus-loop*'
       - 'tools/check_clv*.py'
       - 'tools/resolve_clv1.py'
+      - 'tools/assemble_corpus_loop_demo.py'
+      - 'tools/check_corpus_loop_demo_packet.py'
+      - 'tools/check_corpus_loop_customer_readout.py'
       - 'apps/ui-workbench/src/generated/corpusLoopV1.ts'
       - 'apps/ui-workbench/src/components/corpus/CorpusLoopPanel.vue'
       - 'Makefile'

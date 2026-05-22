@@ -1,8 +1,9 @@
 export const corpusLoopV1 = {
   loopId: 'watson-cyc-semantic-web-chronos-v1',
   sourceCorpus: 'SocioProphet/sociosphere#334',
-  validationTarget: 'make corpus-loop-v1-validate',
-  status: 'Pinned carrier manifest declared',
+  validationTarget: 'make corpus-loop-v1-resolution-validate',
+  status: 'Pinned carrier paths live-verified',
+  resolutionMode: 'live_github_raw',
   components: [
     {
       plane: 'Evidence',
@@ -10,6 +11,7 @@ export const corpusLoopV1 = {
       merged: '#58',
       commit: 'fca062b9302d24be58cbea55885720b2e143b276',
       artifact: 'source-quality answer trace',
+      resolutionStatus: 'found',
     },
     {
       plane: 'Ontology',
@@ -17,6 +19,7 @@ export const corpusLoopV1 = {
       merged: '#103',
       commit: 'b67f458fe8f19fa37505784e4e072c7b954a04dd',
       artifact: 'corpus event semantics',
+      resolutionStatus: 'found',
     },
     {
       plane: 'Policy',
@@ -24,6 +27,7 @@ export const corpusLoopV1 = {
       merged: '#85',
       commit: '90b08a76c0c6e6c0216eefe2591990081714c559',
       artifact: 'governed decision record',
+      resolutionStatus: 'found',
     },
     {
       plane: 'Agent carrier',
@@ -31,6 +35,7 @@ export const corpusLoopV1 = {
       merged: '#184',
       commit: '480fcb7ce4dfca124f6b893306348b76b9103938',
       artifact: 'bounded loop carrier',
+      resolutionStatus: 'found',
     },
     {
       plane: 'Ledger',
@@ -38,6 +43,7 @@ export const corpusLoopV1 = {
       merged: '#20',
       commit: '9be3fdba36e8783eca3fb596f6a4ff9cddcc60d0',
       artifact: 'v0 ledger record',
+      resolutionStatus: 'found',
     },
   ],
   positive: [
@@ -46,6 +52,7 @@ export const corpusLoopV1 = {
     'Policy decision carrier validates',
     'Agent carrier validates',
     'Ledger record validates',
+    'All pinned carrier paths resolve at declared commits',
   ],
   negative: [
     'Missing provenance is rejected',
@@ -53,5 +60,6 @@ export const corpusLoopV1 = {
     'Review-only source cannot be marked implementation-safe',
     'Missing decision reference is rejected',
     'Missing ledger reference is rejected',
+    'Missing carrier path is reported by the resolver',
   ],
 } as const

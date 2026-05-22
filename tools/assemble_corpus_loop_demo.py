@@ -96,11 +96,11 @@ def build_readout(packet: dict[str, Any]) -> dict[str, Any]:
         "kind": "corpus_loop_customer_readout",
         "readout_id": "watson-cyc-semantic-web-chronos-readout-v0",
         "source_packet": str(PACKET_OUT.relative_to(ROOT)),
-        "title": "Governed neuro-symbolic corpus loop",
+        "title": "CHRONOS Evidence Loop",
         "summary": (
             "A read-only demonstration packet showing that the Watson/Cyc/Semantic-Web/CHRONOS "
-            "corpus substrate has been converted into a governed, live-resolved, cross-repo carrier "
-            "loop across evidence, ontology, policy, agent carrier, and ledger planes."
+            "corpus substrate has been converted into a governed, live-resolved, cross-repo "
+            "evidence loop across evidence, ontology, policy, agent carrier, and ledger planes."
         ),
         "proof_points": [
             "The source corpus is captured in SocioProphet/sociosphere#334.",
@@ -108,11 +108,11 @@ def build_readout(packet: dict[str, Any]) -> dict[str, Any]:
             "All five carrier commits are pinned in the v1 manifest.",
             f"All {artifact_count} referenced carrier artifacts are represented in the resolution report.",
             "The demo packet validates as read-only and coordination-only.",
-            "The corpus-loop workflow and local aggregate check validate the committed surfaces.",
+            "The CHRONOS Evidence Loop workflow and local aggregate check validate the committed surfaces.",
         ],
         "safe_claims": [
             "The current state is a governed scaffold, not a production runtime.",
-            "The loop is suitable for a read-only product demonstration and architecture review.",
+            "The CHRONOS Evidence Loop is suitable for a read-only product demonstration and architecture review.",
             "SocioSphere owns coordination and topology validation while downstream repos retain their carrier ownership.",
         ],
         "non_claims": [
@@ -123,7 +123,7 @@ def build_readout(packet: dict[str, Any]) -> dict[str, Any]:
             "This readout does not claim patent or license clearance for artifact reuse.",
             "This readout does not move downstream implementation ownership into SocioSphere.",
         ],
-        "next_step": "Promote from read-only packet to a bounded demo assembler that emits a demo artifact from the manifest without invoking downstream actions.",
+        "next_step": "Promote from read-only CHRONOS Evidence Loop packet to a bounded demo assembler that emits a demo artifact from the manifest without invoking downstream actions.",
     }
 
 
@@ -159,7 +159,7 @@ def main() -> int:
     validate_outputs(packet, readout)
     check_or_write(PACKET_OUT, dump(packet), write=args.write)
     check_or_write(READOUT_OUT, dump(readout), write=args.write)
-    print("OK: corpus loop demo packet and customer readout are current")
+    print("OK: CHRONOS Evidence Loop demo packet and customer readout are current")
     return 0
 
 

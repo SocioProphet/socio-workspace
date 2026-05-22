@@ -1,149 +1,160 @@
-version: 0.1.0
-updated_at: '2026-05-09'
-status: draft
-parent_issue: SocioProphet/sociosphere#310
-canonical_loop:
-  - observe
-  - anchor
-  - normalize
-  - propose
-  - explain
-  - verify
-  - govern
-  - act
-  - receipt
-  - learn
-invariants:
-  - raw_model_output_is_proposal_not_truth
-  - graph_candidates_are_proposals_not_truth
-  - vector_candidates_remain_candidate_only
-  - holmes_verifies_and_explains_but_does_not_admit
-  - policy_fabric_decides_allow_deny_review_or_provisional
-  - agentplane_acts_only_after_admission_and_emits_receipts
-slash_topic_membranes:
-  - id: /architecture/governed-intelligence
-    owner_repo: SocioProphet/sociosphere
-    purpose: Reference architecture rollout and adoption state.
-  - id: /sherlock/evidence-answers
-    owner_repo: SocioProphet/sherlock-search
-    purpose: Evidence-bearing answer candidates, anchors, proposed claims, and display handoff.
-  - id: /holmes/proof-claims
-    owner_repo: SocioProphet/holmes
-    purpose: Proof claims, reasoning traces, contradiction reports, and explanation contracts.
-  - id: /gaia/world-claims
-    owner_repo: SocioProphet/gaia-world-model
-    purpose: Spatial-temporal world claims, geospatial anchors, fusion evidence, uncertainty, and map display.
-  - id: /agents/action-admission
-    owner_repo: SocioProphet/agentplane
-    purpose: Action proposals, admission handoff, runtime boundary records, and receipts.
-  - id: /policy/claim-action-admission
-    owner_repo: SocioProphet/guardrail-fabric
-    purpose: Claim/action admission policy, evidence sufficiency, review gates, and revocation.
-  - id: /ontogenesis/schema-contracts
-    owner_repo: SocioProphet/ontogenesis
-    purpose: Canonical schemas, ontology, SHACL, JSON-LD, and vector encoding manifests.
-  - id: /models/governance-ledger
-    owner_repo: SocioProphet/model-governance-ledger
-    purpose: Model lineage, inference traces, evaluation reports, drift events, and learning events.
-canonical_objects:
-  - name: Entity
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/regis-entity-graph
-    consumers: [SocioProphet/sherlock-search, SocioProphet/holmes, SocioProphet/gaia-world-model, SocioProphet/sociosphere]
-  - name: Anchor
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/sherlock-search
-    consumers: [SocioProphet/gaia-world-model, SocioProphet/model-governance-ledger, SocioProphet/holmes]
-  - name: Evidence
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/sherlock-search
-    consumers: [SocioProphet/holmes, SocioProphet/guardrail-fabric, SocioProphet/gaia-world-model]
-  - name: Claim
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/holmes
-    consumers: [SocioProphet/sherlock-search, SocioProphet/gaia-world-model, SocioProphet/guardrail-fabric, SocioProphet/sociosphere]
-  - name: ProofCertificate
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/holmes
-    consumers: [SocioProphet/guardrail-fabric, SocioProphet/sociosphere]
-  - name: ExplanationTrace
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/holmes
-    consumers: [SocioProphet/sherlock-search, SocioProphet/guardrail-fabric, SocioProphet/gaia-world-model, SocioProphet/model-governance-ledger]
-  - name: VectorCandidate
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/sherlock-search
-    required_status: candidate_only
-    consumers: [SocioProphet/holmes, SocioProphet/gaia-world-model, SocioProphet/agentplane]
-  - name: PolicyDecision
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/guardrail-fabric
-    allowed_states: [allow, deny, require_review, provisional]
-    consumers: [SocioProphet/holmes, SocioProphet/sherlock-search, SocioProphet/gaia-world-model, SocioProphet/agentplane, SocioProphet/sociosphere]
-  - name: ActionProposal
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/agentplane
-    consumers: [SocioProphet/guardrail-fabric, SocioProphet/sociosphere]
-  - name: ActionAdmission
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/guardrail-fabric
-    consumers: [SocioProphet/agentplane, SocioProphet/sociosphere]
-  - name: RuntimeReceipt
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/agentplane
-    consumers: [SocioProphet/sociosphere, SocioProphet/model-governance-ledger]
-  - name: LearningEvent
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/model-governance-ledger
-    consumers: [SocioProphet/sociosphere, SocioProphet/holmes, SocioProphet/guardrail-fabric]
-  - name: Revocation
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/guardrail-fabric
-    consumers: [SocioProphet/sociosphere, SocioProphet/holmes, SocioProphet/sherlock-search, SocioProphet/gaia-world-model, SocioProphet/agentplane]
-  - name: SlashTopicProfile
-    schema_owner: SocioProphet/ontogenesis
-    primary_runtime_owner: SocioProphet/sociosphere
-    consumers: [SocioProphet/sherlock-search, SocioProphet/holmes, SocioProphet/gaia-world-model, SocioProphet/agentplane]
-repo_adoption:
-  - repo: SocioProphet/sociosphere
-    issue: 310
-    role: rollout_registry_and_slash_topic_projection
-    adoption_state: schema_stubbed
-  - repo: SocioProphet/ontogenesis
-    issue: 77
-    role: canonical_schema_generation
-    adoption_state: not_started
-  - repo: SocioProphet/holmes
-    issue: 7
-    role: proof_claim_and_reasoning_contracts
-    adoption_state: not_started
-  - repo: SocioProphet/sherlock-search
-    issue: 51
-    role: evidence_answer_contracts
-    adoption_state: not_started
-  - repo: SocioProphet/gaia-world-model
-    issue: 25
-    role: governed_world_claim_contracts
-    adoption_state: not_started
-  - repo: SocioProphet/guardrail-fabric
-    issue: 23
-    role: claim_action_admission_policy
-    adoption_state: not_started
-  - repo: SocioProphet/agentplane
-    issue: 152
-    role: action_proposal_admission_and_runtime_receipts
-    adoption_state: not_started
-  - repo: SocioProphet/model-governance-ledger
-    issue: 16
-    role: model_lineage_inference_trace_and_learning_events
-    adoption_state: not_started
-vertical_slices:
-  - id: sherlock_holmes_policy_answer
-    status: planned
-    flow: Sherlock query -> Anchor -> Evidence -> ProposedClaim -> Holmes ExplanationTrace -> PolicyDecision -> Answer display
-  - id: gaia_world_claim
-    status: planned
-    flow: Bounded source evidence -> GeoAnchor -> WorldClaim -> FusionExplanation -> Uncertainty -> PolicyDecision -> /map evidence display
-  - id: agentplane_action_receipt
-    status: planned
-    flow: AgentIntent -> ActionProposal -> PolicyDecision/ActionAdmission -> RuntimeBoundary -> RuntimeReceipt -> Sociosphere/LearningEvent
+kind: GovernedIntelligenceRolloutRegistration
+version: 0.2.0
+updated: 2026-05-22
+owner: SocioProphet/sociosphere
+first_validated_vertical_slice: CHRONOS Evidence Loop
+
+canonical_platform_loop:
+  - Observe
+  - Anchor
+  - Normalize
+  - Propose
+  - Explain
+  - Verify
+  - Govern
+  - Act
+  - Receipt
+  - Learn
+
+membranes:
+  - membrane: /architecture/governed-intelligence
+    owner: SocioProphet/sociosphere
+  - membrane: /chronos/evidence-loop
+    owner: SocioProphet/sociosphere
+  - membrane: /sherlock/evidence-answers
+    owner: SocioProphet/sherlock-search
+  - membrane: /holmes/proof-claims
+    owner: SocioProphet/holmes
+  - membrane: /gaia/world-claims
+    owner: SocioProphet/gaia-world-model
+  - membrane: /agents/action-admission
+    owner: SocioProphet/agentplane
+  - membrane: /policy/claim-action-admission
+    owner: SocioProphet/policy-fabric
+  - membrane: /guardrails/evaluation-and-controls
+    owner: SocioProphet/guardrail-fabric
+  - membrane: /ontogenesis/schema-contracts
+    owner: SocioProphet/ontogenesis
+  - membrane: /ledger/governance-records
+    owner: SocioProphet/model-governance-ledger
+
+adoption_status_projection:
+  allowed_statuses:
+    - not_started
+    - schema_stubbed
+    - adapter_in_progress
+    - contract_tests_present
+    - vertical_slice_ready
+  repos:
+    - repo: SocioProphet/sociosphere
+      role: coordination_surface
+      status: vertical_slice_ready
+      current_anchor: CHRONOS Evidence Loop manifests, resolver, packet, readout
+    - repo: SocioProphet/sherlock-search
+      role: evidence_answers
+      status: contract_tests_present
+      current_anchor: SocioProphet/sherlock-search#58
+    - repo: SocioProphet/ontogenesis
+      role: schema_authority
+      status: contract_tests_present
+      current_anchor: SocioProphet/ontogenesis#103
+    - repo: SocioProphet/policy-fabric
+      role: policy_decision_carrier
+      status: contract_tests_present
+      current_anchor: SocioProphet/policy-fabric#85
+    - repo: SocioProphet/agentplane
+      role: bounded_agent_carrier
+      status: contract_tests_present
+      current_anchor: SocioProphet/agentplane#184
+    - repo: SocioProphet/model-governance-ledger
+      role: ledger_record_carrier
+      status: contract_tests_present
+      current_anchor: SocioProphet/model-governance-ledger#20
+    - repo: SocioProphet/holmes
+      role: proof_claims
+      status: not_started
+      current_anchor: null
+    - repo: SocioProphet/gaia-world-model
+      role: world_claims
+      status: not_started
+      current_anchor: null
+    - repo: SocioProphet/guardrail-fabric
+      role: guardrail_evaluation_controls
+      status: not_started
+      current_anchor: null
+    - repo: SocioProphet/slash-topics
+      role: slash_topic_profiles
+      status: not_started
+      current_anchor: null
+
+canonical_object_matrix:
+  - object: SourceQualityAnswerTrace
+    source_of_truth_repo: SocioProphet/sherlock-search
+    status: present
+  - object: CorpusEventSemantics
+    source_of_truth_repo: SocioProphet/ontogenesis
+    status: present
+  - object: GovernedPolicyDecision
+    source_of_truth_repo: SocioProphet/policy-fabric
+    status: present
+  - object: BoundedActionLoop
+    source_of_truth_repo: SocioProphet/agentplane
+    status: present_carrier_only
+  - object: GovernanceRecord
+    source_of_truth_repo: SocioProphet/model-governance-ledger
+    status: present
+  - object: CoordinationManifest
+    source_of_truth_repo: SocioProphet/sociosphere
+    status: present
+  - object: ResolutionReport
+    source_of_truth_repo: SocioProphet/sociosphere
+    status: present
+  - object: CustomerReadout
+    source_of_truth_repo: SocioProphet/sociosphere
+    status: present
+  - object: ProofClaim
+    source_of_truth_repo: SocioProphet/holmes
+    status: pending_broader_rollout
+  - object: WorldClaim
+    source_of_truth_repo: SocioProphet/gaia-world-model
+    status: pending_broader_rollout
+  - object: GuardrailEvaluation
+    source_of_truth_repo: SocioProphet/guardrail-fabric
+    status: pending_broader_rollout
+  - object: SlashTopicProfile
+    source_of_truth_repo: SocioProphet/slash-topics
+    status: pending_broader_rollout
+
+chronos_evidence_loop:
+  source_corpus: SocioProphet/sociosphere#334
+  carriers:
+    - repo: SocioProphet/sherlock-search
+      merged_ref: SocioProphet/sherlock-search#58
+    - repo: SocioProphet/ontogenesis
+      merged_ref: SocioProphet/ontogenesis#103
+    - repo: SocioProphet/policy-fabric
+      merged_ref: SocioProphet/policy-fabric#85
+    - repo: SocioProphet/agentplane
+      merged_ref: SocioProphet/agentplane#184
+    - repo: SocioProphet/model-governance-ledger
+      merged_ref: SocioProphet/model-governance-ledger#20
+  coordination_surfaces:
+    - registry/corpus-loop-v1/valid.watson-cyc-chronos.pinned.json
+    - reports/corpus-loop-v1-resolution-report.json
+    - reports/corpus-loop-demo-packet.json
+    - reports/corpus-loop-customer-readout.json
+  validation_target: make corpus-loop-check
+
+non_goals:
+  - SocioSphere does not own all canonical schemas.
+  - SocioSphere does not own downstream carrier internals.
+  - The CHRONOS Evidence Loop does not claim live runtime execution.
+  - The CHRONOS Evidence Loop does not claim autonomous external effects.
+  - The CHRONOS Evidence Loop does not claim production storage integration.
+  - The CHRONOS Evidence Loop does not claim completed corpus normalization.
+  - The CHRONOS Evidence Loop does not claim patent or license clearance.
+  - VectorCandidate remains candidate_only until evidence, proof, and policy gates validate admission.
+
+supersedes:
+  - pull_request: SocioProphet/sociosphere#311
+    reason: stale branch reconciled into current-main governed-intelligence umbrella with CHRONOS Evidence Loop as first validated vertical slice

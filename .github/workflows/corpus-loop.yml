@@ -1,0 +1,51 @@
+name: corpus-loop
+
+on:
+  push:
+    paths:
+      - 'schemas/corpus-loop-v*.schema.json'
+      - 'registry/corpus-loop-v*/**'
+      - 'reports/corpus-loop-v*'
+      - 'tools/check_clv*.py'
+      - 'tools/resolve_clv1.py'
+      - 'apps/ui-workbench/src/generated/corpusLoopV1.ts'
+      - 'apps/ui-workbench/src/components/corpus/CorpusLoopPanel.vue'
+      - 'Makefile'
+      - '.github/workflows/corpus-loop.yml'
+  pull_request:
+    paths:
+      - 'schemas/corpus-loop-v*.schema.json'
+      - 'registry/corpus-loop-v*/**'
+      - 'reports/corpus-loop-v*'
+      - 'tools/check_clv*.py'
+      - 'tools/resolve_clv1.py'
+      - 'apps/ui-workbench/src/generated/corpusLoopV1.ts'
+      - 'apps/ui-workbench/src/components/corpus/CorpusLoopPanel.vue'
+      - 'Makefile'
+      - '.github/workflows/corpus-loop.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  corpus-loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: python -m pip install jsonschema
+
+      - name: Validate corpus loop v0
+        run: make corpus-loop-v0-validate
+
+      - name: Validate corpus loop v1 manifest and status report
+        run: make corpus-loop-v1-validate
+
+      - name: Validate corpus loop v1 committed resolution report
+        run: make corpus-loop-v1-resolution-validate

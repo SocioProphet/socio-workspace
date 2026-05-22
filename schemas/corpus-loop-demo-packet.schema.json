@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/sociosphere/schemas/corpus-loop-demo-packet.schema.json",
+  "title": "Corpus Loop Demo Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "packet_id",
+    "source_manifest",
+    "source_report",
+    "loop_id",
+    "status",
+    "components",
+    "checks",
+    "boundary"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "kind": {"const": "corpus_loop_demo_packet"},
+    "packet_id": {"type": "string", "minLength": 3},
+    "source_manifest": {"type": "string", "minLength": 1},
+    "source_report": {"type": "string", "minLength": 1},
+    "loop_id": {"type": "string", "minLength": 3},
+    "status": {"enum": ["ready_read_only", "blocked", "partial"]},
+    "components": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/component"}
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["positive", "negative"],
+      "properties": {
+        "positive": {"type": "array", "minItems": 5, "items": {"type": "string", "minLength": 1}},
+        "negative": {"type": "array", "minItems": 5, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only", "coordination_owner", "downstream_owner_policy"],
+      "properties": {
+        "read_only": {"const": true},
+        "coordination_owner": {"const": "SocioProphet/sociosphere"},
+        "downstream_owner_policy": {"const": "owner_repos_retain_authority"}
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plane", "repo", "merged_ref", "pinned_commit", "status", "artifact_count"],
+      "properties": {
+        "plane": {"enum": ["evidence", "ontology", "policy", "runtime", "ledger"]},
+        "repo": {"type": "string", "minLength": 1},
+        "merged_ref": {"type": "string", "minLength": 1},
+        "pinned_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "status": {"enum": ["found", "missing", "unresolved"]},
+        "artifact_count": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

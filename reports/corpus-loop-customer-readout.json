@@ -7,9 +7,9 @@
   "summary": "A read-only demonstration packet showing that the Watson/Cyc/Semantic-Web/CHRONOS corpus substrate has been converted into a governed, live-resolved, cross-repo carrier loop across evidence, ontology, policy, agent carrier, and ledger planes.",
   "proof_points": [
     "The source corpus is captured in SocioProphet/sociosphere#334.",
-    "Five downstream owner planes have merged v0 carrier surfaces.",
+    "5 of 5 downstream owner planes have found carrier surfaces.",
     "All five carrier commits are pinned in the v1 manifest.",
-    "All fifteen referenced carrier artifacts are marked found in the resolution report.",
+    "All 15 referenced carrier artifacts are represented in the resolution report.",
     "The demo packet validates as read-only and coordination-only.",
     "The corpus-loop workflow and local aggregate check validate the committed surfaces."
   ],
@@ -26,5 +26,5 @@
     "This readout does not claim patent or license clearance for artifact reuse.",
     "This readout does not move downstream implementation ownership into SocioSphere."
   ],
-  "next_step": "Promote from read-only packet to a bounded demo assembler that emits a demo artifact from the manifest without executing downstream actions."
+  "next_step": "Promote from read-only packet to a bounded demo assembler that emits a demo artifact from the manifest without invoking downstream actions."
 }

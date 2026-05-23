@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "kind": "neurosymbolic_repo_graph_fixture",
+  "fixture_id": "invalid.missing-boundary",
+  "expected_result": "block_governed_action",
+  "corpus_loop": "watson-cyc-semantic-web-chronos-v1",
+  "repo": "SocioProphet/hellgraph",
+  "graph_state": {
+    "canonical_source_present": true,
+    "manifest_overlay_present": true,
+    "boundary_present": false,
+    "boundary_class": null,
+    "shacl_conforms": true,
+    "policy_decision": "deny",
+    "ledger_required": true
+  },
+  "planes": {
+    "evidence": "SocioProphet/sherlock-search",
+    "ontology": "SocioProphet/ontogenesis",
+    "policy": "SocioProphet/policy-fabric",
+    "runtime": "SocioProphet/agentplane",
+    "ledger": "SocioProphet/model-governance-ledger"
+  },
+  "reasoning": {
+    "chronos": "promotion_candidate_blocked_by_missing_boundary",
+    "watson_cyc": "proof_runtime_requires_boundary_before_action"
+  }
+}

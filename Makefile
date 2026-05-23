@@ -257,6 +257,7 @@ identity-prime-conformance:
 hygiene-check:
 	@echo "==> Running repository hygiene checks..."
 	bash tools/check_hygiene.sh
+	python3 tools/check_final_newlines.py
 	@echo "OK: hygiene-check passed"
 
 

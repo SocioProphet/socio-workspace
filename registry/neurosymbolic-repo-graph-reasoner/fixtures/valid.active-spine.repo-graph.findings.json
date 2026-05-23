@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.1",
+  "kind": "active_spine_repo_graph_findings",
+  "corpus_loop": "watson-cyc-semantic-web-chronos-v1",
+  "generated_from": "registry/neurosymbolic-repo-graph-reasoner/graph-lift.manifest.json",
+  "finding_kinds": [
+    "blocked-non-actionable",
+    "missing-surface",
+    "policy-review-required",
+    "promotion-ready",
+    "stale-pin"
+  ],
+  "findings": [
+    {
+      "kind": "promotion-ready",
+      "repository": "SocioProphet/hellgraph",
+      "severity": "info",
+      "reason": "promotion candidate has required governance surface coverage",
+      "actionable": true
+    },
+    {
+      "kind": "missing-surface",
+      "repository": "SocioProphet/TriTRPC",
+      "severity": "warn",
+      "reason": "missing governance surfaces: manifest_overlay",
+      "actionable": true
+    },
+    {
+      "kind": "policy-review-required",
+      "repository": "SocioProphet/sociosphere",
+      "severity": "info",
+      "reason": "canonical repository is tracked by spine but requires policy review before overlay mutation",
+      "actionable": true
+    },
+    {
+      "kind": "blocked-non-actionable",
+      "repository": "SourceOS-Linux/sourceos-spec",
+      "severity": "info",
+      "reason": "adjacent SourceOS lane is represented but not a SocioProphet mutation target",
+      "actionable": false
+    },
+    {
+      "kind": "stale-pin",
+      "repository": "watson-cyc-semantic-web-chronos-v1",
+      "severity": "review",
+      "reason": "corpus-loop plane pins require explicit review before refresh",
+      "actionable": true
+    }
+  ]
+}

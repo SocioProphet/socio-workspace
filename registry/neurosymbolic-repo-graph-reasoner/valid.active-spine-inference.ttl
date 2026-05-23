@@ -1,0 +1,23 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix repo: <https://github.com/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+repo:SocioProphet/prophet-platform
+  a nrg:RepositoryGraphFixture ;
+  nrg:fixtureId "valid.active-spine-inference" ;
+  nrg:expectedResult "governed_candidate" ;
+  nrg:corpusLoop "watson-cyc-semantic-web-chronos-v1" ;
+  nrg:canonicalSourcePresent true ;
+  nrg:manifestOverlayPresent true ;
+  nrg:boundaryPresent true ;
+  nrg:boundaryClass "runtime_verifier" ;
+  nrg:shaclConforms true ;
+  nrg:policyDecision "allow" ;
+  nrg:ledgerRequired true ;
+  nrg:evidencePlane "SocioProphet/sherlock-search" ;
+  nrg:ontologyPlane "SocioProphet/ontogenesis" ;
+  nrg:policyPlane "SocioProphet/policy-fabric" ;
+  nrg:runtimePlane "SocioProphet/agentplane" ;
+  nrg:ledgerPlane "SocioProphet/model-governance-ledger" ;
+  nrg:chronosReasoning "all_required_governance_surfaces_present" ;
+  nrg:watsonCycReasoning "runtime_product_may_consume_standards_when_boundary_and_policy_are_present" .

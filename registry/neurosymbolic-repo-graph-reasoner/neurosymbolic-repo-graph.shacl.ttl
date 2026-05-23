@@ -32,3 +32,19 @@ nrg:CorpusLoopPlaneBindingShape
   sh:property [ sh:path nrg:policyPlane ; sh:hasValue "SocioProphet/policy-fabric" ] ;
   sh:property [ sh:path nrg:runtimePlane ; sh:hasValue "SocioProphet/agentplane" ] ;
   sh:property [ sh:path nrg:ledgerPlane ; sh:hasValue "SocioProphet/model-governance-ledger" ] .
+
+nrg:ActiveSpineRepositoryShape
+  a sh:NodeShape ;
+  sh:targetClass nrg:ActiveSpineRepository ;
+  sh:property [ sh:path nrg:repository ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:spineRole ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:presentInSpine ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:presentInManifestOverlay ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:presentInCanonicalSources ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:presentInBoundaries ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:presentInTopology ; sh:minCount 1 ; sh:datatype xsd:boolean ] .
+
+nrg:RepositoryGraphInputShape
+  a sh:NodeShape ;
+  sh:targetClass nrg:RepositoryGraphInput ;
+  sh:property [ sh:path nrg:sourcePath ; sh:minCount 1 ; sh:datatype xsd:string ] .

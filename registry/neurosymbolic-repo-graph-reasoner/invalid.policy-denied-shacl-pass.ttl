@@ -1,0 +1,23 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix repo: <https://github.com/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+repo:SocioProphet/prophet-workspace
+  a nrg:RepositoryGraphFixture ;
+  nrg:fixtureId "invalid.policy-denied-shacl-pass" ;
+  nrg:expectedResult "block_governed_action" ;
+  nrg:corpusLoop "watson-cyc-semantic-web-chronos-v1" ;
+  nrg:canonicalSourcePresent true ;
+  nrg:manifestOverlayPresent true ;
+  nrg:boundaryPresent true ;
+  nrg:boundaryClass "workspace_product" ;
+  nrg:shaclConforms true ;
+  nrg:policyDecision "deny" ;
+  nrg:ledgerRequired true ;
+  nrg:evidencePlane "SocioProphet/sherlock-search" ;
+  nrg:ontologyPlane "SocioProphet/ontogenesis" ;
+  nrg:policyPlane "SocioProphet/policy-fabric" ;
+  nrg:runtimePlane "SocioProphet/agentplane" ;
+  nrg:ledgerPlane "SocioProphet/model-governance-ledger" ;
+  nrg:chronosReasoning "shacl_passed_but_policy_denied_current_transition" ;
+  nrg:watsonCycReasoning "shape_conformance_is_not_action_authorization" .

@@ -3,6 +3,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 nrg:RepositoryGraphFixture a rdfs:Class .
+nrg:ActiveSpineRepository a rdfs:Class .
+nrg:RepositoryGraphInput a rdfs:Class .
 
 nrg:fixtureId a rdfs:Property ; rdfs:range xsd:string .
 nrg:expectedResult a rdfs:Property ; rdfs:range xsd:string .
@@ -22,3 +24,12 @@ nrg:runtimePlane a rdfs:Property ; rdfs:range xsd:string .
 nrg:ledgerPlane a rdfs:Property ; rdfs:range xsd:string .
 nrg:chronosReasoning a rdfs:Property ; rdfs:range xsd:string .
 nrg:watsonCycReasoning a rdfs:Property ; rdfs:range xsd:string .
+nrg:sourceDigest a rdfs:Property ; rdfs:range xsd:string .
+nrg:sourcePath a rdfs:Property ; rdfs:range xsd:string .
+nrg:repository a rdfs:Property ; rdfs:range xsd:string .
+nrg:spineRole a rdfs:Property ; rdfs:range xsd:string .
+nrg:presentInSpine a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:presentInManifestOverlay a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:presentInCanonicalSources a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:presentInBoundaries a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:presentInTopology a rdfs:Property ; rdfs:range xsd:boolean .

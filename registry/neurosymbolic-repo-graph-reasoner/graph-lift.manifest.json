@@ -1,0 +1,37 @@
+{
+  "manifest_id": "neurosymbolic-repo-graph-lift-v0",
+  "corpus_loop": "watson-cyc-semantic-web-chronos-v1",
+  "output": "registry/neurosymbolic-repo-graph-reasoner/generated.active-spine.repo-graph.ttl",
+  "inputs": [
+    "registry/spine-v0.txt",
+    "manifest/active-spine.repos.toml",
+    "governance/CANONICAL_SOURCES.yaml",
+    "catalog/boundaries.yaml",
+    "docs/TOPOLOGY.md",
+    "registry/corpus-loop-v1/valid.watson-cyc-chronos.pinned.json"
+  ],
+  "required_repositories": [
+    "SocioProphet/sociosphere",
+    "SocioProphet/prophet-platform",
+    "SocioProphet/TriTRPC",
+    "SocioProphet/socioprophet-standards-storage",
+    "SocioProphet/socioprophet-standards-knowledge",
+    "SocioProphet/prophet-platform-standards",
+    "SocioProphet/socioprophet-agent-standards",
+    "SocioProphet/prophet-workspace",
+    "SocioProphet/hellgraph",
+    "SourceOS-Linux/sourceos-spec"
+  ],
+  "required_planes": {
+    "evidence": "SocioProphet/sherlock-search",
+    "ontology": "SocioProphet/ontogenesis",
+    "policy": "SocioProphet/policy-fabric",
+    "runtime": "SocioProphet/agentplane",
+    "ledger": "SocioProphet/model-governance-ledger"
+  },
+  "non_goals": [
+    "do_not_execute_repo_mutations",
+    "do_not_replace_policy_fabric",
+    "do_not_treat_shacl_as_action_authorization"
+  ]
+}

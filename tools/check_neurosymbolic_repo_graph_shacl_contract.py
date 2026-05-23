@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import importlib.util
 import re
 from pathlib import Path
 import sys
@@ -9,10 +10,19 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_DIR = ROOT / "registry" / "neurosymbolic-repo-graph-reasoner"
 VOCAB = FIXTURE_DIR / "neurosymbolic-repo-graph.ttl"
 CONTRACT = FIXTURE_DIR / "neurosymbolic-repo-graph.shacl.ttl"
+GRAPH_LIFT_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_lift.py"
 
 REQUIRED_SHAPES = {
     "RepositoryGraphFixtureShape",
     "CorpusLoopPlaneBindingShape",
+    "ActiveSpineRepositoryShape",
+    "RepositoryGraphInputShape",
+}
+
+REQUIRED_CLASSES = {
+    "RepositoryGraphFixture",
+    "ActiveSpineRepository",
+    "RepositoryGraphInput",
 }
 
 REQUIRED_PATHS = {
@@ -33,6 +43,15 @@ REQUIRED_PATHS = {
     "ledgerPlane",
     "chronosReasoning",
     "watsonCycReasoning",
+    "sourceDigest",
+    "repository",
+    "spineRole",
+    "presentInSpine",
+    "presentInManifestOverlay",
+    "presentInCanonicalSources",
+    "presentInBoundaries",
+    "presentInTopology",
+    "sourcePath",
 }
 
 EXPECTED_BINDINGS = {
@@ -57,6 +76,16 @@ def declared_vocab_terms(text: str) -> set[str]:
     return set(re.findall(r"^nrg:([A-Za-z][A-Za-z0-9]*)\s+a\s+(?:rdfs:Class|rdfs:Property)", text, re.MULTILINE))
 
 
+def run_graph_lift_check() -> int:
+    spec = importlib.util.spec_from_file_location("check_active_spine_repo_graph_lift", GRAPH_LIFT_CHECK)
+    if spec is None or spec.loader is None:
+        fail("could not load active spine repo graph lift validator")
+        return 1
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return int(module.main())
+
+
 def main() -> int:
     failed = False
     vocab_text = VOCAB.read_text(encoding="utf-8")
@@ -69,9 +98,13 @@ def main() -> int:
             fail(f"contract missing shape {shape}")
             failed = True
 
-    if "RepositoryGraphFixture" not in used:
-        fail("contract missing target class RepositoryGraphFixture")
-        failed = True
+    for klass in REQUIRED_CLASSES:
+        if klass not in used:
+            fail(f"contract missing target class {klass}")
+            failed = True
+        if klass not in declared:
+            fail(f"vocabulary missing class {klass}")
+            failed = True
 
     for path in REQUIRED_PATHS:
         if f"sh:path nrg:{path}" not in contract_text:
@@ -94,7 +127,11 @@ def main() -> int:
     if failed:
         return 1
 
-    print("OK: neurosymbolic repo graph SHACL contract is vocabulary-aligned and plane-bound")
+    graph_lift_status = run_graph_lift_check()
+    if graph_lift_status != 0:
+        return graph_lift_status
+
+    print("OK: neurosymbolic repo graph SHACL contract is vocabulary-aligned, plane-bound, and graph-lift checked")
     return 0
 
 

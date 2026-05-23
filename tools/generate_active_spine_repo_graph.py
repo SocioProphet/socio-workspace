@@ -55,13 +55,16 @@ def presence(repo: str, text: str) -> str:
     return "true" if repo in text or repo.split("/", 1)[-1] in text else "false"
 
 
-def source_digest(paths: list[str]) -> str:
+def source_digest(manifest: dict) -> str:
     h = hashlib.sha256()
-    for rel in paths:
-        path = ROOT / rel
+    pinned = manifest.get("input_blob_shas", {})
+    for rel in manifest["inputs"]:
+        blob_sha = pinned.get(rel)
+        if not blob_sha:
+            raise ValueError(f"missing input blob sha for {rel}")
         h.update(rel.encode("utf-8"))
         h.update(b"\0")
-        h.update(path.read_bytes())
+        h.update(blob_sha.encode("utf-8"))
         h.update(b"\0")
     return h.hexdigest()
 
@@ -82,7 +85,7 @@ def generate() -> str:
     sources_text = read_text(ROOT / "governance/CANONICAL_SOURCES.yaml")
     boundaries_text = read_text(ROOT / "catalog/boundaries.yaml")
     topology_text = read_text(ROOT / "docs/TOPOLOGY.md")
-    digest = source_digest(inputs)
+    digest = source_digest(manifest)
 
     lines = [
         "@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .",

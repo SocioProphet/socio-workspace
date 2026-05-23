@@ -39,6 +39,14 @@ EXPECTED_ROLES = {
     "SourceOS-Linux/sourceos-spec": "adjacent_standard",
 }
 
+BOOLEAN_PREDICATES = {
+    "presentInSpine",
+    "presentInManifestOverlay",
+    "presentInCanonicalSources",
+    "presentInBoundaries",
+    "presentInTopology",
+}
+
 
 def fail(msg: str) -> None:
     print(f"ERR: {msg}", file=sys.stderr)
@@ -53,12 +61,20 @@ def load_generator():
     return module
 
 
-def has_triple(text: str, repo: str, predicate: str, value: str) -> bool:
+def repo_block(text: str, repo: str) -> str:
     local = re.sub(r"[^A-Za-z0-9]", "-", repo).strip("-")
     block_match = re.search(rf"repo:{re.escape(local)}\n(?P<body>.*?)(?:\n\n|\Z)", text, re.DOTALL)
-    if not block_match:
+    return block_match.group("body") if block_match else ""
+
+
+def has_triple(text: str, repo: str, predicate: str, value: str | bool) -> bool:
+    block = repo_block(text, repo)
+    if not block:
         return False
-    return f"nrg:{predicate} {json.dumps(value)}" in block_match.group("body")
+    if predicate in BOOLEAN_PREDICATES:
+        expected = "true" if value is True else "false"
+        return f"nrg:{predicate} {expected}" in block
+    return f"nrg:{predicate} {json.dumps(value)}" in block
 
 
 def main() -> int:
@@ -106,8 +122,8 @@ def main() -> int:
         if not has_triple(graph, repo, "spineRole", role):
             fail(f"graph missing expected spine role for {repo}: {role}")
             failed = True
-        if not has_triple(graph, repo, "presentInSpine", "true") and 'nrg:presentInSpine true' not in graph:
-            fail(f"graph missing spine presence for {repo}")
+        if not has_triple(graph, repo, "presentInSpine", True):
+            fail(f"graph missing per-repository spine presence for {repo}")
             failed = True
 
     for plane, repo in manifest.get("required_planes", {}).items():

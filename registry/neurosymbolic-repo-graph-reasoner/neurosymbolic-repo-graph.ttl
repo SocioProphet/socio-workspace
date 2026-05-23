@@ -1,0 +1,24 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+nrg:RepositoryGraphFixture a rdfs:Class .
+
+nrg:fixtureId a rdfs:Property ; rdfs:range xsd:string .
+nrg:expectedResult a rdfs:Property ; rdfs:range xsd:string .
+nrg:corpusLoop a rdfs:Property ; rdfs:range xsd:string .
+nrg:canonicalSourcePresent a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:manifestOverlayPresent a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:boundaryPresent a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:boundaryClass a rdfs:Property ; rdfs:range xsd:string .
+nrg:shaclConforms a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:policyDecision a rdfs:Property ; rdfs:range xsd:string .
+nrg:ledgerRequired a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:pinnedCommitStale a rdfs:Property ; rdfs:range xsd:boolean .
+nrg:evidencePlane a rdfs:Property ; rdfs:range xsd:string .
+nrg:ontologyPlane a rdfs:Property ; rdfs:range xsd:string .
+nrg:policyPlane a rdfs:Property ; rdfs:range xsd:string .
+nrg:runtimePlane a rdfs:Property ; rdfs:range xsd:string .
+nrg:ledgerPlane a rdfs:Property ; rdfs:range xsd:string .
+nrg:chronosReasoning a rdfs:Property ; rdfs:range xsd:string .
+nrg:watsonCycReasoning a rdfs:Property ; rdfs:range xsd:string .

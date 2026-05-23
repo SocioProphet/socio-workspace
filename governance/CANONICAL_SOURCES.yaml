@@ -124,3 +124,4 @@ hygiene:
   default_branch: main
   single_branch_policy: true
   exempt_from_single_branch: [socioprophet]
+  stale_pr_threshold_days: 90

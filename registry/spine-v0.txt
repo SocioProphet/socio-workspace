@@ -1,0 +1,23 @@
+Active spine v0
+
+Canonical:
+SocioProphet/sociosphere
+SocioProphet/prophet-platform
+SocioProphet/TriTRPC
+SocioProphet/socioprophet-standards-storage
+SocioProphet/socioprophet-standards-knowledge
+
+Candidates:
+SocioProphet/prophet-platform-standards
+SocioProphet/socioprophet-agent-standards
+SocioProphet/prophet-workspace
+SocioProphet/hellgraph
+
+Adjacent:
+SourceOS-Linux/sourceos-spec
+
+Required follow-up:
+- patch manifest workspace
+- refresh lockfile
+- normalize canonical repo registry
+- add coverage validators

@@ -1,0 +1,35 @@
+# Active spine manifest overlay
+# Generated from registry/spine-v0.txt.
+# Do not use this as a lockfile substitute; workspace.lock.json still owns resolved revisions.
+
+[[repos]]
+name = "prophet_platform"
+role = "component"
+url = "https://github.com/SocioProphet/prophet-platform"
+ref = "main"
+local_path = "components/prophet_platform"
+license_hint = "MIT"
+
+[[repos]]
+name = "prophet_workspace"
+role = "component"
+url = "https://github.com/SocioProphet/prophet-workspace"
+ref = "main"
+local_path = "components/prophet_workspace"
+license_hint = "MIT"
+
+[[repos]]
+name = "hellgraph"
+role = "component"
+url = "https://github.com/SocioProphet/hellgraph"
+ref = "main"
+local_path = "components/hellgraph"
+license_hint = "MIT"
+
+[[repos]]
+name = "socioprophet_agent_standards"
+role = "standards"
+url = "https://github.com/SocioProphet/socioprophet-agent-standards"
+ref = "main"
+local_path = "components/socioprophet_agent_standards"
+license_hint = "MIT"

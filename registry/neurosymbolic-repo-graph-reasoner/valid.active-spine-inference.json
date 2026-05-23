@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "kind": "neurosymbolic_repo_graph_fixture",
+  "fixture_id": "valid.active-spine-inference",
+  "expected_result": "governed_candidate",
+  "corpus_loop": "watson-cyc-semantic-web-chronos-v1",
+  "repo": "SocioProphet/prophet-platform",
+  "graph_state": {
+    "canonical_source_present": true,
+    "manifest_overlay_present": true,
+    "boundary_present": true,
+    "boundary_class": "runtime_verifier",
+    "shacl_conforms": true,
+    "policy_decision": "allow",
+    "ledger_required": true
+  },
+  "planes": {
+    "evidence": "SocioProphet/sherlock-search",
+    "ontology": "SocioProphet/ontogenesis",
+    "policy": "SocioProphet/policy-fabric",
+    "runtime": "SocioProphet/agentplane",
+    "ledger": "SocioProphet/model-governance-ledger"
+  },
+  "reasoning": {
+    "chronos": "all_required_governance_surfaces_present",
+    "watson_cyc": "runtime_product_may_consume_standards_when_boundary_and_policy_are_present"
+  }
+}

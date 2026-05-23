@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "kind": "neurosymbolic_repo_graph_fixture",
+  "fixture_id": "diagnostic.stale-pin",
+  "expected_result": "diagnostic_finding_only",
+  "corpus_loop": "watson-cyc-semantic-web-chronos-v1",
+  "repo": "SocioProphet/ontogenesis",
+  "graph_state": {
+    "canonical_source_present": true,
+    "manifest_overlay_present": true,
+    "boundary_present": true,
+    "boundary_class": "law_compiler",
+    "shacl_conforms": true,
+    "policy_decision": "review_required",
+    "ledger_required": true,
+    "pinned_commit_stale": true
+  },
+  "planes": {
+    "evidence": "SocioProphet/sherlock-search",
+    "ontology": "SocioProphet/ontogenesis",
+    "policy": "SocioProphet/policy-fabric",
+    "runtime": "SocioProphet/agentplane",
+    "ledger": "SocioProphet/model-governance-ledger"
+  },
+  "reasoning": {
+    "chronos": "stale_pin_emits_diagnostic_not_automatic_action",
+    "watson_cyc": "freshness_gap_requires_review_before_execution"
+  }
+}

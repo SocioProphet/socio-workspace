@@ -21,7 +21,8 @@ nrg:RepositoryGraphFixtureShape
   sh:property [ sh:path nrg:runtimePlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
   sh:property [ sh:path nrg:ledgerPlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
   sh:property [ sh:path nrg:chronosReasoning ; sh:minCount 1 ; sh:datatype xsd:string ] ;
-  sh:property [ sh:path nrg:watsonCycReasoning ; sh:minCount 1 ; sh:datatype xsd:string ] .
+  sh:property [ sh:path nrg:watsonCycReasoning ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:sourceDigest ; sh:minCount 1 ; sh:datatype xsd:string ] .
 
 nrg:CorpusLoopPlaneBindingShape
   a sh:NodeShape ;

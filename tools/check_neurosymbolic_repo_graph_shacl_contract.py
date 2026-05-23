@@ -13,6 +13,14 @@ CONTRACT = FIXTURE_DIR / "neurosymbolic-repo-graph.shacl.ttl"
 REQUIRED_SHAPES = {
     "RepositoryGraphFixtureShape",
     "CorpusLoopPlaneBindingShape",
+    "ActiveSpineRepositoryShape",
+    "RepositoryGraphInputShape",
+}
+
+REQUIRED_CLASSES = {
+    "RepositoryGraphFixture",
+    "ActiveSpineRepository",
+    "RepositoryGraphInput",
 }
 
 REQUIRED_PATHS = {
@@ -33,6 +41,14 @@ REQUIRED_PATHS = {
     "ledgerPlane",
     "chronosReasoning",
     "watsonCycReasoning",
+    "repository",
+    "spineRole",
+    "presentInSpine",
+    "presentInManifestOverlay",
+    "presentInCanonicalSources",
+    "presentInBoundaries",
+    "presentInTopology",
+    "sourcePath",
 }
 
 EXPECTED_BINDINGS = {
@@ -69,9 +85,13 @@ def main() -> int:
             fail(f"contract missing shape {shape}")
             failed = True
 
-    if "RepositoryGraphFixture" not in used:
-        fail("contract missing target class RepositoryGraphFixture")
-        failed = True
+    for klass in REQUIRED_CLASSES:
+        if klass not in used:
+            fail(f"contract missing target class {klass}")
+            failed = True
+        if klass not in declared:
+            fail(f"vocabulary missing class {klass}")
+            failed = True
 
     for path in REQUIRED_PATHS:
         if f"sh:path nrg:{path}" not in contract_text:

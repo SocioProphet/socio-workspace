@@ -9,8 +9,15 @@ CHECKED = [
     "Makefile",
     "registry/spine-v0.txt",
     "manifest/active-spine.repos.toml",
+    "governance/CANONICAL_SOURCES.yaml",
+    "docs/governance/active-spine-audit-2026-05-23.md",
+    "docs/governance/runner-overlay-integration-note-2026-05-23.md",
     "tools/check_spine_v0.py",
     "tools/check_active_spine_overlay.py",
+    "tools/check_active_spine_sources.py",
+    "tools/check_runner_overlay_discovery.py",
+    "tools/check_runner_overlay_merge_order.py",
+    "tools/runner/manifest_layers.py",
 ]
 
 

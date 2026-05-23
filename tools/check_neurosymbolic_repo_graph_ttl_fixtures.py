@@ -46,7 +46,7 @@ def fail(msg: str) -> None:
 
 
 def ttl_value(text: str, predicate: str) -> object:
-    pattern = rf"nrg:{re.escape(predicate)}\\s+([^;.]*)"
+    pattern = rf"nrg:{re.escape(predicate)}\s+([^;.]*)"
     match = re.search(pattern, text)
     if not match:
         return None

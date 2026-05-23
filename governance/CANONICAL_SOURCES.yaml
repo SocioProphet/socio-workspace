@@ -31,6 +31,7 @@ namespaces:
   standards/control-plane-contracts: { canonical_repo: socioprophet-standards-storage }
   standards/market-data: { canonical_repo: prophet-platform-standards, upstream_standard: socioprophet-standards-storage, note: "runtime market-data profile authority; storage semantics remain upstream" }
   standards/knowledge: { canonical_repo: socioprophet-standards-knowledge }
+  standards/agent-profile: { canonical_repo: socioprophet-agent-standards }
   standards/sourceos-spec: { canonical_repo: sourceos-spec, note: "Typed contracts spec (SourceOS-Linux/sourceos-spec)" }
   standards/epistemic-governance: { canonical_repo: sociosphere, note: "Claim, evidence, critique, repair, promotion, decision/action, appeal, and replay governance standard" }
 
@@ -71,6 +72,7 @@ namespaces:
   # Prophet core cluster
   prophet/platform: { canonical_repo: prophet-platform }
   prophet/control-plane-runtime: { canonical_repo: prophet-platform }
+  prophet/workspace: { canonical_repo: prophet-workspace }
   prophet/market-data: { canonical_repo: prophet-platform, note: "runtime adoption surface for market-data profile v0" }
   prophet/libs: { canonical_repo: prophet-platform, consolidation_note: "collapse prophet-core-libs into prophet-platform/libs" }
   prophet/contracts: { canonical_repo: gaia-world-model, consolidation_note: "collapse prophet-core-contracts into gaia-world-model/contracts" }
@@ -81,6 +83,9 @@ namespaces:
   prophet/policy: { canonical_repo: gaia-world-model, consolidation_note: "collapse prophet-core-policy into gaia-world-model/policy" }
   prophet/infra: { canonical_repo: gaia-world-model, consolidation_note: "collapse prophet-core-infra into gaia-world-model/infra" }
   prophet/scaffolder: { canonical_repo: prophet-platform, consolidation_note: "collapse prophet-core-scaffolder into prophet-platform/tools" }
+
+  # Proof runtime
+  proof/field-graph-runtime: { canonical_repo: hellgraph }
 
   # Identity & security
   identity/zero-trust: { canonical_repo: mcp-a2a-zero-trust }
@@ -119,4 +124,3 @@ hygiene:
   default_branch: main
   single_branch_policy: true
   exempt_from_single_branch: [socioprophet]
-  stale_pr_threshold_days: 90

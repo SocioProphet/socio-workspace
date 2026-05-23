@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.1",
+  "kind": "active_spine_repo_graph_findings",
+  "corpus_loop": "watson-cyc-semantic-web-chronos-v1",
+  "generated_from": "registry/neurosymbolic-repo-graph-reasoner/graph-lift.manifest.json",
+  "finding_kinds": [
+    "promotion-ready"
+  ],
+  "findings": [
+    {
+      "kind": "promotion-ready",
+      "repository": "SocioProphet/hellgraph",
+      "severity": "info",
+      "reason": "promotion candidate has required governance surface coverage",
+      "actionable": true
+    }
+  ]
+}

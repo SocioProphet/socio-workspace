@@ -1,0 +1,24 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix repo: <https://github.com/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+repo:SocioProphet/ontogenesis
+  a nrg:RepositoryGraphFixture ;
+  nrg:fixtureId "diagnostic.stale-pin" ;
+  nrg:expectedResult "diagnostic_finding_only" ;
+  nrg:corpusLoop "watson-cyc-semantic-web-chronos-v1" ;
+  nrg:canonicalSourcePresent true ;
+  nrg:manifestOverlayPresent true ;
+  nrg:boundaryPresent true ;
+  nrg:boundaryClass "law_compiler" ;
+  nrg:shaclConforms true ;
+  nrg:policyDecision "review_required" ;
+  nrg:ledgerRequired true ;
+  nrg:pinnedCommitStale true ;
+  nrg:evidencePlane "SocioProphet/sherlock-search" ;
+  nrg:ontologyPlane "SocioProphet/ontogenesis" ;
+  nrg:policyPlane "SocioProphet/policy-fabric" ;
+  nrg:runtimePlane "SocioProphet/agentplane" ;
+  nrg:ledgerPlane "SocioProphet/model-governance-ledger" ;
+  nrg:chronosReasoning "stale_pin_emits_diagnostic_not_automatic_action" ;
+  nrg:watsonCycReasoning "freshness_gap_requires_review_before_execution" .

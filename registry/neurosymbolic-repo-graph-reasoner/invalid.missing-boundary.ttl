@@ -1,0 +1,23 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix repo: <https://github.com/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+repo:SocioProphet/hellgraph
+  a nrg:RepositoryGraphFixture ;
+  nrg:fixtureId "invalid.missing-boundary" ;
+  nrg:expectedResult "block_governed_action" ;
+  nrg:corpusLoop "watson-cyc-semantic-web-chronos-v1" ;
+  nrg:canonicalSourcePresent true ;
+  nrg:manifestOverlayPresent true ;
+  nrg:boundaryPresent false ;
+  nrg:boundaryClass "" ;
+  nrg:shaclConforms true ;
+  nrg:policyDecision "deny" ;
+  nrg:ledgerRequired true ;
+  nrg:evidencePlane "SocioProphet/sherlock-search" ;
+  nrg:ontologyPlane "SocioProphet/ontogenesis" ;
+  nrg:policyPlane "SocioProphet/policy-fabric" ;
+  nrg:runtimePlane "SocioProphet/agentplane" ;
+  nrg:ledgerPlane "SocioProphet/model-governance-ledger" ;
+  nrg:chronosReasoning "promotion_candidate_blocked_by_missing_boundary" ;
+  nrg:watsonCycReasoning "proof_runtime_requires_boundary_before_action" .

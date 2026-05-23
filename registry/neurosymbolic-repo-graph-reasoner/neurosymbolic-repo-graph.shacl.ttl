@@ -1,0 +1,34 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+nrg:RepositoryGraphFixtureShape
+  a sh:NodeShape ;
+  sh:targetClass nrg:RepositoryGraphFixture ;
+  sh:property [ sh:path nrg:fixtureId ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:expectedResult ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:corpusLoop ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:canonicalSourcePresent ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:manifestOverlayPresent ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:boundaryPresent ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:boundaryClass ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:shaclConforms ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:policyDecision ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:ledgerRequired ; sh:minCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:property [ sh:path nrg:evidencePlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:ontologyPlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:policyPlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:runtimePlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:ledgerPlane ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:chronosReasoning ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path nrg:watsonCycReasoning ; sh:minCount 1 ; sh:datatype xsd:string ] .
+
+nrg:CorpusLoopPlaneBindingShape
+  a sh:NodeShape ;
+  sh:targetClass nrg:RepositoryGraphFixture ;
+  sh:property [ sh:path nrg:corpusLoop ; sh:hasValue "watson-cyc-semantic-web-chronos-v1" ] ;
+  sh:property [ sh:path nrg:evidencePlane ; sh:hasValue "SocioProphet/sherlock-search" ] ;
+  sh:property [ sh:path nrg:ontologyPlane ; sh:hasValue "SocioProphet/ontogenesis" ] ;
+  sh:property [ sh:path nrg:policyPlane ; sh:hasValue "SocioProphet/policy-fabric" ] ;
+  sh:property [ sh:path nrg:runtimePlane ; sh:hasValue "SocioProphet/agentplane" ] ;
+  sh:property [ sh:path nrg:ledgerPlane ; sh:hasValue "SocioProphet/model-governance-ledger" ] .

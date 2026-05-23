@@ -81,6 +81,169 @@ entries:
     current_status: Implementation issue open for Trust-First proof artifact/checker contract.
     next_step: Add proof artifact and Event-IR schemas.
 
+  - repo: SocioProphet/TriTRPC
+    boundary_class: transport_protocol
+    jurisdiction: Transport/RPC schema boundary, envelope compatibility, conformance fixtures, and protocol-version transition control.
+    owned_artifacts:
+      - schemas/avro/trirpc
+      - schemas/schemasalad/trirpc-schema-bundle.v0.yml
+      - protocol fixtures
+      - conformance reports
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - semantic_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - schema fingerprints
+      - conformance fixture hashes
+      - release tags
+    maturity: L1
+    current_status: Active-spine transport standard; boundary record newly represented in Sociosphere atlas.
+    next_step: Add native BOUNDARY.md and exported conformance artifact map in TriTRPC.
+
+  - repo: SocioProphet/socioprophet-standards-storage
+    boundary_class: storage_standard
+    jurisdiction: Storage substrate semantics, replication obligations, durability tiers, capacity policy, and storage proof contracts.
+    owned_artifacts:
+      - storage schemas
+      - replication policy definitions
+      - durability and capacity contracts
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - schema version pinning
+      - storage policy review
+      - fixture hashes
+    maturity: L0
+    current_status: Active-spine storage standard; boundary record newly represented in Sociosphere atlas.
+    next_step: Add native boundary declaration and fixture coverage for storage standard obligations.
+
+  - repo: SocioProphet/socioprophet-standards-knowledge
+    boundary_class: knowledge_standard
+    jurisdiction: Knowledge substrate semantics, provenance, ontology alignment, query contracts, and epistemic-control-plane obligations.
+    owned_artifacts:
+      - knowledge schemas
+      - provenance contracts
+      - ontology alignment contracts
+      - query semantics fixtures
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - semantic_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - ontology source hashes
+      - schema version pinning
+      - provenance fixture hashes
+    maturity: L0
+    current_status: Active-spine knowledge standard; boundary record newly represented in Sociosphere atlas.
+    next_step: Add native boundary declaration and provenance/query fixture coverage.
+
+  - repo: SocioProphet/socioprophet-agent-standards
+    boundary_class: agent_profile_standard
+    jurisdiction: Agent profile contracts, behavior constraints, capability descriptors, lifecycle rules, and admission criteria.
+    owned_artifacts:
+      - agent profile schemas
+      - capability descriptor contracts
+      - lifecycle/admission fixtures
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - profile schema version
+      - capability descriptor hashes
+      - admission fixture hashes
+    maturity: L0
+    current_status: Active-spine promotion candidate; boundary record newly represented in Sociosphere atlas.
+    next_step: Add native boundary declaration and promotion-readiness fixtures.
+
+  - repo: SocioProphet/prophet-workspace
+    boundary_class: workspace_product
+    jurisdiction: User-facing workspace product boundary, project lifecycle surfaces, UI/workbench contracts, and workspace artifact custody.
+    owned_artifacts:
+      - workspace UI contracts
+      - project lifecycle artifacts
+      - workspace artifact manifests
+    claim_modes:
+      - illustrative_schema
+      - fixture_validated
+      - experimental_run
+    sufficiency_types:
+      - task_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - workspace artifact hashes
+      - release tags
+      - UI/workbench validation reports
+    maturity: L0
+    current_status: Active-spine promotion candidate; boundary record newly represented in Sociosphere atlas.
+    next_step: Add native boundary declaration and workspace artifact custody fixtures.
+
+  - repo: SocioProphet/hellgraph
+    boundary_class: proof_graph_runtime
+    jurisdiction: Proof graph runtime, field-graph execution, proof-node custody, graph-transition evidence, and restricted promotion controls.
+    owned_artifacts:
+      - proof graph schemas
+      - graph execution traces
+      - field-graph proof artifacts
+      - transition evidence reports
+    claim_modes:
+      - formal_construction
+      - fixture_validated
+      - experimental_run
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - proof artifact hashes
+      - graph transition logs
+      - checker version pinning
+    maturity: L0
+    current_status: Restricted active-spine promotion candidate; boundary record newly represented in Sociosphere atlas.
+    next_step: Add native boundary declaration, proof graph fixtures, and restricted promotion gate.
+
+  - repo: SourceOS-Linux/sourceos-spec
+    boundary_class: sourceos_spec_standard
+    jurisdiction: SourceOS schema/specification boundary, host-state contracts, ostree/system-space obligations, and adjacent SourceOS compatibility rules.
+    owned_artifacts:
+      - SourceOS specification schemas
+      - host-state contracts
+      - system-space compatibility rules
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - reconstruction_sufficient
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - spec version pinning
+      - schema hashes
+      - compatibility fixture hashes
+    maturity: L0
+    current_status: Adjacent SourceOS active-spine lane; boundary record newly represented in Sociosphere atlas.
+    next_step: Add cross-org boundary reference and compatibility fixture map.
+
   - repo: SocioProphet/policy-fabric
     boundary_class: admissibility_policy
     jurisdiction: Claim-mode promotion, proof-artifact verdict interpretation, and boundary-crossing admissibility.

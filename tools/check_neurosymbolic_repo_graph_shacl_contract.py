@@ -41,6 +41,7 @@ REQUIRED_PATHS = {
     "ledgerPlane",
     "chronosReasoning",
     "watsonCycReasoning",
+    "sourceDigest",
     "repository",
     "spineRole",
     "presentInSpine",

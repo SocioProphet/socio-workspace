@@ -1,0 +1,10 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix repo: <https://github.com/> .
+
+repo:active-spine-generated-graph
+  a nrg:RepositoryGraphFixture ;
+  nrg:fixtureId "generated.active-spine.repo-graph" ;
+  nrg:expectedResult "generated_repo_state_graph" ;
+  nrg:corpusLoop "watson-cyc-semantic-web-chronos-v1" ;
+  nrg:policyDecision "review_required" ;
+  nrg:sourceDigest "d96847bca85d29032afd620f771b54224b2a7619df1d0f6845749320c4369e60" .

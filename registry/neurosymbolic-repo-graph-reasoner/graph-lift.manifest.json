@@ -10,6 +10,14 @@
     "docs/TOPOLOGY.md",
     "registry/corpus-loop-v1/valid.watson-cyc-chronos.pinned.json"
   ],
+  "input_blob_shas": {
+    "registry/spine-v0.txt": "d5be4fc1a73b3b49764d6ebb02dce5886d261a4d",
+    "manifest/active-spine.repos.toml": "d0535218400c7911438130fc68a95d15addb23a7",
+    "governance/CANONICAL_SOURCES.yaml": "9d22f92dbc948cd5348efc2782548a04c0e2637f",
+    "catalog/boundaries.yaml": "c58198e72d1c088e56d04d41f713e2841ccddc41",
+    "docs/TOPOLOGY.md": "bfa759d8f4bb8ac8afcde10b975802cca819c571",
+    "registry/corpus-loop-v1/valid.watson-cyc-chronos.pinned.json": "33c37dec6f03d160efa83f47654f27ec5376b53a"
+  },
   "required_repositories": [
     "SocioProphet/sociosphere",
     "SocioProphet/prophet-platform",

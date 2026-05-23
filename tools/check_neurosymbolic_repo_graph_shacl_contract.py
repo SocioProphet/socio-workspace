@@ -11,6 +11,7 @@ FIXTURE_DIR = ROOT / "registry" / "neurosymbolic-repo-graph-reasoner"
 VOCAB = FIXTURE_DIR / "neurosymbolic-repo-graph.ttl"
 CONTRACT = FIXTURE_DIR / "neurosymbolic-repo-graph.shacl.ttl"
 GRAPH_LIFT_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_lift.py"
+SNAPSHOT_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_snapshot.py"
 
 REQUIRED_SHAPES = {
     "RepositoryGraphFixtureShape",
@@ -76,10 +77,10 @@ def declared_vocab_terms(text: str) -> set[str]:
     return set(re.findall(r"^nrg:([A-Za-z][A-Za-z0-9]*)\s+a\s+(?:rdfs:Class|rdfs:Property)", text, re.MULTILINE))
 
 
-def run_graph_lift_check() -> int:
-    spec = importlib.util.spec_from_file_location("check_active_spine_repo_graph_lift", GRAPH_LIFT_CHECK)
+def run_module(path: Path, module_name: str) -> int:
+    spec = importlib.util.spec_from_file_location(module_name, path)
     if spec is None or spec.loader is None:
-        fail("could not load active spine repo graph lift validator")
+        fail(f"could not load {module_name}")
         return 1
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -127,11 +128,15 @@ def main() -> int:
     if failed:
         return 1
 
-    graph_lift_status = run_graph_lift_check()
+    graph_lift_status = run_module(GRAPH_LIFT_CHECK, "check_active_spine_repo_graph_lift")
     if graph_lift_status != 0:
         return graph_lift_status
 
-    print("OK: neurosymbolic repo graph SHACL contract is vocabulary-aligned, plane-bound, and graph-lift checked")
+    snapshot_status = run_module(SNAPSHOT_CHECK, "check_active_spine_repo_graph_snapshot")
+    if snapshot_status != 0:
+        return snapshot_status
+
+    print("OK: neurosymbolic repo graph SHACL contract is vocabulary-aligned, plane-bound, graph-lift checked, and snapshot-drift checked")
     return 0
 
 

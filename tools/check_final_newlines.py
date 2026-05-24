@@ -16,6 +16,7 @@ CHECKED = [
     "docs/governance/runner-overlay-integration-note-2026-05-23.md",
     "docs/governance/active-spine-validation-stack-2026-05-23.md",
     "docs/governance/neurosymbolic-repo-graph-reasoner.md",
+    "docs/governance/repo-graph-platform-requirements-2026-05-24.md",
     "registry/neurosymbolic-repo-graph-reasoner/active-spine.repo-graph.findings.schema.json",
     "registry/neurosymbolic-repo-graph-reasoner/diagnostic.stale-pin.ttl",
     "registry/neurosymbolic-repo-graph-reasoner/generated.active-spine.repo-graph.ttl",

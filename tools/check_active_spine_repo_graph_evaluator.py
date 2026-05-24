@@ -7,6 +7,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 EVALUATOR = ROOT / "tools" / "evaluate_active_spine_repo_graph.py"
+ADAPTER_CHECK = ROOT / "tools" / "check_repo_graph_adapter.py"
 
 REQUIRED_FINDING_KINDS = {
     "promotion-ready",
@@ -34,10 +35,10 @@ def fail(msg: str) -> None:
     print(f"ERR: {msg}", file=sys.stderr)
 
 
-def load_evaluator():
-    spec = importlib.util.spec_from_file_location("evaluate_active_spine_repo_graph", EVALUATOR)
+def load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
-        raise RuntimeError("could not load evaluator")
+        raise RuntimeError(f"could not load {name}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -45,7 +46,11 @@ def load_evaluator():
 
 def main() -> int:
     failed = False
-    evaluator = load_evaluator()
+    adapter_status = int(load_module(ADAPTER_CHECK, "check_repo_graph_adapter").main())
+    if adapter_status != 0:
+        return adapter_status
+
+    evaluator = load_module(EVALUATOR, "evaluate_active_spine_repo_graph")
     result = evaluator.evaluate()
     findings = result.get("findings", [])
     kinds = {item.get("kind") for item in findings}
@@ -76,7 +81,7 @@ def main() -> int:
     if failed:
         return 1
 
-    print(f"OK: active spine repo graph evaluator produced {len(findings)} governed findings")
+    print(f"OK: active spine repo graph evaluator produced {len(findings)} governed findings through adapter")
     return 0
 
 

@@ -3,12 +3,11 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import re
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-GENERATOR = ROOT / "tools" / "generate_active_spine_repo_graph.py"
+ADAPTER = ROOT / "tools" / "repo_graph_adapter.py"
 OUTPUT = ROOT / "registry" / "neurosymbolic-repo-graph-reasoner" / "active-spine.repo-graph.findings.json"
 
 REQUIRED_FINDINGS = {
@@ -24,35 +23,13 @@ def fail(msg: str) -> None:
     print(f"ERR: {msg}", file=sys.stderr)
 
 
-def load_generator():
-    spec = importlib.util.spec_from_file_location("generate_active_spine_repo_graph", GENERATOR)
+def load_adapter():
+    spec = importlib.util.spec_from_file_location("repo_graph_adapter", ADAPTER)
     if spec is None or spec.loader is None:
-        raise RuntimeError("could not load repo graph generator")
+        raise RuntimeError("could not load repo graph adapter")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module
-
-
-def parse_repo_blocks(graph: str) -> list[dict[str, str]]:
-    blocks = []
-    for match in re.finditer(r"repo:([^\n]+)\n  a nrg:ActiveSpineRepository ;\n(?P<body>.*?)(?:\n\n|\Z)", graph, re.DOTALL):
-        body = match.group("body")
-        record = {"node": match.group(1)}
-        for key in [
-            "repository",
-            "spineRole",
-            "presentInSpine",
-            "presentInManifestOverlay",
-            "presentInCanonicalSources",
-            "presentInBoundaries",
-            "presentInTopology",
-        ]:
-            value_match = re.search(rf"nrg:{key} (?P<value>[^;\.]+)", body)
-            if value_match:
-                value = value_match.group("value").strip().strip('"')
-                record[key] = value
-        blocks.append(record)
-    return blocks
+    return module.default_adapter()
 
 
 def finding(kind: str, repo: str, severity: str, reason: str, actionable: bool) -> dict:
@@ -66,20 +43,18 @@ def finding(kind: str, repo: str, severity: str, reason: str, actionable: bool) 
 
 
 def evaluate() -> dict:
-    generator = load_generator()
-    graph = generator.generate()
-    repos = parse_repo_blocks(graph)
+    repos = load_adapter().repositories()
     findings = []
 
     for repo in repos:
-        name = repo.get("repository", "unknown")
-        role = repo.get("spineRole", "unclassified")
+        name = repo.repository or "unknown"
+        role = repo.spine_role or "unclassified"
         surfaces = {
-            "spine": repo.get("presentInSpine") == "true",
-            "manifest_overlay": repo.get("presentInManifestOverlay") == "true",
-            "canonical_sources": repo.get("presentInCanonicalSources") == "true",
-            "boundaries": repo.get("presentInBoundaries") == "true",
-            "topology": repo.get("presentInTopology") == "true",
+            "spine": repo.present_in_spine,
+            "manifest_overlay": repo.present_in_manifest_overlay,
+            "canonical_sources": repo.present_in_canonical_sources,
+            "boundaries": repo.present_in_boundaries,
+            "topology": repo.present_in_topology,
         }
         missing = [surface for surface, present in surfaces.items() if not present]
 

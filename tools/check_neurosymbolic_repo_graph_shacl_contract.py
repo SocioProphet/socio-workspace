@@ -13,6 +13,7 @@ CONTRACT = FIXTURE_DIR / "neurosymbolic-repo-graph.shacl.ttl"
 GRAPH_LIFT_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_lift.py"
 SNAPSHOT_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_snapshot.py"
 EVALUATOR_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_evaluator.py"
+FINDINGS_SCHEMA_CHECK = ROOT / "tools" / "check_active_spine_repo_graph_findings_schema.py"
 
 REQUIRED_SHAPES = {
     "RepositoryGraphFixtureShape",
@@ -141,7 +142,11 @@ def main() -> int:
     if evaluator_status != 0:
         return evaluator_status
 
-    print("OK: neurosymbolic repo graph SHACL contract is vocabulary-aligned, plane-bound, graph-lift checked, snapshot-drift checked, and evaluator-checked")
+    findings_schema_status = run_module(FINDINGS_SCHEMA_CHECK, "check_active_spine_repo_graph_findings_schema")
+    if findings_schema_status != 0:
+        return findings_schema_status
+
+    print("OK: neurosymbolic repo graph SHACL contract is vocabulary-aligned, plane-bound, graph-lift checked, snapshot-drift checked, evaluator-checked, and findings-schema checked")
     return 0
 
 

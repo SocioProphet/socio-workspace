@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.label-leakage",
+  "title": "Invalid carrier accepting apparent grounding with label leakage",
+  "source": {
+    "sourceType": "differentiable-constraint-learning",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "verified",
+    "claimStatus": "grounded-symbol",
+    "validationState": "training-accuracy-only",
+    "methodFamilies": ["NSR-DIFFERENTIABLE-CONSTRAINT-LEARNING"],
+    "groundingStatus": "claimed",
+    "leakageAssessment": "missing",
+    "transductionAssessment": "missing",
+    "nonAuthorityDeclaration": "Apparent grounding accepted from model performance."
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "evidenceReplayAuthority": "missing",
+    "policyAdmissionAuthority": "missing"
+  },
+  "expectedValidationFailure": {
+    "reason": "Apparent symbol grounding cannot be accepted without anti-leakage checks, transduction validation, provenance, and replayable verification.",
+    "failureMode": "label_leakage_grounding_failure"
+  }
+}

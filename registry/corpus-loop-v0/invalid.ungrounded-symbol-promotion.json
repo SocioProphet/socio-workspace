@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.ungrounded-symbol-promotion",
+  "title": "Invalid carrier promoting ungrounded symbol to canonical claim",
+  "source": {
+    "sourceType": "neural-extraction",
+    "evidenceRefs": []
+  },
+  "carrier": {
+    "status": "admitted",
+    "claimStatus": "canonical",
+    "validationState": "missing-grounding-assessment",
+    "methodFamilies": ["NSR-SYMBOLIC-ADJUDICATION"],
+    "symbol": "TemporalEvidenceNode",
+    "groundingStatus": "unknown",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "semanticVocabularyDraft": "bypassed",
+    "schemaAuthority": "bypassed"
+  },
+  "expectedValidationFailure": {
+    "reason": "A neural or hybrid system may propose a symbol, but CHRONOS cannot promote it without evidence anchoring, grounding assessment, and owning-plane review.",
+    "failureMode": "ungrounded_symbol_promotion"
+  }
+}

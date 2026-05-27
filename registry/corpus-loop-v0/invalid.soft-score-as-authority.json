@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.soft-score-as-authority",
+  "title": "Invalid carrier treating fuzzy satisfaction score as authority",
+  "source": {
+    "sourceType": "neuro-symbolic-evaluation",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "admitted",
+    "claimStatus": "truth",
+    "validationState": "soft-score-only",
+    "methodFamilies": ["NSR-SOFT-CONSTRAINT"],
+    "softSatisfactionScore": 0.94,
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "policyAdmissionAuthority": "self-authorized-by-score"
+  },
+  "expectedValidationFailure": {
+    "reason": "A fuzzy or differentiable satisfaction score cannot promote a CHRONOS carrier to admitted truth or policy authority.",
+    "failureMode": "soft_score_as_truth"
+  }
+}

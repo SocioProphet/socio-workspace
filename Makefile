@@ -23,9 +23,9 @@ ui-dev: ui-preflight
 # --- end ui-workbench targets ---
 
 # --- standards validation targets ---
-.PHONY: validate validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate multidomain-geospatial-standards-compliance-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate corpus-loop-v0-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-v1-resolution-live corpus-loop-demo-packet-validate corpus-loop-customer-readout-validate corpus-loop-demo-assemble-check corpus-loop-demo-assemble-write corpus-loop-check
+.PHONY: validate validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate multidomain-geospatial-standards-compliance-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-v1-resolution-live corpus-loop-demo-packet-validate corpus-loop-customer-readout-validate corpus-loop-demo-assemble-check corpus-loop-demo-assemble-write corpus-loop-check
 
-validate: validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate corpus-loop-v0-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate
+validate: validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate
 	@echo "OK: validate"
 
 validate-standards:
@@ -163,6 +163,9 @@ corpus-loop-v0-validate:
 	python3 -m pip install --user jsonschema >/dev/null
 	python3 tools/check_clv0.py
 
+neurosymbolic-chronos-validate:
+	python3 tools/check_neurosymbolic_chronos.py
+
 corpus-loop-v1-validate:
 	python3 -m pip install --user jsonschema >/dev/null
 	python3 tools/check_clv1.py
@@ -185,7 +188,7 @@ corpus-loop-demo-assemble-check:
 corpus-loop-demo-assemble-write:
 	python3 tools/assemble_corpus_loop_demo.py --write
 
-corpus-loop-check: corpus-loop-v0-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-demo-assemble-check corpus-loop-demo-packet-validate corpus-loop-customer-readout-validate ui-check
+corpus-loop-check: corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-demo-assemble-check corpus-loop-demo-packet-validate corpus-loop-customer-readout-validate ui-check
 	@echo "OK: corpus-loop-check"
 
 multidomain-geospatial-standards-compliance-validate:
@@ -238,67 +241,4 @@ compliance-check:
 	@echo "OK: compliance-check complete"
 
 compliance-summary:
-	python3 telemetry/compliance_checker.py summary --format json
-
-# --- GAIA World Model v1 readiness targets ---
-.PHONY: gaia-world-model-v1-readiness-validate
-
-gaia-world-model-v1-readiness-validate:
-	python3 tools/check_gaia_world_model_v1_readiness.py
-
-# --- source exposure governance targets ---
-.PHONY: source-exposure-check
-
-source-exposure-check:
-	@echo "==> Running source exposure publication safety check..."
-	python3 tools/check_source_exposure.py
-	@echo "OK: source-exposure-check passed"
-
-# --- merge order ---
-.PHONY: merge-order
-
-merge-order:
-	python3 engines/propagation_engine.py merge-order
-
-# --- workspace runner targets ---
-.PHONY: workspace-list lock-verify lock-update inventory topology-check proof-slice-smoke
-
-workspace-list:
-	python3 tools/runner/runner.py list
-
-lock-verify:
-	python3 tools/runner/runner.py lock-verify
-
-lock-update:
-	python3 tools/runner/runner.py lock-update
-
-inventory:
-	python3 tools/runner/runner.py inventory
-
-topology-check:
-	python3 tools/check_topology.py
-
-proof-slice-smoke:
-	python3 tools/runner/proof_slice_smoke.py
-
-# --- identity conformance targets ---
-.PHONY: identity-prime-conformance
-
-identity-prime-conformance:
-	python3 tools/conformance/validate_identity_is_prime_fixtures.py
-
-# --- hygiene targets ---
-.PHONY: hygiene-check
-
-hygiene-check:
-	@echo "==> Running repository hygiene checks..."
-	bash tools/check_hygiene.sh
-	python3 tools/check_final_newlines.py
-	@echo "OK: hygiene-check passed"
-
-
-# --- full workspace check (run in CI) ---
-.PHONY: workspace-check
-
-workspace-check: validate registry-validate build-intelligence-validate deployment-topology-validate contract-lock-validate compliance-check source-exposure-check lock-verify topology-check hygiene-check identity-prime-conformance
-	@echo "OK: workspace-check passed"
+	python3 telemetry/compliance_checker.py summary

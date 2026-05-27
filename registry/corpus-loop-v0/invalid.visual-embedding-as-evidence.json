@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.visual-embedding-as-evidence",
+  "title": "Invalid carrier treating ontology embedding visualization as evidence",
+  "source": {
+    "sourceType": "ontology-embedding-visualization",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "verified",
+    "claimStatus": "evidence",
+    "validationState": "visual-inspection-only",
+    "methodFamilies": ["NSR-ONTOLOGY-INFERENCE"],
+    "visualizationType": "t-SNE",
+    "groundingStatus": "claimed-from-visual-cluster",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "semanticVocabularyDraft": "bypassed",
+    "schemaAuthority": "bypassed",
+    "evidenceReplayAuthority": "missing"
+  },
+  "expectedValidationFailure": {
+    "reason": "A visual embedding cluster, t-SNE plot, or neighborhood diagram cannot serve as evidence or ontology authority without provenance, replayable verification, and owning-plane review.",
+    "failureMode": "visual_embedding_as_evidence"
+  }
+}

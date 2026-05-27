@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.transduction-certificate-missing",
+  "title": "Invalid carrier accepting perception-to-symbol mapping without transduction certificate",
+  "source": {
+    "sourceType": "neural-to-symbolic-extraction",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "verified",
+    "claimStatus": "grounded-symbol",
+    "validationState": "model-performance-only",
+    "methodFamilies": ["NSR-SYMBOLIC-ADJUDICATION"],
+    "groundingStatus": "claimed",
+    "transductionAssessment": "missing",
+    "maskedOutputEvaluation": "missing",
+    "heldOutGroundingValidation": "missing",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "evidenceReplayAuthority": "missing",
+    "policyAdmissionAuthority": "missing"
+  },
+  "expectedValidationFailure": {
+    "reason": "A perception-to-symbol mapping cannot be admitted without a transduction assessment, masked-output evaluation, held-out grounding validation, and evidence/replay authority.",
+    "failureMode": "transduction_certificate_missing"
+  }
+}

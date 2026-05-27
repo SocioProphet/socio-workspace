@@ -12,6 +12,8 @@ INVALIDS = [
     FIXTURES / "invalid.soft-score-as-authority.json",
     FIXTURES / "invalid.ungrounded-symbol-promotion.json",
     FIXTURES / "invalid.label-leakage-carrier.json",
+    FIXTURES / "invalid.visual-embedding-as-evidence.json",
+    FIXTURES / "invalid.transduction-certificate-missing.json",
 ]
 
 REQUIRED_METHOD_FAMILIES = {
@@ -40,6 +42,8 @@ FAILURE_MODE_BY_FILE = {
     "invalid.soft-score-as-authority.json": "soft_score_as_truth",
     "invalid.ungrounded-symbol-promotion.json": "ungrounded_symbol_promotion",
     "invalid.label-leakage-carrier.json": "label_leakage_grounding_failure",
+    "invalid.visual-embedding-as-evidence.json": "visual_embedding_as_evidence",
+    "invalid.transduction-certificate-missing.json": "transduction_certificate_missing",
 }
 
 
@@ -113,6 +117,18 @@ def assert_invalid_rejected(path: Path, data: dict[str, Any]) -> None:
         require(carrier.get("leakageAssessment") == "missing", "label-leakage fixture must lack leakage assessment")
         require(carrier.get("transductionAssessment") == "missing", "label-leakage fixture must lack transduction assessment")
         require(authority.get("evidenceReplayAuthority") == "missing", "label-leakage fixture must lack evidence replay authority")
+
+    if path.name == "invalid.visual-embedding-as-evidence.json":
+        require(carrier.get("visualizationType") == "t-SNE", "visual embedding fixture must expose t-SNE visualization")
+        require(carrier.get("validationState") == "visual-inspection-only", "visual embedding fixture must expose visual-only validation")
+        require(authority.get("semanticVocabularyDraft") == "bypassed", "visual embedding fixture must bypass semantic vocabulary authority")
+        require(authority.get("evidenceReplayAuthority") == "missing", "visual embedding fixture must lack evidence replay authority")
+
+    if path.name == "invalid.transduction-certificate-missing.json":
+        require(carrier.get("transductionAssessment") == "missing", "transduction fixture must lack transduction assessment")
+        require(carrier.get("maskedOutputEvaluation") == "missing", "transduction fixture must lack masked output evaluation")
+        require(carrier.get("heldOutGroundingValidation") == "missing", "transduction fixture must lack held-out grounding validation")
+        require(authority.get("evidenceReplayAuthority") == "missing", "transduction fixture must lack evidence replay authority")
 
 
 def main() -> int:

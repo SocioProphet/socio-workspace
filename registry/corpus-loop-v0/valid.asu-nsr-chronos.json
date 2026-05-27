@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.asu-nsr-method-map.v0",
+  "title": "ASU neuro-symbolic method map as CHRONOS carrier candidate",
+  "source": {
+    "sourceType": "external-course-corpus",
+    "provider": "Arizona State University neuro-symbolic reasoning materials",
+    "licenseStatus": "external-reference-only",
+    "vendoredContent": false,
+    "evidenceRefs": [
+      "ASU NSR taxonomy deck",
+      "ASU Logic Review deck",
+      "ASU LTN deck",
+      "ASU LNN deck",
+      "ASU NeurASP deck",
+      "ASU SATNet deck",
+      "ASU dILP deck",
+      "ASU Deep Ontological Networks deck",
+      "ASU DSR/DSP deck"
+    ]
+  },
+  "carrier": {
+    "status": "candidate",
+    "claimStatus": "derived-integration-summary",
+    "validationState": "human-reviewed-corpus-map",
+    "methodFamilies": [
+      "NSR-FOUNDATION-LOGIC",
+      "NSR-TAXONOMY",
+      "NSR-SOFT-CONSTRAINT",
+      "NSR-TRUTH-BOUND",
+      "NSR-SYMBOLIC-ADJUDICATION",
+      "NSR-DIFFERENTIABLE-CONSTRAINT-LEARNING",
+      "NSR-RULE-LEARNING",
+      "NSR-ONTOLOGY-INFERENCE",
+      "NSR-SYMBOLIC-POLICY"
+    ],
+    "nonAuthorityDeclaration": "This carrier classifies external neuro-symbolic methods for CHRONOS integration. It does not promote schemas, ontology, policy, execution, memory, or model-routing decisions."
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "schemaAuthority": "SourceOS-Linux/sourceos-spec",
+    "semanticVocabularyDraft": "SocioProphet/ontogenesis",
+    "evidenceReplayAuthority": "SocioProphet/agentplane",
+    "policyAdmissionAuthority": "SocioProphet/policy-fabric",
+    "modelGovernanceAuthority": "SocioProphet/model-governance-ledger",
+    "routingAuthority": "SocioProphet/model-router"
+  },
+  "requiredBoundaries": [
+    "soft scores remain advisory",
+    "neural outputs require evidence anchoring",
+    "learned rules remain candidate proposals",
+    "symbolic derivations do not imply policy admission",
+    "ontology embeddings do not imply ontology authority",
+    "symbolic policies require controller admission before runtime use"
+  ],
+  "replay": {
+    "expectedLifecycle": [
+      "evidence_anchor",
+      "normalized_claim",
+      "candidate_carrier",
+      "explanation_trace",
+      "verification_result",
+      "governance_decision",
+      "receipt_or_rejection",
+      "learning_update"
+    ]
+  }
+}

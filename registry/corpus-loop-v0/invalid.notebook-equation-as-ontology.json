@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.notebook-equation-as-ontology",
+  "title": "Invalid carrier treating notebook equation output as ontology assertion",
+  "source": {
+    "sourceType": "jupyter-notebook-symbolic-regression",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "admitted",
+    "claimStatus": "ontology_assertion",
+    "validationState": "notebook-output-only",
+    "methodFamilies": ["SR-GP-EVOLUTIONARY", "SR-KAN-BASED"],
+    "equationCandidate": "y = sin(x) + x^2",
+    "notebookRef": "notebook://unreviewed/example.ipynb",
+    "webProtegeMutation": "direct",
+    "semanticPromotionStatus": "self-promoted",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "semanticVocabularyDraft": "bypassed",
+    "schemaAuthority": "bypassed",
+    "evidenceReplayAuthority": "missing"
+  },
+  "expectedValidationFailure": {
+    "reason": "A notebook-generated equation cannot directly mutate ontology or WebProtege without SRAssertion review, evidence replay, and semantic authority handoff.",
+    "failureMode": "notebook_equation_as_ontology"
+  }
+}

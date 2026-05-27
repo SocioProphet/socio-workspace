@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.equation-as-authority",
+  "title": "Invalid carrier treating symbolic regression output as admitted law",
+  "source": {
+    "sourceType": "symbolic-regression-run",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "admitted",
+    "claimStatus": "law",
+    "validationState": "fit-metric-only",
+    "methodFamilies": ["SR-GP-EVOLUTIONARY"],
+    "equationCandidate": "F = m * a",
+    "fitMetric": {"name": "NMSE", "value": 0.0001},
+    "complexityMetric": {"name": "operator_count", "value": 3},
+    "semanticPromotionStatus": "self-promoted",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "semanticVocabularyDraft": "bypassed",
+    "schemaAuthority": "bypassed",
+    "evidenceReplayAuthority": "missing",
+    "policyAdmissionAuthority": "missing"
+  },
+  "expectedValidationFailure": {
+    "reason": "A symbolic-regression equation candidate cannot be promoted as law or ontology truth from fit metrics alone.",
+    "failureMode": "equation_as_authority"
+  }
+}

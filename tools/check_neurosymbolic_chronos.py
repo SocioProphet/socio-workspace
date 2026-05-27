@@ -7,13 +7,17 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "registry" / "corpus-loop-v0"
-VALID = FIXTURES / "valid.asu-nsr-chronos.json"
+VALID_ASU_NSR = FIXTURES / "valid.asu-nsr-chronos.json"
+VALID_SR = FIXTURES / "valid.symbolic-regression-insertion-map.json"
 INVALIDS = [
     FIXTURES / "invalid.soft-score-as-authority.json",
     FIXTURES / "invalid.ungrounded-symbol-promotion.json",
     FIXTURES / "invalid.label-leakage-carrier.json",
     FIXTURES / "invalid.visual-embedding-as-evidence.json",
     FIXTURES / "invalid.transduction-certificate-missing.json",
+    FIXTURES / "invalid.equation-as-authority.json",
+    FIXTURES / "invalid.telemetry-model-as-policy.json",
+    FIXTURES / "invalid.notebook-equation-as-ontology.json",
 ]
 
 REQUIRED_METHOD_FAMILIES = {
@@ -26,6 +30,19 @@ REQUIRED_METHOD_FAMILIES = {
     "NSR-RULE-LEARNING",
     "NSR-ONTOLOGY-INFERENCE",
     "NSR-SYMBOLIC-POLICY",
+}
+
+REQUIRED_SR_METHOD_FAMILIES = {
+    "SR-GP-EVOLUTIONARY",
+    "SR-SPARSE-REGRESSION",
+    "SR-TRANSFORMER-PRETRAINING",
+    "SR-MCTS-DECODING",
+    "SR-CROSS-MODAL-PRETRAINING",
+    "SR-LLM-EVOLUTIONARY",
+    "SR-PROGRAM-SEARCH",
+    "SR-KAN-BASED",
+    "SR-PHYSICS-CONSTRAINED",
+    "SR-BENCHMARKING",
 }
 
 REQUIRED_AUTHORITIES = {
@@ -44,6 +61,9 @@ FAILURE_MODE_BY_FILE = {
     "invalid.label-leakage-carrier.json": "label_leakage_grounding_failure",
     "invalid.visual-embedding-as-evidence.json": "visual_embedding_as_evidence",
     "invalid.transduction-certificate-missing.json": "transduction_certificate_missing",
+    "invalid.equation-as-authority.json": "equation_as_authority",
+    "invalid.telemetry-model-as-policy.json": "telemetry_model_as_policy",
+    "invalid.notebook-equation-as-ontology.json": "notebook_equation_as_ontology",
 }
 
 
@@ -68,28 +88,62 @@ def dotted(data: dict[str, Any], path: str) -> Any:
     return current
 
 
-def validate_valid_fixture(data: dict[str, Any]) -> None:
-    require(data.get("kind") == "ChronosCarrierRegistration", "valid fixture wrong kind")
-    require(data.get("schemaVersion") == "0.1.0", "valid fixture wrong schemaVersion")
-    require(dotted(data, "carrier.status") == "candidate", "valid carrier must remain candidate")
+def validate_valid_nsr_fixture(data: dict[str, Any]) -> None:
+    require(data.get("kind") == "ChronosCarrierRegistration", "valid NSR fixture wrong kind")
+    require(data.get("schemaVersion") == "0.1.0", "valid NSR fixture wrong schemaVersion")
+    require(dotted(data, "carrier.status") == "candidate", "valid NSR carrier must remain candidate")
     require(
         dotted(data, "carrier.claimStatus") == "derived-integration-summary",
-        "valid carrier claimStatus must be derived-integration-summary",
+        "valid NSR carrier claimStatus must be derived-integration-summary",
     )
     require(
         dotted(data, "carrier.validationState") == "human-reviewed-corpus-map",
-        "valid carrier validationState mismatch",
+        "valid NSR carrier validationState mismatch",
     )
     families = set(dotted(data, "carrier.methodFamilies"))
-    require(families == REQUIRED_METHOD_FAMILIES, "valid carrier method family set drifted")
+    require(families == REQUIRED_METHOD_FAMILIES, "valid NSR carrier method family set drifted")
     declaration = dotted(data, "carrier.nonAuthorityDeclaration")
-    require(isinstance(declaration, str) and "does not promote" in declaration, "valid fixture missing non-authority declaration")
+    require(isinstance(declaration, str) and "does not promote" in declaration, "valid NSR fixture missing non-authority declaration")
     authorities = dotted(data, "authority")
     for key, expected in REQUIRED_AUTHORITIES.items():
         require(authorities.get(key) == expected, f"authority mismatch for {key}")
     lifecycle = dotted(data, "replay.expectedLifecycle")
-    require("governance_decision" in lifecycle, "valid fixture must include governance_decision lifecycle step")
-    require("receipt_or_rejection" in lifecycle, "valid fixture must include receipt_or_rejection lifecycle step")
+    require("governance_decision" in lifecycle, "valid NSR fixture must include governance_decision lifecycle step")
+    require("receipt_or_rejection" in lifecycle, "valid NSR fixture must include receipt_or_rejection lifecycle step")
+
+
+def validate_valid_sr_fixture(data: dict[str, Any]) -> None:
+    require(data.get("kind") == "ChronosCarrierRegistration", "valid SR fixture wrong kind")
+    require(data.get("schemaVersion") == "0.1.0", "valid SR fixture wrong schemaVersion")
+    require(dotted(data, "carrier.status") == "candidate", "valid SR carrier must remain candidate")
+    require(
+        dotted(data, "carrier.validationState") == "human-reviewed-field-map",
+        "valid SR carrier validationState mismatch",
+    )
+    families = set(dotted(data, "carrier.methodFamilies"))
+    require(families == REQUIRED_SR_METHOD_FAMILIES, "valid SR carrier method family set drifted")
+    insertion_points = set(dotted(data, "carrier.insertionPoints"))
+    required_insertion_points = {
+        "SocioProphet/memory-mesh",
+        "SocioProphet/prophet-platform",
+        "notebook-layer",
+        "SocioProphet/ontogenesis",
+        "SocioProphet/webprotege",
+        "SocioProphet/agentplane",
+        "SocioProphet/alexandrian-academy",
+        "quantum-hamiltonian-learning-lane",
+    }
+    require(required_insertion_points <= insertion_points, "valid SR fixture missing insertion point")
+    declaration = dotted(data, "carrier.nonAuthorityDeclaration")
+    require(isinstance(declaration, str) and "does not promote equations" in declaration, "valid SR fixture missing equation non-authority declaration")
+    authorities = dotted(data, "authority")
+    for key, expected in REQUIRED_AUTHORITIES.items():
+        require(authorities.get(key) == expected, f"SR authority mismatch for {key}")
+    require(authorities.get("educationCanonAuthority") == "SocioProphet/alexandrian-academy", "SR education authority mismatch")
+    lifecycle = dotted(data, "replay.expectedLifecycle")
+    require("equation_candidate" in lifecycle, "valid SR fixture must include equation_candidate lifecycle step")
+    require("semantic_review_request" in lifecycle, "valid SR fixture must include semantic_review_request lifecycle step")
+    require("receipt_or_rejection" in lifecycle, "valid SR fixture must include receipt_or_rejection lifecycle step")
 
 
 def assert_invalid_rejected(path: Path, data: dict[str, Any]) -> None:
@@ -130,12 +184,31 @@ def assert_invalid_rejected(path: Path, data: dict[str, Any]) -> None:
         require(carrier.get("heldOutGroundingValidation") == "missing", "transduction fixture must lack held-out grounding validation")
         require(authority.get("evidenceReplayAuthority") == "missing", "transduction fixture must lack evidence replay authority")
 
+    if path.name == "invalid.equation-as-authority.json":
+        require(carrier.get("status") == "admitted", "equation fixture must try invalid admission")
+        require(carrier.get("claimStatus") == "law", "equation fixture must try law claim")
+        require(carrier.get("validationState") == "fit-metric-only", "equation fixture must expose fit-metric-only validation")
+        require(authority.get("semanticVocabularyDraft") == "bypassed", "equation fixture must bypass semantic vocabulary authority")
+
+    if path.name == "invalid.telemetry-model-as-policy.json":
+        require(carrier.get("claimStatus") == "policy", "telemetry fixture must try policy claim")
+        require(carrier.get("validationState") == "telemetry-fit-only", "telemetry fixture must expose telemetry-fit-only validation")
+        require(authority.get("policyAdmissionAuthority") == "bypassed", "telemetry fixture must bypass policy admission")
+        require(authority.get("runtimeAuthority") == "bypassed", "telemetry fixture must bypass runtime authority")
+
+    if path.name == "invalid.notebook-equation-as-ontology.json":
+        require(carrier.get("claimStatus") == "ontology_assertion", "notebook fixture must try ontology assertion")
+        require(carrier.get("validationState") == "notebook-output-only", "notebook fixture must expose notebook-output-only validation")
+        require(carrier.get("webProtegeMutation") == "direct", "notebook fixture must try direct WebProtege mutation")
+        require(authority.get("semanticVocabularyDraft") == "bypassed", "notebook fixture must bypass semantic vocabulary authority")
+
 
 def main() -> int:
-    validate_valid_fixture(load(VALID))
+    validate_valid_nsr_fixture(load(VALID_ASU_NSR))
+    validate_valid_sr_fixture(load(VALID_SR))
     for path in INVALIDS:
         assert_invalid_rejected(path, load(path))
-    print("OK: neuro-symbolic CHRONOS carrier fixtures validated")
+    print("OK: neuro-symbolic and symbolic-regression CHRONOS carrier fixtures validated")
     return 0
 
 

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.telemetry-model-as-policy",
+  "title": "Invalid carrier treating discovered telemetry dynamics as policy",
+  "source": {
+    "sourceType": "platform-telemetry-sindy-run",
+    "evidenceRefs": ["synthetic-negative-fixture"]
+  },
+  "carrier": {
+    "status": "admitted",
+    "claimStatus": "policy",
+    "validationState": "telemetry-fit-only",
+    "methodFamilies": ["SR-SPARSE-REGRESSION"],
+    "equationCandidate": "dQ_dt = a * Q - b * R",
+    "fitMetric": {"name": "residual", "value": 0.02},
+    "policyAction": "auto-scale-agentplane-workers",
+    "runtimeAdmissionStatus": "self-authorized",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "evidenceReplayAuthority": "missing",
+    "policyAdmissionAuthority": "bypassed",
+    "runtimeAuthority": "bypassed"
+  },
+  "expectedValidationFailure": {
+    "reason": "A telemetry-derived dynamics equation cannot become policy or runtime control without evidence replay, policy admission, and runtime authority review.",
+    "failureMode": "telemetry_model_as_policy"
+  }
+}

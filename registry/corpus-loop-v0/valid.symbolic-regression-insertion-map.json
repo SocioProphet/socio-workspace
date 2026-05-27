@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.symbolic-regression-insertion-map.v0",
+  "title": "Symbolic regression insertion-point map for CHRONOS",
+  "source": {
+    "sourceType": "field-map-capture",
+    "provider": "symbolic regression and scientific-law discovery literature",
+    "licenseStatus": "external-reference-only",
+    "vendoredContent": false,
+    "evidenceRefs": [
+      "TPSR / transformer-based planning for symbolic regression",
+      "SNIP / symbolic-numeric integrated pre-training",
+      "LLM-SR / LLM evolutionary symbolic regression",
+      "PySR / SymbolicRegression.jl",
+      "SINDy sparse system identification",
+      "KAN / Kolmogorov-Arnold Networks",
+      "FunSearch program search",
+      "Feynman symbolic-regression benchmark family"
+    ]
+  },
+  "carrier": {
+    "status": "candidate",
+    "claimStatus": "derived-integration-summary",
+    "validationState": "human-reviewed-field-map",
+    "methodFamilies": [
+      "SR-GP-EVOLUTIONARY",
+      "SR-SPARSE-REGRESSION",
+      "SR-TRANSFORMER-PRETRAINING",
+      "SR-MCTS-DECODING",
+      "SR-CROSS-MODAL-PRETRAINING",
+      "SR-LLM-EVOLUTIONARY",
+      "SR-PROGRAM-SEARCH",
+      "SR-KAN-BASED",
+      "SR-PHYSICS-CONSTRAINED",
+      "SR-BENCHMARKING"
+    ],
+    "insertionPoints": [
+      "SocioProphet/memory-mesh",
+      "SocioProphet/prophet-platform",
+      "notebook-layer",
+      "SocioProphet/ontogenesis",
+      "SocioProphet/webprotege",
+      "SocioProphet/agentplane",
+      "SocioProphet/alexandrian-academy",
+      "quantum-hamiltonian-learning-lane"
+    ],
+    "nonAuthorityDeclaration": "This carrier classifies symbolic-regression insertion points. It does not promote equations to ontology truth, evidence, policy, controller status, memory, routing, or runtime authority."
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "schemaAuthority": "SourceOS-Linux/sourceos-spec",
+    "semanticVocabularyDraft": "SocioProphet/ontogenesis",
+    "evidenceReplayAuthority": "SocioProphet/agentplane",
+    "policyAdmissionAuthority": "SocioProphet/policy-fabric",
+    "modelGovernanceAuthority": "SocioProphet/model-governance-ledger",
+    "routingAuthority": "SocioProphet/model-router",
+    "educationCanonAuthority": "SocioProphet/alexandrian-academy"
+  },
+  "requiredBoundaries": [
+    "equation candidate is not law",
+    "telemetry model is not policy",
+    "notebook equation is not ontology assertion",
+    "latent similarity is not validation",
+    "benchmark score is not admission",
+    "program candidate is not controller",
+    "units check is not full validation"
+  ],
+  "replay": {
+    "expectedLifecycle": [
+      "dataset_anchor",
+      "method_run_record",
+      "equation_candidate",
+      "metric_report",
+      "complexity_report",
+      "semantic_review_request",
+      "governance_decision",
+      "receipt_or_rejection",
+      "learning_update"
+    ]
+  }
+}

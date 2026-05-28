@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "receipt_id": "svf:receipt:sociosphere.registry-dogfood.001",
+  "run_ref": "svf:run:sociosphere.registry-dogfood.001",
+  "run_digest": {"algorithm": "sha256", "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+  "plan_ref": "svf:plan:sociosphere.registry-dogfood",
+  "plan_digest": {"algorithm": "sha256", "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+  "policy_ref": "svf:policy:sociosphere.local-readonly",
+  "policy_digest": {"algorithm": "sha256", "digest": "cccccccccccccccccccccccccccccccc"},
+  "input_digests": [
+    {"name": "registry/sovereign-validation-fabric.yaml", "algorithm": "sha256", "digest": "dddddddddddddddddddddddddddddddd"}
+  ],
+  "output_digests": [
+    {"name": "svf-registry-validator-json", "algorithm": "sha256", "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+  ],
+  "certified_claims": ["schema_conformant", "receipt_integrity_verified"],
+  "non_certified_claims": [
+    "Does not certify downstream repository validation behavior.",
+    "Does not certify Action execution."
+  ],
+  "verification": {
+    "status": "verified",
+    "verifier": "sociosphere.svf_runner.shape_check",
+    "verified_at": "2026-05-28T16:00:02Z",
+    "diagnostics": []
+  },
+  "issued_at": "2026-05-28T16:00:02Z",
+  "provenance_refs": ["SocioProphet/sociosphere#394"],
+  "signature": {}
+}

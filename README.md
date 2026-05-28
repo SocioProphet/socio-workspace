@@ -29,6 +29,7 @@ Sociosphere is responsible for:
 - Maintaining the Boundary Atlas in `catalog/` + `docs/boundary-atlas-v0.1.md`.
 - Owning the Angel of the Lord adversarial hardening regime across workspace CI lanes.
 - Validating source-exposure publication safety with `tools/check_source_exposure.py`.
+- Discovering Sovereign Validation Fabric profiles and selecting registered validation plans with `registry/sovereign-validation-fabric.yaml` and `tools/svf_runner.py`.
 
 Sociosphere is **not** the place for feature implementation inside downstream
 component repositories.
@@ -38,6 +39,7 @@ component repositories.
 - Documentation index: `docs/README.md`
 - Architecture baseline: `docs/architecture/overview.md`
 - Upstream bindings (edge capabilities): `docs/architecture/upstream-bindings-edge-capabilities.md`
+- Sovereign Validation Fabric workspace layer: `docs/architecture/sovereign-validation-fabric-workspace.md`
 - Scope/current state/backlog: `docs/SCOPE_PURPOSE_STATUS_BACKLOG.md`
 - Integration ledger: `docs/INTEGRATION_STATUS.md`
 - Boundary Atlas: `docs/boundary-atlas-v0.1.md`
@@ -71,6 +73,7 @@ component repositories.
 | `registry/devops-automation.yaml` | CI/CD automation policies |
 | `registry/deduplication-map.yaml` | Duplicate consolidation tracker |
 | `registry/upstream-bindings-edge-capabilities.yaml` | Machine-readable upstream baselines, dispositions, and tracked risk notes for edge-capability donor/dependency repos |
+| `registry/sovereign-validation-fabric.yaml` | Workspace SVF profiles, repo-to-plan mappings, changed-path selectors, receipt root, and upstream ProCybernetica schema authority refs |
 
 ### Engine layer
 
@@ -135,6 +138,12 @@ make source-exposure-check
 # Proof apparatus workspace
 cat manifest/proof-workspace.toml
 python3 tools/validate_proof_apparatus.py
+
+# Sovereign Validation Fabric workspace discovery
+python3 tools/validate_svf_registry.py
+python3 tools/svf_runner.py list
+python3 tools/svf_runner.py select --repo SocioProphet/sociosphere --changed-path registry/sovereign-validation-fabric.yaml
+make svf-workspace-validate
 
 # Success and dedup reporting
 python cli/measure-success.py

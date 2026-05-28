@@ -143,6 +143,8 @@ python3 tools/validate_proof_apparatus.py
 python3 tools/validate_svf_registry.py
 python3 tools/svf_runner.py list
 python3 tools/svf_runner.py select --repo SocioProphet/sociosphere --changed-path registry/sovereign-validation-fabric.yaml
+python3 tools/svf_runner.py verify-receipt tests/fixtures/svf/receipt.valid.synthetic.json
+python3 tools/svf_runner.py explain tests/fixtures/svf/receipt.valid.synthetic.json
 make svf-workspace-validate
 
 # Success and dedup reporting

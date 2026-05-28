@@ -3,8 +3,8 @@
     "name": "sociosphere",
     "version": "0.1"
   },
-  "generated_at": "2026-04-17T23:48:14Z",
-  "_note": "Revisions pinned from live GitHub HEAD SHAs on 2026-04-17. Re-run `runner lock-update` after `runner fetch` to refresh.",
+  "generated_at": "2026-05-28T20:45:00Z",
+  "_note": "Revisions pinned from live GitHub HEAD SHAs. TritFabric row is manifest-derived from the pinned recovered-work admission revision; re-run runner lock-update after runner fetch to refresh materialized checkouts.",
   "repos": [
     {
       "name": "workspace_inventory",
@@ -85,6 +85,16 @@
       "local_path": "components/ontogenesis",
       "tree_hash": null,
       "retrieved_at": "2026-04-08T16:43:25Z"
+    },
+    {
+      "name": "tritfabric",
+      "role": "component",
+      "url": "https://github.com/SocioProphet/tritfabric",
+      "ref": "main",
+      "rev": "3644b4a4b32fec209c2a57843ce9db2f1273bbec",
+      "local_path": "components/tritfabric",
+      "tree_hash": null,
+      "retrieved_at": "2026-05-28T20:45:00Z"
     },
     {
       "name": "tritrpc",

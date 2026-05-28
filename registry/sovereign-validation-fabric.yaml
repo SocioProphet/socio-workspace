@@ -69,22 +69,42 @@ profiles:
     owning_plane: "defensive-assurance"
     mode: "advisory"
     policy_ref: "svf:policy:scope-d.synthetic-readonly"
-    execution_backend: "placeholder"
+    execution_backend: "local"
     required_receipt_classes:
       - "policy_boundary_preserved"
       - "non_production_only"
     default_plans:
       - "svf:plan:scope-d.defensive-assurance-basic"
+    contract_refs:
+      - "svf/scope-d-defensive-assurance-basic.json"
+    validation_command: "npm run validate:svf"
     changed_path_selectors:
+      - selector_id: "svf-contract"
+        paths:
+          - "docs/SVF-DEFENSIVE-ASSURANCE.md"
+          - "svf/**"
+          - "scripts/validate-svf-contracts.js"
+          - "package.json"
+        plans:
+          - "svf:plan:scope-d.defensive-assurance-basic"
       - selector_id: "policy-fixtures"
         paths:
-          - "schemas/**"
-          - "tests/fixtures/**"
-          - "reports/**"
+          - "config/schemas/**"
+          - "examples/**"
+          - "fixtures/**"
+          - "runs/**"
+          - "scripts/test-engagement-policy.js"
+          - "scripts/test-collector-policy.js"
+          - "scripts/test-ai-infra-slice.js"
+          - "scripts/test-graph-robustness-slice.js"
+          - "scripts/test-reporting-exports.js"
+          - "scripts/smoke-tamper-detection.js"
         plans:
           - "svf:plan:scope-d.defensive-assurance-basic"
     non_claims:
-      - "Advisory placeholder only until SCOPE-D lands repo-local plans."
+      - "Advisory until npm run validate:svf is observed green."
+      - "Does not execute Actions through Sociosphere runner."
+      - "Does not certify live-target or production-environment behavior."
   - profile_id: "svf:profile:ontogenesis.semantic-validation"
     repo: "SocioProphet/ontogenesis"
     local_path_hint: "~/dev/ontogenesis"

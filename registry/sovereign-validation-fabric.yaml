@@ -111,20 +111,42 @@ profiles:
     owning_plane: "ontology"
     mode: "advisory"
     policy_ref: "svf:policy:ontogenesis.semantic-readonly"
-    execution_backend: "placeholder"
+    execution_backend: "local"
     required_receipt_classes:
       - "semantic_roundtrip_preserved"
       - "schema_conformant"
+      - "artifact_integrity_verified"
     default_plans:
       - "svf:plan:ontogenesis.semantic-validation-basic"
+    contract_refs:
+      - "svf/ontogenesis-semantic-validation-basic.json"
+    validation_command: "make svf"
     changed_path_selectors:
+      - selector_id: "svf-contract"
+        paths:
+          - "docs/SVF-SEMANTIC-VALIDATION.md"
+          - "svf/**"
+          - "scripts/validate_svf_contracts.py"
+          - "Makefile"
+          - "README.md"
+        plans:
+          - "svf:plan:ontogenesis.semantic-validation-basic"
       - selector_id: "ontology-surfaces"
         paths:
-          - "ontology/**"
-          - "schemas/**"
+          - "Upper/**"
+          - "Middle/**"
+          - "Lower/**"
+          - "Domains/**"
+          - "Platform/**"
+          - "prophet/**"
+          - "epi/**"
           - "shapes/**"
+          - "examples/**"
+          - "catalog/**"
           - "dist/**"
         plans:
           - "svf:plan:ontogenesis.semantic-validation-basic"
     non_claims:
-      - "Advisory placeholder only until Ontogenesis lands repo-local plans."
+      - "Advisory until make svf and the full Ontogenesis validation pipeline are observed green."
+      - "Does not execute Actions through Sociosphere runner."
+      - "Does not certify domain truth or downstream consumer correctness."

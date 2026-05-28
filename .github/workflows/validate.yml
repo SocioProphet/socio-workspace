@@ -55,7 +55,7 @@ jobs:
         run: bash tools/check_hygiene.sh
 
       - name: Source exposure check
-        run: make source-exposure-check
+        run: python tools/check_source_exposure.py
 
       - name: UI install
         run: make ui-install

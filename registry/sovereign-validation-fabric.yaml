@@ -150,3 +150,45 @@ profiles:
       - "Advisory until make svf and the full Ontogenesis validation pipeline are observed green."
       - "Does not execute Actions through Sociosphere runner."
       - "Does not certify domain truth or downstream consumer correctness."
+  - profile_id: "svf:profile:sourceos.contracts"
+    repo: "SourceOS-Linux/sourceos-spec"
+    local_path_hint: "~/dev/sourceos-spec"
+    owning_plane: "sourceos-contracts"
+    mode: "advisory"
+    policy_ref: "svf:policy:sourceos.contract-readonly"
+    execution_backend: "local"
+    required_receipt_classes:
+      - "schema_conformant"
+      - "fixtures_validated"
+      - "policy_boundary_preserved"
+      - "non_production_only"
+    default_plans:
+      - "svf:plan:sourceos.contract-validation-basic"
+    contract_refs:
+      - "svf/sourceos-contract-validation-basic.json"
+    validation_command: "make validate-svf-contracts"
+    changed_path_selectors:
+      - selector_id: "svf-contract"
+        paths:
+          - "docs/SVF-OS-VALIDATION-PROFILES.md"
+          - "svf/**"
+          - "tools/validate_svf_contracts.py"
+          - "Makefile"
+          - "README.md"
+        plans:
+          - "svf:plan:sourceos.contract-validation-basic"
+      - selector_id: "sourceos-contract-surfaces"
+        paths:
+          - "schemas/**"
+          - "examples/**"
+          - "semantic/**"
+          - "openapi*.yaml"
+          - "asyncapi*.yaml"
+          - "docs/**"
+          - "tools/validate_*examples.py"
+        plans:
+          - "svf:plan:sourceos.contract-validation-basic"
+    non_claims:
+      - "Advisory until make validate-svf-contracts and the SourceOS spec validation pipeline are observed green."
+      - "Does not execute Actions through Sociosphere runner."
+      - "Does not build an OS image, validate bootability, certify hardware compatibility, sign artifacts, publish releases, deploy updates, or certify production readiness."

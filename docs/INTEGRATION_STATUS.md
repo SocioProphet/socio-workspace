@@ -47,6 +47,25 @@ facts that were previously repeated in multiple places.
 - Status: removed as an independent workspace dependency
 - Notes/content: folded into TritRPC docs during de-commingling
 
+### TritFabric recovered Atlas / Community / Serve work
+- Detailed ledger: `docs/integration/tritfabric-recovered-work-ledger-2026-05-27.md`
+- Canonical implementation owner: `SocioProphet/tritfabric`
+- SocioSphere role: estate registration, boundary routing, and follow-on propagation only
+- Integration range: TritFabric PR #9 through PR #23, excluding duplicate PR #13
+- Status: first major recovered Atlas / TritFabric / Community Learning / Serve work package absorbed downstream
+- Captured planes:
+  - framework and calculus contracts;
+  - Trit-visible promotion semantics;
+  - Network Atlas framework catalog and adapter governance;
+  - Community Learning workflows, API stubs, and stream contracts;
+  - Serve p95/inflight autoscaler core, observability, integration tests, and readiness docs.
+- Non-scope in SocioSphere: TritFabric implementation, runtime endpoints, model promotion execution, community event persistence, Serve deployment, and adapter implementation
+- Follow-on targets:
+  - `SocioProphet/ontogenesis` for stabilized ontology / SHACL vocabulary once TritFabric schemas settle
+  - `SocioProphet/prophet-platform` for product/runtime use of Community Learning and Network Atlas surfaces after gates are explicit
+  - `SocioProphet/superconscious` for mentor/learner coordination semantics only, not authority-plane ownership
+  - SociOS / SourceOS runtime repos for opt-in runtime packaging only after TritFabric readiness notes advance to runtime tranches
+
 ### Edge capabilities upstream bindings
 - Narrative binding doc: `docs/architecture/upstream-bindings-edge-capabilities.md`
 - Machine-readable baseline map: `registry/upstream-bindings-edge-capabilities.yaml`
@@ -85,3 +104,8 @@ namespace responsibilities.
 For Agent Harness Delivery Routing, treat `docs/integration/agent-harness-delivery-routing.md`
 as the routing baseline. SocioSphere records topology and owner-plane routing;
 Delivery Excellence owns delivery metrics and scoreboards.
+
+For TritFabric recovered work, treat `docs/integration/tritfabric-recovered-work-ledger-2026-05-27.md`
+as the estate registration baseline. TritFabric owns implementation and immediate
+contracts; SocioSphere owns only cross-repo status, owner-plane routing, and
+follow-on propagation records.

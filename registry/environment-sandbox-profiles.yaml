@@ -1,0 +1,69 @@
+schema_version: "1.0"
+registry_id: "environment-sandbox:registry:sociosphere.workspace"
+plane: "workspace-environment-state"
+upstream_authority:
+  policy_repo: "SocioProphet/ProCybernetica"
+  workspace_repo: "SocioProphet/sociosphere"
+state_model:
+  selected_status: "environment_selected_missing_observation"
+  requested_status: "environment_requested"
+  running_status: "environment_running"
+  observed_status: "environment_observed"
+  failed_status: "environment_failed"
+  stale_status: "environment_stale"
+profiles:
+  - profile_id: "environment-sandbox:profile:sociosphere.control-plane-readout"
+    repo: "SocioProphet/sociosphere"
+    owning_plane: "workspace-controller"
+    mode: "advisory"
+    sandbox_kind: "control_plane_readout"
+    baseline_ref: "workspace://sociosphere/main"
+    changed_service_policy:
+      delta_deploy_allowed: false
+      baseline_fallback_required: true
+      changed_service_refs: []
+    routing:
+      http_grpc_routing: "not_configured"
+      async_queue_isolation: "not_configured"
+      stateful_resource_isolation: "not_configured"
+    execution:
+      executor_plane: "AgentPlane"
+      execution_configured: false
+      validation_command: "make svf-workspace-validate"
+      evidence_required: true
+    consumers:
+      - "SocioProphet/prophet-platform"
+      - "SocioProphet/model-router"
+      - "SocioProphet/superconscious"
+    non_claims:
+      - "Does not create a sandbox environment."
+      - "Does not deploy changed services."
+      - "Does not route traffic or isolate queues."
+      - "Records the control-plane gap before execution parity."
+  - profile_id: "environment-sandbox:profile:sourceos.contract-validation"
+    repo: "SourceOS-Linux/sourceos-spec"
+    owning_plane: "sourceos-contracts"
+    mode: "advisory"
+    sandbox_kind: "contract_validation"
+    baseline_ref: "workspace://sourceos-spec/main"
+    changed_service_policy:
+      delta_deploy_allowed: false
+      baseline_fallback_required: true
+      changed_service_refs: []
+    routing:
+      http_grpc_routing: "not_configured"
+      async_queue_isolation: "not_configured"
+      stateful_resource_isolation: "not_configured"
+    execution:
+      executor_plane: "AgentPlane"
+      execution_configured: false
+      validation_command: "make validate-svf-contracts"
+      evidence_required: true
+    consumers:
+      - "SocioProphet/prophet-platform"
+      - "SocioProphet/model-router"
+      - "SocioProphet/superconscious"
+    non_claims:
+      - "Does not build or boot an OS image."
+      - "Does not certify hardware compatibility."
+      - "Does not create a request-isolated environment."

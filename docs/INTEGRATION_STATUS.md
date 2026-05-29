@@ -5,6 +5,22 @@ facts that were previously repeated in multiple places.
 
 ## Current state
 
+### Reciprocal Channel Governance
+- Canonical doctrine anchor: `SocioProphet/ProCybernetica` — `docs/cybernetic-governance/RECIPROCAL_CHANNEL_GOVERNANCE.md`
+- Semantic mirror: `SocioProphet/ontogenesis` — `Middle/reciprocal-channel-governance.ttl` and `shapes/reciprocal-channel-governance.shacl.ttl`
+- Runtime/API consumer: `SocioProphet/prophet-platform` — `docs/CHANNEL_GOVERNED_RUNTIME_GATES.md`, `contracts/channel-governance/`, and `tools/validate_channel_runtime_gates.py`
+- Memory sink consumer: `SocioProphet/memory-mesh` — `docs/architecture/channel-provenance-write-gates.md`, `schemas/channel-provenance-memory-write-gate.schema.json`, examples, and validator
+- Graph sink consumer: `SocioProphet/regis-entity-graph` — `docs/epistemic-edge-typing.md`, `schemas/epistemic-edge-record.schema.json`, examples, and validator
+- Projection consumer: `SocioProphet/HolographMe` — `docs/projection-loss-profiles.md`, `examples/projection-loss-profile.example.json`, and schema-light validator
+- Status: governance spine captured across doctrine, ontology, runtime contract, memory, graph, and projection planes
+- Current scope: contract/doctrine/schema/example/validator capture; no production runtime enforcement claim
+- Non-scope in SocioSphere: doctrine authorship, semantic vocabulary implementation, runtime API behavior, memory writeback, graph storage, projection generation, and adversarial exercise execution
+- Follow-on targets:
+  - `SocioProphet/agentplane` or `SocioProphet/superconscious` for agent channel-consumption/production authority and repair/escalation behavior
+  - `SocioProphet/SCOPE-D` for adversarial channel fixtures: ASR/OCR confusion, homoglyphs, stale telemetry, forged logs, malicious summaries, poisoned memory, poisoned graph edges, and projection overclaim
+  - `SocioProphet/gaia-world-model` for evidence-channel tagging on world observations
+  - `SocioProphet/alexandrian-academy` for operator literacy on reading machine percepts, source basis, confidence type, and projection loss
+
 ### Epistemic Governance
 - Canonical standard anchor: `standards/epistemic-governance/`
 - Protocol surface: `protocol/epistemic-governance/v1/`
@@ -87,6 +103,8 @@ facts that were previously repeated in multiple places.
 | Current steady state | TritRPC remains as standalone core dependency |
 
 ## Interpretation rule
+
+For Reciprocal Channel Governance, treat ProCybernetica as the doctrine authority, Ontogenesis as the semantic mirror, Prophet Platform as the runtime contract surface, Memory Mesh as the memory sink consumer, Regis Entity Graph as the graph sink consumer, and HolographMe as the projection/loss-profile consumer. SocioSphere records integration status and follow-on routing only.
 
 If another document references Trit-to-Trust as an active workspace dependency,
 treat that content as historical context. Current behavior is defined by

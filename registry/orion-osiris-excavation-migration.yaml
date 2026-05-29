@@ -1,0 +1,117 @@
+kind: CrossRepoMigrationLane
+version: 0.1.0
+lane_id: orion-osiris-excavation-migration
+updated: 2026-05-29
+owner: SocioProphet/sociosphere
+coordination_issue: SocioProphet/sociosphere#406
+
+purpose: >-
+  Coordinate the migration of OSIRIS excavation findings out of the quarantine
+  repo and into Gaia, Orion, SCOPE-D, Prophet Platform, and later Ontogenesis
+  without allowing the inherited OSIRIS codebase to become the product owner.
+
+quarantine_source:
+  repo: mdheller/osiris
+  status: quarantine_metadata_only
+  allowed_artifacts:
+    - import notes
+    - route risk maps
+    - component maps
+    - source ledgers
+    - fixture sketches
+    - migration candidates
+  blocked_use:
+    - product runtime
+    - production deployment
+    - live feed authority
+    - scanner execution authority
+    - direct dependency for Prophet Platform
+
+product_lane:
+  source_evidence_owner:
+    repo: SocioProphet/gaia-world-model
+    issue: SocioProphet/gaia-world-model#29
+    role: source_records_and_transparent_adapters
+    validation:
+      - python3 scripts/validate_orion_osiris_source_records.py
+    current_artifacts:
+      - docs/integrations/ORION_OSIRIS_SOURCE_ADAPTERS.md
+      - docs/integrations/ORION_OSIRIS_SOURCE_LEDGER.md
+      - schemas/orion-osiris/gaia_source_record.v0_1.schema.json
+      - fixtures/orion-osiris/source-records/
+  field_intelligence_owner:
+    repo: SocioProphet/orion-field-intelligence
+    issue: SocioProphet/orion-field-intelligence#2
+    role: observation_events_fusion_decision_cards_receipts_map_markers
+    validation:
+      - python3 scripts/validate_facility_risk_fixtures.py
+    current_artifacts:
+      - docs/integrations/OSIRIS_EXCAVATION_MAP_MVP.md
+      - schemas/orion-observation-event.v0_1.schema.json
+      - schemas/orion-map-marker.v0_1.schema.json
+      - scripts/orion_event_to_marker.py
+      - fixtures/facility-risk/
+  recon_action_boundary:
+    repo: SocioProphet/SCOPE-D
+    issue: null
+    role: scanner_sweep_recon_engagement_policy_boundary
+    issue_note: GitHub Issues are disabled in this repository.
+    current_artifacts:
+      - docs/osiris-scanner-sweep-quarantine.md
+  runtime_binding_consumer:
+    repo: SocioProphet/prophet-platform
+    issue: SocioProphet/prophet-platform#506
+    role: downstream_workbench_runtime_binding_after_seam_stabilizes
+    status: planned_after_gaia_orion_contract_stabilization
+  semantic_promotion_owner:
+    repo: SocioProphet/ontogenesis
+    issue: null
+    role: later_vocabulary_and_shape_stabilization
+    status: deferred_until_schema_names_stabilize
+
+allowed_inheritance:
+  - map_first_ux_pattern
+  - grouped_layer_grammar
+  - selected_entity_panel_pattern
+  - fixture_scenario_sketches
+  - source_ledger_metadata
+  - public_feed_candidate_inventory
+
+blocked_inheritance:
+  - stealthFetch
+  - scanner_route_runtime
+  - sweep_route_runtime
+  - osint_panel_execution_behavior
+  - ungated_recon_ui
+  - inherited_route_handlers_as_authority
+  - live_feed_truth_assumptions
+  - credentials_or_api_keys_from_osiris
+  - customer_or_real_target_data_in_osiris
+
+required_dependency_direction:
+  - from: mdheller/osiris
+    to: SocioProphet/gaia-world-model
+    relation: excavation_metadata_to_source_records
+  - from: mdheller/osiris
+    to: SocioProphet/orion-field-intelligence
+    relation: excavation_metadata_to_event_map_mvp
+  - from: mdheller/osiris
+    to: SocioProphet/SCOPE-D
+    relation: scanner_sweep_findings_to_quarantine_boundary
+  - from: SocioProphet/gaia-world-model
+    to: SocioProphet/orion-field-intelligence
+    relation: source_record_refs_consumed_by_orion_events
+  - from: SocioProphet/orion-field-intelligence
+    to: SocioProphet/prophet-platform
+    relation: marker_and_decision_artifacts_consumed_by_runtime_later
+  - from: SocioProphet/sociosphere
+    to: all
+    relation: coordination_and_topology_tracking_only
+
+non_goals:
+  - SocioSphere does not implement Gaia adapters.
+  - SocioSphere does not implement Orion UI.
+  - SocioSphere does not implement scanner or sweep gating.
+  - The lane does not authorize direct OSIRIS code promotion.
+  - The lane does not claim a production-ready map workbench.
+  - The lane does not authorize live target action.

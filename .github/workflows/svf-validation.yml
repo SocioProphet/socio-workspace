@@ -20,3 +20,7 @@ jobs:
         run: |
           python3 -m pip install --user pyyaml >/dev/null
           python3 tools/check_svf_workspace_state.py
+      - name: Validate environment sandbox profiles
+        run: |
+          python3 -m pip install --user pyyaml >/dev/null
+          python3 tools/validate_environment_sandbox_profiles.py

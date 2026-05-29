@@ -77,6 +77,8 @@ def validate_registry(registry: dict[str, Any]) -> list[dict[str, Any]]:
         default_plans = profile.get("default_plans", [])
         selectors = profile.get("changed_path_selectors", [])
         policy_ref = profile.get("policy_ref")
+        contract_refs = profile.get("contract_refs", [])
+        validation_command = profile.get("validation_command")
 
         results.append(check(isinstance(profile_id, str) and SVF_ID_RE.match(profile_id) is not None and profile_id.startswith("svf:profile:"), f"{prefix}-profile-id-valid"))
         if isinstance(profile_id, str):
@@ -94,6 +96,15 @@ def validate_registry(registry: dict[str, Any]) -> list[dict[str, Any]]:
         results.append(check(isinstance(default_plans, list) and len(default_plans) >= 1 and all(isinstance(plan, str) and plan.startswith("svf:plan:") for plan in default_plans), f"{prefix}-default-plans-valid"))
         results.append(check(isinstance(profile.get("required_receipt_classes", []), list), f"{prefix}-required-receipt-classes-list"))
         results.append(check(isinstance(profile.get("non_claims", []), list), f"{prefix}-non-claims-list"))
+
+        contract_refs_valid = isinstance(contract_refs, list) and all(isinstance(item, str) and len(item) > 0 and not item.startswith("/") for item in contract_refs)
+        results.append(check(contract_refs_valid, f"{prefix}-contract-refs-valid", [str(contract_refs)] if not contract_refs_valid else []))
+
+        command_valid = validation_command is None or (isinstance(validation_command, str) and len(validation_command.strip()) > 0)
+        results.append(check(command_valid, f"{prefix}-validation-command-valid", [str(validation_command)] if not command_valid else []))
+
+        if validation_command:
+            results.append(check(backend != "placeholder", f"{prefix}-validation-command-requires-real-backend", [str(profile_id)] if backend == "placeholder" else []))
 
         placeholder_ok = not (mode == "blocking" and backend == "placeholder")
         results.append(check(placeholder_ok, f"{prefix}-blocking-profile-not-placeholder", [str(profile_id)] if not placeholder_ok else []))

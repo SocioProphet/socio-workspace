@@ -16,3 +16,7 @@ jobs:
           python-version: '3.11'
       - name: Validate Sociosphere SVF workspace
         run: make svf-workspace-validate
+      - name: Validate Sociosphere SVF workspace state
+        run: |
+          python3 -m pip install --user pyyaml >/dev/null
+          python3 tools/check_svf_workspace_state.py

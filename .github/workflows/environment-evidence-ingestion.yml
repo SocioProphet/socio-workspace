@@ -1,0 +1,30 @@
+name: Environment Evidence Ingestion
+
+on:
+  push:
+    paths:
+      - 'tests/fixtures/environment/evidence-ingestion.*.json'
+      - 'tools/validate_environment_evidence_ingestion.py'
+      - '.github/workflows/environment-evidence-ingestion.yml'
+  pull_request:
+    paths:
+      - 'tests/fixtures/environment/evidence-ingestion.*.json'
+      - 'tools/validate_environment_evidence_ingestion.py'
+      - '.github/workflows/environment-evidence-ingestion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-environment-evidence-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate environment evidence ingestion fixtures
+        run: python3 tools/validate_environment_evidence_ingestion.py

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "ingestion_id": "sociosphere:environment-evidence-ingestion:observed-missing-evidence:scope-d-example",
+  "workspace_ref": "workspace://scope-d/main",
+  "environment_profile_id": "environment-sandbox:profile:sociosphere.control-plane-readout",
+  "environment_state_before": "environment_requested",
+  "environment_state_after": "environment_observed",
+  "prophet_platform_refs": {
+    "request_id": "environment:validate-change-v2-request:scope-d-example",
+    "response_id": "environment:validate-change-v2-response:observed:scope-d-example",
+    "run_link_id": "environment:validate-change-v2-agentplane-link:scope-d-example"
+  },
+  "agentplane_refs": {
+    "sandbox_run_ref": "agentplane:sandbox-run:observed:scope-d-example",
+    "evidence_refs": [],
+    "receipt_refs": [
+      "receipt://agentplane/sandbox-run/scope-d-example/synthetic-observed"
+    ]
+  },
+  "policy_refs": [
+    "SocioProphet/ProCybernetica#svf-policy-primitive"
+  ],
+  "state_write": {
+    "allowed": true,
+    "state_authority": "Sociosphere",
+    "execution_authority": "AgentPlane",
+    "product_surface": "Prophet Platform"
+  },
+  "non_claims": [
+    "Invalid fixture: observed state without evidence must be rejected."
+  ]
+}

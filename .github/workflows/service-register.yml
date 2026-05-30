@@ -6,6 +6,7 @@ on:
       - "architecture/service-register/**"
       - "tools/validate_service_register_artifacts.py"
       - "tools/check_service_register_repo_coverage.py"
+      - "tools/check_service_dependency_cycles.py"
       - ".github/workflows/service-register.yml"
   push:
     branches: [main]
@@ -13,6 +14,7 @@ on:
       - "architecture/service-register/**"
       - "tools/validate_service_register_artifacts.py"
       - "tools/check_service_register_repo_coverage.py"
+      - "tools/check_service_dependency_cycles.py"
       - ".github/workflows/service-register.yml"
 
 jobs:
@@ -27,3 +29,5 @@ jobs:
         run: python3 tools/validate_service_register_artifacts.py
       - name: Check service register repo coverage warn-only
         run: python3 tools/check_service_register_repo_coverage.py
+      - name: Check service dependency cycles warn-only
+        run: python3 tools/check_service_dependency_cycles.py

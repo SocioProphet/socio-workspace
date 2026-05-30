@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/sociosphere/service-dependency-edges.schema.json",
+  "title": "SocioSphere Service Dependency Edge Row",
+  "type": "object",
+  "required": [
+    "edge_id",
+    "from_service_id",
+    "to_service_id",
+    "edge_kind",
+    "dependency_mode",
+    "cycle_policy",
+    "required_for_bootstrap",
+    "required_for_product_hardening",
+    "evidence_required",
+    "notes"
+  ],
+  "properties": {
+    "edge_id": { "type": "string", "pattern": "^edge\\.[0-9]{3,}$" },
+    "from_service_id": { "type": "string", "pattern": "^svc\\.[a-z0-9-]+\\.[a-z0-9-]+$" },
+    "to_service_id": { "type": "string", "pattern": "^svc\\.[a-z0-9-]+\\.[a-z0-9-]+$" },
+    "edge_kind": { "enum": ["depends_on", "consumes", "emits_to", "governs", "ui_surface", "evidence_feed"] },
+    "dependency_mode": { "enum": ["hard", "soft", "optional-extension", "runtime-callback", "policy-required", "governance-feedback", "evaluation-orchestration", "evidence-feed", "ui-consumes"] },
+    "cycle_policy": { "enum": ["forbidden", "allowed-if-optional", "allowed-runtime-feedback", "allowed-governance-loop"] },
+    "required_for_bootstrap": { "enum": ["true", "false", true, false] },
+    "required_for_product_hardening": { "enum": ["true", "false", true, false] },
+    "evidence_required": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

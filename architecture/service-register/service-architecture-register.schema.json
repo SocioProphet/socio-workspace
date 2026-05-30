@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/sociosphere/service-architecture-register.schema.json",
+  "title": "SocioSphere Service Architecture Register Row",
+  "type": "object",
+  "required": [
+    "service_id",
+    "service_name",
+    "stack_tier",
+    "owning_repo",
+    "supporting_repos",
+    "contract_family",
+    "contract_repo",
+    "contract_paths",
+    "runtime_authority",
+    "evidence_emitted",
+    "depends_on",
+    "consumed_by",
+    "governance_boundary",
+    "product_status",
+    "local_first_posture",
+    "notes"
+  ],
+  "properties": {
+    "service_id": { "type": "string", "pattern": "^svc\\.[a-z0-9-]+\\.[a-z0-9-]+$" },
+    "service_name": { "type": "string", "minLength": 1 },
+    "stack_tier": { "enum": ["substrate", "managed-substrate", "workspace-substrate", "platform-core", "product-service", "application", "misc"] },
+    "owning_repo": { "type": "string", "minLength": 1 },
+    "supporting_repos": { "type": "string" },
+    "contract_family": { "type": "string" },
+    "contract_repo": { "type": "string" },
+    "contract_paths": { "type": "string" },
+    "runtime_authority": { "enum": ["none", "local-only", "local-privileged", "mesh-optional", "cloud-optional", "cloud-control", "privileged"] },
+    "evidence_emitted": { "type": "string" },
+    "depends_on": { "type": "string" },
+    "consumed_by": { "type": "string" },
+    "governance_boundary": { "type": "string" },
+    "product_status": { "enum": ["planning", "prototype", "active-build", "usable", "hardened"] },
+    "local_first_posture": { "enum": ["local-only", "local-first", "mesh-optional", "cloud-required"] },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

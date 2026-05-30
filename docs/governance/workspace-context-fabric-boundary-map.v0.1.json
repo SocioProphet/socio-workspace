@@ -1,0 +1,99 @@
+{
+  "schema_version": "sociosphere.workspace-context-fabric-boundary-map.v0.1",
+  "status": "active",
+  "surface": "workspace-context-fabric",
+  "owning_repositories": [
+    {
+      "repo": "SocioProphet/prophet-workspace",
+      "authority": "workspace domain contracts",
+      "owns": [
+        "Workroom",
+        "ProfessionalWorkroom",
+        "ContextGraph",
+        "ProviderCapture",
+        "ProviderProjection",
+        "ShareGrant",
+        "RecallCandidate",
+        "WorkspaceContextRuntimeBinding"
+      ]
+    },
+    {
+      "repo": "SocioProphet/prophet-platform",
+      "authority": "runtime record and evidence binding",
+      "owns": [
+        "WorkspaceContextRecord"
+      ]
+    },
+    {
+      "repo": "SocioProphet/agentplane",
+      "authority": "execution evidence",
+      "owns": [
+        "WorkroomContextEvidence"
+      ]
+    },
+    {
+      "repo": "SocioProphet/memory-mesh",
+      "authority": "review-only recall promotion",
+      "owns": [
+        "WorkspaceRecallPromotionPacket"
+      ]
+    },
+    {
+      "repo": "SocioProphet/agent-registry",
+      "authority": "agent and session authority binding",
+      "owns": [
+        "WorkspaceContextAuthorityBinding"
+      ]
+    },
+    {
+      "repo": "SocioProphet/policy-fabric",
+      "authority": "policy decision boundary",
+      "owns": [
+        "workspace_context_policy_decision"
+      ]
+    },
+    {
+      "repo": "SocioProphet/mcp-a2a-zero-trust",
+      "authority": "mediated capability grant profile",
+      "owns": [
+        "WorkspaceContextCapabilityGrantProfile"
+      ]
+    },
+    {
+      "repo": "SocioProphet/socioprophet-agent-standards",
+      "authority": "profile and conformance overlay",
+      "owns": [
+        "WorkspaceContextFabricProfile"
+      ]
+    },
+    {
+      "repo": "SocioProphet/sociosphere",
+      "authority": "estate registration and topology",
+      "owns": [
+        "manifest registration",
+        "workspace lock",
+        "boundary map",
+        "source exposure review"
+      ]
+    }
+  ],
+  "dependency_edges": [
+    { "from": "prophet_workspace", "to": "prophet-platform", "relation": "runtime_records" },
+    { "from": "prophet_workspace", "to": "agentplane", "relation": "execution_evidence_refs" },
+    { "from": "prophet_workspace", "to": "agent_registry", "relation": "authority_refs" },
+    { "from": "prophet_workspace", "to": "memory_mesh", "relation": "recall_promotion_refs" },
+    { "from": "prophet_workspace", "to": "policy-fabric", "relation": "policy_decision_refs" },
+    { "from": "prophet_workspace", "to": "mcp_a2a_zero_trust", "relation": "capability_grant_refs" },
+    { "from": "socioprophet_agent_standards", "to": "prophet_workspace", "relation": "profile_requires" },
+    { "from": "socioprophet_agent_standards", "to": "prophet-platform", "relation": "profile_requires" },
+    { "from": "socioprophet_agent_standards", "to": "agentplane", "relation": "profile_requires" },
+    { "from": "socioprophet_agent_standards", "to": "memory_mesh", "relation": "profile_requires" },
+    { "from": "socioprophet_agent_standards", "to": "agent_registry", "relation": "profile_requires" }
+  ],
+  "non_ownership_rules": [
+    "Sociosphere does not redefine component contracts.",
+    "Provider-facing context surfaces are policy-bound and grant-bound.",
+    "Recall promotion is review-only unless Memory Mesh and Policy Fabric approve a later writeback path.",
+    "External provider projections are compiled views, not canonical context graph transfer."
+  ]
+}

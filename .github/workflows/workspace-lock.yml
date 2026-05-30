@@ -1,0 +1,44 @@
+name: Workspace Lock
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/workspace-lock.yml'
+      - 'tools/generate_workspace_lock.py'
+      - 'manifest/workspace.toml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-workspace-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate workspace lock
+        run: python3 tools/generate_workspace_lock.py --write
+
+      - name: Validate workspace lock
+        run: python3 tools/generate_workspace_lock.py --check
+
+      - name: Commit workspace lock if changed
+        run: |
+          if git diff --quiet -- manifest/workspace.lock.json; then
+            echo "No workspace lock changes to commit."
+            exit 0
+          fi
+          git add manifest/workspace.lock.json
+          git commit -m "Generate workspace manifest lock"
+          git push

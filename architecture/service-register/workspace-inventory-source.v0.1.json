@@ -1,0 +1,20 @@
+{
+  "artifact_id": "sociosphere.workspace-inventory-source.v0.1",
+  "status": "warn-only-binding",
+  "source_repository": "SocioProphet/workspace-inventory",
+  "source_artifact_candidates": [
+    "architecture/repo-estate/canonical-repo-estate.v1.0.csv",
+    "canonical-repo-estate.v1.0.csv",
+    "workspace-inventory/repositories.csv",
+    "inventory/repositories.csv"
+  ],
+  "consumer_repository": "SocioProphet/sociosphere",
+  "consumer_artifacts": [
+    "architecture/service-register/service-architecture-register.v1.0.csv",
+    "architecture/service-register/canonical-repo-estate.v1.0.csv"
+  ],
+  "expected_canonical_repo_count": 125,
+  "binding_mode": "external-source-pending",
+  "validator_mode": "warn-only",
+  "notes": "PR-E records workspace-inventory as the canonical repo-estate source for future coverage and drift checks. The validator remains warn-only until workspace-inventory exports a stable artifact path."
+}

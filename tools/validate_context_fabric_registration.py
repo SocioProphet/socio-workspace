@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Validate Workspace Context Fabric registration staging.
+"""Validate Workspace Context Fabric registration state.
 
-This validator keeps the folded-registration path safe without requiring a
-whole-file manifest rewrite through connector tooling. It verifies that the
-registration fragment contains the expected repo entries and that the canonical
-manifest does not contain duplicate repo names when the fragment is folded.
+The registration can be in either valid state:
+
+1. pending fold: all expected repos are present in the registration fragment and
+   absent from manifest/workspace.toml.
+2. folded: all expected repos are present in manifest/workspace.toml.
+
+Partial folds and duplicate repo names are rejected.
 """
 
 from __future__ import annotations
@@ -31,32 +34,61 @@ def names(path: Path) -> list[str]:
     return NAME_RE.findall(text)
 
 
+def duplicates(values: list[str]) -> list[str]:
+    return sorted({value for value in values if values.count(value) > 1})
+
+
 def main() -> int:
     manifest_names = names(MANIFEST)
     fragment_names = names(FRAGMENT)
     fragment_set = set(fragment_names)
+    manifest_set = set(manifest_names)
 
-    missing = sorted(EXPECTED - fragment_set)
-    if missing:
-        print("ERR: registration fragment missing expected repos: " + ", ".join(missing), file=sys.stderr)
-        return 2
-
-    extra_dupes = sorted(set(manifest_names) & EXPECTED)
-    if extra_dupes:
+    fragment_missing = sorted(EXPECTED - fragment_set)
+    if fragment_missing:
         print(
-            "ERR: expected fragment repos already appear in manifest/workspace.toml: "
-            + ", ".join(extra_dupes),
+            "ERR: registration fragment missing expected repos: "
+            + ", ".join(fragment_missing),
             file=sys.stderr,
         )
         return 2
 
-    combined = manifest_names + fragment_names
-    dupes = sorted({name for name in combined if combined.count(name) > 1})
-    if dupes:
-        print("ERR: duplicate repo names after fold: " + ", ".join(dupes), file=sys.stderr)
+    manifest_dupes = duplicates(manifest_names)
+    if manifest_dupes:
+        print(
+            "ERR: duplicate repo names in manifest/workspace.toml: "
+            + ", ".join(manifest_dupes),
+            file=sys.stderr,
+        )
         return 2
 
-    print("OK: Context Fabric registration fragment is fold-safe")
+    fragment_dupes = duplicates(fragment_names)
+    if fragment_dupes:
+        print(
+            "ERR: duplicate repo names in registration fragment: "
+            + ", ".join(fragment_dupes),
+            file=sys.stderr,
+        )
+        return 2
+
+    present = EXPECTED & manifest_set
+    missing_from_manifest = EXPECTED - manifest_set
+
+    if present and missing_from_manifest:
+        print(
+            "ERR: partial Context Fabric fold; present="
+            + ", ".join(sorted(present))
+            + " missing="
+            + ", ".join(sorted(missing_from_manifest)),
+            file=sys.stderr,
+        )
+        return 2
+
+    if present == EXPECTED:
+        print("OK: Context Fabric registration entries are folded into manifest/workspace.toml")
+        return 0
+
+    print("OK: Context Fabric registration fragment is pending fold and fold-safe")
     return 0
 
 

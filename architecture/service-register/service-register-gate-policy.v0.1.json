@@ -1,0 +1,34 @@
+{
+  "artifact_id": "sociosphere.service-register-gate-policy.v0.1",
+  "status": "warn-only",
+  "gate_mode": "warn-only",
+  "hard_gate_enabled": false,
+  "required_artifacts_before_hard_gate": [
+    "service-architecture-register.v1.0.csv",
+    "canonical-repo-estate.v1.0.csv",
+    "service-dependency-edges.v0.1.csv",
+    "critical-contract-path-stubs.v0.1.csv"
+  ],
+  "required_external_source_before_hard_gate": {
+    "repository": "SocioProphet/workspace-inventory",
+    "artifact_path_status": "pending-stable-path"
+  },
+  "warn_only_checks": [
+    "artifact_presence",
+    "repo_coverage",
+    "dependency_cycles",
+    "critical_path_generation",
+    "workspace_inventory_binding",
+    "drift_report"
+  ],
+  "future_hard_gate_checks": [
+    "all_required_artifacts_present",
+    "canonical_repo_count_matches_workspace_inventory",
+    "no_missing_repo_coverage",
+    "no_noncanonical_repo_references",
+    "no_forbidden_dependency_cycles",
+    "critical_path_report_generated",
+    "no_new_blocking_services_without_acknowledgement"
+  ],
+  "notes": "PR-F captures drift report and CI gate policy in warn-only mode. Hard gates remain disabled until artifact CSVs are present and workspace-inventory exports a stable canonical repo-estate artifact."
+}

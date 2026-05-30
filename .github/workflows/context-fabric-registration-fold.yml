@@ -1,0 +1,45 @@
+name: Context Fabric Registration Fold
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/context-fabric-registration-fold.yml'
+      - 'tools/fold_context_fabric_registration.py'
+      - 'tools/validate_context_fabric_registration.py'
+      - 'manifest/context-fabric.registration.toml'
+
+permissions:
+  contents: write
+
+jobs:
+  fold-context-fabric-registration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fold Context Fabric registration
+        run: python3 tools/fold_context_fabric_registration.py --write
+
+      - name: Validate Context Fabric registration
+        run: python3 tools/validate_context_fabric_registration.py
+
+      - name: Commit folded manifest if changed
+        run: |
+          if git diff --quiet -- manifest/workspace.toml; then
+            echo "No manifest fold changes to commit."
+            exit 0
+          fi
+          git add manifest/workspace.toml
+          git commit -m "Fold Context Fabric registration into workspace manifest"
+          git push

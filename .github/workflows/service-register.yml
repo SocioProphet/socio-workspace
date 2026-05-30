@@ -9,6 +9,7 @@ on:
       - "tools/check_service_dependency_cycles.py"
       - "tools/generate_service_critical_path_report.py"
       - "tools/check_workspace_inventory_binding.py"
+      - "tools/generate_service_register_drift_report.py"
       - ".github/workflows/service-register.yml"
   push:
     branches: [main]
@@ -19,6 +20,7 @@ on:
       - "tools/check_service_dependency_cycles.py"
       - "tools/generate_service_critical_path_report.py"
       - "tools/check_workspace_inventory_binding.py"
+      - "tools/generate_service_register_drift_report.py"
       - ".github/workflows/service-register.yml"
 
 jobs:
@@ -39,3 +41,5 @@ jobs:
         run: python3 tools/generate_service_critical_path_report.py
       - name: Check workspace-inventory binding warn-only
         run: python3 tools/check_workspace_inventory_binding.py
+      - name: Generate service register drift report warn-only
+        run: python3 tools/generate_service_register_drift_report.py

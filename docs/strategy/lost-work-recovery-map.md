@@ -1,14 +1,15 @@
 # Lost Work Recovery Map
 
-Status: active recovery index  
+Status: active recovery ledger; top-ten recovery tranche closed  
 Coordination authority: `SocioProphet/sociosphere`  
-Tracking issue: #408
+Tracking issue: #408  
+Last tranche review: 2026-05-30
 
 ## Purpose
 
-This document records important conceptual, product, governance, and research threads that were previously developed across the estate but have fallen out of active backlog visibility.
+This document records important conceptual, product, governance, and research threads that were previously developed across the estate but fell out of active backlog visibility.
 
-The recovery map converts those threads into governed estate objects. A recovered thread must have an owner repo, an explicit archive status, or a frozen return condition. The map does not promote speculative claims to theorem status, implementation status, or product readiness.
+The recovery map converts those threads into governed estate objects. A recovered thread must have an owner repo, an explicit archive status, a frozen return condition, or an intentional non-pursuit rationale. The map does not promote speculative claims to theorem status, implementation status, or product readiness.
 
 ## Non-goals
 
@@ -22,62 +23,57 @@ This document does not replace repo-local issue tracking. It does not assert tha
 - `research foundation`: belongs in Heller-Godel, Heller-Einstein, or a Clay-program foundation repo, with claim boundaries preserved.
 - `frozen with return condition`: not active, but not discarded; may return only when named prerequisites are satisfied.
 - `archive-only`: preserved for provenance and future review, with no current action.
+- `recovered`: durable owner and control artifact exist.
+- `corrected`: prior recovery assumption was wrong and has been replaced by a verified authority surface.
+- `already captured`: the thread already had a durable authority surface before this recovery tranche.
 
-## Recovery table
+## Top-ten recovery disposition table
 
-| Thread | Why it matters | Owning repo | Status | First action |
+| # | Thread | Owning repo / authority surface | Disposition | Recovery artifacts |
 |---|---|---|---|---|
-| DoNotLearn / DoNotLink privacy doctrine | Prevents latent identity reconstruction across memory, graph, fraud, and agent systems by blocking unsafe joins, graph paths, latent-space reuse, and basis-vector leakage. | `SocioProphet/ontogenesis` | authority-plane doctrine | Draft vocabulary and boundary note for non-linkability and non-learnability constraints. |
-| Systems-learning-loops as institutional learning canon | Preserves how the estate learns from evidence, failure, delivery, doctrine, experiments, and postmortems. | `SocioProphet/systems-learning-loops` | active backlog | Create a learning-loop canon index and map downstream consumers. |
-| Governed memory representation strata | Separates raw evidence, frames, schemas, symbolic relations, statistics, vectors, learned latent layers, governance, and actions. | `SocioProphet/ontogenesis`; `SocioProphet/prophet-platform` | authority-plane doctrine | Draft memory-representation strata and promotion boundaries. |
-| Common IR kernel | Provides a shared object model for proof/governance tracks: ClaimIR, ObjectIR, ContextIR, EvidenceIR, MorphismIR, ObligationIR, VerifierIR, ReceiptIR, LedgerIR. | `SocioProphet/proof-fabric-kernel` | active backlog | Define an IR-family skeleton with non-claiming semantics. |
-| Boundary geometry / spectral-boundary grammar | Bridges boundary conditions, admissible modes, symmetry, recurrence, spectral behavior, and lawful-learning grammar. | `SocioProphet/heller-godel-core`; `SocioProphet/heller-einstein` | research foundation | Create a boundary grammar note with explicit claim grades. |
-| TriTRPC typed control-plane substrate | Candidate typed protocol surface for agent, workroom, memory, and control-plane communication. | `SocioProphet/TriTRPC` | product substrate | Audit repo state and define v0.1 scope. |
-| slash-topics governed topic-pack membrane | Candidate semantic membrane for topic packs, Holmes/Sherlock/Search interoperability, and navigable workroom intelligence. | `SocioProphet/slash-topics` | product substrate | Define a topic-pack contract and authority boundaries. |
-| workspace-inventory estate ledger | Converts repo, branch, PR, issue, CI, doctrine, and capture state into a governed estate inventory. | `SocioProphet/workspace-inventory`; `SocioProphet/sociosphere` | active backlog | Define estate inventory schema and Sociosphere registration bridge. |
-| speechlab audio-first review/runtime surface | Captures spoken review, audio-friendly sectioning, dictated corpus ingestion, and human-machine channel testing. | `SocioProphet/speechlab` | product substrate | Define an audio review loop and confusability fixtures. |
-| Heller-Godel calculus-invariant character paper | Preserves the invariant layer that separates calculus-relative presentation from proof-class/statistical/character data. | `SocioProphet/heller-godel-core` | research foundation | Promote to a Tier 0/Tier 1 foundation note with strict claim boundaries. |
-| Heller-Godel five-predicate epistemic grammar | Separates provability, truth, projection, recognition, and descent/obstruction. | `SocioProphet/heller-godel-core` | research foundation | Add to foundation grammar backlog; prevent predicate collapse. |
-| Godel 1949 time/fibration bridge | Potential disciplined bridge among S3/S2/S1 projection, causal phase, Heller-Einstein, and time theory. | `SocioProphet/heller-einstein`; `SocioProphet/heller-godel-core` | frozen with return condition | Return only as a typed bridge note with no physics claim promotion. |
-| Prime Harness SPEC v0.2 | Concrete analytic-number-theory harness scope for sieve oracle, zero-table provenance, residual machinery, Li quadrature, manifests, and integration tests. | `SocioProphet/hphd-zeta-mirror-lattice` | active backlog | Reconcile with current HPHd/Zeta repo strategy before implementation. |
-| Wythoff / Schwarz finite-generative syntax | Encodes finite generative syntax for symmetry, tessellation, reflection groups, and lawful object generation. | `SocioProphet/heller-godel-core` | research foundation | Add as a boundary/symmetry grammar candidate. |
-| Moufang-loop holonomy after moduli construction | Advanced future target with a known prerequisite. | `SocioProphet/heller-godel-core` | frozen with return condition | Return only after moduli construction exists. |
-| Operator L_phi and recognition dynamics | Future bridge between proof objects, recognition, and lawful-learning validation. | `SocioProphet/heller-godel-core` | frozen with return condition | Return only after `L_phi` is typed and defined. |
-| Curry-Howard-Lambek categorical setup | Potential formal bridge across proofs, programs, categories, semantics, and proof-fabric. | `SocioProphet/heller-godel-core`; `SocioProphet/proof-fabric-kernel` | frozen with return condition | Return after common IR kernel has stabilized. |
-| Lawful-learning monograph TeX source | Publication-scale canonical exposition distinct from repo-local docs. | TBD | archive-only | Locate and classify source before promotion. |
-| Delivery Excellence integration target | Turns governance and doctrine into repeatable delivery quality. | TBD | active backlog | Locate authority repo and map delivery-loop consumers. |
+| 1 | DoNotLearn / DoNotLink privacy doctrine | `SocioProphet/ontogenesis` | recovered | `docs/specs/privacy-nonlinkability-doctrine-v0.md`; `Platform/GovernedIntelligence/privacy-nonlinkability.ttl`; `contexts/governed-intelligence.context.jsonld`; `shapes/privacy_nonlinkability.shacl.ttl`; `examples/privacy-nonlinkability/`; `scripts/validate_privacy_nonlinkability_examples.py`; `Makefile` validation target. |
+| 2 | Systems-learning-loops as institutional learning canon | `SocioProphet/systems-learning-loops` | recovered | `docs/institutional-learning-canon-v0.md`; `kb/topics/institutional-learning.yaml`; `kb/patterns/pattern-template.md`; `kb/patterns/institutional-amnesia.md`; `kb/receipts/README.md`; `kb/receipts/lost-work-recovery-map.receipt.yaml`. |
+| 3 | Governed memory representation strata | `SocioProphet/ontogenesis` | recovered | `docs/specs/governed-memory-representation-strata-v0.md`; `Platform/GovernedIntelligence/memory-representation-strata.ttl`; `contexts/governed-intelligence.context.jsonld`; `examples/memory-representation-strata/`; `shapes/memory_representation_strata.shacl.ttl`; `scripts/validate_memory_representation_strata_examples.py`; `Makefile` validation target. |
+| 4 | Common IR kernel / proof-fabric kernel | `SocioProphet/Heller-Godel/proof_fabric_kernel/` | corrected | Prior standalone `SocioProphet/proof-fabric-kernel` assumption superseded. Active PFK lives in Heller-Godel. Added `proof_fabric_kernel/docs/ClayProgram_PFK_ConsumerContract_v0.md`; corrected and closed #416. |
+| 5 | Boundary geometry / spectral-boundary grammar | `SocioProphet/Heller-Godel` | recovered | `docs/framework-core/boundary-spectral-grammar-v0.md`; indexed in `docs/framework-core/README.md`. |
+| 6 | workspace-inventory estate ledger | `SocioProphet/workspace-inventory` | recovered | `docs/estate-ledger-v0.md`; optional estate/recovery/adoption/validation/drift fields in `inventory/schema.json`; initial annotations in `inventory/repos.yaml`; enum hardening in `tools/validate_inventory.py`. |
+| 7 | TriTRPC typed control-plane substrate | `SocioProphet/TriTRPC` | recovered | `docs/vnext/control-plane-substrate-recovery-v0.md`; indexed in `docs/vnext/README.md`; no v1/vNext normative protocol changes. |
+| 8 | slash-topics governed topic-pack membrane | `SocioProphet/slash-topics` | recovered | `docs/governed-topic-pack-membrane-v0.md`; indexed in `README.md`; no schema/runtime changes. |
+| 9 | speechlab audio-first review/runtime surface | `SocioProphet/speechlab` | recovered | `README.md`; `docs/audio-first-review-runtime-v0.md`; no runtime/model/ingestion changes. |
+| 10 | Heller-Godel calculus-invariant character paper | `SocioProphet/Heller-Godel` | already captured | Existing `docs/manuscripts/calculus_invariant_characters_v2_1_3.md`; canonical Paper I / D1 rewrite at `docs/manuscripts/paper_i_deligne_cohomological_phase_characters.md`; framework-core README already describes active proof-character core. No new artifact required. |
 
-## Priority recovery order
+## Additional recovered / deferred threads
 
-1. DoNotLearn / DoNotLink privacy doctrine.
-2. Systems-learning-loops as institutional learning canon.
-3. Governed memory representation strata.
-4. Common IR kernel.
-5. Boundary geometry / spectral-boundary grammar.
-6. workspace-inventory estate ledger.
-7. TriTRPC typed control-plane substrate.
-8. slash-topics governed topic-pack membrane.
-9. speechlab audio-first review/runtime surface.
-10. Heller-Godel calculus-invariant character paper.
+| Thread | Owning repo | Status | Disposition / return condition |
+|---|---|---|---|
+| Heller-Godel five-predicate epistemic grammar | `SocioProphet/Heller-Godel` | research foundation | Still deferred. Needs separate framework-core note only after checking existing coverage. |
+| Godel 1949 time/fibration bridge | `SocioProphet/Heller-Godel`; possible future Heller-Einstein surface | frozen with return condition | Return only as a typed bridge note with no physics claim promotion. |
+| Prime Harness SPEC v0.2 | `SocioProphet/hphd-zeta-mirror-lattice` | active backlog | Still requires repo-specific reconciliation before implementation. |
+| Wythoff / Schwarz finite-generative syntax | `SocioProphet/Heller-Godel` | partially recovered | Captured as part of `docs/framework-core/boundary-spectral-grammar-v0.md`; stronger use requires proof-bearing domain artifact. |
+| Moufang-loop holonomy after moduli construction | `SocioProphet/Heller-Godel` | frozen with return condition | Return only after moduli construction exists. |
+| Operator L_phi and recognition dynamics | `SocioProphet/Heller-Godel` | frozen with return condition | Return only after `L_phi` is typed and defined. |
+| Curry-Howard-Lambek categorical setup | `SocioProphet/Heller-Godel`; PFK-adjacent only if needed | frozen with return condition | Return after proof-fabric / framework IR usage stabilizes. |
+| Lawful-learning monograph TeX source | TBD | archive-only | Locate and classify source before promotion. |
+| Delivery Excellence integration target | TBD | active backlog | Locate authority repo and map delivery-loop consumers. |
 
 ## Do-not-lose-again rule
 
 A recovered thread may not remain as unowned memory. It must resolve into exactly one of these dispositions:
 
-1. assigned owner repo with an issue or committed control artifact;
+1. assigned owner repo with committed control artifact;
 2. explicit archive-only status with provenance notes;
 3. frozen-with-return-condition status with named prerequisites;
-4. closed as intentionally not pursued, with rationale.
+4. blocked with blocker reference;
+5. superseded by a verified authority surface;
+6. closed as intentionally not pursued, with rationale.
 
-## Immediate follow-on issues
+## Consolidation follow-ons
 
-The first follow-on tranche should open or update repo-local issues for the top five active targets:
+The top-ten recovery tranche is closed. Remaining consolidation work should be limited and explicit:
 
-- `SocioProphet/ontogenesis`: DoNotLearn / DoNotLink and governed memory strata.
-- `SocioProphet/systems-learning-loops`: learning-loop canon index.
-- `SocioProphet/proof-fabric-kernel`: common IR-family skeleton.
-- `SocioProphet/heller-godel-core`: boundary geometry / spectral-boundary grammar and invariant-character foundation note.
-- `SocioProphet/workspace-inventory`: estate-ledger schema and Sociosphere registration bridge.
+1. Add or update estate-ledger annotations in `SocioProphet/workspace-inventory` for all newly touched authority repos.
+2. Add learning receipts in `SocioProphet/systems-learning-loops` for the main recovered doctrines, not every individual file.
+3. Resume product/research execution from the recovered authority surfaces instead of continuing generic recovery.
 
 ## Claim boundary
 

@@ -1,0 +1,36 @@
+name: Workspace Context Fabric Governance
+
+on:
+  pull_request:
+    paths:
+      - 'docs/governance/workspace-context-fabric-boundary-map.v0.1.json'
+      - 'docs/governance/workspace-context-fabric-source-exposure-review.v0.1.md'
+      - 'tools/validate_workspace_context_fabric_governance.py'
+      - '.github/workflows/workspace-context-fabric-governance.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/governance/workspace-context-fabric-boundary-map.v0.1.json'
+      - 'docs/governance/workspace-context-fabric-source-exposure-review.v0.1.md'
+      - 'tools/validate_workspace_context_fabric_governance.py'
+      - '.github/workflows/workspace-context-fabric-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-workspace-context-fabric-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate Workspace Context Fabric governance
+        run: python3 tools/validate_workspace_context_fabric_governance.py

@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-"""Warn-only service dependency edge validator and cycle classifier.
-
-PR-C establishes the dependency-graph validation lane. It remains warn-only
-until the edge table is committed and critical-path generation is introduced in
-PR-D.
-"""
+"""Service dependency edge validator and cycle classifier."""
 from __future__ import annotations
 
 import csv
+import os
 from collections import defaultdict
 from pathlib import Path
 
@@ -55,6 +51,10 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 def warn(message: str) -> None:
     print(f"WARN: {message}")
+
+
+def fail(message: str) -> None:
+    print(f"FAIL: {message}")
 
 
 def ok(message: str) -> None:
@@ -111,12 +111,28 @@ def classify_cycle(cycle: list[str], lookup: dict[tuple[str, str], list[dict[str
     return "forbidden"
 
 
+def record(strict: bool, failures: list[str], message: str) -> None:
+    if strict:
+        fail(message)
+        failures.append(message)
+    else:
+        warn(message)
+
+
 def main() -> int:
     print("SocioSphere service dependency cycle check")
+    strict = os.environ.get("SERVICE_REGISTER_STRICT", "0") == "1"
+    failures: list[str] = []
+
     if not EDGES.exists():
-        warn(f"missing {EDGES.relative_to(ROOT)}; cycle classification cannot run yet")
-        print("PR-C cycle checker is warn-only by design; exiting 0")
-        return 0
+        message = f"missing {EDGES.relative_to(ROOT)}; cycle classification cannot run yet"
+        record(strict, failures, message)
+        return 1 if failures else 0
+
+    if not REGISTER.exists():
+        message = f"missing {REGISTER.relative_to(ROOT)}; service references cannot be validated"
+        record(strict, failures, message)
+        return 1 if failures else 0
 
     edges = read_csv(EDGES)
     services = service_ids_from_register()
@@ -124,32 +140,32 @@ def main() -> int:
     if len(edges) == EXPECTED_EDGE_ROWS:
         ok(f"edge rows={len(edges)}")
     else:
-        warn(f"edge row count {len(edges)} != expected {EXPECTED_EDGE_ROWS}")
+        record(strict, failures, f"edge row count {len(edges)} != expected {EXPECTED_EDGE_ROWS}")
 
     boot_required = sum(1 for edge in edges if boolish(edge.get("required_for_bootstrap")))
     if boot_required == EXPECTED_BOOT_REQUIRED:
         ok(f"boot-required edges={boot_required}")
     else:
-        warn(f"boot-required edge count {boot_required} != expected {EXPECTED_BOOT_REQUIRED}")
+        record(strict, failures, f"boot-required edge count {boot_required} != expected {EXPECTED_BOOT_REQUIRED}")
 
     allowed_cycle_edges = [edge for edge in edges if edge.get("cycle_policy") in ALLOWED_CYCLE_POLICIES_NON_FORBIDDEN]
     if len(allowed_cycle_edges) == EXPECTED_ALLOWED_CYCLES:
         ok(f"declared allowed-cycle edges={len(allowed_cycle_edges)}")
     else:
-        warn(f"declared allowed-cycle edges {len(allowed_cycle_edges)} != expected {EXPECTED_ALLOWED_CYCLES}")
+        record(strict, failures, f"declared allowed-cycle edges {len(allowed_cycle_edges)} != expected {EXPECTED_ALLOWED_CYCLES}")
 
     for edge in edges:
+        edge_id = edge.get("edge_id", "<missing-edge-id>")
         if edge.get("edge_kind") not in ALLOWED_EDGE_KINDS:
-            warn(f"{edge.get('edge_id')} has invalid edge_kind={edge.get('edge_kind')}")
+            record(strict, failures, f"{edge_id} has invalid edge_kind={edge.get('edge_kind')}")
         if edge.get("dependency_mode") not in ALLOWED_DEPENDENCY_MODES:
-            warn(f"{edge.get('edge_id')} has invalid dependency_mode={edge.get('dependency_mode')}")
+            record(strict, failures, f"{edge_id} has invalid dependency_mode={edge.get('dependency_mode')}")
         if edge.get("cycle_policy") not in ALLOWED_CYCLE_POLICIES:
-            warn(f"{edge.get('edge_id')} has invalid cycle_policy={edge.get('cycle_policy')}")
-        if services:
-            if edge.get("from_service_id") not in services:
-                warn(f"{edge.get('edge_id')} from_service_id missing from register: {edge.get('from_service_id')}")
-            if edge.get("to_service_id") not in services:
-                warn(f"{edge.get('edge_id')} to_service_id missing from register: {edge.get('to_service_id')}")
+            record(strict, failures, f"{edge_id} has invalid cycle_policy={edge.get('cycle_policy')}")
+        if edge.get("from_service_id") not in services:
+            record(strict, failures, f"{edge_id} from_service_id missing from register: {edge.get('from_service_id')}")
+        if edge.get("to_service_id") not in services:
+            record(strict, failures, f"{edge_id} to_service_id missing from register: {edge.get('to_service_id')}")
 
     cycles = find_cycles(edges)
     lookup = edge_lookup(edges)
@@ -159,14 +175,16 @@ def main() -> int:
     if allowed_cycles:
         ok(f"allowed cycles detected={len(allowed_cycles)}")
     else:
-        warn("no allowed cycles detected; expected feedback loops may be absent or artifacts missing")
+        record(strict, failures, "no allowed cycles detected; expected feedback loops may be absent or artifacts missing")
 
     if forbidden_cycles:
-        warn(f"forbidden cycles detected={len(forbidden_cycles)}: {forbidden_cycles}")
+        record(strict, failures, f"forbidden cycles detected={len(forbidden_cycles)}: {forbidden_cycles}")
     else:
         ok("no forbidden cycles detected")
 
-    print("PR-C cycle checker is warn-only by design; exiting 0")
+    if failures:
+        return 1
+    print("dependency cycle check complete")
     return 0
 
 

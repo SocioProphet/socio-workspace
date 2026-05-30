@@ -38,6 +38,8 @@ Role: runtime services, platform contracts, transport, validation, install path,
 
 Role: professional workrooms, public/operator UI, dashboarding, search/discovery, and voice/work capture surfaces.
 
+Current contract anchor: `SocioProphet/prophet-workspace:docs/workroom-substrate-alignment-v0.md` aligns Professional Workrooms to recovered privacy, memory, topic-pack, audio-review, agent, model-governance, estate-ledger, and learning-receipt surfaces without moving those authority planes into `prophet-workspace`.
+
 ### Governed AI execution
 
 - `SocioProphet/agentplane`
@@ -83,6 +85,15 @@ A subsystem is integrated only when it has:
 5. a feedback path into DelEx boards, KPIs, or readiness;
 6. a corrective control when telemetry or validation shows drift.
 
+For Professional Workrooms, the current integration evidence is contract-level rather than runtime-level:
+
+- `SocioProphet/prophet-workspace:contracts/workspace/professional-workroom.schema.json`
+- `SocioProphet/prophet-workspace:contracts/workspace/professional-workroom.v0.1.example.json`
+- `SocioProphet/prophet-workspace:tools/validate_professional_workrooms.py`
+- `SocioProphet/prophet-workspace:.github/workflows/professional-workrooms.yml`
+- `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-workspace-workroom-substrate.yaml`
+- `SocioProphet/systems-learning-loops:kb/receipts/prophet-workspace-workroom-substrate.receipt.yaml`
+
 ## Cybernetic control loops
 
 ### Delivery loop
@@ -103,22 +114,25 @@ Search, Memory, Graph, and Query -> Context Pack -> Agent Output -> Human Feedba
 
 ## Current completion readout
 
-As of 2026-04-29:
+As of 2026-05-30:
 
-- Overall Professional Intelligence OS alignment: 22%
-- Architecture spine: 35%
+- Overall Professional Intelligence OS alignment: 26%
+- Architecture spine: 40%
 - DelEx governance and operating model: 40%
 - DelEx automation: 25%
-- Platform contracts: 30%
-- Governance loops: 25%
-- Cybernetic controls: 15%
+- Platform contracts: 32%
+- Professional Workroom contract alignment: 45%
+- Governance loops: 30%
+- Cybernetic controls: 20%
 - SocioProphet UI/dashboard integration: 8%
-- Sociosphere topology integration: 20%
+- Sociosphere topology integration: 25%
 - Agentplane execution integration: 15%
 - Policy Fabric integration: 25%
 - ContractForge / Obligation Ledger integration: 25%
 - Runtime implementation: 5%
-- Demo readiness: 10%
+- Demo readiness: 12%
+
+The increase reflects contract-level and governance-ledger alignment only. It does not represent runtime, UI, deployment, or demo completion.
 
 ## Control references
 
@@ -126,6 +140,9 @@ As of 2026-04-29:
 - DelEx control register: `SocioProphet/delivery-excellence:docs/professional-intelligence-control-register.md`
 - UI definition: `SocioProphet/socioprophet:docs/professional-intelligence-ui-dashboard.md`
 - Workspace boundary: `SocioProphet/prophet-workspace:docs/professional-workrooms.md`
+- Workroom substrate alignment: `SocioProphet/prophet-workspace:docs/workroom-substrate-alignment-v0.md`
+- Workspace estate overlay: `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-workspace-workroom-substrate.yaml`
+- Workroom learning receipt: `SocioProphet/systems-learning-loops:kb/receipts/prophet-workspace-workroom-substrate.receipt.yaml`
 
 ## Sociosphere responsibilities
 
@@ -142,4 +159,5 @@ Sociosphere should:
 - Do not turn Sociosphere into the canonical home for all Professional Intelligence schemas.
 - Do not duplicate DelEx control registers or Prophet Platform manifests.
 - Do not count a README reference as integration.
+- Do not count workroom contract alignment as runtime implementation or demo readiness.
 - Do not mark demo readiness without evidence and adoption telemetry.

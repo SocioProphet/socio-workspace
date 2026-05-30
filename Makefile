@@ -220,3 +220,29 @@ svf-workspace-validate: svf-registry-validate svf-runner-list svf-runner-select-
 
 mirror-drift-check:
 	python3 engines/mirror_drift_engine.py check
+
+registry-admissions-validate:
+	python3 tools/validate_registry_admissions.py
+
+effective-canonical-registry-validate:
+	python3 tools/build_effective_canonical_registry.py
+
+registry-validate: registry-admissions-validate effective-canonical-registry-validate
+	@echo "==> Validating registry ontology roles and layers..."
+	python3 engines/ontology_engine.py validate
+	@echo "==> Checking dependency graph for cycles..."
+	python3 engines/propagation_engine.py cycles
+	@echo "==> Validating mirror drift status..."
+	python3 engines/mirror_drift_engine.py check
+	@echo "OK: registry-validate passed"
+
+build-intelligence-validate:
+	python3 tools/validate_build_intelligence.py
+
+deployment-topology-validate:
+	python3 tools/validate_deployment_topology.py
+
+contract-lock-validate:
+	python3 tools/validate_contract_locks.py
+
+ontology-validate: registry-validate

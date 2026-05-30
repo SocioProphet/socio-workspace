@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Warn-only repo coverage checker for the SocioSphere service register."""
+"""Repo coverage checker for the SocioSphere service register."""
 from __future__ import annotations
 
 import csv
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,21 +34,37 @@ def warn(message: str) -> None:
     print(f"WARN: {message}")
 
 
+def fail(message: str) -> None:
+    print(f"FAIL: {message}")
+
+
 def ok(message: str) -> None:
     print(f"OK: {message}")
 
 
 def main() -> int:
     print("SocioSphere service-register repo coverage check")
+    strict = os.environ.get("SERVICE_REGISTER_STRICT", "0") == "1"
+    failures = 0
+
     if not REGISTER.exists():
-        warn(f"missing {REGISTER.relative_to(ROOT)}; coverage cannot run yet")
+        message = f"missing {REGISTER.relative_to(ROOT)}; coverage cannot run yet"
+        if strict:
+            fail(message)
+            return 1
+        warn(message)
         return 0
 
     service_rows = read_csv(REGISTER)
     if len(service_rows) == EXPECTED_SERVICE_ROWS:
         ok(f"service rows={len(service_rows)}")
     else:
-        warn(f"service row count {len(service_rows)} != expected {EXPECTED_SERVICE_ROWS}")
+        message = f"service row count {len(service_rows)} != expected {EXPECTED_SERVICE_ROWS}"
+        if strict:
+            fail(message)
+            failures += 1
+        else:
+            warn(message)
 
     mapped_repos: set[str] = set()
     for row in service_rows:
@@ -57,7 +74,11 @@ def main() -> int:
                     mapped_repos.add(value)
 
     if not CANONICAL_REPOS.exists():
-        warn(f"missing {CANONICAL_REPOS.relative_to(ROOT)}; mapped repo count={len(mapped_repos)}")
+        message = f"missing {CANONICAL_REPOS.relative_to(ROOT)}; mapped repo count={len(mapped_repos)}"
+        if strict:
+            fail(message)
+            return 1
+        warn(message)
         return 0
 
     canonical_rows = read_csv(CANONICAL_REPOS)
@@ -68,19 +89,36 @@ def main() -> int:
     if len(canonical_repos) == EXPECTED_REPO_COUNT:
         ok(f"canonical repos={len(canonical_repos)}")
     else:
-        warn(f"canonical repo count {len(canonical_repos)} != expected {EXPECTED_REPO_COUNT}")
+        message = f"canonical repo count {len(canonical_repos)} != expected {EXPECTED_REPO_COUNT}"
+        if strict:
+            fail(message)
+            failures += 1
+        else:
+            warn(message)
 
     if missing:
-        warn(f"missing coverage for {len(missing)} repos: {missing}")
+        message = f"missing coverage for {len(missing)} repos: {missing}"
+        if strict:
+            fail(message)
+            failures += 1
+        else:
+            warn(message)
     else:
         ok("no missing canonical repo coverage")
 
     if extra:
-        warn(f"register references {len(extra)} noncanonical repos: {extra}")
+        message = f"register references {len(extra)} noncanonical repos: {extra}"
+        if strict:
+            fail(message)
+            failures += 1
+        else:
+            warn(message)
     else:
         ok("no noncanonical repo references")
 
-    print("PR-B coverage checker is warn-only by design; exiting 0")
+    if failures:
+        return 1
+    print("repo coverage check complete")
     return 0
 
 

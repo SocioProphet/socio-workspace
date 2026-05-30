@@ -657,3 +657,44 @@ name = "regis-entity-graph"
 role = "component"
 url = "https://github.com/SocioProphet/regis-entity-graph"
 ref = "main"
+
+# ── Workspace Context Fabric ─────────────────────────────────────────────────
+
+[[repos]]
+name = "prophet_workspace"
+role = "component"
+url = "https://github.com/SocioProphet/prophet-workspace"
+ref = "main"
+local_path = "components/prophet_workspace"
+license_hint = "MIT"
+trust_zone = "workspace"
+required_capabilities = ["workspace_context", "provider_projection", "policy_aware_ux"]
+
+[[repos]]
+name = "agent_registry"
+role = "security"
+url = "https://github.com/SocioProphet/agent-registry"
+ref = "main"
+local_path = "components/agent_registry"
+license_hint = "MIT"
+trust_zone = "control"
+required_capabilities = ["agent_identity", "tool_grants", "session_authority", "revocation"]
+
+[[repos]]
+name = "memory_mesh"
+role = "component"
+url = "https://github.com/SocioProphet/memory-mesh"
+ref = "main"
+local_path = "components/memory_mesh"
+license_hint = "MIT"
+trust_zone = "memory"
+required_capabilities = ["recall", "context_pack", "learning_proposal"]
+
+[[repos]]
+name = "socioprophet_agent_standards"
+role = "standards"
+url = "https://github.com/SocioProphet/socioprophet-agent-standards"
+ref = "main"
+local_path = "components/socioprophet_agent_standards"
+license_hint = "MIT"
+required_capabilities = ["agent_profile", "conformance", "compatibility_matrix"]

@@ -1,0 +1,25 @@
+name: service-register
+
+on:
+  pull_request:
+    paths:
+      - "architecture/service-register/**"
+      - "tools/validate_service_register_artifacts.py"
+      - ".github/workflows/service-register.yml"
+  push:
+    branches: [main]
+    paths:
+      - "architecture/service-register/**"
+      - "tools/validate_service_register_artifacts.py"
+      - ".github/workflows/service-register.yml"
+
+jobs:
+  warn-only-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate service register artifacts warn-only
+        run: python3 tools/validate_service_register_artifacts.py

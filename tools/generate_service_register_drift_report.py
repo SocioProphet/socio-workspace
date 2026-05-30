@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""Generate a warn-only service-register drift report.
-
-PR-F adds drift-report scaffolding and CI gate policy. The script remains
-warn-only until the service register CSVs and workspace-inventory export path are
-stable.
-"""
+"""Generate and optionally enforce service-register drift checks."""
 from __future__ import annotations
 
 import csv
 import json
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,9 +64,11 @@ def main() -> int:
     print("SocioSphere service-register drift report")
     policy = load_policy()
     gate_mode = str(policy.get("gate_mode", "warn-only")) if policy else "warn-only"
+    strict_env = os.environ.get("SERVICE_REGISTER_STRICT", "0") == "1"
+    strict = strict_env or bool(policy.get("hard_gate_enabled"))
 
     rows: list[dict[str, str]] = []
-    add_row(rows, "gate_mode", "ok" if gate_mode == "warn-only" else "warn", "warn-only", gate_mode, "hard gates remain disabled in PR-F")
+    add_row(rows, "gate_mode", "ok" if gate_mode in {"warn-only", "artifact-count-strict"} else "warn", "warn-only|artifact-count-strict", gate_mode, "strict artifact-count gate may be enabled by policy or SERVICE_REGISTER_STRICT=1")
 
     artifacts = [
         ("service_rows", REGISTER, EXPECTED["service_rows"]),
@@ -81,11 +79,11 @@ def main() -> int:
     for check_id, path, expected in artifacts:
         actual_count = count_csv_rows(path)
         if actual_count is None:
-            add_row(rows, check_id, "warn", str(expected), "missing", f"{path.relative_to(ROOT)} is not present")
+            add_row(rows, check_id, "fail" if strict else "warn", str(expected), "missing", f"{path.relative_to(ROOT)} is not present")
         elif actual_count == expected:
             add_row(rows, check_id, "ok", str(expected), str(actual_count), "count matches expected")
         else:
-            add_row(rows, check_id, "warn", str(expected), str(actual_count), "count mismatch")
+            add_row(rows, check_id, "fail" if strict else "warn", str(expected), str(actual_count), "count mismatch")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("w", newline="", encoding="utf-8") as handle:
@@ -94,13 +92,18 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(rows)
 
+    failures = sum(1 for row in rows if row["status"] == "fail")
     warnings = sum(1 for row in rows if row["status"] == "warn")
-    if warnings:
+    if failures:
+        warn(f"drift failures={failures}; output={OUT.relative_to(ROOT)}")
+    elif warnings:
         warn(f"drift warnings={warnings}; output={OUT.relative_to(ROOT)}")
     else:
         ok(f"no drift warnings; output={OUT.relative_to(ROOT)}")
 
-    print("PR-F drift checker is warn-only by design; exiting 0")
+    if failures:
+        return 1
+    print("service-register drift check complete")
     return 0
 
 

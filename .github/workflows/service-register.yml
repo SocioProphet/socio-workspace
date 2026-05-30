@@ -26,8 +26,10 @@ on:
       - ".github/workflows/service-register.yml"
 
 jobs:
-  warn-only-validate:
+  validate:
     runs-on: ubuntu-latest
+    env:
+      SERVICE_REGISTER_STRICT: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,15 +37,15 @@ jobs:
           python-version: "3.11"
       - name: Rehydrate service register artifacts
         run: python3 tools/rehydrate_service_register_artifacts.py
-      - name: Validate service register artifacts warn-only
+      - name: Validate service register artifacts
         run: python3 tools/validate_service_register_artifacts.py
-      - name: Check service register repo coverage warn-only
+      - name: Check service register repo coverage
         run: python3 tools/check_service_register_repo_coverage.py
-      - name: Check service dependency cycles warn-only
+      - name: Check service dependency cycles
         run: python3 tools/check_service_dependency_cycles.py
-      - name: Generate service critical path report warn-only
+      - name: Generate service critical path report
         run: python3 tools/generate_service_critical_path_report.py
-      - name: Check workspace-inventory binding warn-only
+      - name: Check workspace inventory binding
         run: python3 tools/check_workspace_inventory_binding.py
-      - name: Generate service register drift report warn-only
+      - name: Generate service register drift report
         run: python3 tools/generate_service_register_drift_report.py

@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-"""Generate a warn-only critical-path report from classified service edges.
-
-PR-D establishes generated critical-path reporting. The report remains warn-only
-until CSV artifacts are committed and cycle classification is fully enforced.
-"""
+"""Generate critical-path reporting from service edges."""
 from __future__ import annotations
 
 import csv
+import os
 from collections import defaultdict, deque
 from pathlib import Path
 
@@ -43,6 +40,10 @@ def warn(message: str) -> None:
     print(f"WARN: {message}")
 
 
+def error(message: str) -> None:
+    print(f"ERROR: {message}")
+
+
 def ok(message: str) -> None:
     print(f"OK: {message}")
 
@@ -72,9 +73,14 @@ def blast_radius(service_id: str, graph: dict[str, list[str]]) -> set[str]:
 
 def main() -> int:
     print("SocioSphere generated critical-path report")
+    required = os.environ.get("SERVICE_REGISTER_STRICT", "0") == "1"
+
     if not REGISTER.exists() or not EDGES.exists():
-        warn("missing register or edge CSV; generated critical-path report cannot run yet")
-        print("PR-D critical-path generator is warn-only by design; exiting 0")
+        message = "missing register or edge CSV; generated critical-path report cannot run yet"
+        if required:
+            error(message)
+            return 1
+        warn(message)
         return 0
 
     services = read_csv(REGISTER)
@@ -127,8 +133,15 @@ def main() -> int:
 
     blocking = sum(1 for row in rows if row["severity"] == "BLOCKING")
     hardening = sum(1 for row in rows if row["severity"] == "HARDENING")
+    if not rows:
+        message = f"generated zero critical-path rows; output={OUT.relative_to(ROOT)}"
+        if required:
+            error(message)
+            return 1
+        warn(message)
+        return 0
     ok(f"generated rows={len(rows)} blocking={blocking} hardening={hardening} output={OUT.relative_to(ROOT)}")
-    print("PR-D critical-path generator is warn-only by design; exiting 0")
+    print("critical-path generation complete")
     return 0
 
 

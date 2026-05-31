@@ -20,6 +20,7 @@ The intended v1.0 control set is:
 | `critical-path-blocking-report.generated.csv` | Generated critical path report from the service graph. |
 | `critical-path-blocking-report.v0.2.csv` | Current manually curated critical path report: 4 BLOCKING and 4 HARDENING rows. |
 | `repo-reconciliation-report.v0.1.csv` | A2A/MCP and Fabric/MLOps/Atlas reconciliation notes. |
+| `mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv` | MCP/A2A bootstrap vs zero-trust consolidation matrix, including PPS carrier-verifier preservation requirement. |
 | `fabric-atlas-model-carry-reconciliation.v0.1.csv` | Expanded authority matrix for TritFabric, Atlas bundle repos, Fabric/MLOps, SourceOS model-carry, SHIR, runtime, routing, policy, governance, and lab boundaries. |
 | `fabric-atlas-model-carry-propagation-plan.v0.1.csv` | Planned propagation rows for converting the reconciliation matrix into service edges, contract registry targets, repo status metadata, and follow-on archive/inspection actions. |
 | `atlas-bundle-diff-status.v0.1.csv` | Negative-evidence and blocker status for the three Atlas bundle repositories pending direct tree/file confirmation. |
@@ -31,6 +32,8 @@ The intended v1.0 control set is:
 
 - `SocioProphet/Shining-Apple` is removed from the go-forward estate.
 - `SocioProphet/sourceos-a2a-mcp-bootstrap` is a consolidation candidate into `SocioProphet/mcp-a2a-zero-trust` and/or `SocioProphet/TriTRPC`; it is not a standalone service.
+- The PPS carrier verifier from `SocioProphet/sourceos-a2a-mcp-bootstrap` must be migrated to, or explicitly superseded by, canonical zero-trust/protocol tooling before bootstrap is archived.
+- `SocioProphet/mcp-a2a-zero-trust` remains the canonical MCP/A2A zero-trust authority candidate.
 - `SocioProphet/tritfabric` is the canonical implementation and immediate contract authority for recovered Atlas / TritFabric / Community / Serve work; SocioSphere records absorption, boundary posture, and propagation requirements.
 - Atlas bundle repositories are reference / archive / incubation candidates pending direct tree/file confirmation; `atlas_os_service_full` is the strongest archive/retire candidate by current evidence.
 - `SocioProphet/prophet-platform-fabric-mlops-ts-suite` is the downstream Fabric/MLOps pack lane, not the root fabric authority.
@@ -42,7 +45,7 @@ The intended v1.0 control set is:
 
 ## Validation posture
 
-The service-register lane has advanced past the original PR-A scaffold. Artifact presence, row counts, Workspace Inventory binding metadata, canonical repo mirror identity, generated sync-report freshness, generated drift-report freshness, reconciliation artifacts, propagation-plan structure, Atlas bundle diff status, and critical contract ledgers are now deterministic checks.
+The service-register lane has advanced past the original PR-A scaffold. Artifact presence, row counts, Workspace Inventory binding metadata, canonical repo mirror identity, generated sync-report freshness, generated drift-report freshness, reconciliation artifacts, propagation-plan structure, MCP/A2A consolidation status, Atlas bundle diff status, and critical contract ledgers are now deterministic checks.
 
 Strict checks currently enforced:
 
@@ -56,16 +59,18 @@ Strict checks currently enforced:
 8. `workspace-inventory-sync-report.generated.csv` is fresh relative to its generator.
 9. `service-register-drift-report.generated.csv` is fresh relative to its generator.
 10. Critical contract paths and contract target ledger checks run in strict mode.
-11. `fabric-atlas-model-carry-reconciliation.v0.1.csv` has required rows, columns, confidence values, and root authority ordering.
-12. `fabric-atlas-model-carry-propagation-plan.v0.1.csv` has required propagation IDs, source artifact linkage, status values, and target-artifact shape.
-13. `atlas-bundle-diff-status.v0.1.csv` has exactly the three Atlas bundle rows, explicit negative evidence fields, allowed status values, and direct tree/file listing blocker language.
+11. `mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv` preserves canonical zero-trust status, bootstrap transitional status, and the PPS carrier verifier migration/supersession requirement.
+12. `fabric-atlas-model-carry-reconciliation.v0.1.csv` has required rows, columns, confidence values, and root authority ordering.
+13. `fabric-atlas-model-carry-propagation-plan.v0.1.csv` has required propagation IDs, source artifact linkage, status values, and target-artifact shape.
+14. `atlas-bundle-diff-status.v0.1.csv` has exactly the three Atlas bundle rows, explicit negative evidence fields, allowed status values, and direct tree/file listing blocker language.
 
 Checks intentionally still staged / warning-only or not yet promoted:
 
 1. Live networked comparison against the upstream Workspace Inventory export.
-2. Atlas bundle archive/retirement decision after direct tree/file confirmation.
-3. Direct mutation of generated service-register and dependency-edge chunks from propagation-plan rows.
-4. Blocking-service acknowledgement policy beyond the current contract ledger.
+2. MCP/A2A bootstrap archive decision after PPS verifier migration/supersession.
+3. Atlas bundle archive/retirement decision after direct tree/file confirmation.
+4. Direct mutation of generated service-register and dependency-edge chunks from propagation-plan rows.
+5. Blocking-service acknowledgement policy beyond the current contract ledger.
 
 Validation hardening order:
 
@@ -77,7 +82,8 @@ Validation hardening order:
 6. PR-F: add drift report and CI gate.
 7. PR-418: enforce artifact presence and row-count validation.
 8. Workspace Inventory mirror tranche: add source binding, mirror pin, generated sync report, generated drift report, and freshness checks.
-9. Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator.
-10. Propagation-plan tranche: add planned semantic propagation rows without mutating generated register/edge chunks blindly.
-11. Atlas diff-status tranche: preserve negative Atlas evidence and direct tree/file blocker in a validated artifact.
-12. Next: apply propagation rows to source-of-truth register/edge generation once artifact chunk provenance is confirmed, and confirm Atlas root trees before archive decisions.
+9. MCP/A2A tranche: preserve PPS carrier verifier and retain zero-trust as canonical authority candidate.
+10. Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator.
+11. Propagation-plan tranche: add planned semantic propagation rows without mutating generated register/edge chunks blindly.
+12. Atlas diff-status tranche: preserve negative Atlas evidence and direct tree/file blocker in a validated artifact.
+13. Next: migrate or supersede the PPS carrier verifier in canonical tooling; apply propagation rows to source-of-truth register/edge generation once artifact chunk provenance is confirmed; confirm Atlas root trees before archive decisions.

@@ -1,0 +1,55 @@
+{
+  "artifact_id": "sociosphere.contract-target-ledger.v0.1",
+  "status": "active",
+  "expected_entries": 4,
+  "entries": [
+    {
+      "service_id": "svc.platform.cybernetic-governance",
+      "contract_repo": "SocioProphet/ProCybernetica",
+      "schema_path": "contracts/governance-loop.schema.json",
+      "schema_commit": "cb7257f1cc7362d5e61bd552a6f71360887f2911",
+      "fixture_path": "fixtures/governance-loop.valid.json",
+      "fixture_commit": "f05d756c028a070be1d9af9ebb3183f4abae9e13",
+      "validator_path": "tools/validate_contract_schemas.py",
+      "validator_commit": "055aefcff001ab85e5fe13ee0d1bbcdc8a45eb32",
+      "workflow_path": ".github/workflows/contract-schemas.yml",
+      "workflow_commit": "7a9443116378e3c14ee479cb28de0d5ee620f0fe"
+    },
+    {
+      "service_id": "svc.platform.ontology-semantics",
+      "contract_repo": "SocioProphet/ontogenesis",
+      "schema_path": "schemas/ontology-semantics.schema.json",
+      "schema_commit": "385bd07a4c2346a475d2a3a0c3842d2d319f5f44",
+      "fixture_path": "fixtures/ontology-semantics.valid.json",
+      "fixture_commit": "00a64e0a05ba892098095359bbfd0447ab839c32",
+      "validator_path": "tools/validate_contract_schemas.py",
+      "validator_commit": "0babc77cb71b90ec2a414e8c64c5b314852736e0",
+      "workflow_path": ".github/workflows/contract-schemas.yml",
+      "workflow_commit": "74f027adf1af9411bd7e6d13167d2271ac34f4fa"
+    },
+    {
+      "service_id": "svc.substrate.agent-machine",
+      "contract_repo": "SourceOS-Linux/agent-machine",
+      "schema_path": "contracts/lifecycle.schema.json",
+      "schema_commit": "abe7cbfafb4735683155c51284ce80847a03d26c",
+      "fixture_path": "fixtures/lifecycle.valid.json",
+      "fixture_commit": "e84bb3cb8e95afe9f7694b50119e6840ac1cee4b",
+      "validator_path": "tools/validate_contract_schemas.py",
+      "validator_commit": "23ef6f21ba103d6fcf095ac5e423ef9987c67481",
+      "workflow_path": ".github/workflows/contract-schemas.yml",
+      "workflow_commit": "96f88a1b164e4c07d310b684c18066f4385b6104"
+    },
+    {
+      "service_id": "svc.managed.boot-evidence",
+      "contract_repo": "SociOS-Linux/nlboot",
+      "schema_path": "schemas/boot-evidence.schema.json",
+      "schema_commit": "df2081b78356fe420557a878740f64c536e9cfc9",
+      "fixture_path": "fixtures/boot-evidence.valid.json",
+      "fixture_commit": "a6e7794bf7f1d792591cf37b0a3887363df3cc34",
+      "validator_path": "tools/validate_contract_schemas.py",
+      "validator_commit": "cd0b1df01010c5253e3a095f44d11b684d291862",
+      "workflow_path": ".github/workflows/contract-schemas.yml",
+      "workflow_commit": "b880f1bafb57e011d26d6821cd5e07f2fc7998f6"
+    }
+  ]
+}

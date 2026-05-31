@@ -1,6 +1,7 @@
 version: "0.1.0"
 updated_at: "2026-05-31"
 status: "registered"
+registration_note: "SocioSphere workspace-level status and routing record for the SourceOS interaction substrate."
 
 canonical_contract:
   repo: "SourceOS-Linux/sourceos-spec"

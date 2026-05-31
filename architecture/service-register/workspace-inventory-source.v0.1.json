@@ -4,13 +4,28 @@
   "source_repository": "SocioProphet/workspace-inventory",
   "source_artifact_path": "exports/canonical-repo-estate.v1.0.csv",
   "source_manifest_path": "exports/canonical-repo-estate.v1.0.json",
+  "source_validation_tool": "tools/check_canonical_repo_export.py",
+  "source_validation_workflow": ".github/workflows/inventory.yml",
   "consumer_repository": "SocioProphet/sociosphere",
   "consumer_artifacts": [
     "architecture/service-register/service-architecture-register.v1.0.csv",
     "architecture/service-register/canonical-repo-estate.v1.0.csv"
   ],
   "expected_canonical_repo_count": 125,
+  "expected_source_manifest": {
+    "artifact_id": "workspace_inventory.canonical_repo_estate.v1.0",
+    "status": "canonical-export",
+    "export_path": "exports/canonical-repo-estate.v1.0.csv",
+    "repo_count": 125
+  },
+  "expected_source_columns": [
+    "repo_full_name",
+    "owned_services",
+    "supporting_services",
+    "contract_services",
+    "canonical_status"
+  ],
   "binding_mode": "stable-export",
-  "validator_mode": "strict-local-binding",
-  "notes": "workspace-inventory now exports the stable canonical repo-estate artifact at exports/canonical-repo-estate.v1.0.csv. SocioSphere validates the binding and local mirror under SERVICE_REGISTER_STRICT=1."
+  "validator_mode": "strict-local-binding-with-upstream-contract",
+  "notes": "workspace-inventory exports the stable canonical repo-estate artifact at exports/canonical-repo-estate.v1.0.csv and validates it with tools/check_canonical_repo_export.py through .github/workflows/inventory.yml. SocioSphere validates the binding contract and local mirror under SERVICE_REGISTER_STRICT=1. Cross-repo fetch remains out of the local CI path until a pinned artifact-consumption mechanism is introduced."
 }

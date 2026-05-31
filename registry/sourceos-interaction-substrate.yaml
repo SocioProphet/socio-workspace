@@ -1,0 +1,79 @@
+version: "0.1.0"
+updated_at: "2026-05-31"
+status: "registered"
+
+canonical_contract:
+  repo: "SourceOS-Linux/sourceos-spec"
+  schema: "schemas/SourceOSInteractionEvent.json"
+  reference_flow: "examples/interaction-flow/noetica-superconscious-agentplane-agentterm.flow.json"
+  implementation_ledger: "docs/contract-additions/sourceos-interaction-implementation-ledger.md"
+  top_level_index: "docs/contract-additions/sourceos-interaction-top-level-index.md"
+  latest_merge_commit: "836e3e3972a6f7d5993dcf679b38d1360c76a657"
+
+workspace_role:
+  sociosphere: "cross-repo status, owner-plane routing, and workspace-level propagation record only"
+  non_scope:
+    - "feature implementation"
+    - "runtime event transport"
+    - "policy admission"
+    - "identity or grant authority"
+    - "durable memory writeback"
+    - "execution evidence production"
+
+planes:
+  sourceos_spec:
+    repo: "SourceOS-Linux/sourceos-spec"
+    role: "canonical schema, generated artifacts, reference flow, and implementation ledger"
+    status: "merged"
+  noetica:
+    repo: "SocioProphet/Noetica"
+    role: "browser chat and governance-trail emitter"
+    status: "merged"
+    downstream_pointer_commit: "defba9a536706f3f5af8decd2ac4f1d8f594b2a4"
+  agent_term:
+    repo: "SourceOS-Linux/agent-term"
+    role: "terminal governance-trace renderer and local event recording surface"
+    status: "merged"
+    downstream_pointer_commit: "f4272d86e38d999e70f3b3b774bcf8c53695d1f6"
+  superconscious:
+    repo: "SocioProphet/superconscious"
+    role: "task-boundary reference binding"
+    status: "merged"
+    downstream_pointer_commit: "5cf46a4ca5a8a1f7c399d72305ec29a891f267fe"
+  agentplane:
+    repo: "SocioProphet/agentplane"
+    role: "execution evidence and replay reference binding"
+    status: "merged"
+    downstream_pointer_commit: "6e932f54f6391ed3c0ef971054bb67307ea28da9"
+
+validation_lanes:
+  sourceos_spec:
+    - "SourceOS Interaction Substrate"
+    - "SourceOS Interaction Codegen"
+    - "SourceOS Interaction Reference Flow"
+    - "SVF Validation"
+    - "validate-ops-history"
+  noetica:
+    - "validate"
+    - "SourceOS Contract Sync"
+  agent_term:
+    - "CI"
+    - "SourceOS Contract Sync"
+  superconscious:
+    - "Superconscious CI"
+    - "SVF Validation"
+    - "Trust Surface"
+    - "lawful-learning-t2-prime"
+  agentplane:
+    - "lint"
+    - "validate"
+    - "tests"
+    - "ci"
+    - "SourceOS Interaction Evidence Binding"
+
+future_work:
+  - "Add live event-export transport after transport decision."
+  - "Bind Policy Fabric, Agent Registry, and Memory Mesh with the same reference-flow discipline."
+  - "Replace pinned vendoring with a managed package, subtree, or submodule strategy."
+  - "Add a replay demo consuming the canonical reference-flow packet without live service dependencies."
+  - "Defer manifest/lock mutation until network-aware materializer supports live commit SHA resolution."

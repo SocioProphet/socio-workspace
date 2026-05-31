@@ -1,0 +1,38 @@
+name: Workspace Resolved Lock Contract
+
+on:
+  pull_request:
+    paths:
+      - 'docs/governance/network-aware-workspace-lock-materializer.v0.md'
+      - 'schemas/workspace-resolved-lock.v0.schema.json'
+      - 'tests/fixtures/workspace-resolved-lock*.json'
+      - 'tools/validate_workspace_resolved_lock.py'
+      - '.github/workflows/workspace-resolved-lock-contract.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/governance/network-aware-workspace-lock-materializer.v0.md'
+      - 'schemas/workspace-resolved-lock.v0.schema.json'
+      - 'tests/fixtures/workspace-resolved-lock*.json'
+      - 'tools/validate_workspace_resolved_lock.py'
+      - '.github/workflows/workspace-resolved-lock-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-workspace-resolved-lock-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate workspace resolved lock contract
+        run: python3 tools/validate_workspace_resolved_lock.py

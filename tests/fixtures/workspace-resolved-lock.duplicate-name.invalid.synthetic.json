@@ -1,0 +1,34 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock.v0",
+  "generated_at": "2026-05-31T00:45:00Z",
+  "source_manifest": "manifest/workspace.toml",
+  "source_lock": "manifest/workspace.lock.json",
+  "resolution_mode": "live_ref_resolution",
+  "repo_count": 2,
+  "repos": [
+    {
+      "name": "prophet_workspace",
+      "role": "component",
+      "url": "https://github.com/SocioProphet/prophet-workspace",
+      "declared_ref": "main",
+      "declared_rev": null,
+      "resolved_rev": "23456789abcdef0123456789abcdef0123456789",
+      "resolution_status": "resolved",
+      "resolution_error": null,
+      "required_capabilities": [],
+      "required_grants": []
+    },
+    {
+      "name": "prophet_workspace",
+      "role": "component",
+      "url": "https://github.com/SocioProphet/prophet-workspace",
+      "declared_ref": "main",
+      "declared_rev": null,
+      "resolved_rev": "23456789abcdef0123456789abcdef0123456789",
+      "resolution_status": "resolved",
+      "resolution_error": null,
+      "required_capabilities": [],
+      "required_grants": []
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 """Validate Workspace Context Fabric governance artifacts.
 
 This file is intentionally watched by the Workspace Context Fabric governance
-workflow.
+workflow. This branch touch exists to exercise the pull-request workflow path.
 """
 
 from __future__ import annotations

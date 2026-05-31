@@ -2,6 +2,7 @@
 """Validate SocioSphere's workspace-inventory repo-estate binding."""
 from __future__ import annotations
 
+import csv
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,21 @@ EXPECTED_REPO_COUNT = 125
 EXPECTED_SOURCE_REPO = "SocioProphet/workspace-inventory"
 EXPECTED_SOURCE_PATH = "exports/canonical-repo-estate.v1.0.csv"
 EXPECTED_MANIFEST_PATH = "exports/canonical-repo-estate.v1.0.json"
+EXPECTED_SOURCE_VALIDATION_TOOL = "tools/check_canonical_repo_export.py"
+EXPECTED_SOURCE_VALIDATION_WORKFLOW = ".github/workflows/inventory.yml"
+EXPECTED_SOURCE_MANIFEST = {
+    "artifact_id": "workspace_inventory.canonical_repo_estate.v1.0",
+    "status": "canonical-export",
+    "export_path": EXPECTED_SOURCE_PATH,
+    "repo_count": EXPECTED_REPO_COUNT,
+}
+EXPECTED_SOURCE_COLUMNS = [
+    "repo_full_name",
+    "owned_services",
+    "supporting_services",
+    "contract_services",
+    "canonical_status",
+]
 
 
 def warn(message: str) -> None:
@@ -29,9 +45,8 @@ def ok(message: str) -> None:
 
 
 def count_csv_rows(path: Path) -> int:
-    with path.open(encoding="utf-8") as handle:
-        lines = [line for line in handle.read().splitlines() if line.strip()]
-    return max(0, len(lines) - 1)
+    with path.open(newline="", encoding="utf-8") as handle:
+        return sum(1 for _ in csv.DictReader(handle))
 
 
 def record(required: bool, failures: list[str], message: str) -> None:
@@ -40,6 +55,13 @@ def record(required: bool, failures: list[str], message: str) -> None:
         failures.append(message)
     else:
         warn(message)
+
+
+def expect_equal(required: bool, failures: list[str], label: str, actual: object, expected: object) -> None:
+    if actual == expected:
+        ok(f"{label}={actual}")
+    else:
+        record(required, failures, f"unexpected {label}={actual!r}; expected {expected!r}")
 
 
 def main() -> int:
@@ -61,20 +83,22 @@ def main() -> int:
         "source_repository": EXPECTED_SOURCE_REPO,
         "source_artifact_path": EXPECTED_SOURCE_PATH,
         "source_manifest_path": EXPECTED_MANIFEST_PATH,
+        "source_validation_tool": EXPECTED_SOURCE_VALIDATION_TOOL,
+        "source_validation_workflow": EXPECTED_SOURCE_VALIDATION_WORKFLOW,
         "binding_mode": "stable-export",
-        "validator_mode": "strict-local-binding",
+        "validator_mode": "strict-local-binding-with-upstream-contract",
+        "expected_canonical_repo_count": EXPECTED_REPO_COUNT,
+        "expected_source_manifest": EXPECTED_SOURCE_MANIFEST,
+        "expected_source_columns": EXPECTED_SOURCE_COLUMNS,
     }
     for key, expected in checks.items():
-        actual = binding.get(key)
-        if actual == expected:
-            ok(f"{key}={actual}")
-        else:
-            record(required, failures, f"unexpected {key}={actual!r}; expected {expected!r}")
+        expect_equal(required, failures, key, binding.get(key), expected)
 
-    if binding.get("expected_canonical_repo_count") == EXPECTED_REPO_COUNT:
-        ok(f"expected_canonical_repo_count={EXPECTED_REPO_COUNT}")
+    consumer_artifacts = binding.get("consumer_artifacts")
+    if isinstance(consumer_artifacts, list) and str(LOCAL_CANONICAL.relative_to(ROOT)) in consumer_artifacts:
+        ok(f"consumer_artifacts includes {LOCAL_CANONICAL.relative_to(ROOT)}")
     else:
-        record(required, failures, f"expected_canonical_repo_count {binding.get('expected_canonical_repo_count')} != {EXPECTED_REPO_COUNT}")
+        record(required, failures, f"consumer_artifacts does not include {LOCAL_CANONICAL.relative_to(ROOT)}")
 
     if not LOCAL_CANONICAL.exists():
         record(required, failures, f"local canonical repo artifact absent: {LOCAL_CANONICAL.relative_to(ROOT)}")

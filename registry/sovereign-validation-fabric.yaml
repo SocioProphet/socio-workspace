@@ -10,6 +10,64 @@ upstream_authority:
     run: "schemas/cybernetic-governance/svf_validation_run.v1.json"
     receipt: "schemas/cybernetic-governance/svf_validation_receipt.v1.json"
 receipt_root: "artifacts/svf/receipts"
+actions:
+  - action_id: "svf:action:sociosphere.validate-registry"
+    version: "1.0.0"
+    owner_repo: "SocioProphet/sociosphere"
+    backend: "local"
+    shell: false
+    argv:
+      - "python3"
+      - "tools/validate_svf_registry.py"
+      - "--json"
+    timeout_seconds: 60
+    side_effect_class: "artifact_write"
+    filesystem_scope:
+      read:
+        - "registry/sovereign-validation-fabric.yaml"
+        - "tools/validate_svf_registry.py"
+      write:
+        - "artifacts/svf/runs/**"
+    network_mode: "not_required"
+    credential_policy: "none"
+    output_artifacts:
+      - "action_result_json"
+    supported_claims:
+      - "schema_conformant"
+      - "policy_boundary_preserved"
+      - "non_production_only"
+plans:
+  - plan_id: "svf:plan:sociosphere.registry-dogfood"
+    version: "1.0.0"
+    owner_repo: "SocioProphet/sociosphere"
+    applicable_repos:
+      - "SocioProphet/sociosphere"
+    mode: "blocking"
+    backend: "local"
+    actions:
+      - "svf:action:sociosphere.validate-registry"
+    required_evidence:
+      - "action_result_json"
+      - "validation_run"
+      - "validation_receipt"
+    success_criteria:
+      - "all_actions_pass"
+      - "receipt_verifies"
+    failure_taxonomy:
+      - "action_exit_nonzero"
+      - "timeout"
+      - "unregistered_action"
+      - "receipt_digest_mismatch"
+    declared_claims:
+      - "schema_conformant"
+      - "policy_boundary_preserved"
+      - "non_production_only"
+      - "artifact_integrity_verified"
+      - "receipt_integrity_verified"
+    non_claims:
+      - "Does not certify production readiness."
+      - "Does not certify Signadot vendor parity."
+      - "Does not certify container, browser, QEMU, or cluster runtime parity."
 profiles:
   - profile_id: "svf:profile:sociosphere.dogfood"
     repo: "SocioProphet/sociosphere"
@@ -38,7 +96,7 @@ profiles:
           - "svf:plan:sociosphere.registry-dogfood"
     non_claims:
       - "Does not certify downstream repository validation behavior."
-      - "Does not execute registered Actions in the first registry tranche."
+      - "Does not execute non-registered Actions."
   - profile_id: "svf:profile:procybernetica.svf-policy"
     repo: "SocioProphet/ProCybernetica"
     local_path_hint: "~/dev/ProCybernetica"

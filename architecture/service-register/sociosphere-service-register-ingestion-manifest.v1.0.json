@@ -10,6 +10,7 @@
   "critical_path_report_generated": "critical-path-blocking-report.generated.csv",
   "critical_path_report_manual": "critical-path-blocking-report.v0.2.csv",
   "repo_reconciliation_report": "repo-reconciliation-report.v0.1.csv",
+  "mcp_a2a_bootstrap_zero_trust_diff": "mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv",
   "fabric_atlas_model_carry_reconciliation": "fabric-atlas-model-carry-reconciliation.v0.1.csv",
   "fabric_atlas_model_carry_propagation_plan": "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
   "atlas_bundle_diff_status": "atlas-bundle-diff-status.v0.1.csv",
@@ -25,6 +26,7 @@
   "allowed_cycle_count": 7,
   "reconciliation_artifacts": [
     "repo-reconciliation-report.v0.1.csv",
+    "mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv",
     "fabric-atlas-model-carry-reconciliation.v0.1.csv",
     "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
     "atlas-bundle-diff-status.v0.1.csv"
@@ -40,6 +42,7 @@
     "tools/generate_service_register_drift_report.py --check",
     "tools/check_critical_contract_paths.py",
     "tools/check_contract_target_ledger.py",
+    "tools/check_mcp_a2a_bootstrap_zero_trust_diff.py",
     "tools/check_fabric_atlas_model_carry_reconciliation.py",
     "tools/check_fabric_atlas_model_carry_propagation_plan.py",
     "tools/check_atlas_bundle_diff_status.py"
@@ -52,6 +55,7 @@
     "PR-E: wire workspace-inventory as canonical repo source",
     "PR-F: add drift report and CI gate",
     "Workspace Inventory mirror tranche: add stable export binding, mirror pin, sync report, drift report, and freshness checks",
+    "MCP/A2A tranche: preserve PPS carrier verifier and retain zero-trust as canonical authority candidate",
     "Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator",
     "Propagation-plan tranche: add planned semantic propagation rows without mutating generated register/edge chunks blindly",
     "Atlas diff-status tranche: preserve negative Atlas evidence and direct tree/file blocker in a validated artifact"

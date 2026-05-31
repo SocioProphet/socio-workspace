@@ -2,8 +2,10 @@
 """Generate and optionally enforce service-register drift checks."""
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -17,6 +19,7 @@ CANONICAL_REPOS_MIRROR = ARTIFACT_ROOT / "canonical-repo-estate.mirror.v1.0.json
 EDGES = ARTIFACT_ROOT / "service-dependency-edges.v0.1.csv"
 STUBS = ARTIFACT_ROOT / "critical-contract-path-stubs.v0.1.csv"
 OUT = ARTIFACT_ROOT / "service-register-drift-report.generated.csv"
+FIELDNAMES = ["check_id", "status", "expected", "actual", "notes"]
 
 EXPECTED = {
     "service_rows": 46,
@@ -112,8 +115,7 @@ def add_mirror_pin_row(rows: list[dict[str, str]], strict: bool) -> None:
         add_row(rows, "canonical_repo_mirror_pin", "fail" if strict else "warn", expected_sha, actual_sha, "local mirror Git blob SHA mismatch")
 
 
-def main() -> int:
-    print("SocioSphere service-register drift report")
+def build_rows() -> list[dict[str, str]]:
     policy = load_policy()
     gate_mode = str(policy.get("gate_mode", "warn-only")) if policy else "warn-only"
     strict_env = os.environ.get("SERVICE_REGISTER_STRICT", "0") == "1"
@@ -138,11 +140,23 @@ def main() -> int:
             add_row(rows, check_id, "fail" if strict else "warn", str(expected), str(actual_count), "count mismatch")
 
     add_mirror_pin_row(rows, strict)
+    return rows
 
+
+def render_csv() -> str:
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=FIELDNAMES, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(build_rows())
+    return buffer.getvalue()
+
+
+def write_report() -> int:
+    print("SocioSphere service-register drift report")
+    rows = build_rows()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("w", newline="", encoding="utf-8") as handle:
-        fieldnames = ["check_id", "status", "expected", "actual", "notes"]
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=FIELDNAMES, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -159,6 +173,29 @@ def main() -> int:
         return 1
     print("service-register drift check complete")
     return 0
+
+
+def check_report() -> int:
+    expected = render_csv()
+    if not OUT.exists():
+        print(f"ERR: missing generated report: {OUT.relative_to(ROOT)}")
+        return 2
+    actual = OUT.read_text(encoding="utf-8")
+    if actual != expected:
+        print(f"ERR: stale generated report: {OUT.relative_to(ROOT)}")
+        print("Run: python3 tools/generate_service_register_drift_report.py")
+        return 2
+    print(f"OK: {OUT.relative_to(ROOT)} is fresh")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="fail if the checked-in generated report is stale")
+    args = parser.parse_args()
+    if args.check:
+        return check_report()
+    return write_report()
 
 
 if __name__ == "__main__":

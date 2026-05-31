@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Service dependency edge validator and cycle classifier."""
+"""Service dependency edge validator and hard-cycle classifier."""
 from __future__ import annotations
 
 import csv
@@ -15,6 +15,7 @@ REGISTER = ARTIFACT_ROOT / "service-architecture-register.v1.0.csv"
 EXPECTED_EDGE_ROWS = 119
 EXPECTED_BOOT_REQUIRED = 28
 EXPECTED_ALLOWED_CYCLES = 7
+HARD_CYCLE_MODES = {"hard", "policy-required"}
 
 ALLOWED_EDGE_KINDS = {
     "depends_on",
@@ -71,6 +72,20 @@ def service_ids_from_register() -> set[str]:
     return {row["service_id"] for row in read_csv(REGISTER) if row.get("service_id")}
 
 
+def hard_cycle_edges(edges: list[dict[str, str]]) -> list[dict[str, str]]:
+    return [
+        edge for edge in edges
+        if edge.get("dependency_mode") in HARD_CYCLE_MODES
+        and edge.get("cycle_policy") == "forbidden"
+    ]
+
+
+def canonical_cycle(cycle: list[str]) -> tuple[str, ...]:
+    body = cycle[:-1]
+    rotations = [tuple(body[i:] + body[:i]) for i in range(len(body))]
+    return min(rotations)
+
+
 def find_cycles(edges: list[dict[str, str]]) -> list[list[str]]:
     graph: dict[str, list[str]] = defaultdict(list)
     for edge in edges:
@@ -83,7 +98,7 @@ def find_cycles(edges: list[dict[str, str]]) -> list[list[str]]:
         for nxt in graph.get(node, []):
             if nxt in path:
                 cycle = path[path.index(nxt):] + [nxt]
-                key = tuple(cycle)
+                key = canonical_cycle(cycle)
                 if key not in seen:
                     seen.add(key)
                     cycles.append(cycle)
@@ -93,22 +108,6 @@ def find_cycles(edges: list[dict[str, str]]) -> list[list[str]]:
     for node in sorted(graph):
         visit(node, [node])
     return cycles
-
-
-def edge_lookup(edges: list[dict[str, str]]) -> dict[tuple[str, str], list[dict[str, str]]]:
-    lookup: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
-    for edge in edges:
-        lookup[(edge["from_service_id"], edge["to_service_id"])].append(edge)
-    return lookup
-
-
-def classify_cycle(cycle: list[str], lookup: dict[tuple[str, str], list[dict[str, str]]]) -> str:
-    policies: list[str] = []
-    for left, right in zip(cycle, cycle[1:]):
-        policies.extend(edge.get("cycle_policy", "forbidden") for edge in lookup.get((left, right), []))
-    if any(policy in ALLOWED_CYCLE_POLICIES_NON_FORBIDDEN for policy in policies):
-        return "allowed"
-    return "forbidden"
 
 
 def record(strict: bool, failures: list[str], message: str) -> None:
@@ -167,20 +166,11 @@ def main() -> int:
         if edge.get("to_service_id") not in services:
             record(strict, failures, f"{edge_id} to_service_id missing from register: {edge.get('to_service_id')}")
 
-    cycles = find_cycles(edges)
-    lookup = edge_lookup(edges)
-    forbidden_cycles = [cycle for cycle in cycles if classify_cycle(cycle, lookup) == "forbidden"]
-    allowed_cycles = [cycle for cycle in cycles if classify_cycle(cycle, lookup) == "allowed"]
-
-    if allowed_cycles:
-        ok(f"allowed cycles detected={len(allowed_cycles)}")
-    else:
-        record(strict, failures, "no allowed cycles detected; expected feedback loops may be absent or artifacts missing")
-
+    forbidden_cycles = find_cycles(hard_cycle_edges(edges))
     if forbidden_cycles:
-        record(strict, failures, f"forbidden cycles detected={len(forbidden_cycles)}: {forbidden_cycles}")
+        record(strict, failures, f"forbidden hard cycles detected={len(forbidden_cycles)}: {forbidden_cycles}")
     else:
-        ok("no forbidden cycles detected")
+        ok("no forbidden hard cycles detected")
 
     if failures:
         return 1

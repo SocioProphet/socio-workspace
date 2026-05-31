@@ -1,0 +1,38 @@
+name: SourceOS Interaction Substrate Registration
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "registry/sourceos-interaction-substrate.yaml"
+      - "docs/INTEGRATION_STATUS.md"
+      - "tools/validate_sourceos_interaction_substrate_registration.py"
+      - ".github/workflows/sourceos-interaction-substrate-registration.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "registry/sourceos-interaction-substrate.yaml"
+      - "docs/INTEGRATION_STATUS.md"
+      - "tools/validate_sourceos_interaction_substrate_registration.py"
+      - ".github/workflows/sourceos-interaction-substrate-registration.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-sourceos-interaction-substrate-registration:
+    name: Validate SourceOS interaction substrate registration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validator dependency
+        run: python -m pip install --upgrade pip pyyaml
+
+      - name: Validate SourceOS interaction substrate registration
+        run: python tools/validate_sourceos_interaction_substrate_registration.py

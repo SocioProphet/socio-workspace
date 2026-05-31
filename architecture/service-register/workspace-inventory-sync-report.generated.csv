@@ -1,0 +1,2 @@
+check_id,status,source_repository,source_artifact_path,local_artifact_path,pinning_mode,expected_git_blob_sha,network_policy,notes
+workspace_inventory_upstream_sync,deferred,SocioProphet/workspace-inventory,exports/canonical-repo-estate.v1.0.csv,architecture/service-register/canonical-repo-estate.v1.0.csv,git-blob-sha,10c47ac5411b82ac5bf2b15f2e4360f57e34e148,no-network-in-service-register-ci,Normal service-register CI validates the pinned local mirror only. Networked upstream comparison belongs in a future explicit sync/update job.

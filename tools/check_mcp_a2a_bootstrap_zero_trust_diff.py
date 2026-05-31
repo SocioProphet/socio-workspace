@@ -32,6 +32,8 @@ ALLOWED_STATUS = {
     "migrate-or-supersede-before-archive",
     "must-preserve",
     "archive-ready",
+    "archive-ready-after-tree-confirmation",
+    "preserved-in-canonical",
     "blocked",
 }
 EXPECTED_ROLES = {
@@ -98,14 +100,15 @@ def main() -> int:
     verifier = by_key["PPS-carrier-verifier"]
     canonical = by_key["SocioProphet/mcp-a2a-zero-trust"]
 
-    if bootstrap["consolidation_status"] != "migrate-or-supersede-before-archive":
-        return fail("bootstrap row must remain migrate-or-supersede-before-archive until PPS verifier is preserved")
-    if verifier["consolidation_status"] != "must-preserve":
-        return fail("PPS verifier row must remain must-preserve until migrated or superseded")
+    if bootstrap["consolidation_status"] != "archive-ready-after-tree-confirmation":
+        return fail("bootstrap row must remain archive-ready-after-tree-confirmation after PPS verifier preservation")
+    if verifier["consolidation_status"] != "preserved-in-canonical":
+        return fail("PPS verifier row must remain preserved-in-canonical")
     if canonical["consolidation_status"] != "retain-canonical":
         return fail("zero-trust row must remain retain-canonical")
-    if "BLAKE3" not in verifier["confirmed_assets"] or "Ed25519" not in verifier["confirmed_assets"]:
-        return fail("PPS verifier row must preserve BLAKE3 and Ed25519 evidence")
+    for row in (canonical, verifier):
+        if "BLAKE3" not in row["confirmed_assets"] or "Ed25519" not in row["confirmed_assets"]:
+            return fail("canonical and verifier rows must preserve BLAKE3 and Ed25519 evidence")
 
     print(f"OK: MCP/A2A bootstrap zero-trust diff valid ({len(rows)} rows)")
     return 0

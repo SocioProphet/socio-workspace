@@ -2,9 +2,16 @@
   "artifact_id": "sociosphere.service-register-ingestion.v1.0",
   "source_register": "service-architecture-register.v1.0.csv",
   "canonical_repo_estate": "canonical-repo-estate.v1.0.csv",
+  "canonical_repo_estate_mirror": "canonical-repo-estate.mirror.v1.0.json",
+  "workspace_inventory_source": "workspace-inventory-source.v0.1.json",
+  "workspace_inventory_sync_report": "workspace-inventory-sync-report.generated.csv",
   "edge_table": "service-dependency-edges.v0.1.csv",
   "contract_stubs": "critical-contract-path-stubs.v0.1.csv",
-  "critical_path_report": "critical-path-blocking-report.v0.2.csv",
+  "critical_path_report_generated": "critical-path-blocking-report.generated.csv",
+  "critical_path_report_manual": "critical-path-blocking-report.v0.2.csv",
+  "repo_reconciliation_report": "repo-reconciliation-report.v0.1.csv",
+  "fabric_atlas_model_carry_reconciliation": "fabric-atlas-model-carry-reconciliation.v0.1.csv",
+  "service_register_drift_report": "service-register-drift-report.generated.csv",
   "service_rows": 46,
   "unique_repos_in_register_fields": 125,
   "misc_closed": true,
@@ -14,11 +21,22 @@
   "total_edges": 119,
   "boot_required_edges": 28,
   "allowed_cycle_count": 7,
+  "reconciliation_artifacts": [
+    "repo-reconciliation-report.v0.1.csv",
+    "fabric-atlas-model-carry-reconciliation.v0.1.csv"
+  ],
   "required_validators": [
-    "validate_service_register.py",
-    "check_repo_coverage.py",
-    "check_dependency_cycles.py",
-    "generate_critical_path_report.py"
+    "tools/validate_service_register_artifacts.py",
+    "tools/check_service_register_repo_coverage.py",
+    "tools/check_service_dependency_cycles.py",
+    "tools/generate_service_critical_path_report.py",
+    "tools/check_workspace_inventory_binding.py",
+    "tools/check_canonical_repo_mirror_pin.py",
+    "tools/generate_workspace_inventory_sync_report.py --check",
+    "tools/generate_service_register_drift_report.py --check",
+    "tools/check_critical_contract_paths.py",
+    "tools/check_contract_target_ledger.py",
+    "tools/check_fabric_atlas_model_carry_reconciliation.py"
   ],
   "pr_sequence": [
     "PR-A: add canonical artifacts, schemas, README, and warn-only validator",
@@ -26,6 +44,8 @@
     "PR-C: add edge validator and cycle classifier",
     "PR-D: generate critical path report from classified graph",
     "PR-E: wire workspace-inventory as canonical repo source",
-    "PR-F: add drift report and CI gate"
+    "PR-F: add drift report and CI gate",
+    "Workspace Inventory mirror tranche: add stable export binding, mirror pin, sync report, drift report, and freshness checks",
+    "Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator"
   ]
 }

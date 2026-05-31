@@ -25,6 +25,7 @@ EXPECTED = [
     "critical-path-blocking-report.generated.csv",
     "critical-path-blocking-report.v0.2.csv",
     "repo-reconciliation-report.v0.1.csv",
+    "mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv",
     "fabric-atlas-model-carry-reconciliation.v0.1.csv",
     "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
     "atlas-bundle-diff-status.v0.1.csv",
@@ -62,6 +63,19 @@ EDGE_REQUIRED = [
     "required_for_bootstrap",
     "required_for_product_hardening",
     "evidence_required",
+    "notes",
+]
+
+MCP_DIFF_REQUIRED = [
+    "repo_full_name",
+    "repo_size",
+    "observed_role",
+    "confirmed_assets",
+    "pr_title_evidence",
+    "proposed_authority_role",
+    "consolidation_status",
+    "confidence",
+    "next_action",
     "notes",
 ]
 
@@ -150,6 +164,7 @@ def main() -> int:
 
     validate_csv_headers("service-architecture-register.v1.0.csv", SERVICE_REQUIRED)
     validate_csv_headers("service-dependency-edges.v0.1.csv", EDGE_REQUIRED)
+    validate_csv_headers("mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv", MCP_DIFF_REQUIRED)
     validate_csv_headers("fabric-atlas-model-carry-reconciliation.v0.1.csv", RECONCILIATION_REQUIRED)
     validate_csv_headers("fabric-atlas-model-carry-propagation-plan.v0.1.csv", PROPAGATION_REQUIRED)
     validate_csv_headers("atlas-bundle-diff-status.v0.1.csv", ATLAS_DIFF_REQUIRED)

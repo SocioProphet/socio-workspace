@@ -1,0 +1,24 @@
+name: runtime-evidence-ingestion
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "tests/fixtures/environment/runtime-evidence-ingestion*.json"
+      - "tools/validate_runtime_evidence_ingestion.py"
+      - ".github/workflows/runtime-evidence-ingestion.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-runtime-evidence-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate runtime evidence ingestion fixtures
+        run: python3 tools/validate_runtime_evidence_ingestion.py

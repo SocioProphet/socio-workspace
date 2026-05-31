@@ -1,0 +1,20 @@
+{
+  "artifact_id": "sociosphere.canonical_repo_estate_mirror.v1.0",
+  "status": "pinned-local-mirror",
+  "source_repository": "SocioProphet/workspace-inventory",
+  "source_artifact_path": "exports/canonical-repo-estate.v1.0.csv",
+  "source_manifest_path": "exports/canonical-repo-estate.v1.0.json",
+  "local_artifact_path": "architecture/service-register/canonical-repo-estate.v1.0.csv",
+  "expected_git_blob_sha": "10c47ac5411b82ac5bf2b15f2e4360f57e34e148",
+  "expected_row_count": 125,
+  "expected_columns": [
+    "repo_full_name",
+    "owned_services",
+    "supporting_services",
+    "contract_services",
+    "canonical_status"
+  ],
+  "pinning_mode": "git-blob-sha",
+  "validation_tool": "tools/check_canonical_repo_mirror_pin.py",
+  "notes": "This manifest pins SocioSphere's deterministic local mirror of the Workspace Inventory canonical repo-estate export. The Git blob SHA is computed over 'blob <byte_length>\\0<file_bytes>'."
+}

@@ -28,6 +28,8 @@ Role: operating model, boards, work orders, KPIs, repo readiness, playbooks, bou
 
 Role: runtime services, platform contracts, transport, validation, install path, and deployment topology.
 
+Current runtime-boundary anchor: `SocioProphet/prophet-platform:docs/WORKROOM_UPDATE_RUNTIME_BOUNDARY.md` defines prerequisites before the workroom update contract can become a live service. It does not define an endpoint, service, persistence model, or mutation path.
+
 ### Work surface and UI
 
 - `SocioProphet/prophet-workspace`
@@ -85,14 +87,20 @@ A subsystem is integrated only when it has:
 5. a feedback path into DelEx boards, KPIs, or readiness;
 6. a corrective control when telemetry or validation shows drift.
 
-For Professional Workrooms, the current integration evidence is contract-level rather than runtime-level:
+For Professional Workrooms, the current integration evidence is contract-level and runtime-boundary-level rather than runtime-implementation-level:
 
 - `SocioProphet/prophet-workspace:contracts/workspace/professional-workroom.schema.json`
 - `SocioProphet/prophet-workspace:contracts/workspace/professional-workroom.v0.1.example.json`
 - `SocioProphet/prophet-workspace:tools/validate_professional_workrooms.py`
 - `SocioProphet/prophet-workspace:.github/workflows/professional-workrooms.yml`
+- `SocioProphet/prophet-platform:contracts/workspace/workroom-update-request.example.json`
+- `SocioProphet/prophet-platform:contracts/workspace/workroom-update-response.accepted.example.json`
+- `SocioProphet/prophet-platform:tools/validate_workroom_update_contract.py`
+- `SocioProphet/prophet-platform:docs/WORKROOM_UPDATE_RUNTIME_BOUNDARY.md`
 - `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-workspace-workroom-substrate.yaml`
+- `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-platform-workroom-update-boundary.yaml`
 - `SocioProphet/systems-learning-loops:kb/receipts/prophet-workspace-workroom-substrate.receipt.yaml`
+- `SocioProphet/systems-learning-loops:kb/receipts/prophet-platform-workroom-update-boundary.receipt.yaml`
 
 ## Cybernetic control loops
 
@@ -116,23 +124,24 @@ Search, Memory, Graph, and Query -> Context Pack -> Agent Output -> Human Feedba
 
 As of 2026-05-30:
 
-- Overall Professional Intelligence OS alignment: 26%
-- Architecture spine: 40%
+- Overall Professional Intelligence OS alignment: 27%
+- Architecture spine: 41%
 - DelEx governance and operating model: 40%
 - DelEx automation: 25%
-- Platform contracts: 32%
+- Platform contracts: 35%
 - Professional Workroom contract alignment: 45%
-- Governance loops: 30%
-- Cybernetic controls: 20%
+- Workroom runtime-boundary readiness: 20%
+- Governance loops: 31%
+- Cybernetic controls: 21%
 - SocioProphet UI/dashboard integration: 8%
-- Sociosphere topology integration: 25%
+- Sociosphere topology integration: 26%
 - Agentplane execution integration: 15%
 - Policy Fabric integration: 25%
 - ContractForge / Obligation Ledger integration: 25%
 - Runtime implementation: 5%
 - Demo readiness: 12%
 
-The increase reflects contract-level and governance-ledger alignment only. It does not represent runtime, UI, deployment, or demo completion.
+The increase reflects contract-level, runtime-boundary, and governance-ledger alignment only. It does not represent runtime service implementation, UI integration, deployment, live mutation, or demo completion.
 
 ## Control references
 
@@ -141,8 +150,11 @@ The increase reflects contract-level and governance-ledger alignment only. It do
 - UI definition: `SocioProphet/socioprophet:docs/professional-intelligence-ui-dashboard.md`
 - Workspace boundary: `SocioProphet/prophet-workspace:docs/professional-workrooms.md`
 - Workroom substrate alignment: `SocioProphet/prophet-workspace:docs/workroom-substrate-alignment-v0.md`
+- Workroom update runtime boundary: `SocioProphet/prophet-platform:docs/WORKROOM_UPDATE_RUNTIME_BOUNDARY.md`
 - Workspace estate overlay: `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-workspace-workroom-substrate.yaml`
+- Platform runtime-boundary estate overlay: `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-platform-workroom-update-boundary.yaml`
 - Workroom learning receipt: `SocioProphet/systems-learning-loops:kb/receipts/prophet-workspace-workroom-substrate.receipt.yaml`
+- Workroom runtime-boundary learning receipt: `SocioProphet/systems-learning-loops:kb/receipts/prophet-platform-workroom-update-boundary.receipt.yaml`
 
 ## Sociosphere responsibilities
 
@@ -160,4 +172,5 @@ Sociosphere should:
 - Do not duplicate DelEx control registers or Prophet Platform manifests.
 - Do not count a README reference as integration.
 - Do not count workroom contract alignment as runtime implementation or demo readiness.
+- Do not count runtime-boundary readiness as runtime implementation.
 - Do not mark demo readiness without evidence and adoption telemetry.

@@ -95,12 +95,15 @@ For Professional Workrooms, the current integration evidence is contract-level a
 - `SocioProphet/prophet-workspace:.github/workflows/professional-workrooms.yml`
 - `SocioProphet/prophet-platform:contracts/workspace/workroom-update-request.example.json`
 - `SocioProphet/prophet-platform:contracts/workspace/workroom-update-response.accepted.example.json`
+- `SocioProphet/prophet-platform:contracts/workspace/workroom-update-response.invalid-runtime-mutation.example.json`
 - `SocioProphet/prophet-platform:tools/validate_workroom_update_contract.py`
 - `SocioProphet/prophet-platform:docs/WORKROOM_UPDATE_RUNTIME_BOUNDARY.md`
 - `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-workspace-workroom-substrate.yaml`
 - `SocioProphet/workspace-inventory:inventory/estate-overlays/prophet-platform-workroom-update-boundary.yaml`
 - `SocioProphet/systems-learning-loops:kb/receipts/prophet-workspace-workroom-substrate.receipt.yaml`
 - `SocioProphet/systems-learning-loops:kb/receipts/prophet-platform-workroom-update-boundary.receipt.yaml`
+
+The invalid mutation fixture is a regression guard: it proves `accepted_for_review` cannot carry `runtimeMutationPerformed: true`.
 
 ## Cybernetic control loops
 

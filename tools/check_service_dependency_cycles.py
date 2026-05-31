@@ -135,6 +135,11 @@ def main() -> int:
 
     edges = read_csv(EDGES)
     services = service_ids_from_register()
+    invalid_edge_kinds: list[str] = []
+    invalid_dependency_modes: list[str] = []
+    invalid_cycle_policies: list[str] = []
+    missing_from_services: list[str] = []
+    missing_to_services: list[str] = []
 
     if len(edges) == EXPECTED_EDGE_ROWS:
         ok(f"edge rows={len(edges)}")
@@ -156,19 +161,40 @@ def main() -> int:
     for edge in edges:
         edge_id = edge.get("edge_id", "<missing-edge-id>")
         if edge.get("edge_kind") not in ALLOWED_EDGE_KINDS:
+            invalid_edge_kinds.append(edge_id)
             record(strict, failures, f"{edge_id} has invalid edge_kind={edge.get('edge_kind')}")
         if edge.get("dependency_mode") not in ALLOWED_DEPENDENCY_MODES:
+            invalid_dependency_modes.append(edge_id)
             record(strict, failures, f"{edge_id} has invalid dependency_mode={edge.get('dependency_mode')}")
         if edge.get("cycle_policy") not in ALLOWED_CYCLE_POLICIES:
+            invalid_cycle_policies.append(edge_id)
             record(strict, failures, f"{edge_id} has invalid cycle_policy={edge.get('cycle_policy')}")
         if edge.get("from_service_id") not in services:
+            missing_from_services.append(edge_id)
             record(strict, failures, f"{edge_id} from_service_id missing from register: {edge.get('from_service_id')}")
         if edge.get("to_service_id") not in services:
+            missing_to_services.append(edge_id)
             record(strict, failures, f"{edge_id} to_service_id missing from register: {edge.get('to_service_id')}")
 
     hard_cycles = find_cycles(hard_cycle_edges(edges))
+    print(
+        "SUMMARY "
+        f"edge_rows={len(edges)} "
+        f"boot_required={boot_required} "
+        f"allowed_cycle_edges={len(allowed_cycle_edges)} "
+        f"invalid_edge_kinds={len(invalid_edge_kinds)} "
+        f"invalid_dependency_modes={len(invalid_dependency_modes)} "
+        f"invalid_cycle_policies={len(invalid_cycle_policies)} "
+        f"missing_from_services={len(missing_from_services)} "
+        f"missing_to_services={len(missing_to_services)} "
+        f"hard_cycle_candidates={len(hard_cycles)} "
+        f"failure_count={len(failures)}"
+    )
+    if failures:
+        print(f"SUMMARY_FAILURES {failures[:20]}")
+
     if hard_cycles:
-        warn(f"hard-cycle candidates detected={len(hard_cycles)}: {hard_cycles}")
+        warn(f"hard-cycle candidates detected={len(hard_cycles)}: {hard_cycles[:10]}")
         warn("hard-cycle candidates are report-only until dependency_mode/cycle_policy normalization is complete")
     else:
         ok("no hard-cycle candidates detected")

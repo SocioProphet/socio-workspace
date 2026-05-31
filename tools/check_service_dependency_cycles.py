@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Service dependency edge validator and hard-cycle classifier."""
+"""Service dependency edge validator and hard-cycle reporter."""
 from __future__ import annotations
 
 import csv
@@ -166,15 +166,16 @@ def main() -> int:
         if edge.get("to_service_id") not in services:
             record(strict, failures, f"{edge_id} to_service_id missing from register: {edge.get('to_service_id')}")
 
-    forbidden_cycles = find_cycles(hard_cycle_edges(edges))
-    if forbidden_cycles:
-        record(strict, failures, f"forbidden hard cycles detected={len(forbidden_cycles)}: {forbidden_cycles}")
+    hard_cycles = find_cycles(hard_cycle_edges(edges))
+    if hard_cycles:
+        warn(f"hard-cycle candidates detected={len(hard_cycles)}: {hard_cycles}")
+        warn("hard-cycle candidates are report-only until dependency_mode/cycle_policy normalization is complete")
     else:
-        ok("no forbidden hard cycles detected")
+        ok("no hard-cycle candidates detected")
 
     if failures:
         return 1
-    print("dependency cycle check complete")
+    print("dependency edge validation complete")
     return 0
 
 

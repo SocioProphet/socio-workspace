@@ -12,6 +12,7 @@ on:
       - "tools/generate_service_critical_path_report.py"
       - "tools/check_workspace_inventory_binding.py"
       - "tools/check_canonical_repo_mirror_pin.py"
+      - "tools/generate_workspace_inventory_sync_report.py"
       - "tools/generate_service_register_drift_report.py"
       - "tools/check_critical_contract_paths.py"
       - "tools/check_contract_target_ledger.py"
@@ -27,6 +28,7 @@ on:
       - "tools/generate_service_critical_path_report.py"
       - "tools/check_workspace_inventory_binding.py"
       - "tools/check_canonical_repo_mirror_pin.py"
+      - "tools/generate_workspace_inventory_sync_report.py"
       - "tools/generate_service_register_drift_report.py"
       - "tools/check_critical_contract_paths.py"
       - "tools/check_contract_target_ledger.py"
@@ -60,5 +62,7 @@ jobs:
         run: python3 tools/check_workspace_inventory_binding.py
       - name: Check canonical repo mirror pin
         run: python3 tools/check_canonical_repo_mirror_pin.py
+      - name: Generate workspace inventory sync report
+        run: python3 tools/generate_workspace_inventory_sync_report.py
       - name: Generate service register drift report
         run: python3 tools/generate_service_register_drift_report.py

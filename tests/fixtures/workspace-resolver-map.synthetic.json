@@ -1,0 +1,14 @@
+{
+  "https://github.com/SocioProphet/prophet-workspace": {
+    "main": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "https://github.com/SocioProphet/agent-registry": {
+    "main": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "https://github.com/SocioProphet/memory-mesh": {
+    "main": "cccccccccccccccccccccccccccccccccccccccc"
+  },
+  "https://github.com/SocioProphet/socioprophet-agent-standards": {
+    "main": "dddddddddddddddddddddddddddddddddddddddd"
+  }
+}

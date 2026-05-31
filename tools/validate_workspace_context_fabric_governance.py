@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate Workspace Context Fabric governance artifacts."""
+"""Validate Workspace Context Fabric governance artifacts.
+
+This file is intentionally watched by the Workspace Context Fabric governance
+workflow.
+"""
 
 from __future__ import annotations
 

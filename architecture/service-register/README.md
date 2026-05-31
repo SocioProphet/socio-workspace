@@ -21,6 +21,7 @@ The intended v1.0 control set is:
 | `critical-path-blocking-report.v0.2.csv` | Current manually curated critical path report: 4 BLOCKING and 4 HARDENING rows. |
 | `repo-reconciliation-report.v0.1.csv` | A2A/MCP and Fabric/MLOps/Atlas reconciliation notes. |
 | `fabric-atlas-model-carry-reconciliation.v0.1.csv` | Expanded authority matrix for TritFabric, Atlas bundle repos, Fabric/MLOps, SourceOS model-carry, SHIR, runtime, routing, policy, governance, and lab boundaries. |
+| `fabric-atlas-model-carry-propagation-plan.v0.1.csv` | Planned propagation rows for converting the reconciliation matrix into service edges, contract registry targets, repo status metadata, and follow-on archive/inspection actions. |
 | `service-register-drift-report.generated.csv` | Generated deterministic drift report including row counts and canonical repo mirror-pin status. |
 | `sociosphere-service-register-ingestion-manifest.v1.0.json` | Machine-readable ingestion manifest. |
 | `service-register-gate-policy.v0.1.json` | Current gate policy for strict deterministic service-register validation. |
@@ -40,7 +41,7 @@ The intended v1.0 control set is:
 
 ## Validation posture
 
-The service-register lane has advanced past the original PR-A scaffold. Artifact presence, row counts, Workspace Inventory binding metadata, canonical repo mirror identity, generated sync-report freshness, generated drift-report freshness, and critical contract ledgers are now deterministic checks.
+The service-register lane has advanced past the original PR-A scaffold. Artifact presence, row counts, Workspace Inventory binding metadata, canonical repo mirror identity, generated sync-report freshness, generated drift-report freshness, reconciliation artifacts, propagation-plan structure, and critical contract ledgers are now deterministic checks.
 
 Strict checks currently enforced:
 
@@ -54,12 +55,14 @@ Strict checks currently enforced:
 8. `workspace-inventory-sync-report.generated.csv` is fresh relative to its generator.
 9. `service-register-drift-report.generated.csv` is fresh relative to its generator.
 10. Critical contract paths and contract target ledger checks run in strict mode.
+11. `fabric-atlas-model-carry-reconciliation.v0.1.csv` has required rows, columns, confidence values, and root authority ordering.
+12. `fabric-atlas-model-carry-propagation-plan.v0.1.csv` has required propagation IDs, source artifact linkage, status values, and target-artifact shape.
 
 Checks intentionally still staged / warning-only or not yet promoted:
 
 1. Live networked comparison against the upstream Workspace Inventory export.
 2. Atlas bundle archive/retirement decision after file-level extraction.
-3. Full semantic propagation of TritFabric/SHIR/model-carry authority boundaries into service dependencies and contract registries.
+3. Direct mutation of generated service-register and dependency-edge chunks from propagation-plan rows.
 4. Blocking-service acknowledgement policy beyond the current contract ledger.
 
 Validation hardening order:
@@ -73,4 +76,5 @@ Validation hardening order:
 7. PR-418: enforce artifact presence and row-count validation.
 8. Workspace Inventory mirror tranche: add source binding, mirror pin, generated sync report, generated drift report, and freshness checks.
 9. Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator.
-10. Next: propagate reconciliation decisions into service-register dependencies, contract registry targets, and Workspace Inventory status metadata.
+10. Propagation-plan tranche: add planned semantic propagation rows without mutating generated register/edge chunks blindly.
+11. Next: apply propagation rows to source-of-truth register/edge generation once artifact chunk provenance is confirmed.

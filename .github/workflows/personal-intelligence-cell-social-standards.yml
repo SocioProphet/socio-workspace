@@ -1,0 +1,30 @@
+name: personal-intelligence-cell-social-standards
+
+on:
+  pull_request:
+    paths: &pic_social_standards_paths
+      - 'standards/personal-intelligence-cell/social-environment-snapshot.schema.json'
+      - 'standards/personal-intelligence-cell/social-environment-snapshot.example.json'
+      - 'standards/personal-intelligence-cell/reputation-delta.schema.json'
+      - 'standards/personal-intelligence-cell/reputation-delta.example.json'
+      - 'tools/validate_personal_intelligence_cell_social_environment.py'
+      - 'README.md'
+      - 'docs/runbooks/ci.md'
+  push:
+    paths: *pic_social_standards_paths
+
+permissions:
+  contents: read
+
+jobs:
+  validate-personal-intelligence-cell-social-standards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate Personal Intelligence Cell social and reputation standards
+        run: python3 tools/validate_personal_intelligence_cell_social_environment.py

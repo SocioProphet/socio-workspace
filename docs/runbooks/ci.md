@@ -6,6 +6,7 @@
 |------|---------|-------------|
 | `.github/workflows/validate.yml` | push, PR | Runner smoke + lock-verify + topology + UI + standards |
 | `.github/workflows/ui-check.yml` | push, PR | UI install + build only |
+| `.github/workflows/personal-intelligence-cell-social-standards.yml` | push, PR (path-filtered) | Validates Personal Intelligence Cell social-environment and reputation standards examples/schemas |
 
 ## Steps in `validate.yml`
 
@@ -46,6 +47,12 @@ make validate-standards
 ```
 Validates adaptation program JSON and QES schemas.
 
+### Personal Intelligence Cell social/reputation standards
+```bash
+python3 tools/validate_personal_intelligence_cell_social_environment.py
+```
+Validates the snapshot and reputation schemas/examples, including confidence interval and anti-manipulation constraints.
+
 ## How to fix common failures
 
 ### `MISSING-FROM-LOCK <repo>`
@@ -82,4 +89,3 @@ A `role=third_party` entry has no `rev` in the lock. Fix: add an explicit rev.
    ```
 3. Commit both changes together with a short rationale and a link to the relevant issue.
 4. Push; CI will re-run `lock-verify` to confirm the update is consistent.
-

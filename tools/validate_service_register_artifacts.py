@@ -26,6 +26,7 @@ EXPECTED = [
     "critical-path-blocking-report.v0.2.csv",
     "repo-reconciliation-report.v0.1.csv",
     "fabric-atlas-model-carry-reconciliation.v0.1.csv",
+    "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
     "service-register-drift-report.generated.csv",
     "sociosphere-service-register-ingestion-manifest.v1.0.json",
     "service-register-gate-policy.v0.1.json",
@@ -76,6 +77,20 @@ RECONCILIATION_REQUIRED = [
     "notes",
 ]
 
+PROPAGATION_REQUIRED = [
+    "propagation_id",
+    "source_artifact",
+    "decision_scope",
+    "from_authority",
+    "to_consumer",
+    "service_surface",
+    "propagation_mode",
+    "target_artifact",
+    "next_action",
+    "status",
+    "notes",
+]
+
 
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
@@ -121,6 +136,7 @@ def main() -> int:
     validate_csv_headers("service-architecture-register.v1.0.csv", SERVICE_REQUIRED)
     validate_csv_headers("service-dependency-edges.v0.1.csv", EDGE_REQUIRED)
     validate_csv_headers("fabric-atlas-model-carry-reconciliation.v0.1.csv", RECONCILIATION_REQUIRED)
+    validate_csv_headers("fabric-atlas-model-carry-propagation-plan.v0.1.csv", PROPAGATION_REQUIRED)
 
     manifest_path = ARTIFACT_ROOT / "sociosphere-service-register-ingestion-manifest.v1.0.json"
     if manifest_path.exists():

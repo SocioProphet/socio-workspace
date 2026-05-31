@@ -1,5 +1,7 @@
 name: service-register
 
+# Observable CI probe: service-register v3
+
 on:
   workflow_dispatch:
   pull_request:

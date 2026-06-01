@@ -32,6 +32,18 @@ ALLOWED_TARGETS = {
     "SocioProphet/ontogenesis",
     "SocioProphet/agentplane",
 }
+EXPECTED_STATUS = {
+    "ATLAS-EXTRACT-001": "extracted",
+    "ATLAS-EXTRACT-002": "pending",
+    "ATLAS-EXTRACT-003": "pending",
+    "ATLAS-EXTRACT-004": "pending",
+    "ATLAS-EXTRACT-005": "pending",
+    "ATLAS-EXTRACT-006": "extracted",
+    "ATLAS-EXTRACT-007": "extracted",
+    "ATLAS-EXTRACT-008": "extracted",
+    "ATLAS-EXTRACT-009": "extracted",
+    "ATLAS-EXTRACT-010": "extracted",
+}
 
 
 def fail(message: str) -> int:
@@ -73,10 +85,15 @@ def main() -> int:
             return fail(f"row {index} unexpected canonical_target={row['canonical_target']!r}")
         if row["extraction_status"] not in ALLOWED_STATUS:
             return fail(f"row {index} invalid extraction_status={row['extraction_status']!r}")
-        if row["extraction_status"] != "pending":
-            return fail(f"row {index} extraction_status must remain pending until material is extracted or explicitly covered elsewhere")
+        if row["extraction_status"] != EXPECTED_STATUS[extraction_id]:
+            return fail(
+                f"row {index} extraction_status must be {EXPECTED_STATUS[extraction_id]!r}; "
+                "update EXPECTED_STATUS when extraction state changes"
+            )
         if "README" not in row["source_evidence"]:
             return fail(f"row {index} source_evidence must cite README-derived evidence")
+        if row["extraction_status"] == "extracted" and "Preserved in" not in row["next_action"]:
+            return fail(f"row {index} extracted rows must cite preservation target in next_action")
         for column in REQUIRED_COLUMNS:
             if not row[column].strip():
                 return fail(f"row {index} missing required value for {column}")

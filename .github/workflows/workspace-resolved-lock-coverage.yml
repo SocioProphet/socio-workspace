@@ -1,0 +1,46 @@
+name: Workspace Resolved Lock Coverage
+
+on:
+  pull_request:
+    paths:
+      - 'tools/report_workspace_resolved_lock_coverage.py'
+      - 'manifest/workspace.lock.json'
+      - 'manifest/workspace.resolved.lock.json'
+      - '.github/workflows/workspace-resolved-lock-coverage.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'tools/report_workspace_resolved_lock_coverage.py'
+      - 'manifest/workspace.lock.json'
+      - 'manifest/workspace.resolved.lock.json'
+      - '.github/workflows/workspace-resolved-lock-coverage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report-workspace-resolved-lock-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate coverage report
+        run: |
+          mkdir -p reports
+          python3 tools/report_workspace_resolved_lock_coverage.py > reports/workspace-resolved-lock-coverage.json
+          python3 -m json.tool reports/workspace-resolved-lock-coverage.json >/dev/null
+          cat reports/workspace-resolved-lock-coverage.json
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-resolved-lock-coverage
+          path: reports/workspace-resolved-lock-coverage.json

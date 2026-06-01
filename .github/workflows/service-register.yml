@@ -16,6 +16,7 @@ on:
       - "tools/generate_service_register_drift_report.py"
       - "tools/check_critical_contract_paths.py"
       - "tools/check_contract_target_ledger.py"
+      - "tools/check_lampstand_contract_registry.py"
       - "tools/check_mcp_a2a_bootstrap_zero_trust_diff.py"
       - "tools/check_fabric_atlas_model_carry_reconciliation.py"
       - "tools/check_fabric_atlas_model_carry_propagation_plan.py"
@@ -36,6 +37,7 @@ on:
       - "tools/generate_service_register_drift_report.py"
       - "tools/check_critical_contract_paths.py"
       - "tools/check_contract_target_ledger.py"
+      - "tools/check_lampstand_contract_registry.py"
       - "tools/check_mcp_a2a_bootstrap_zero_trust_diff.py"
       - "tools/check_fabric_atlas_model_carry_reconciliation.py"
       - "tools/check_fabric_atlas_model_carry_propagation_plan.py"
@@ -70,6 +72,8 @@ jobs:
         run: python3 tools/check_workspace_inventory_binding.py
       - name: Check canonical repo mirror pin
         run: python3 tools/check_canonical_repo_mirror_pin.py
+      - name: Check Lampstand contract registry
+        run: python3 tools/check_lampstand_contract_registry.py
       - name: Check MCP A2A bootstrap zero-trust diff
         run: python3 tools/check_mcp_a2a_bootstrap_zero_trust_diff.py
       - name: Check Fabric Atlas Model Carry reconciliation

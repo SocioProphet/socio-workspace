@@ -55,6 +55,11 @@ def is_repo_or_asset(value: str) -> bool:
     return len(parts) == 2 and all(parts)
 
 
+def has_evidence_tokens(value: str, tokens: set[str]) -> bool:
+    normalized = value.casefold()
+    return all(token.casefold() in normalized for token in tokens)
+
+
 def main() -> int:
     if not ARTIFACT.exists():
         return fail(f"missing artifact: {ARTIFACT.relative_to(ROOT)}")
@@ -107,7 +112,7 @@ def main() -> int:
     if canonical["consolidation_status"] != "retain-canonical":
         return fail("zero-trust row must remain retain-canonical")
     for row in (canonical, verifier):
-        if "BLAKE3" not in row["confirmed_assets"] or "Ed25519" not in row["confirmed_assets"]:
+        if not has_evidence_tokens(row["confirmed_assets"], {"BLAKE3", "Ed25519"}):
             return fail("canonical and verifier rows must preserve BLAKE3 and Ed25519 evidence")
 
     print(f"OK: MCP/A2A bootstrap zero-trust diff valid ({len(rows)} rows)")

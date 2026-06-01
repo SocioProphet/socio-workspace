@@ -37,7 +37,7 @@ EXPECTED_STATUS = {
     "ATLAS-EXTRACT-002": "extracted",
     "ATLAS-EXTRACT-003": "extracted",
     "ATLAS-EXTRACT-004": "extracted",
-    "ATLAS-EXTRACT-005": "blocked",
+    "ATLAS-EXTRACT-005": "covered-elsewhere",
     "ATLAS-EXTRACT-006": "extracted",
     "ATLAS-EXTRACT-007": "extracted",
     "ATLAS-EXTRACT-008": "extracted",
@@ -94,6 +94,8 @@ def main() -> int:
             return fail(f"row {index} source_evidence must cite README-derived evidence")
         if row["extraction_status"] == "extracted" and "Preserved in" not in row["next_action"]:
             return fail(f"row {index} extracted rows must cite preservation target in next_action")
+        if row["extraction_status"] == "covered-elsewhere" and "Covered in" not in row["next_action"]:
+            return fail(f"row {index} covered-elsewhere rows must cite coverage target in next_action")
         if row["extraction_status"] == "blocked" and "branch-protected" not in row["next_action"]:
             return fail(f"row {index} blocked rows must cite branch-protection reason in next_action")
         for column in REQUIRED_COLUMNS:

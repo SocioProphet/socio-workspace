@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-06-01T16:40:00Z",
+  "repo_count": 4,
+  "repos": [
+    {
+      "declared_ref": "main",
+      "declared_rev": null,
+      "license_hint": "MIT",
+      "local_path": "components/agent_registry",
+      "name": "agent_registry",
+      "required_capabilities": [
+        "agent_identity",
+        "tool_grants",
+        "session_authority",
+        "revocation"
+      ],
+      "required_grants": [],
+      "resolution_error": null,
+      "resolution_status": "resolved",
+      "resolved_rev": "805703f9fff8c95c6061aacc9f33852c838ee3e0",
+      "role": "security",
+      "trust_profile_ref": null,
+      "trust_zone": "control",
+      "url": "https://github.com/SocioProphet/agent-registry"
+    },
+    {
+      "declared_ref": "main",
+      "declared_rev": null,
+      "license_hint": "MIT",
+      "local_path": "components/memory_mesh",
+      "name": "memory_mesh",
+      "required_capabilities": [
+        "recall",
+        "context_pack",
+        "learning_proposal"
+      ],
+      "required_grants": [],
+      "resolution_error": null,
+      "resolution_status": "resolved",
+      "resolved_rev": "d449eec0300bd10f3666ca640fc71b001f9ac98a",
+      "role": "component",
+      "trust_profile_ref": null,
+      "trust_zone": "memory",
+      "url": "https://github.com/SocioProphet/memory-mesh"
+    },
+    {
+      "declared_ref": "main",
+      "declared_rev": null,
+      "license_hint": "MIT",
+      "local_path": "components/prophet_workspace",
+      "name": "prophet_workspace",
+      "required_capabilities": [
+        "workspace_context",
+        "provider_projection",
+        "policy_aware_ux"
+      ],
+      "required_grants": [],
+      "resolution_error": null,
+      "resolution_status": "resolved",
+      "resolved_rev": "3d45dc2a7d04e5378894560554e91aceeb104000",
+      "role": "component",
+      "trust_profile_ref": null,
+      "trust_zone": "workspace",
+      "url": "https://github.com/SocioProphet/prophet-workspace"
+    },
+    {
+      "declared_ref": "main",
+      "declared_rev": null,
+      "license_hint": "MIT",
+      "local_path": "components/socioprophet_agent_standards",
+      "name": "socioprophet_agent_standards",
+      "required_capabilities": [
+        "agent_profile",
+        "conformance",
+        "compatibility_matrix"
+      ],
+      "required_grants": [],
+      "resolution_error": null,
+      "resolution_status": "resolved",
+      "resolved_rev": "4c2bfb56a408c6cbd5ad70ffa96fa6561d37a311",
+      "role": "standards",
+      "trust_profile_ref": null,
+      "trust_zone": null,
+      "url": "https://github.com/SocioProphet/socioprophet-agent-standards"
+    }
+  ],
+  "resolution_mode": "live_ref_resolution",
+  "schema_version": "sociosphere.workspace-resolved-lock.v0",
+  "source_lock": "manifest/workspace.lock.json",
+  "source_manifest": "manifest/workspace.toml"
+}

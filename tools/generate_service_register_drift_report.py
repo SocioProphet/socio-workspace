@@ -23,7 +23,7 @@ FIELDNAMES = ["check_id", "status", "expected", "actual", "notes"]
 
 EXPECTED = {
     "service_rows": 46,
-    "canonical_repos": 125,
+    "canonical_repos": 122,
     "edge_rows": 119,
     "contract_stubs": 4,
 }

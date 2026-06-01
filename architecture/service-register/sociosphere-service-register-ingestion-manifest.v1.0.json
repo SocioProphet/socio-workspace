@@ -19,10 +19,15 @@
   "atlas_retirement_readiness": "atlas-retirement-readiness.v0.1.csv",
   "service_register_drift_report": "service-register-drift-report.generated.csv",
   "service_rows": 46,
-  "unique_repos_in_register_fields": 125,
+  "unique_repos_in_register_fields": 122,
   "misc_closed": true,
   "misc_repos_remaining": [],
-  "removed_from_go_forward": ["SocioProphet/Shining-Apple"],
+  "removed_from_go_forward": [
+    "SocioProphet/Shining-Apple",
+    "SocioProphet/atlas_master_bundle_autopilot_fullorchestration",
+    "SocioProphet/atlas_master_bundle_complete",
+    "SocioProphet/atlas_os_service_full"
+  ],
   "consolidation_candidates": ["SocioProphet/sourceos-a2a-mcp-bootstrap"],
   "total_edges": 119,
   "boot_required_edges": 28,
@@ -71,7 +76,7 @@
     "Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator",
     "Propagation-plan tranche: add planned semantic propagation rows without mutating generated register/edge chunks blindly",
     "Atlas diff-status tranche: preserve README-confirmed partial Atlas evidence and direct tree/file blocker in a validated artifact",
-    "Atlas README extraction tranche: capture durable Atlas vocabulary before any future canonical count reduction",
-    "Atlas retirement-readiness tranche: record 125-to-122 readiness pending architecture-policy acceptance of direct-tree limitation"
+    "Atlas README extraction tranche: capture durable Atlas vocabulary before canonical count reduction",
+    "Atlas retirement tranche: reduce canonical repo estate from 125 to 122 after extraction discharge and policy acceptance"
   ]
 }

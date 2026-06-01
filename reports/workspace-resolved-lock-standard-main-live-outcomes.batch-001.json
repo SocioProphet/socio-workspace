@@ -4,7 +4,7 @@
   "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
   "scope": "standard_main_ref_batch_001",
   "outcome_counts": {
-    "resolved": 8,
+    "resolved": 9,
     "missing_or_inaccessible": 0
   },
   "resolved": [

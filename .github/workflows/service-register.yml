@@ -1,6 +1,6 @@
 name: service-register
 
-# Observable CI probe: service-register current
+# Observable CI probe: service-register current diagnostics
 
 on:
   workflow_dispatch:
@@ -64,6 +64,64 @@ jobs:
         run: python3 tools/validate_service_register_artifacts.py
       - name: Check service register repo coverage
         run: python3 tools/check_service_register_repo_coverage.py
+      - name: Diagnostic dependency edge row count
+        run: |
+          python3 - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('architecture/service-register/service-dependency-edges.v0.1.csv', newline='', encoding='utf-8')))
+          print(f'DIAG edge_rows={len(rows)} expected=119')
+          raise SystemExit(0 if len(rows)==119 else 1)
+          PY
+      - name: Diagnostic dependency boot-required count
+        run: |
+          python3 - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('architecture/service-register/service-dependency-edges.v0.1.csv', newline='', encoding='utf-8')))
+          n=sum(1 for r in rows if str(r.get('required_for_bootstrap','')).strip().lower()=='true')
+          print(f'DIAG boot_required={n} expected=28')
+          raise SystemExit(0 if n==28 else 1)
+          PY
+      - name: Diagnostic dependency allowed-cycle count
+        run: |
+          python3 - <<'PY'
+          import csv
+          allowed={'allowed-if-optional','allowed-runtime-feedback','allowed-governance-loop'}
+          rows=list(csv.DictReader(open('architecture/service-register/service-dependency-edges.v0.1.csv', newline='', encoding='utf-8')))
+          n=sum(1 for r in rows if r.get('cycle_policy') in allowed)
+          print(f'DIAG allowed_cycle_edges={n} expected=7')
+          raise SystemExit(0 if n==7 else 1)
+          PY
+      - name: Diagnostic dependency enum validity
+        run: |
+          python3 - <<'PY'
+          import csv
+          kinds={'depends_on','consumes','emits_to','governs','ui_surface','evidence_feed'}
+          modes={'hard','soft','optional-extension','runtime-callback','policy-required','governance-feedback','evaluation-orchestration','evidence-feed','ui-consumes'}
+          policies={'forbidden','allowed-if-optional','allowed-runtime-feedback','allowed-governance-loop'}
+          rows=list(csv.DictReader(open('architecture/service-register/service-dependency-edges.v0.1.csv', newline='', encoding='utf-8')))
+          bad=[]
+          for r in rows:
+            edge_id=r.get('edge_id','<missing-edge-id>')
+            if r.get('edge_kind') not in kinds: bad.append(f'{edge_id}:edge_kind={r.get("edge_kind")}')
+            if r.get('dependency_mode') not in modes: bad.append(f'{edge_id}:dependency_mode={r.get("dependency_mode")}')
+            if r.get('cycle_policy') not in policies: bad.append(f'{edge_id}:cycle_policy={r.get("cycle_policy")}')
+          print(f'DIAG enum_failures={len(bad)} sample={bad[:20]}')
+          raise SystemExit(0 if not bad else 1)
+          PY
+      - name: Diagnostic dependency service references
+        run: |
+          python3 - <<'PY'
+          import csv
+          services={r['service_id'] for r in csv.DictReader(open('architecture/service-register/service-architecture-register.v1.0.csv', newline='', encoding='utf-8')) if r.get('service_id')}
+          rows=list(csv.DictReader(open('architecture/service-register/service-dependency-edges.v0.1.csv', newline='', encoding='utf-8')))
+          missing=[]
+          for r in rows:
+            edge_id=r.get('edge_id','<missing-edge-id>')
+            if r.get('from_service_id') not in services: missing.append(f'{edge_id}:from={r.get("from_service_id")}')
+            if r.get('to_service_id') not in services: missing.append(f'{edge_id}:to={r.get("to_service_id")}')
+          print(f'DIAG service_reference_failures={len(missing)} sample={missing[:20]}')
+          raise SystemExit(0 if not missing else 1)
+          PY
       - name: Check service dependency cycles
         run: python3 tools/check_service_dependency_cycles.py
       - name: Generate service critical path report

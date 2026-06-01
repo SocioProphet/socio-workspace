@@ -1,0 +1,73 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-standard-main-live-outcomes.v0",
+  "generated_at": "2026-06-01T18:25:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "standard_main_ref_batch_004_delivery_docs_support",
+  "outcome_counts": {
+    "resolved": 4,
+    "missing_or_inaccessible": 5
+  },
+  "resolved": [
+    {
+      "name": "delivery-excellence-boards",
+      "url": "https://github.com/SocioProphet/delivery-excellence-boards",
+      "declared_ref": "main",
+      "resolved_rev": "d8d1137542f2142382c30cfa947ef57905e4f96a"
+    },
+    {
+      "name": "delivery-excellence-bounties",
+      "url": "https://github.com/SocioProphet/delivery-excellence-bounties",
+      "declared_ref": "main",
+      "resolved_rev": "33b24f5fc7eb714e195d02dc9301ea6a73bccb20"
+    },
+    {
+      "name": "delivery-excellence-innersource",
+      "url": "https://github.com/SocioProphet/delivery-excellence-innersource",
+      "declared_ref": "main",
+      "resolved_rev": "a2bcf59d1992a01b6f5637a746a5cf6ba650922c"
+    },
+    {
+      "name": "socioprophet_docs",
+      "url": "https://github.com/SocioProphet/socioprophet-docs",
+      "declared_ref": "main",
+      "resolved_rev": "b9077188a04ff9de9e391b54cf05f3a895581976"
+    }
+  ],
+  "missing_or_inaccessible": [
+    {
+      "name": "socioprophet_integration",
+      "url": "https://github.com/SocioProphet/socioprophet_integration",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "runbooks",
+      "url": "https://github.com/SocioProphet/runbooks",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "onboarding-docs",
+      "url": "https://github.com/SocioProphet/onboarding-docs",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "architecture-docs",
+      "url": "https://github.com/SocioProphet/architecture-docs",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "api-specs",
+      "url": "https://github.com/SocioProphet/api-specs",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    }
+  ]
+}

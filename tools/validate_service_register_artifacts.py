@@ -25,6 +25,7 @@ EXPECTED = [
     "critical-path-blocking-report.generated.csv",
     "critical-path-blocking-report.v0.2.csv",
     "repo-reconciliation-report.v0.1.csv",
+    "lampstand-contract-registry.v0.1.csv",
     "mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv",
     "fabric-atlas-model-carry-reconciliation.v0.1.csv",
     "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
@@ -63,6 +64,18 @@ EDGE_REQUIRED = [
     "required_for_bootstrap",
     "required_for_product_hardening",
     "evidence_required",
+    "notes",
+]
+
+LAMPSTAND_CONTRACT_REQUIRED = [
+    "contract_id",
+    "service_id",
+    "repo_full_name",
+    "contract_family",
+    "contract_path",
+    "contract_role",
+    "status",
+    "validation_command",
     "notes",
 ]
 
@@ -164,6 +177,7 @@ def main() -> int:
 
     validate_csv_headers("service-architecture-register.v1.0.csv", SERVICE_REQUIRED)
     validate_csv_headers("service-dependency-edges.v0.1.csv", EDGE_REQUIRED)
+    validate_csv_headers("lampstand-contract-registry.v0.1.csv", LAMPSTAND_CONTRACT_REQUIRED)
     validate_csv_headers("mcp-a2a-bootstrap-zero-trust-diff.v0.1.csv", MCP_DIFF_REQUIRED)
     validate_csv_headers("fabric-atlas-model-carry-reconciliation.v0.1.csv", RECONCILIATION_REQUIRED)
     validate_csv_headers("fabric-atlas-model-carry-propagation-plan.v0.1.csv", PROPAGATION_REQUIRED)

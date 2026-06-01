@@ -30,6 +30,7 @@ EXPECTED = [
     "fabric-atlas-model-carry-reconciliation.v0.1.csv",
     "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
     "atlas-bundle-diff-status.v0.1.csv",
+    "atlas-readme-extraction-checklist.v0.1.csv",
     "service-register-drift-report.generated.csv",
     "sociosphere-service-register-ingestion-manifest.v1.0.json",
     "service-register-gate-policy.v0.1.json",
@@ -133,6 +134,17 @@ ATLAS_DIFF_REQUIRED = [
     "notes",
 ]
 
+ATLAS_EXTRACT_REQUIRED = [
+    "extraction_id",
+    "source_repo",
+    "source_evidence",
+    "concept",
+    "canonical_target",
+    "extraction_status",
+    "next_action",
+    "notes",
+]
+
 
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
@@ -182,6 +194,7 @@ def main() -> int:
     validate_csv_headers("fabric-atlas-model-carry-reconciliation.v0.1.csv", RECONCILIATION_REQUIRED)
     validate_csv_headers("fabric-atlas-model-carry-propagation-plan.v0.1.csv", PROPAGATION_REQUIRED)
     validate_csv_headers("atlas-bundle-diff-status.v0.1.csv", ATLAS_DIFF_REQUIRED)
+    validate_csv_headers("atlas-readme-extraction-checklist.v0.1.csv", ATLAS_EXTRACT_REQUIRED)
 
     manifest_path = ARTIFACT_ROOT / "sociosphere-service-register-ingestion-manifest.v1.0.json"
     if manifest_path.exists():

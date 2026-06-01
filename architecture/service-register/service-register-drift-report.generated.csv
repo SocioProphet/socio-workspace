@@ -1,7 +1,7 @@
 check_id,status,expected,actual,notes
 gate_mode,ok,warn-only|artifact-count-strict,artifact-count-strict,strict artifact-count gate may be enabled by policy or SERVICE_REGISTER_STRICT=1
 service_rows,ok,46,46,count matches expected
-canonical_repos,ok,125,125,count matches expected
+canonical_repos,ok,122,122,count matches expected
 edge_rows,ok,119,119,count matches expected
 contract_stubs,ok,4,4,count matches expected
-canonical_repo_mirror_pin,ok,10c47ac5411b82ac5bf2b15f2e4360f57e34e148,10c47ac5411b82ac5bf2b15f2e4360f57e34e148,local mirror Git blob SHA matches pinned upstream mirror identity
+canonical_repo_mirror_pin,ok,45c789828325871fefe7450189cad4d26c5978db,45c789828325871fefe7450189cad4d26c5978db,local mirror Git blob SHA matches pinned upstream mirror identity

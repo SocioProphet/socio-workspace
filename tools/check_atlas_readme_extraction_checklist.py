@@ -34,10 +34,10 @@ ALLOWED_TARGETS = {
 }
 EXPECTED_STATUS = {
     "ATLAS-EXTRACT-001": "extracted",
-    "ATLAS-EXTRACT-002": "pending",
-    "ATLAS-EXTRACT-003": "pending",
-    "ATLAS-EXTRACT-004": "pending",
-    "ATLAS-EXTRACT-005": "pending",
+    "ATLAS-EXTRACT-002": "extracted",
+    "ATLAS-EXTRACT-003": "extracted",
+    "ATLAS-EXTRACT-004": "extracted",
+    "ATLAS-EXTRACT-005": "blocked",
     "ATLAS-EXTRACT-006": "extracted",
     "ATLAS-EXTRACT-007": "extracted",
     "ATLAS-EXTRACT-008": "extracted",
@@ -94,6 +94,8 @@ def main() -> int:
             return fail(f"row {index} source_evidence must cite README-derived evidence")
         if row["extraction_status"] == "extracted" and "Preserved in" not in row["next_action"]:
             return fail(f"row {index} extracted rows must cite preservation target in next_action")
+        if row["extraction_status"] == "blocked" and "branch-protected" not in row["next_action"]:
+            return fail(f"row {index} blocked rows must cite branch-protection reason in next_action")
         for column in REQUIRED_COLUMNS:
             if not row[column].strip():
                 return fail(f"row {index} missing required value for {column}")

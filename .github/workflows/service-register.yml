@@ -1,6 +1,6 @@
 name: service-register
 
-# Observable CI probe: service-register current enum-column diagnostics
+# Observable CI probe: service-register current edge-kind artifact diagnostics
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
       - "tools/check_critical_contract_paths.py"
       - "tools/check_contract_target_ledger.py"
       - "tools/check_lampstand_contract_registry.py"
-      - "tools/check_mcp_a2a_bootstrap_zero_trust_diff.py"
+      - "tools/check_mcp_a2a_bootstrap_zero-trust_diff.py"
       - "tools/check_fabric_atlas_model_carry_reconciliation.py"
       - "tools/check_fabric_atlas_model_carry_propagation_plan.py"
       - "tools/check_atlas_bundle_diff_status.py"
@@ -91,6 +91,28 @@ jobs:
           print(f'DIAG allowed_cycle_edges={n} expected=7')
           raise SystemExit(0 if n==7 else 1)
           PY
+      - name: Generate edge kind diagnostics artifact
+        run: |
+          python3 - <<'PY'
+          import csv
+          from collections import Counter
+          rows=list(csv.DictReader(open('architecture/service-register/service-dependency-edges.v0.1.csv', newline='', encoding='utf-8')))
+          allowed={'depends_on','consumes','emits_to','governs','ui_surface','evidence_feed'}
+          counts=Counter(r.get('edge_kind','') for r in rows)
+          bad=[(r.get('edge_id','<missing-edge-id>'), r.get('edge_kind','')) for r in rows if r.get('edge_kind') not in allowed]
+          with open('edge-kind-diagnostics.txt','w',encoding='utf-8') as out:
+              out.write('distinct_edge_kinds\n')
+              for kind, count in sorted(counts.items()):
+                  out.write(f'{kind},{count}\n')
+              out.write('\ninvalid_edge_kinds\n')
+              for edge_id, kind in bad:
+                  out.write(f'{edge_id},{kind}\n')
+          print('wrote edge-kind-diagnostics.txt')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edge-kind-diagnostics
+          path: edge-kind-diagnostics.txt
       - name: Diagnostic edge_kind enum
         run: |
           python3 - <<'PY'

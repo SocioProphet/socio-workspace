@@ -1,0 +1,41 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-standard-main-live-outcomes.v0",
+  "generated_at": "2026-06-01T18:05:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "standard_main_ref_batch_002_product_runtime_interfaces",
+  "outcome_counts": {
+    "resolved": 1,
+    "missing_or_inaccessible": 3
+  },
+  "resolved": [
+    {
+      "name": "prophet_cli",
+      "url": "https://github.com/SocioProphet/prophet-cli",
+      "declared_ref": "main",
+      "resolved_rev": "7da8ecd1f715243b3b7a67cd73988dea4dbb0e31"
+    }
+  ],
+  "missing_or_inaccessible": [
+    {
+      "name": "prophet-sdk",
+      "url": "https://github.com/SocioProphet/prophet-sdk",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "prophet-ui",
+      "url": "https://github.com/SocioProphet/prophet-ui",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "ui-workbench",
+      "url": "https://github.com/SocioProphet/ui-workbench",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    }
+  ]
+}

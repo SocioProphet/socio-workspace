@@ -36,9 +36,6 @@ SocioProphet/agent-registry,-,svc.platform.agent-runtime,-,primary
 SocioProphet/agentplane,svc.platform.agent-runtime,"svc.platform.compute-mesh,svc.product.prophet-lattice,svc.product.workroom",-,primary
 SocioProphet/alexandrian-academy,svc.product.academy,-,-,primary
 SocioProphet/api-contracts,-,"svc.workspace.standards,svc.platform.protocol-contract",-,primary
-SocioProphet/atlas_master_bundle_autopilot_fullorchestration,-,svc.product.model-training,-,primary
-SocioProphet/atlas_master_bundle_complete,-,svc.product.model-training,-,primary
-SocioProphet/atlas_os_service_full,-,svc.product.model-training,-,primary
 SocioProphet/bsd-proof-program,-,svc.product.research-program,-,primary
 SocioProphet/cairnpath-mesh,-,svc.platform.memory-graph,-,primary
 SocioProphet/cloudshell-fog,-,svc.managed.cloudshell-fog,-,primary

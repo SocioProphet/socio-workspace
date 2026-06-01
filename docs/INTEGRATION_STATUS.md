@@ -6,13 +6,13 @@ facts that were previously repeated in multiple places.
 ## Current state
 
 ### SourceOS Interaction Substrate
-- Canonical contract anchor: `SourceOS-Linux/sourceos-spec` — `schemas/SourceOSInteractionEvent.json`, generated TypeScript/Python artifacts, reference-flow packet, top-level index, and implementation ledger
+- Canonical contract anchor: `SourceOS-Linux/sourceos-spec` — `schemas/SourceOSInteractionEvent.json`, generated TypeScript/Python artifacts, reference-flow packet, Noetica placement addendum, top-level index, and implementation ledger
 - Workspace routing record: `registry/sourceos-interaction-substrate.yaml`
-- Browser/chat surface: `SocioProphet/Noetica` — emits `SourceOSInteractionEvent`, exposes event-derived governance trace, and sync-checks the generated TypeScript contract artifact
+- Browser/chat/desktop surface: `SocioProphet/Noetica` — emits or will emit `SourceOSInteractionEvent` through the typed transport / local-service boundary, exposes event-derived governance trace, and sync-checks the generated TypeScript contract artifact
 - Terminal/operator surface: `SourceOS-Linux/agent-term` — ingests/renders/records interaction governance traces and sync-checks the generated Python contract artifact
 - Task-boundary coordinator: `SocioProphet/superconscious` — records SourceOS interaction task-boundary references and rejects authority drift
 - Evidence/replay authority: `SocioProphet/agentplane` — records execution evidence and replay references bound to interaction-event refs
-- Status: canonical schema, generated artifacts, downstream sync checks, task-boundary binding, evidence binding, downstream pointers, and end-to-end reference packet are merged
+- Status: canonical schema, generated artifacts, downstream sync checks, task-boundary binding, evidence binding, downstream pointers, Noetica transport/local-service placement guidance, and end-to-end reference packet are merged
 - Current scope in SocioSphere: cross-repo status, owner-plane routing, source exposure awareness, and future workspace propagation only
 - Non-scope in SocioSphere: feature implementation, runtime event transport, policy admission, identity/grant authority, durable memory writeback, execution evidence production, and schema ownership
 - Follow-on targets:
@@ -120,7 +120,7 @@ facts that were previously repeated in multiple places.
 
 ## Interpretation rule
 
-For SourceOS Interaction Substrate, treat `SourceOS-Linux/sourceos-spec` as the schema and reference-flow authority, `SocioProphet/Noetica` as the browser/chat surface, `SourceOS-Linux/agent-term` as the terminal/operator surface, `SocioProphet/superconscious` as the task-boundary coordinator, and `SocioProphet/agentplane` as the evidence/replay authority. SocioSphere records integration status, owner-plane routing, source-exposure awareness, and future workspace propagation only; it does not own downstream implementation or runtime transport.
+For SourceOS Interaction Substrate, treat `SourceOS-Linux/sourceos-spec` as the schema and reference-flow authority, `SocioProphet/Noetica` as the browser/chat/desktop surface whose future live event emission is placed at the typed transport / local-service boundary, `SourceOS-Linux/agent-term` as the terminal/operator surface, `SocioProphet/superconscious` as the task-boundary coordinator, and `SocioProphet/agentplane` as the evidence/replay authority. SocioSphere records integration status, owner-plane routing, source-exposure awareness, and future workspace propagation only; it does not own downstream implementation or runtime transport.
 
 For Reciprocal Channel Governance, treat ProCybernetica as the doctrine authority, Ontogenesis as the semantic mirror, Prophet Platform as the runtime contract surface, Memory Mesh as the memory sink consumer, Regis Entity Graph as the graph sink consumer, and HolographMe as the projection/loss-profile consumer. SocioSphere records integration status and follow-on routing only.
 

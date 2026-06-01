@@ -16,6 +16,7 @@
   "fabric_atlas_model_carry_propagation_plan": "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
   "atlas_bundle_diff_status": "atlas-bundle-diff-status.v0.1.csv",
   "atlas_readme_extraction_checklist": "atlas-readme-extraction-checklist.v0.1.csv",
+  "atlas_retirement_readiness": "atlas-retirement-readiness.v0.1.csv",
   "service_register_drift_report": "service-register-drift-report.generated.csv",
   "service_rows": 46,
   "unique_repos_in_register_fields": 125,
@@ -35,7 +36,8 @@
     "fabric-atlas-model-carry-reconciliation.v0.1.csv",
     "fabric-atlas-model-carry-propagation-plan.v0.1.csv",
     "atlas-bundle-diff-status.v0.1.csv",
-    "atlas-readme-extraction-checklist.v0.1.csv"
+    "atlas-readme-extraction-checklist.v0.1.csv",
+    "atlas-retirement-readiness.v0.1.csv"
   ],
   "required_validators": [
     "tools/validate_service_register_artifacts.py",
@@ -53,7 +55,8 @@
     "tools/check_fabric_atlas_model_carry_reconciliation.py",
     "tools/check_fabric_atlas_model_carry_propagation_plan.py",
     "tools/check_atlas_bundle_diff_status.py",
-    "tools/check_atlas_readme_extraction_checklist.py"
+    "tools/check_atlas_readme_extraction_checklist.py",
+    "tools/check_atlas_retirement_readiness.py"
   ],
   "pr_sequence": [
     "PR-A: add canonical artifacts, schemas, README, and warn-only validator",
@@ -68,6 +71,7 @@
     "Fabric / Atlas / Model Carry tranche: add confidence-scored authority reconciliation matrix and validator",
     "Propagation-plan tranche: add planned semantic propagation rows without mutating generated register/edge chunks blindly",
     "Atlas diff-status tranche: preserve README-confirmed partial Atlas evidence and direct tree/file blocker in a validated artifact",
-    "Atlas README extraction tranche: capture durable Atlas vocabulary before any future canonical count reduction"
+    "Atlas README extraction tranche: capture durable Atlas vocabulary before any future canonical count reduction",
+    "Atlas retirement-readiness tranche: record 125-to-122 readiness pending architecture-policy acceptance of direct-tree limitation"
   ]
 }

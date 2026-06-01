@@ -24,6 +24,10 @@ ALLOWED_EDGE_KINDS = {
     "governs",
     "ui_surface",
     "evidence_feed",
+    "governance-feedback",
+    "evaluation-orchestration",
+    "runtime-callback",
+    "ui-consumes",
 }
 ALLOWED_DEPENDENCY_MODES = {
     "hard",

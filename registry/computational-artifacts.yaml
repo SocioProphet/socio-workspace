@@ -74,9 +74,34 @@ spec:
         - SocioProphet/prophet-platform
         - SocioProphet/gaia-world-model
         - SocioProphet/delivery-excellence
+    - when: policyChanged
+      notifyRepos:
+        - SocioProphet/prophet-platform
+        - SocioProphet/policy-fabric
+        - SocioProphet/guardrail-fabric
+        - SocioProphet/agentplane
+    - when: evidenceChanged
+      notifyRepos:
+        - SocioProphet/prophet-platform
+        - SocioProphet/sherlock-search
+        - SocioProphet/delivery-excellence
     - when: safetyClassPrivileged
       requireHumanReview: true
       blockAutoPromotion: true
+    - when: safetyClassProhibited
+      requireHumanReview: true
+      blockAutoPromotion: true
+      rejectOnIngest: true
+  governance:
+    slashTopicBinding:
+      namespace: /computational-artifacts
+      topics:
+        - /computational-artifacts/registry
+        - /computational-artifacts/health
+        - /computational-artifacts/propagation
+        - /computational-artifacts/governance
+      governingRepo: SocioProphet/slash-topics
+      approvalRequired: true
   healthModel:
     freshnessStates:
       - fresh

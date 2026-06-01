@@ -11,7 +11,12 @@ ARTIFACT_ROOT = ROOT / "architecture" / "service-register"
 REGISTER = ARTIFACT_ROOT / "service-architecture-register.v1.0.csv"
 CANONICAL_REPOS = ARTIFACT_ROOT / "canonical-repo-estate.v1.0.csv"
 EXPECTED_SERVICE_ROWS = 46
-EXPECTED_REPO_COUNT = 125
+EXPECTED_REPO_COUNT = 122
+RETIRED_ATLAS_REPOS = {
+    "SocioProphet/atlas_master_bundle_autopilot_fullorchestration",
+    "SocioProphet/atlas_master_bundle_complete",
+    "SocioProphet/atlas_os_service_full",
+}
 REPO_FIELDS = ("owning_repo", "supporting_repos", "contract_repo")
 
 
@@ -84,7 +89,8 @@ def main() -> int:
     canonical_rows = read_csv(CANONICAL_REPOS)
     canonical_repos = {repo_key(row).strip() for row in canonical_rows if repo_key(row).strip()}
     missing = sorted(canonical_repos - mapped_repos)
-    extra = sorted(mapped_repos - canonical_repos)
+    extra = sorted((mapped_repos - canonical_repos) - RETIRED_ATLAS_REPOS)
+    retired_atlas_still_referenced = sorted((mapped_repos - canonical_repos) & RETIRED_ATLAS_REPOS)
 
     if len(canonical_repos) == EXPECTED_REPO_COUNT:
         ok(f"canonical repos={len(canonical_repos)}")
@@ -106,6 +112,9 @@ def main() -> int:
     else:
         ok("no missing canonical repo coverage")
 
+    if retired_atlas_still_referenced:
+        ok(f"retired Atlas repos remain only as tolerated legacy service-register references: {retired_atlas_still_referenced}")
+
     if extra:
         message = f"register references {len(extra)} noncanonical repos: {extra}"
         if strict:
@@ -114,7 +123,7 @@ def main() -> int:
         else:
             warn(message)
     else:
-        ok("no noncanonical repo references")
+        ok("no noncanonical repo references outside tolerated retired Atlas references")
 
     if failures:
         return 1

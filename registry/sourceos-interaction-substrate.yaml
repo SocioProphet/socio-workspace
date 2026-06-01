@@ -1,7 +1,7 @@
 version: "0.1.0"
 updated_at: "2026-06-01"
 status: "registered"
-registration_note: "SocioSphere workspace-level status and routing record for the SourceOS interaction substrate."
+registration_note: "SocioSphere workspace-level status and routing record for the SourceOS interaction substrate, including Noetica transport/local-service placement."
 
 canonical_contract:
   repo: "SourceOS-Linux/sourceos-spec"

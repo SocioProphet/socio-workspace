@@ -7,12 +7,22 @@ on:
       - 'tests/fixtures/workspace-resolver-map.synthetic.json'
       - '.github/workflows/workspace-resolved-lock-generator.yml'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'offline-fixture or live-write'
+        required: true
+        default: 'offline-fixture'
+        type: choice
+        options:
+          - offline-fixture
+          - live-write
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-offline-resolver:
+    if: github.event_name == 'pull_request' || inputs.mode == 'offline-fixture'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,3 +40,38 @@ jobs:
             --require-names prophet_workspace agent_registry memory_mesh socioprophet_agent_standards \
             > /tmp/workspace.resolved.lock.json
           python3 -m json.tool /tmp/workspace.resolved.lock.json >/dev/null
+
+  live-resolved-lock:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'live-write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate live workspace resolved lock
+        run: python3 tools/generate_workspace_resolved_lock.py --live --write
+
+      - name: Validate generated JSON
+        run: python3 -m json.tool manifest/workspace.resolved.lock.json >/dev/null
+
+      - name: Commit resolved lock if changed
+        run: |
+          if git diff --quiet -- manifest/workspace.resolved.lock.json; then
+            echo "No resolved lock changes to commit."
+            exit 0
+          fi
+          git add manifest/workspace.resolved.lock.json
+          git commit -m "Generate live workspace resolved lock"
+          git push

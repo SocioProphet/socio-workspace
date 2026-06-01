@@ -11,12 +11,12 @@
     "architecture/service-register/service-architecture-register.v1.0.csv",
     "architecture/service-register/canonical-repo-estate.v1.0.csv"
   ],
-  "expected_canonical_repo_count": 125,
+  "expected_canonical_repo_count": 122,
   "expected_source_manifest": {
     "artifact_id": "workspace_inventory.canonical_repo_estate.v1.0",
     "status": "canonical-export",
     "export_path": "exports/canonical-repo-estate.v1.0.csv",
-    "repo_count": 125
+    "repo_count": 122
   },
   "expected_source_columns": [
     "repo_full_name",
@@ -27,5 +27,5 @@
   ],
   "binding_mode": "stable-export",
   "validator_mode": "strict-local-binding-with-upstream-contract",
-  "notes": "workspace-inventory exports the stable canonical repo-estate artifact at exports/canonical-repo-estate.v1.0.csv and validates it with tools/check_canonical_repo_export.py through .github/workflows/inventory.yml. SocioSphere validates the binding contract and local mirror under SERVICE_REGISTER_STRICT=1. Cross-repo fetch remains out of the local CI path until a pinned artifact-consumption mechanism is introduced."
+  "notes": "workspace-inventory exports the stable canonical repo-estate artifact at exports/canonical-repo-estate.v1.0.csv and validates it with tools/check_canonical_repo_export.py through .github/workflows/inventory.yml. SocioSphere validates the binding contract and local mirror under SERVICE_REGISTER_STRICT=1. Canonical go-forward repo count is 122 after Atlas bundle repos were removed from the primary estate and tracked by Atlas reconciliation artifacts. Cross-repo fetch remains out of the local CI path until a pinned artifact-consumption mechanism is introduced."
 }

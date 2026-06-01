@@ -1,0 +1,48 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-live-outcomes.v0",
+  "generated_at": "2026-06-01T17:35:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "alternate_refs_and_pinned_revs",
+  "outcome_counts": {
+    "alternate_ref_resolved": 2,
+    "pinned_ref_drift": 2,
+    "missing_or_inaccessible": 0
+  },
+  "alternate_ref_resolved": [
+    {
+      "name": "socioprophet_web",
+      "url": "https://github.com/SocioProphet/socioprophet",
+      "declared_ref": "master",
+      "resolved_rev": "289b5306129e5950c2f58e524bb6ee3cd61fd1cf",
+      "resolution_status": "resolved"
+    },
+    {
+      "name": "socios-coreos-config",
+      "url": "https://github.com/SociOS-Linux/socios-coreos-config",
+      "declared_ref": "testing-devel",
+      "resolved_rev": "29b4e73139de6e0985ace0958f5f95e16a3c5835",
+      "resolution_status": "resolved"
+    }
+  ],
+  "pinned_ref_drift": [
+    {
+      "name": "tritfabric",
+      "url": "https://github.com/SocioProphet/tritfabric",
+      "declared_ref": "main",
+      "declared_rev": "3644b4a4b32fec209c2a57843ce9db2f1273bbec",
+      "current_ref_rev": "9be4c3c74a8416d8c225124c0144647fa1b8b5e5",
+      "resolution_status": "drift",
+      "expected_next_action": "preserve pin unless an explicit pin-bump review approves current main or another target rev"
+    },
+    {
+      "name": "tritrpc",
+      "url": "https://github.com/SocioProphet/TriTRPC",
+      "declared_ref": "main",
+      "declared_rev": "efc114b0132b61472d3abb29007441597bca0cfc",
+      "current_ref_rev": "2caf46cae246d2ba432d580559f10f4da4cfc50c",
+      "resolution_status": "drift",
+      "expected_next_action": "preserve pin unless an explicit pin-bump review approves current main or another target rev"
+    }
+  ],
+  "missing_or_inaccessible": []
+}

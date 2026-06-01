@@ -35,6 +35,18 @@ ALLOWED_STATUS = {
     "extract-and-merge",
     "active-authority",
 }
+ALLOWED_ROOT_FILE_EVIDENCE = {
+    "not-confirmed",
+    "partial-readme-confirmed",
+    "tree-confirmed",
+    "extracted-and-preserved",
+}
+
+EXPECTED_EVIDENCE = {
+    "SocioProphet/atlas_master_bundle_complete": "partial-readme-confirmed",
+    "SocioProphet/atlas_master_bundle_autopilot_fullorchestration": "partial-readme-confirmed",
+    "SocioProphet/atlas_os_service_full": "partial-readme-confirmed",
+}
 
 
 def fail(message: str) -> int:
@@ -70,12 +82,18 @@ def main() -> int:
             return fail(f"row {index} invalid current_status={row['current_status']!r}")
         if row["confidence"] not in ALLOWED_CONFIDENCE:
             return fail(f"row {index} invalid confidence={row['confidence']!r}")
+        if row["root_file_evidence"] not in ALLOWED_ROOT_FILE_EVIDENCE:
+            return fail(f"row {index} invalid root_file_evidence={row['root_file_evidence']!r}")
+        if row["root_file_evidence"] != EXPECTED_EVIDENCE[repo]:
+            return fail(f"row {index} root_file_evidence must remain {EXPECTED_EVIDENCE[repo]!r} until tree extraction state changes")
         if row["indexed_code_hits"] != "none":
             return fail(f"row {index} indexed_code_hits must remain explicit; expected 'none'")
         if row["user_pr_history"] != "none":
             return fail(f"row {index} user_pr_history must remain explicit; expected 'none'")
         if "direct repository tree/file listing" not in row["blocker"]:
             return fail(f"row {index} blocker must name direct repository tree/file listing")
+        if "README" not in row["last_observed_signal"]:
+            return fail(f"row {index} must mention README confirmation in last_observed_signal")
         for column in REQUIRED_COLUMNS:
             if not row[column].strip():
                 return fail(f"row {index} missing required value for {column}")

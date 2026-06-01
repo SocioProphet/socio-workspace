@@ -101,9 +101,9 @@ Sub-topics:
 
 ```bash
 make computational-artifacts-validate
-python3 tools/runner/runner.py artifact-health-report
-python3 tools/runner/runner.py artifact-health-report --table
-python3 tools/runner/runner.py artifact-health-report --output /tmp/artifact-health-report.json
+python3 tools/runner/artifact_health_report.py
+python3 tools/runner/artifact_health_report.py --table
+python3 tools/runner/artifact_health_report.py --output /tmp/artifact-health-report.json
 ```
 
 The report lists for each artifact:
@@ -124,7 +124,7 @@ The report lists for each artifact:
 1. Add an entry to `spec.registryEntries` in `registry/computational-artifacts.yaml`.
 2. Set `safetyClass` appropriately. `privileged` and `prohibited` entries are blocked from auto-promotion.
 3. Run `make computational-artifacts-validate` to confirm the entry is valid.
-4. Run `python3 tools/runner/runner.py artifact-health-report --table` to verify the new artifact appears in the health report.
+4. Run `python3 tools/runner/artifact_health_report.py --table` to verify the new artifact appears in the health report.
 
 Sociosphere validates and propagates registry state. Implementing the downstream
 feature is the responsibility of the owning repo.

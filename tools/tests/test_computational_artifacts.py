@@ -16,14 +16,14 @@ _spec = importlib.util.spec_from_file_location(
 _mod = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
 _spec.loader.exec_module(_mod)  # type: ignore[union-attr]
 
-_runner_spec = importlib.util.spec_from_file_location(
-    "runner",
-    ROOT / "tools" / "runner" / "runner.py",
+_report_spec = importlib.util.spec_from_file_location(
+    "computational_artifact_health_report",
+    ROOT / "tools" / "computational_artifact_health_report.py",
 )
-_runner = importlib.util.module_from_spec(_runner_spec)  # type: ignore[arg-type]
-if "runner" not in sys.modules:
-    sys.modules["runner"] = _runner
-_runner_spec.loader.exec_module(_runner)  # type: ignore[union-attr]
+_report = importlib.util.module_from_spec(_report_spec)  # type: ignore[arg-type]
+if "computational_artifact_health_report" not in sys.modules:
+    sys.modules["computational_artifact_health_report"] = _report
+_report_spec.loader.exec_module(_report)  # type: ignore[union-attr]
 
 
 def test_validate_computational_artifacts_passes() -> None:
@@ -105,29 +105,29 @@ def test_registry_entries_have_required_fields() -> None:
 
 def test_artifact_health_state_seed_is_stale() -> None:
     entry = {"id": "test.entry", "safetyClass": "bounded", "status": "seed"}
-    assert _runner._artifact_health_state(entry) == "stale"
+    assert _report.artifact_health_state(entry) == "stale"
 
 
 def test_artifact_health_state_prohibited_is_blocked() -> None:
     entry = {"id": "test.entry", "safetyClass": "prohibited", "status": "fresh"}
-    assert _runner._artifact_health_state(entry) == "blocked"
+    assert _report.artifact_health_state(entry) == "blocked"
 
 
 def test_artifact_health_state_deprecated() -> None:
     entry = {"id": "test.entry", "safetyClass": "bounded", "status": "deprecated"}
-    assert _runner._artifact_health_state(entry) == "deprecated"
+    assert _report.artifact_health_state(entry) == "deprecated"
 
 
 def test_artifact_health_state_fresh() -> None:
     entry = {"id": "test.entry", "safetyClass": "advisory", "status": "fresh"}
-    assert _runner._artifact_health_state(entry) == "fresh"
+    assert _report.artifact_health_state(entry) == "fresh"
 
 
 def test_artifact_health_report_payload_structure() -> None:
     if not _YAML_AVAILABLE:
         return
     registry = _REGISTRY_DATA
-    payload = _runner.artifact_health_report_payload(registry)
+    payload = _report.artifact_health_report_payload(registry)
     assert payload["kind"] == "ComputationalArtifactHealthReport"
     assert "generatedAt" in payload
     assert "artifacts" in payload
@@ -147,9 +147,9 @@ def test_artifact_health_report_payload_structure() -> None:
         assert field in first, f"artifact health report missing field: {field}"
 
 
-def test_artifact_health_report_runner_command() -> None:
+def test_artifact_health_report_command() -> None:
     result = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "runner" / "runner.py"), "artifact-health-report"],
+        [sys.executable, str(ROOT / "tools" / "computational_artifact_health_report.py")],
         cwd=ROOT,
         text=True,
         capture_output=True,

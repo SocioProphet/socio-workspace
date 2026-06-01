@@ -1,0 +1,67 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-standard-main-live-outcomes.v0",
+  "generated_at": "2026-06-01T17:45:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "standard_main_ref_batch_001",
+  "outcome_counts": {
+    "resolved": 8,
+    "missing_or_inaccessible": 0
+  },
+  "resolved": [
+    {
+      "name": "agentplane",
+      "url": "https://github.com/SocioProphet/agentplane",
+      "declared_ref": "main",
+      "resolved_rev": "e508e1e1565e9ce316339448c50f7325cc36676b"
+    },
+    {
+      "name": "mcp_a2a_zero_trust",
+      "url": "https://github.com/SocioProphet/mcp-a2a-zero-trust",
+      "declared_ref": "main",
+      "resolved_rev": "35f1a2e112ff6031a8181f6cb1b7ce7398b53582"
+    },
+    {
+      "name": "policy-fabric",
+      "url": "https://github.com/SocioProphet/policy-fabric",
+      "declared_ref": "main",
+      "resolved_rev": "d527b7efc4bbf1b72ad6570e7c5f94a2e0ceb13e"
+    },
+    {
+      "name": "prophet-platform",
+      "url": "https://github.com/SocioProphet/prophet-platform",
+      "declared_ref": "main",
+      "resolved_rev": "233f0b5f6a17391972bcd961c4c59e3f0e04c094"
+    },
+    {
+      "name": "gaia_world_model",
+      "url": "https://github.com/SocioProphet/gaia-world-model",
+      "declared_ref": "main",
+      "resolved_rev": "944a190c18d5b03b1292b04826015e459e3b402e"
+    },
+    {
+      "name": "lampstand",
+      "url": "https://github.com/SocioProphet/lampstand",
+      "declared_ref": "main",
+      "resolved_rev": "a33d251ecc3d30293d9a728f86f0a6bcec45b69c"
+    },
+    {
+      "name": "sourceos-spec",
+      "url": "https://github.com/SourceOS-Linux/sourceos-spec",
+      "declared_ref": "main",
+      "resolved_rev": "c23db7c7736e114cb753c26f867cef7590666e1a"
+    },
+    {
+      "name": "source-os",
+      "url": "https://github.com/SociOS-Linux/source-os",
+      "declared_ref": "main",
+      "resolved_rev": "3191ece71ed5fd62509a4d175f82a78c7cac614e"
+    },
+    {
+      "name": "new_hope",
+      "url": "https://github.com/SocioProphet/new-hope",
+      "declared_ref": "main",
+      "resolved_rev": "f711bbdd72a8299f20c93788b3656a3ae2ace754"
+    }
+  ],
+  "missing_or_inaccessible": []
+}

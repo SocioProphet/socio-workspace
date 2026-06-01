@@ -1,5 +1,5 @@
 version: "0.1.0"
-updated_at: "2026-05-31"
+updated_at: "2026-06-01"
 status: "registered"
 registration_note: "SocioSphere workspace-level status and routing record for the SourceOS interaction substrate."
 
@@ -9,7 +9,8 @@ canonical_contract:
   reference_flow: "examples/interaction-flow/noetica-superconscious-agentplane-agentterm.flow.json"
   implementation_ledger: "docs/contract-additions/sourceos-interaction-implementation-ledger.md"
   top_level_index: "docs/contract-additions/sourceos-interaction-top-level-index.md"
-  latest_merge_commit: "836e3e3972a6f7d5993dcf679b38d1360c76a657"
+  noetica_placement_addendum: "docs/contract-additions/sourceos-interaction-noetica-placement-addendum.md"
+  latest_merge_commit: "c23db7c7736e114cb753c26f867cef7590666e1a"
 
 workspace_role:
   sociosphere: "cross-repo status, owner-plane routing, and workspace-level propagation record only"
@@ -24,13 +25,14 @@ workspace_role:
 planes:
   sourceos_spec:
     repo: "SourceOS-Linux/sourceos-spec"
-    role: "canonical schema, generated artifacts, reference flow, and implementation ledger"
+    role: "canonical schema, generated artifacts, reference flow, Noetica placement addendum, and implementation ledger"
     status: "merged"
   noetica:
     repo: "SocioProphet/Noetica"
-    role: "browser chat and governance-trail emitter"
+    role: "browser chat / desktop surface with future interaction emission placed at typed transport and local-service boundary"
     status: "merged"
     downstream_pointer_commit: "defba9a536706f3f5af8decd2ac4f1d8f594b2a4"
+    transport_placement_commit: "986059dbe7fc5bf8435c784ad5adbf4230dfca78"
   agent_term:
     repo: "SourceOS-Linux/agent-term"
     role: "terminal governance-trace renderer and local event recording surface"
@@ -73,7 +75,7 @@ validation_lanes:
     - "SourceOS Interaction Evidence Binding"
 
 future_work:
-  - "Add live event-export transport after transport decision."
+  - "Add live event-export transport after Noetica local-service runtime decision."
   - "Bind Policy Fabric, Agent Registry, and Memory Mesh with the same reference-flow discipline."
   - "Replace pinned vendoring with a managed package, subtree, or submodule strategy."
   - "Add a replay demo consuming the canonical reference-flow packet without live service dependencies."

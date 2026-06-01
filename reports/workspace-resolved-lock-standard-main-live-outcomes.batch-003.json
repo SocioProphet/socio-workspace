@@ -1,0 +1,73 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-standard-main-live-outcomes.v0",
+  "generated_at": "2026-06-01T18:15:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "standard_main_ref_batch_003_standards_storage_semantic_delivery",
+  "outcome_counts": {
+    "resolved": 10,
+    "missing_or_inaccessible": 0
+  },
+  "resolved": [
+    {
+      "name": "prophet_platform_standards",
+      "url": "https://github.com/SocioProphet/prophet-platform-standards",
+      "declared_ref": "main",
+      "resolved_rev": "b80737bafca6e399adf7eb8bf81aea3db61c8fa6"
+    },
+    {
+      "name": "socioprophet_standards_knowledge",
+      "url": "https://github.com/SocioProphet/socioprophet-standards-knowledge",
+      "declared_ref": "main",
+      "resolved_rev": "4b641b9efdc99f1d9b49cdf0b3a06029e96e485f"
+    },
+    {
+      "name": "socioprophet_standards_storage",
+      "url": "https://github.com/SocioProphet/socioprophet-standards-storage",
+      "declared_ref": "main",
+      "resolved_rev": "aec10a98a99bffa4cacf01eb4b675510cee34fba"
+    },
+    {
+      "name": "semantic_serdes",
+      "url": "https://github.com/SocioProphet/semantic-serdes",
+      "declared_ref": "main",
+      "resolved_rev": "323c21e8f4a64a93c0e7f51e4cda7ae02e510822"
+    },
+    {
+      "name": "delivery_excellence",
+      "url": "https://github.com/SocioProphet/delivery-excellence",
+      "declared_ref": "main",
+      "resolved_rev": "ada56eb93f5fe7df786353666488e79cf67cb2bc"
+    },
+    {
+      "name": "delivery_excellence_automation",
+      "url": "https://github.com/SocioProphet/delivery-excellence-automation",
+      "declared_ref": "main",
+      "resolved_rev": "e5b3f0e95cec23e455a3e70219bb717515abedc0"
+    },
+    {
+      "name": "slash_topics",
+      "url": "https://github.com/SocioProphet/slash-topics",
+      "declared_ref": "main",
+      "resolved_rev": "9037a91959706e4cef07d0b55edfea8e9487baf1"
+    },
+    {
+      "name": "ontogenesis",
+      "url": "https://github.com/SocioProphet/ontogenesis",
+      "declared_ref": "main",
+      "resolved_rev": "7f79a9c2639d07e9e899864f128df193cfa5b9be"
+    },
+    {
+      "name": "cairnpath_mesh",
+      "url": "https://github.com/SocioProphet/cairnpath-mesh",
+      "declared_ref": "main",
+      "resolved_rev": "37b612d54ab50c64e29c8904f672ba3c999bb469"
+    },
+    {
+      "name": "prophet_cli",
+      "url": "https://github.com/SocioProphet/prophet-cli",
+      "declared_ref": "main",
+      "resolved_rev": "7da8ecd1f715243b3b7a67cd73988dea4dbb0e31"
+    }
+  ],
+  "missing_or_inaccessible": []
+}

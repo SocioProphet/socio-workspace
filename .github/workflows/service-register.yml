@@ -1,5 +1,7 @@
 name: service-register
 
+# Observable CI probe: service-register after MCP/A2A checker fix
+
 on:
   workflow_dispatch:
   pull_request:

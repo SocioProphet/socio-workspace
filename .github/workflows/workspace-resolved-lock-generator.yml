@@ -6,6 +6,11 @@ on:
       - 'tools/generate_workspace_resolved_lock.py'
       - 'tests/fixtures/workspace-resolver-map.synthetic.json'
       - '.github/workflows/workspace-resolved-lock-generator.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/workspace-resolved-lock.trigger'
   workflow_dispatch:
     inputs:
       mode:
@@ -42,7 +47,7 @@ jobs:
           python3 -m json.tool /tmp/workspace.resolved.lock.json >/dev/null
 
   live-resolved-lock:
-    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'live-write'
+    if: (github.event_name == 'workflow_dispatch' && inputs.mode == 'live-write') || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -17,12 +17,12 @@ _mod = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
 _spec.loader.exec_module(_mod)  # type: ignore[union-attr]
 
 _runner_spec = importlib.util.spec_from_file_location(
-    "runner",
-    ROOT / "tools" / "runner" / "runner.py",
+    "artifact_health_report",
+    ROOT / "tools" / "runner" / "artifact_health_report.py",
 )
 _runner = importlib.util.module_from_spec(_runner_spec)  # type: ignore[arg-type]
-if "runner" not in sys.modules:
-    sys.modules["runner"] = _runner
+if "artifact_health_report" not in sys.modules:
+    sys.modules["artifact_health_report"] = _runner
 _runner_spec.loader.exec_module(_runner)  # type: ignore[union-attr]
 
 
@@ -149,7 +149,7 @@ def test_artifact_health_report_payload_structure() -> None:
 
 def test_artifact_health_report_runner_command() -> None:
     result = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "runner" / "runner.py"), "artifact-health-report"],
+        [sys.executable, str(ROOT / "tools" / "runner" / "artifact_health_report.py")],
         cwd=ROOT,
         text=True,
         capture_output=True,

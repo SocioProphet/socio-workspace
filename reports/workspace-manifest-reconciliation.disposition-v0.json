@@ -1,0 +1,119 @@
+{
+  "schema_version": "sociosphere.workspace-manifest-reconciliation-disposition.v0",
+  "generated_at": "2026-06-02T12:20:00Z",
+  "source_issue": "SocioProphet/sociosphere#439",
+  "source_reports": [
+    "reports/workspace-resolved-lock-coverage.baseline.json",
+    "reports/workspace-resolved-lock-missing-classification.baseline.json",
+    "reports/workspace-resolved-lock-high-risk-live-outcomes.json",
+    "reports/workspace-resolved-lock-standard-main-live-outcomes.batch-002.json",
+    "reports/workspace-resolved-lock-standard-main-live-outcomes.batch-004.json",
+    "reports/workspace-resolved-lock-standard-main-live-outcomes.batch-005.json",
+    "reports/workspace-resolved-lock-standard-main-live-outcomes.batch-006.json"
+  ],
+  "purpose": "Classify unresolved workspace manifest entries before any manifest cleanup or full-estate resolved lock claim.",
+  "summary": {
+    "confirmed_alias_or_canonicalization_review": 2,
+    "ref_reconciliation_required": 1,
+    "repository_404_or_connector_inaccessible": 25,
+    "pin_drift_review_required": 2,
+    "do_not_auto_remove": true
+  },
+  "policy": {
+    "default_action": "hold_for_owner_confirmation",
+    "removal_requires": "explicit manifest cleanup PR with rationale and linked evidence",
+    "rename_requires": "validated target repo and ref",
+    "private_repo_requires": "connector visibility or explicit private-repo declaration",
+    "pin_bump_requires": "explicit pin-bump review"
+  },
+  "pin_drift_review_required": [
+    {
+      "name": "tritfabric",
+      "current_manifest_url": "https://github.com/SocioProphet/tritfabric",
+      "declared_ref": "main",
+      "declared_rev": "3644b4a4b32fec209c2a57843ce9db2f1273bbec",
+      "current_ref_rev": "9be4c3c74a8416d8c225124c0144647fa1b8b5e5",
+      "proposed_disposition": "preserve_pin_pending_review"
+    },
+    {
+      "name": "tritrpc",
+      "current_manifest_url": "https://github.com/SocioProphet/TriTRPC",
+      "declared_ref": "main",
+      "declared_rev": "efc114b0132b61472d3abb29007441597bca0cfc",
+      "current_ref_rev": "2caf46cae246d2ba432d580559f10f4da4cfc50c",
+      "proposed_disposition": "preserve_pin_pending_review"
+    }
+  ],
+  "ref_reconciliation_required": [
+    {
+      "name": "knowledge-graph",
+      "current_manifest_url": "https://github.com/SocioProphet/knowledge-graph",
+      "declared_ref": "main",
+      "lookup_status": "ref_missing_or_no_main",
+      "proposed_disposition": "verify_default_branch_or_pin_non_main_ref"
+    }
+  ],
+  "canonicalization_review_required": [
+    {
+      "name": "hdt_app",
+      "current_manifest_url": "https://github.com/SocioProphet/hdt_app",
+      "lookup_status": "repository_404",
+      "candidate_canonical_repo": "https://github.com/SocioProphet/human-digital-twin",
+      "candidate_canonical_rev": "a3a192cd0120d6004f57bc6f546af26abbd8fa81",
+      "proposed_disposition": "confirm_rename_or_remove_alias"
+    },
+    {
+      "name": "human_digital_twin",
+      "current_manifest_url": "https://github.com/SocioProphet/human-digital-twin",
+      "lookup_status": "resolved",
+      "resolved_rev": "a3a192cd0120d6004f57bc6f546af26abbd8fa81",
+      "proposed_disposition": "retain_as_canonical_hdt_repo_if_hdt_app_is_alias"
+    }
+  ],
+  "repository_404_or_connector_inaccessible": [
+    "prophet-sdk",
+    "prophet-ui",
+    "ui-workbench",
+    "socioprophet_integration",
+    "runbooks",
+    "onboarding-docs",
+    "architecture-docs",
+    "api-specs",
+    "connector-github",
+    "connector-gitlab",
+    "connector-jira",
+    "connector-kafka",
+    "connector-slack",
+    "configs",
+    "dev_api",
+    "asr-service",
+    "embeddings-service",
+    "event-bus",
+    "data-pipeline",
+    "graph-explorer",
+    "hdt_app",
+    "semantic-search-bi",
+    "trust-registry",
+    "trust-registry-ui"
+  ],
+  "recommended_next_prs": [
+    {
+      "title": "Reconcile workspace manifest aliases and stale refs",
+      "scope": "hdt_app, knowledge-graph, tritfabric, tritrpc",
+      "risk": "medium",
+      "notes": "Do not remove entries without explicit owner confirmation. Preserve pins unless approved."
+    },
+    {
+      "title": "Classify connector and service manifest stubs",
+      "scope": "connector-*, dev_api, asr-service, embeddings-service, event-bus, data-pipeline",
+      "risk": "medium",
+      "notes": "Determine whether entries are planned repos, retired repos, private repos, or stale manifest imports."
+    },
+    {
+      "title": "Classify documentation/support manifest entries",
+      "scope": "runbooks, onboarding-docs, architecture-docs, api-specs, socioprophet_integration",
+      "risk": "low",
+      "notes": "Likely docs consolidation or archival cleanup."
+    }
+  ]
+}

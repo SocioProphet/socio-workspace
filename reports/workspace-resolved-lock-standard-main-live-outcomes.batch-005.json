@@ -1,0 +1,83 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-standard-main-live-outcomes.v0",
+  "generated_at": "2026-06-01T18:40:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "standard_main_ref_batch_005_connectors_adapters_services",
+  "outcome_counts": {
+    "resolved": 1,
+    "missing_or_inaccessible": 9
+  },
+  "resolved": [
+    {
+      "name": "cc",
+      "url": "https://github.com/SocioProphet/cc",
+      "declared_ref": "main",
+      "resolved_rev": "31b82de869772438147eb793be8cf5144dc400d8"
+    }
+  ],
+  "missing_or_inaccessible": [
+    {
+      "name": "connector-github",
+      "url": "https://github.com/SocioProphet/connector-github",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "connector-gitlab",
+      "url": "https://github.com/SocioProphet/connector-gitlab",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "connector-jira",
+      "url": "https://github.com/SocioProphet/connector-jira",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "connector-kafka",
+      "url": "https://github.com/SocioProphet/connector-kafka",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "connector-slack",
+      "url": "https://github.com/SocioProphet/connector-slack",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "configs",
+      "url": "https://github.com/SocioProphet/configs",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "dev_api",
+      "url": "https://github.com/SocioProphet/dev-api",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "asr-service",
+      "url": "https://github.com/SocioProphet/asr-service",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "embeddings-service",
+      "url": "https://github.com/SocioProphet/embeddings-service",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    }
+  ]
+}

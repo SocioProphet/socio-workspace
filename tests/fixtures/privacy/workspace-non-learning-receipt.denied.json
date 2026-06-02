@@ -1,0 +1,18 @@
+{
+  "attempted_learning_surface": "memory-mesh-writeback",
+  "cleanup_refs": [
+    "cleanup:discard-ephemeral-summary",
+    "cleanup:delete-derived-vector-candidate"
+  ],
+  "decision_ref": "privacy-decision:deny:incident-review-memory-writeback",
+  "derived_artifact_refs": [],
+  "disposition": "blocked",
+  "generated_at": "2026-06-02T00:00:00Z",
+  "operation_ref": "workspace-operation:memory-writeback:incident-review-summary",
+  "protected_signal_refs": [
+    "protected-signal:operator-local-diagnostics-log",
+    "protected-signal:legal-evidence-note-export"
+  ],
+  "receipt_kind": "WorkspaceNonLearningReceipt",
+  "timestamp": "2026-06-02T00:00:00Z"
+}

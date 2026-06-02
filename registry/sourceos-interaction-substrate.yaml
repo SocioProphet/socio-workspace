@@ -1,16 +1,17 @@
 version: "0.1.0"
-updated_at: "2026-06-01"
+updated_at: "2026-06-02"
 status: "registered"
-registration_note: "SocioSphere workspace-level status and routing record for the SourceOS interaction substrate, including Noetica transport/local-service placement."
+registration_note: "SocioSphere workspace-level status and routing record for the SourceOS interaction substrate, including bounded Noetica artifact export and opt-in AgentTerm import."
 
 canonical_contract:
   repo: "SourceOS-Linux/sourceos-spec"
   schema: "schemas/SourceOSInteractionEvent.json"
   reference_flow: "examples/interaction-flow/noetica-superconscious-agentplane-agentterm.flow.json"
   implementation_ledger: "docs/contract-additions/sourceos-interaction-implementation-ledger.md"
+  runtime_bridge_ledger: "docs/contract-additions/sourceos-interaction-runtime-bridge-ledger.md"
   top_level_index: "docs/contract-additions/sourceos-interaction-top-level-index.md"
   noetica_placement_addendum: "docs/contract-additions/sourceos-interaction-noetica-placement-addendum.md"
-  latest_merge_commit: "c23db7c7736e114cb753c26f867cef7590666e1a"
+  latest_merge_commit: "22c46a81edf36e58ef1224c326fac2753cc1ecf7"
 
 workspace_role:
   sociosphere: "cross-repo status, owner-plane routing, and workspace-level propagation record only"
@@ -25,19 +26,22 @@ workspace_role:
 planes:
   sourceos_spec:
     repo: "SourceOS-Linux/sourceos-spec"
-    role: "canonical schema, generated artifacts, reference flow, Noetica placement addendum, and implementation ledger"
+    role: "canonical schema, generated artifacts, reference flow, Noetica placement addendum, implementation ledger, and runtime bridge ledger"
     status: "merged"
   noetica:
     repo: "SocioProphet/Noetica"
-    role: "browser chat / desktop surface with future interaction emission placed at typed transport and local-service boundary"
+    role: "browser chat / desktop surface with bounded SourceOSInteractionEvent artifact export at typed transport and local-service boundary"
     status: "merged"
     downstream_pointer_commit: "defba9a536706f3f5af8decd2ac4f1d8f594b2a4"
     transport_placement_commit: "986059dbe7fc5bf8435c784ad5adbf4230dfca78"
+    runtime_bridge_adr_commit: "60b720f5c43f4fe2b315a9e81078b3c48b1e5160"
+    artifact_export_commit: "b09a7bbf4a843dd9cd7b54a80537d7dc8b551302"
   agent_term:
     repo: "SourceOS-Linux/agent-term"
-    role: "terminal governance-trace renderer and local event recording surface"
+    role: "terminal governance-trace renderer, local event recording surface, and opt-in Noetica artifact import consumer"
     status: "merged"
     downstream_pointer_commit: "f4272d86e38d999e70f3b3b774bcf8c53695d1f6"
+    noetica_artifact_import_commit: "61870a9dff19c93cceeb0c521d008e041214140a"
   superconscious:
     repo: "SocioProphet/superconscious"
     role: "task-boundary reference binding"
@@ -75,7 +79,9 @@ validation_lanes:
     - "SourceOS Interaction Evidence Binding"
 
 future_work:
-  - "Add live event-export transport after Noetica local-service runtime decision."
+  - "Select production app-data export path after Noetica local service install/runtime contract stabilizes."
+  - "Decide whether Noetica should expose recent events through a local endpoint after artifact export remains stable."
+  - "Decide whether OpsHistory becomes the durable event store after artifact export/import is proven."
   - "Bind Policy Fabric, Agent Registry, and Memory Mesh with the same reference-flow discipline."
   - "Replace pinned vendoring with a managed package, subtree, or submodule strategy."
   - "Add a replay demo consuming the canonical reference-flow packet without live service dependencies."

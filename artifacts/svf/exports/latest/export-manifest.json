@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "export_id": "svf:export:sociosphere.registry-dogfood.latest",
+  "repo": "SocioProphet/sociosphere",
+  "profile_ref": "svf:profile:sociosphere.dogfood",
+  "plan_ref": "svf:plan:sociosphere.registry-dogfood",
+  "policy_ref": "svf:policy:sociosphere.local-readonly",
+  "run_ref": "svf:run:sociosphere.registry-dogfood.verified",
+  "receipt_ref": "svf:receipt:sociosphere.registry-dogfood.verified",
+  "run_artifact": "artifacts/svf/exports/latest/validation-run.json",
+  "receipt_artifact": "artifacts/svf/exports/latest/validation-receipt.json",
+  "run_digest": {
+    "algorithm": "sha256",
+    "digest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "receipt_digest": {
+    "algorithm": "sha256",
+    "digest": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "exported_at": "2026-05-31T18:46:09Z",
+  "verification_status": "verified",
+  "certified_claims": [
+    "schema_conformant",
+    "non_production_only",
+    "policy_boundary_preserved",
+    "artifact_integrity_verified",
+    "receipt_integrity_verified"
+  ],
+  "non_certified_claims": [
+    "production_readiness",
+    "live_infrastructure_safety",
+    "container_runtime_parity",
+    "browser_runtime_parity",
+    "qemu_runtime_parity",
+    "signadot_vendor_parity",
+    "network_isolation_enforced"
+  ],
+  "downstream_consumers": [
+    "SocioProphet/prophet-platform#549",
+    "SocioProphet/prophet-platform#562"
+  ],
+  "non_claims": [
+    "Export manifest identifies stable SVF run and receipt artifacts for downstream consumers.",
+    "Export manifest does not authorize downstream systems to issue or sign Sociosphere receipts.",
+    "Export manifest does not certify production readiness, live infrastructure safety, or Signadot vendor parity."
+  ]
+}

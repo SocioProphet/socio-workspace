@@ -1,0 +1,159 @@
+{
+  "schema_version": "sociosphere.workspace-dispositions.v0",
+  "source_issue": "SocioProphet/sociosphere#439",
+  "generated_at": "2026-06-02T18:25:00Z",
+  "policy": {
+    "purpose": "Track inventory disposition without changing manifest membership, refs, or pins.",
+    "allowed_first_pr_changes": [
+      "add disposition metadata",
+      "add validation",
+      "add reporting"
+    ],
+    "forbidden_first_pr_changes": [
+      "delete manifest entries",
+      "rename manifest entries",
+      "move pins",
+      "claim full-estate lock completion"
+    ],
+    "default_unresolved_action": "hold_for_confirmation"
+  },
+  "dispositions": [
+    {
+      "name": "tritfabric",
+      "status": "pin_drift_review_required",
+      "source_issue": 451,
+      "current_action": "preserve_pin",
+      "notes": "Pinned dependency drifts from current main; do not bump without explicit pin review."
+    },
+    {
+      "name": "tritrpc",
+      "status": "pin_drift_review_required",
+      "source_issue": 451,
+      "current_action": "preserve_pin",
+      "notes": "Pinned protocol dependency drifts from current main; do not bump without explicit pin review."
+    },
+    {
+      "name": "knowledge-graph",
+      "status": "ref_reconciliation_required",
+      "source_issue": 451,
+      "current_action": "verify_ref_before_manifest_change",
+      "notes": "Declared main ref did not resolve; verify default branch or intended ref before editing manifest."
+    },
+    {
+      "name": "hdt_app",
+      "status": "alias_or_stale_pending_confirmation",
+      "source_issue": 451,
+      "current_action": "hold_for_confirmation",
+      "candidate_successor": "human_digital_twin",
+      "notes": "Repository lookup returned 404; may be stale alias, planned/private repo, or retired surface."
+    },
+    {
+      "name": "human_digital_twin",
+      "status": "retain_candidate_canonical",
+      "source_issue": 451,
+      "current_action": "retain",
+      "notes": "Repository resolves and is candidate canonical HDT surface."
+    },
+    {
+      "name": "connector-github",
+      "status": "planned_or_stale_connector_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "connector-gitlab",
+      "status": "planned_or_stale_connector_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "connector-jira",
+      "status": "planned_or_stale_connector_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "connector-kafka",
+      "status": "planned_or_stale_connector_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "connector-slack",
+      "status": "planned_or_stale_connector_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "configs",
+      "status": "planned_or_stale_adapter_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "dev_api",
+      "status": "planned_or_stale_service_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "asr-service",
+      "status": "planned_or_stale_service_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "embeddings-service",
+      "status": "planned_or_stale_service_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "event-bus",
+      "status": "planned_or_stale_service_stub_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "data-pipeline",
+      "status": "candidate_successor_pending_confirmation",
+      "source_issue": 452,
+      "current_action": "hold_for_confirmation",
+      "candidate_successors": [
+        "datakit",
+        "argo-dataflow"
+      ],
+      "notes": "Candidate adjacent repositories are not confirmed semantic replacements."
+    },
+    {
+      "name": "socioprophet_integration",
+      "status": "stale_or_merged_pending_confirmation",
+      "source_issue": 453,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "runbooks",
+      "status": "stale_or_uncreated_pending_confirmation",
+      "source_issue": 453,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "onboarding-docs",
+      "status": "stale_or_uncreated_pending_confirmation",
+      "source_issue": 453,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "architecture-docs",
+      "status": "stale_or_uncreated_pending_confirmation",
+      "source_issue": 453,
+      "current_action": "hold_for_confirmation"
+    },
+    {
+      "name": "api-specs",
+      "status": "stale_or_uncreated_pending_confirmation",
+      "source_issue": 453,
+      "current_action": "hold_for_confirmation"
+    }
+  ]
+}

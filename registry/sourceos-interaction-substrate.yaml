@@ -78,11 +78,25 @@ validation_lanes:
     - "ci"
     - "SourceOS Interaction Evidence Binding"
 
+follow_up_issues:
+  noetica:
+    production_app_data_export_path: "SocioProphet/Noetica#49"
+    optional_recent_event_endpoint: "SocioProphet/Noetica#50"
+    opshistory_durability_decision: "SocioProphet/Noetica#51"
+  policy_fabric:
+    policy_decision_refs: "SocioProphet/policy-fabric#94"
+  agent_registry:
+    identity_grant_session_refs: "SocioProphet/agent-registry#48"
+  memory_mesh:
+    context_pack_and_memory_refs: "SocioProphet/memory-mesh#37"
+
 future_work:
-  - "Select production app-data export path after Noetica local service install/runtime contract stabilizes."
-  - "Decide whether Noetica should expose recent events through a local endpoint after artifact export remains stable."
-  - "Decide whether OpsHistory becomes the durable event store after artifact export/import is proven."
-  - "Bind Policy Fabric, Agent Registry, and Memory Mesh with the same reference-flow discipline."
+  - "SocioProphet/Noetica#49: Select production app-data export path after Noetica local service install/runtime contract stabilizes."
+  - "SocioProphet/Noetica#50: Decide whether Noetica should expose recent events through a local endpoint after artifact export remains stable."
+  - "SocioProphet/Noetica#51: Decide whether OpsHistory becomes the durable event store after artifact export/import is proven."
+  - "SocioProphet/policy-fabric#94: Bind Policy Fabric decision refs into the runtime bridge."
+  - "SocioProphet/agent-registry#48: Bind identity, grant, session, and revocation refs into the runtime bridge."
+  - "SocioProphet/memory-mesh#37: Bind context-pack and durable memory refs into the runtime bridge."
   - "Replace pinned vendoring with a managed package, subtree, or submodule strategy."
   - "Add a replay demo consuming the canonical reference-flow packet without live service dependencies."
   - "Defer manifest/lock mutation until network-aware materializer supports live commit SHA resolution."

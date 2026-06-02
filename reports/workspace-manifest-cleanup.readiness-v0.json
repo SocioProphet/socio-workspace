@@ -1,0 +1,100 @@
+{
+  "schema_version": "sociosphere.workspace-manifest-cleanup-readiness.v0",
+  "source_issue": "SocioProphet/sociosphere#439",
+  "generated_at": "2026-06-02T12:45:00Z",
+  "status": "ready_for_metadata_only_pr",
+  "recommended_next_action": "open_pr_1_add_inventory_disposition_metadata_only",
+  "guardrail": "do_not_delete_rename_or_repin_in_first_cleanup_pr",
+  "related_issues": {
+    "pins_aliases_refs": 451,
+    "connector_service_entries": 452,
+    "documentation_support_entries": 453
+  },
+  "do_not_touch_yet": {
+    "pinned_dependencies": [
+      "tritfabric",
+      "tritrpc"
+    ],
+    "alias_or_canonicalization_candidates": [
+      "hdt_app",
+      "human_digital_twin"
+    ],
+    "ref_anomalies": [
+      "knowledge-graph"
+    ],
+    "connector_service_planned_or_stale_candidates": [
+      "connector-github",
+      "connector-gitlab",
+      "connector-jira",
+      "connector-kafka",
+      "connector-slack",
+      "configs",
+      "dev_api",
+      "asr-service",
+      "embeddings-service",
+      "event-bus",
+      "data-pipeline"
+    ],
+    "documentation_support_stale_candidates": [
+      "socioprophet_integration",
+      "runbooks",
+      "onboarding-docs",
+      "architecture-docs",
+      "api-specs"
+    ]
+  },
+  "candidate_pr_sequence": [
+    {
+      "sequence": 1,
+      "title": "Add inventory disposition metadata only",
+      "risk": "low",
+      "allowed_changes": [
+        "add machine-readable disposition metadata",
+        "add validation/reporting around disposition metadata"
+      ],
+      "forbidden_changes": [
+        "delete manifest entries",
+        "rename manifest entries",
+        "move pins",
+        "claim full-estate lock completion"
+      ]
+    },
+    {
+      "sequence": 2,
+      "title": "Resolve confirmed aliases and stale docs",
+      "risk": "medium",
+      "requires": [
+        "owner confirmation",
+        "inbound-reference scan",
+        "canonical replacement evidence"
+      ]
+    },
+    {
+      "sequence": 3,
+      "title": "Ref and pin reconciliation",
+      "risk": "high",
+      "requires": [
+        "explicit pin review",
+        "correct branch/ref verification",
+        "compatibility notes"
+      ]
+    },
+    {
+      "sequence": 4,
+      "title": "Full-estate resolved lock regeneration",
+      "risk": "medium",
+      "requires": [
+        "reconciled manifest",
+        "every repo has resolution status",
+        "unresolved entries have explicit disposition"
+      ]
+    }
+  ],
+  "exit_criteria_for_439": [
+    "issues 451 452 and 453 have final dispositions",
+    "approved manifest cleanup PRs are merged",
+    "manifest/workspace.resolved.lock.json is regenerated from reconciled manifest",
+    "coverage report reflects final estate state",
+    "remaining unresolved entries are explicitly intentional and documented"
+  ]
+}

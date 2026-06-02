@@ -16,12 +16,12 @@ facts that were previously repeated in multiple places.
 - Current scope in SocioSphere: cross-repo status, owner-plane routing, source exposure awareness, and future workspace propagation only
 - Non-scope in SocioSphere: feature implementation, live runtime event transport, policy admission, identity/grant authority, durable memory writeback, execution evidence production, and schema ownership
 - Follow-on targets:
-  - Production app-data export path after Noetica local service install/runtime contract stabilizes
-  - Optional Noetica recent-event endpoint after artifact export remains stable
-  - OpsHistory durable event-store decision after artifact export/import is proven
-  - Policy Fabric for policy decision refs and admission semantics
-  - Agent Registry for identity, grants, sessions, and revocation refs
-  - Memory Mesh for context-pack and durable memory refs
+  - `SocioProphet/Noetica#49` — production app-data export path after Noetica local service install/runtime contract stabilizes
+  - `SocioProphet/Noetica#50` — optional Noetica recent-event endpoint after artifact export remains stable
+  - `SocioProphet/Noetica#51` — OpsHistory durable event-store decision after artifact export/import is proven
+  - `SocioProphet/policy-fabric#94` — Policy Fabric decision refs and admission semantics
+  - `SocioProphet/agent-registry#48` — identity, grant, session, and revocation refs
+  - `SocioProphet/memory-mesh#37` — context-pack and durable memory refs
   - A future network-aware SocioSphere materializer for manifest/lock mutation with live commit SHA resolution
 
 ### Reciprocal Channel Governance

@@ -1,0 +1,38 @@
+name: Workspace Dispositions
+
+on:
+  pull_request:
+    paths:
+      - 'manifest/workspace.dispositions.json'
+      - 'manifest/workspace.lock.json'
+      - 'tools/validate_workspace_dispositions.py'
+      - '.github/workflows/workspace-dispositions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-workspace-dispositions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Validate workspace dispositions
+        run: |
+          mkdir -p reports
+          python3 tools/validate_workspace_dispositions.py > reports/workspace-dispositions-validation.json
+          python3 -m json.tool reports/workspace-dispositions-validation.json >/dev/null
+          cat reports/workspace-dispositions-validation.json
+
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-dispositions-validation
+          path: reports/workspace-dispositions-validation.json

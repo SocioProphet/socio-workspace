@@ -1,0 +1,89 @@
+{
+  "schema_version": "sociosphere.workspace-resolved-lock-standard-main-live-outcomes.v0",
+  "generated_at": "2026-06-01T18:55:00Z",
+  "source_classification_report": "reports/workspace-resolved-lock-missing-classification.baseline.json",
+  "scope": "standard_main_ref_batch_006_components_graph_runtime",
+  "outcome_counts": {
+    "resolved": 3,
+    "missing_or_inaccessible": 8
+  },
+  "resolved": [
+    {
+      "name": "human_digital_twin",
+      "url": "https://github.com/SocioProphet/human-digital-twin",
+      "declared_ref": "main",
+      "resolved_rev": "a3a192cd0120d6004f57bc6f546af26abbd8fa81"
+    },
+    {
+      "name": "regis-entity-graph",
+      "url": "https://github.com/SocioProphet/regis-entity-graph",
+      "declared_ref": "main",
+      "resolved_rev": "ace6b15cff9fa8795bb8c6b90f4f3b5d059471de"
+    },
+    {
+      "name": "human_digital_twin_alias_check",
+      "url": "https://github.com/SocioProphet/human-digital-twin",
+      "declared_ref": "main",
+      "resolved_rev": "a3a192cd0120d6004f57bc6f546af26abbd8fa81",
+      "note": "records successful lookup for the URL behind human_digital_twin; hdt_app remains separately unresolved"
+    }
+  ],
+  "missing_or_inaccessible": [
+    {
+      "name": "event-bus",
+      "url": "https://github.com/SocioProphet/event-bus",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "data-pipeline",
+      "url": "https://github.com/SocioProphet/data-pipeline",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "knowledge-graph",
+      "url": "https://github.com/SocioProphet/knowledge-graph",
+      "declared_ref": "main",
+      "lookup_status": "ref_missing_or_no_main",
+      "expected_next_action": "confirm default branch or whether repo should be manifest-pinned to a non-main ref"
+    },
+    {
+      "name": "graph-explorer",
+      "url": "https://github.com/SocioProphet/graph-explorer",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "hdt_app",
+      "url": "https://github.com/SocioProphet/hdt_app",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether this should point to SocioProphet/human-digital-twin or another canonical HDT repo"
+    },
+    {
+      "name": "semantic-search-bi",
+      "url": "https://github.com/SocioProphet/semantic-search-bi",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "trust-registry",
+      "url": "https://github.com/SocioProphet/trust-registry",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    },
+    {
+      "name": "trust-registry-ui",
+      "url": "https://github.com/SocioProphet/trust-registry-ui",
+      "declared_ref": "main",
+      "lookup_status": "repository_404",
+      "expected_next_action": "confirm whether repo was renamed, retired, private beyond connector visibility, or should be removed from workspace manifest"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 name: service-register
 
+# Observable CI probe: latest service-register spine
+
 on:
   workflow_dispatch:
   pull_request:

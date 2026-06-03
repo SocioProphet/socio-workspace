@@ -23,6 +23,7 @@ This ledger supplements `docs/integration/tritfabric-recovered-work-ledger-2026-
 | `SocioProphet/prophet-platform` | #516 | Standalone API-stub runner | Merged |
 | `SocioProphet/prophet-platform` | #518 | Focused API-stub workflow | Merged |
 | `SocioProphet/prophet-platform` | #553 | UI/readiness label contract and validator | Merged |
+| `SocioProphet/prophet-platform` | #558 | Detached UI readiness-label component scaffold | Merged |
 | `SocioProphet/superconscious` | #58 | Advisory-only consumption boundary | Merged |
 | `SocioProphet/superconscious` | #61 | Named advisory-boundary Makefile target | Merged |
 
@@ -69,7 +70,8 @@ Sociosphere does not reimplement TritFabric contracts or product/runtime surface
 - local-pre-infrastructure API stubs;
 - standalone API-stub runner;
 - focused workflow;
-- UI/readiness label contract and validator.
+- UI/readiness label contract and validator;
+- detached UI readiness-label component scaffold.
 
 Prophet Platform does not become the authority plane for TritFabric implementation, Ontogenesis vocabulary, or Sociosphere estate registration.
 
@@ -87,7 +89,7 @@ Superconscious must not perform model promotion, final Community Learning eligib
 
 ## Known validation caveats
 
-Prophet Platform broad validation lanes have had intermittent unrelated failures during the TritFabric consumption PRs. The TritFabric-specific contract, stub, workflow, UI-label, and governance checks passed, and the merged Prophet Platform changes were bounded to planning/contracts/API-stub/tooling/workflow/label-contract files.
+Prophet Platform broad validation lanes have had intermittent unrelated failures during the TritFabric consumption PRs. The TritFabric-specific contract, stub, workflow, UI-label, UI-component, and governance checks passed, and the merged Prophet Platform changes were bounded to planning/contracts/API-stub/tooling/workflow/label-contract/detached-component files.
 
 Superconscious `Certificate Doctrine CI` remained red during advisory-boundary PRs. Trust Surface, SVF Validation, Superconscious CI, and lawful-learning checks passed. The certificate lane failure was not attributable to TritFabric advisory-boundary files based on available connector logs and artifacts.
 
@@ -101,5 +103,5 @@ It does not claim runtime production readiness, model promotion execution, adapt
 
 1. Rationalize Sociosphere canonical registry folding so staged/effective admissions can be safely folded into `registry/canonical-repos.yaml` without connector-driven full-file truncation risk.
 2. Decide whether TritFabric runtime packaging belongs in SociOS / SourceOS only after runtime deployment readiness advances beyond report-only mode.
-3. Expand Prophet Platform product UI components only after the readiness label contract stabilizes.
+3. Decide whether and when to mount the detached Prophet Platform UI component into a product route.
 4. Keep Superconscious advisory-only unless a separate authority review explicitly changes the estate boundary.

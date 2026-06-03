@@ -105,8 +105,8 @@ def main() -> int:
     verifier = by_key["PPS-carrier-verifier"]
     canonical = by_key["SocioProphet/mcp-a2a-zero-trust"]
 
-    if bootstrap["consolidation_status"] != "archive-ready-after-tree-confirmation":
-        return fail("bootstrap row must remain archive-ready-after-tree-confirmation after PPS verifier preservation")
+    if bootstrap["consolidation_status"] != "archive-ready":
+        return fail("bootstrap row must be archive-ready after tree confirmation and PPS verifier preservation")
     if verifier["consolidation_status"] != "preserved-in-canonical":
         return fail("PPS verifier row must remain preserved-in-canonical")
     if canonical["consolidation_status"] != "retain-canonical":

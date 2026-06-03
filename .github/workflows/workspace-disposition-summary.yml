@@ -1,0 +1,37 @@
+name: Workspace Disposition Summary
+
+on:
+  pull_request:
+    paths:
+      - 'manifest/workspace.dispositions.json'
+      - 'tools/report_workspace_disposition_summary.py'
+      - '.github/workflows/workspace-disposition-summary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report-workspace-disposition-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate workspace disposition summary
+        run: |
+          mkdir -p reports
+          python3 tools/report_workspace_disposition_summary.py > reports/workspace-disposition-summary.json
+          python3 -m json.tool reports/workspace-disposition-summary.json >/dev/null
+          cat reports/workspace-disposition-summary.json
+
+      - name: Upload disposition summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-disposition-summary
+          path: reports/workspace-disposition-summary.json

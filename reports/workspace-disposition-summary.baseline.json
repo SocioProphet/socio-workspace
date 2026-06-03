@@ -1,0 +1,81 @@
+{
+  "action_counts": {
+    "hold_for_confirmation": 17,
+    "preserve_pin": 2,
+    "retain": 1,
+    "verify_ref_before_manifest_change": 1
+  },
+  "by_status": {
+    "alias_or_stale_pending_confirmation": [
+      "hdt_app"
+    ],
+    "candidate_successor_pending_confirmation": [
+      "data-pipeline"
+    ],
+    "pin_drift_review_required": [
+      "tritfabric",
+      "tritrpc"
+    ],
+    "planned_or_stale_adapter_pending_confirmation": [
+      "configs"
+    ],
+    "planned_or_stale_connector_stub_pending_confirmation": [
+      "connector-github",
+      "connector-gitlab",
+      "connector-jira",
+      "connector-kafka",
+      "connector-slack"
+    ],
+    "planned_or_stale_service_stub_pending_confirmation": [
+      "asr-service",
+      "dev_api",
+      "embeddings-service",
+      "event-bus"
+    ],
+    "ref_reconciliation_required": [
+      "knowledge-graph"
+    ],
+    "retain_candidate_canonical": [
+      "human_digital_twin"
+    ],
+    "stale_or_merged_pending_confirmation": [
+      "socioprophet_integration"
+    ],
+    "stale_or_uncreated_pending_confirmation": [
+      "api-specs",
+      "architecture-docs",
+      "onboarding-docs",
+      "runbooks"
+    ]
+  },
+  "candidate_successors": {
+    "data-pipeline": [
+      "datakit",
+      "argo-dataflow"
+    ],
+    "hdt_app": "human_digital_twin"
+  },
+  "disposition_count": 21,
+  "schema_version": "sociosphere.workspace-disposition-summary.v0",
+  "source": "manifest/workspace.dispositions.json",
+  "source_issue": "SocioProphet/sociosphere#439",
+  "source_issue_counts": {
+    "451": 5,
+    "452": 11,
+    "453": 5
+  },
+  "source_schema_version": "sociosphere.workspace-dispositions.v0",
+  "status_counts": {
+    "alias_or_stale_pending_confirmation": 1,
+    "candidate_successor_pending_confirmation": 1,
+    "pin_drift_review_required": 2,
+    "planned_or_stale_adapter_pending_confirmation": 1,
+    "planned_or_stale_connector_stub_pending_confirmation": 5,
+    "planned_or_stale_service_stub_pending_confirmation": 4,
+    "ref_reconciliation_required": 1,
+    "retain_candidate_canonical": 1,
+    "stale_or_merged_pending_confirmation": 1,
+    "stale_or_uncreated_pending_confirmation": 4
+  },
+  "summary_status": "metadata_only_no_manifest_mutation"
+}

@@ -23,6 +23,21 @@ VALID_ADAPTER: dict[str, Any] = {
     "repo": "SocioProphet/example-math-repo",
     "domain": "example-mathematical-physics-domain",
     "controller_protocol": "protocol/proof-apparatus-workspace/v0",
+    "pfk_authority": {
+        "authority_repo": "SocioProphet/Heller-Godel",
+        "authority_path": "proof_fabric_kernel/",
+        "pinned_commit": "988307215ad38ccb16514311222184a1b757752b",
+        "consumed_schemas": [
+            "PFK-SCHEMA-001",
+            "PFK-SCHEMA-002",
+            "PFK-SCHEMA-003",
+            "PFK-SCHEMA-004",
+        ],
+        "consumer_maturity": "M1-pinned-schema-dependency",
+        "local_schema_authority": False,
+        "schema_validity_is_content_validity": False,
+        "notes": ["PFK envelope validity is not theorem evidence."],
+    },
     "claims": [
         {
             "claim_id": "EXAMPLE-CLAIM-001",
@@ -171,6 +186,30 @@ def main() -> int:
     passed_gate_missing_digests = clone_adapter()
     passed_gate_missing_digests["gates"][0]["status"] = "pass"
     expect_fail("passed gate missing digests", lambda: validate_adapter_case(passed_gate_missing_digests))
+
+    invalid_pfk_repo = clone_adapter()
+    invalid_pfk_repo["pfk_authority"]["authority_repo"] = "SocioProphet/not-heller-godel"
+    expect_fail("invalid PFK authority repo", lambda: validate_adapter_case(invalid_pfk_repo))
+
+    floating_pfk_commit = clone_adapter()
+    floating_pfk_commit["pfk_authority"]["pinned_commit"] = "main"
+    expect_fail("PFK authority cannot float main", lambda: validate_adapter_case(floating_pfk_commit))
+
+    unknown_pfk_schema = clone_adapter()
+    unknown_pfk_schema["pfk_authority"]["consumed_schemas"] = ["PFK-SCHEMA-999"]
+    expect_fail("unknown PFK schema identifier", lambda: validate_adapter_case(unknown_pfk_schema))
+
+    duplicate_pfk_schema = clone_adapter()
+    duplicate_pfk_schema["pfk_authority"]["consumed_schemas"] = ["PFK-SCHEMA-001", "PFK-SCHEMA-001"]
+    expect_fail("duplicate PFK schema identifiers", lambda: validate_adapter_case(duplicate_pfk_schema))
+
+    local_schema_authority = clone_adapter()
+    local_schema_authority["pfk_authority"]["local_schema_authority"] = True
+    expect_fail("local PFK schema authority forbidden", lambda: validate_adapter_case(local_schema_authority))
+
+    schema_as_truth = clone_adapter()
+    schema_as_truth["pfk_authority"]["schema_validity_is_content_validity"] = True
+    expect_fail("schema validity cannot mean content validity", lambda: validate_adapter_case(schema_as_truth))
 
     invalid_manifest_role = clone_manifest()
     invalid_manifest_role["repos"][0]["role"] = "not-a-valid-role"

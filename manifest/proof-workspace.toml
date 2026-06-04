@@ -9,6 +9,26 @@ attestation_required = true
 default_claim_state = "diagnosed"
 default_new_synthesis_state = "speculative"
 claim_schema = "standards/proof-apparatus/claim-ledger.schema.json"
+proof_adapter_schema = "standards/proof-apparatus/proof-adapter.schema.json"
+pfk_stack_integration_map = "protocol/proof-apparatus-workspace/v0/pfk-stack-integration-map.md"
+repo_role_catalog = "catalog/proof-repo-roles.yaml"
+
+[proof_workspace.pfk_authority]
+repo = "SocioProphet/Heller-Godel"
+path = "proof_fabric_kernel/"
+commit = "988307215ad38ccb16514311222184a1b757752b"
+dependency_form = "PFK authority: SocioProphet/Heller-Godel/proof_fabric_kernel @ 988307215ad38ccb16514311222184a1b757752b"
+schema_catalog = "proof_fabric_kernel/docs/SchemaCatalog_v1.md"
+consumer_contract = "proof_fabric_kernel/docs/ClayProgram_PFK_ConsumerContract_v0.md"
+schemas = [
+  "PFK-SCHEMA-001",
+  "PFK-SCHEMA-002",
+  "PFK-SCHEMA-003",
+  "PFK-SCHEMA-004"
+]
+floating_main_allowed = false
+schema_validity_is_content_validity = false
+receipts_are_theorem_evidence = false
 
 [proof_workspace.policy]
 promotion_requires = [
@@ -17,11 +37,15 @@ promotion_requires = [
   "artifact_digests",
   "gate_status",
   "severity_delta",
-  "controller_decision"
+  "controller_decision",
+  "pfk_dependency_pin",
+  "anti_seed_acknowledgement"
 ]
 failure_wall_required_when_blocked = true
 prose_only_promotion_allowed = false
 speculation_can_promote_to_theorem = false
+pfk_envelope_validity_promotes_claim = false
+memory_context_promotes_claim = false
 
 [proof_workspace.evidence]
 severity_levels = ["E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"]
@@ -39,37 +63,148 @@ failure_walls = [
 ]
 
 [[repos]]
-name = "bsd-proof-program"
-role = "domain-engine"
-domain = "elliptic-curves-congruent-number-bsd"
-url = "https://github.com/SocioProphet/bsd-proof-program"
-ref = "main"
-local_path = "proof/bsd-proof-program"
-owned_gates = [
-  "tunnell-engine",
-  "root-number-grid",
-  "cm-consistency",
-  "bounded-height-search",
-  "descent-image-filtering",
-  "four-descent-ladder"
-]
-primary_walls = ["certificate_wall", "height_bound_wall"]
-
-[[repos]]
 name = "Heller-Godel"
 role = "metatheory-engine"
 domain = "proof-boundary-incompleteness-formal-governance"
 url = "https://github.com/SocioProphet/Heller-Godel"
 ref = "main"
 local_path = "proof/heller-godel"
+pfk_authority = true
+pfk_consumer_maturity = "authority"
 owned_gates = [
   "claim-boundary",
   "non-claim",
   "formalization-readiness",
   "incompleteness-boundary",
-  "proof-ledger-consistency"
+  "proof-ledger-consistency",
+  "pfk-schema-catalog",
+  "pfk-anti-seed"
 ]
 primary_walls = ["set_theoretic_wall", "preimage_wall"]
+
+[[repos]]
+name = "Heller-Winters-Theorem"
+role = "finite-channel-engine"
+domain = "su2-finite-channel-representation-theory"
+url = "https://github.com/SocioProphet/Heller-Winters-Theorem"
+ref = "main"
+local_path = "proof/heller-winters-theorem"
+pfk_authority = false
+pfk_consumer_maturity = "M1"
+owned_gates = [
+  "channel-product",
+  "jmax-gram",
+  "u1-null-model",
+  "wigner-table-reproduction",
+  "symbolic-small-jmax",
+  "pfk-dependency-pin"
+]
+primary_walls = ["certificate_wall", "quotient_wall", "preimage_wall"]
+
+[[repos]]
+name = "Heller-Einstein"
+role = "mathematical-physics-engine"
+domain = "typed-interface-projection-stochasticity"
+url = "https://github.com/SocioProphet/Heller-Einstein"
+ref = "main"
+local_path = "proof/heller-einstein"
+pfk_authority = false
+pfk_consumer_maturity = "M0"
+owned_gates = [
+  "typed-interface-preservation",
+  "projection-loss-boundary",
+  "stochasticity-nonclaim",
+  "pfk-dependency-pin"
+]
+primary_walls = ["preimage_wall", "continuum_reconstruction_wall"]
+
+[[repos]]
+name = "Heller-Dirac"
+role = "mathematical-physics-engine"
+domain = "spectral-hopf-modular-borel-field-apparatus"
+url = "https://github.com/SocioProphet/Heller-Dirac"
+ref = "main"
+local_path = "proof/heller-dirac"
+pfk_authority = false
+pfk_consumer_maturity = "M0"
+owned_gates = [
+  "spectral-triple-boundary",
+  "hopf-scaffold-nonclaim",
+  "borel-side-method-grade",
+  "pfk-dependency-pin"
+]
+primary_walls = ["certificate_wall", "preimage_wall", "continuum_reconstruction_wall"]
+
+[[repos]]
+name = "bsd-proof-program"
+role = "domain-engine"
+domain = "elliptic-curves-congruent-number-bsd"
+url = "https://github.com/SocioProphet/bsd-proof-program"
+ref = "main"
+local_path = "proof/bsd-proof-program"
+pfk_authority = false
+pfk_consumer_maturity = "M1"
+owned_gates = [
+  "tunnell-engine",
+  "root-number-grid",
+  "cm-consistency",
+  "bounded-height-search",
+  "descent-image-filtering",
+  "four-descent-ladder",
+  "pfk-dependency-pin"
+]
+primary_walls = ["certificate_wall", "height_bound_wall"]
+
+[[repos]]
+name = "np-program"
+role = "domain-engine"
+domain = "p-vs-np-proof-complexity-lawful-morphology"
+url = "https://github.com/SocioProphet/np-program"
+ref = "main"
+local_path = "proof/np-program"
+pfk_authority = false
+pfk_consumer_maturity = "M1"
+owned_gates = [
+  "barrier-registry",
+  "proof-complexity-separation-boundary",
+  "catalan-mu2-protocol",
+  "pfk-dependency-pin"
+]
+primary_walls = ["certificate_wall", "counting_wall", "combinatorial_extremal_wall"]
+
+[[repos]]
+name = "ns-program"
+role = "domain-engine"
+domain = "navier-stokes-program"
+url = "https://github.com/SocioProphet/ns-program"
+ref = "main"
+local_path = "proof/ns-program"
+pfk_authority = false
+pfk_consumer_maturity = "M1"
+owned_gates = [
+  "dimensional-guard",
+  "candidate-c-fluid-gravity-diagnostic",
+  "candidate-d-heller-einstein-diagnostic",
+  "pfk-dependency-pin"
+]
+primary_walls = ["continuum_reconstruction_wall", "preimage_wall", "certificate_wall"]
+
+[[repos]]
+name = "hodge-program-proof"
+role = "domain-engine"
+domain = "hodge-theoretic-proof-program"
+url = "https://github.com/SocioProphet/hodge-program-proof"
+ref = "main"
+local_path = "proof/hodge-program-proof"
+pfk_authority = false
+pfk_consumer_maturity = "M1"
+owned_gates = [
+  "hodge-anti-seed",
+  "hodge-origin-distance-classification",
+  "algebraic-cycle-realization-boundary",
+  "pfk-dependency-pin"
+]
+primary_walls = ["integer_chern_wall", "preimage_wall", "certificate_wall"]
 
 [[repos]]
 name = "yang-mills"
@@ -78,6 +213,8 @@ domain = "gauge-theory-mass-gap-obstruction"
 url = "https://github.com/SocioProphet/yang-mills"
 ref = "main"
 local_path = "proof/yang-mills"
+pfk_authority = false
+pfk_consumer_maturity = "M0"
 owned_gates = [
   "gram-gate",
   "symmetry-equality",
@@ -85,7 +222,8 @@ owned_gates = [
   "kp-certificate",
   "operator-rg",
   "log-sobolev",
-  "continuum-obstruction"
+  "continuum-obstruction",
+  "pfk-dependency-pin"
 ]
 primary_walls = [
   "certificate_wall",
@@ -97,32 +235,35 @@ primary_walls = [
 ]
 
 [[repos]]
-name = "Heller-Winters-Theorem"
-role = "finite-channel-engine"
-domain = "su2-finite-channel-representation-theory"
-url = "https://github.com/SocioProphet/Heller-Winters-Theorem"
-ref = "main"
-local_path = "proof/heller-winters-theorem"
-owned_gates = [
-  "channel-product",
-  "jmax-gram",
-  "u1-null-model",
-  "wigner-table-reproduction",
-  "symbolic-small-jmax"
-]
-primary_walls = ["certificate_wall", "quotient_wall", "preimage_wall"]
-
-[[repos]]
 name = "hphd-zeta-mirror-lattice"
 role = "analytic-number-theory-engine"
 domain = "zeta-rh-smoothed-observable-mirror-lattice"
 url = "https://github.com/SocioProphet/hphd-zeta-mirror-lattice"
 ref = "main"
 local_path = "proof/hphd-zeta-mirror-lattice"
+pfk_authority = false
+pfk_consumer_maturity = "M1"
 owned_gates = [
   "smoothed-observable-decomposition",
   "main-nt-mirror-comp-error",
   "zero-localization-nonclaim",
-  "finite-degree-artin-transfer"
+  "finite-degree-artin-transfer",
+  "pfk-dependency-pin"
 ]
 primary_walls = ["certificate_wall", "counting_wall", "shell_map_preservation_wall"]
+
+[[repos]]
+name = "identity-is-prime-reference"
+role = "research-engine"
+domain = "identity-prime-reference"
+url = "https://github.com/SocioProphet/identity-is-prime-reference"
+ref = "main"
+local_path = "proof/identity-is-prime-reference"
+pfk_authority = false
+pfk_consumer_maturity = "M0"
+owned_gates = [
+  "identity-prime-event-ir",
+  "policy-polytope-boundary",
+  "epistemic-edge-nonclaim"
+]
+primary_walls = ["quotient_wall", "preimage_wall"]

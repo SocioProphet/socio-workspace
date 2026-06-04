@@ -1,0 +1,42 @@
+apiVersion: sociosphere.socioprophet.io/v1alpha1
+kind: ResourceIntakeAdoptionRegistry
+metadata:
+  name: resource-intake-adoption
+  status: seed
+  updated: "2026-06-03"
+  authorityRepo: SocioProphet/sociosphere
+purpose: invalid fixture
+authoritySurfaces:
+  learningLoop:
+    repo: SocioProphet/systems-learning-loops
+    role: learning loop
+  valueMeasurement:
+    repo: SocioProphet/economic-prophet
+    role: value measurement
+  estateGovernance:
+    repo: SocioProphet/sociosphere
+    role: estate governance
+adoptions:
+  - id: invalid-runtime-dependency
+    status: active-seed
+    sourceCorpus:
+      repo: SocioProphet/ai-economist
+      upstream: salesforce/ai-economist
+      license: BSD-3-Clause
+      intakeMode: conceptual-patterns-only
+      runtimeDependency: true
+    receivingRepo: SocioProphet/economic-prophet
+    receivingFiles:
+      - docs/policy_simulation_source_intake.md
+    gates:
+      - donor runtime dependency must remain false
+      - reward functionals must remain advisory-only
+      - triparty lambda_admit must not exceed lambda_evid
+      - triparty lambda_release must not exceed lambda_admit
+      - residual must equal lambda_evid minus lambda_release
+    downstreamConsumers:
+      - SocioProphet/economic-prophet
+      - SocioProphet/systems-learning-loops
+      - SocioProphet/sociosphere
+    nextSteps:
+      - this fixture should fail

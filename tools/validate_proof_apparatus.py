@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -30,6 +31,8 @@ PROOF_MANIFEST = ROOT / "manifest" / "proof-workspace.toml"
 CLAIM_SCHEMA = ROOT / "standards" / "proof-apparatus" / "claim-ledger.schema.json"
 ADAPTER_SCHEMA = ROOT / "standards" / "proof-apparatus" / "proof-adapter.schema.json"
 ADJACENCY_REGISTRY = ROOT / "registry" / "proof-adjacency-ranking.v0.yaml"
+PROOF_ROLE_CATALOG = ROOT / "catalog" / "proof-repo-roles.yaml"
+PFK_INTEGRATION_MAP = ROOT / "protocol" / "proof-apparatus-workspace" / "v0" / "pfk-stack-integration-map.md"
 
 SEVERITY = {"E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"}
 CLAIM_STATES = {
@@ -76,6 +79,15 @@ VALID_WALLS = {
     "set_theoretic_wall",
     "combinatorial_extremal_wall",
 }
+VALID_PFK_SCHEMAS = {"PFK-SCHEMA-001", "PFK-SCHEMA-002", "PFK-SCHEMA-003", "PFK-SCHEMA-004"}
+VALID_PFK_MATURITY = {
+    "M0-citation-only",
+    "M1-pinned-schema-dependency",
+    "M2-example-compatibility",
+    "M3-native-receipt-emission",
+    "M4-migration-disciplined-consumer",
+}
+SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def load_json(path: Path) -> Any:
@@ -127,6 +139,29 @@ def validate_registry() -> None:
         require(term in content, f"proof adjacency registry missing required term: {term}")
 
 
+def validate_pfk_control_files() -> None:
+    require(PFK_INTEGRATION_MAP.exists(), f"missing PFK integration map: {PFK_INTEGRATION_MAP}")
+    map_content = PFK_INTEGRATION_MAP.read_text(encoding="utf-8")
+    for term in (
+        "PFK authority: `SocioProphet/Heller-Godel/proof_fabric_kernel/`",
+        "Schema validity is envelope validity, not theorem evidence.",
+        "Sociosphere must not silently upgrade a domain claim.",
+        "Promotion by prose alone is forbidden.",
+    ):
+        require(term in map_content, f"PFK integration map missing required term: {term}")
+
+    require(PROOF_ROLE_CATALOG.exists(), f"missing proof role catalog: {PROOF_ROLE_CATALOG}")
+    role_content = PROOF_ROLE_CATALOG.read_text(encoding="utf-8")
+    for term in (
+        "proof_fabric_authority:",
+        "proof_workspace_controller:",
+        "proof_domain_engines:",
+        "SocioProphet/Heller-Godel",
+        "SocioProphet/sociosphere",
+    ):
+        require(term in role_content, f"proof role catalog missing required term: {term}")
+
+
 def validate_manifest(manifest: dict[str, Any]) -> list[dict[str, Any]]:
     proof_workspace = manifest.get("proof_workspace")
     require(isinstance(proof_workspace, dict), "manifest missing [proof_workspace]")
@@ -172,6 +207,55 @@ def validate_manifest(manifest: dict[str, Any]) -> list[dict[str, Any]]:
     return repos
 
 
+def validate_pfk_authority(path: Path, pfk_authority: dict[str, Any]) -> None:
+    for field in (
+        "authority_repo",
+        "authority_path",
+        "pinned_commit",
+        "consumed_schemas",
+        "schema_validity_is_content_validity",
+    ):
+        require(field in pfk_authority, f"{path} pfk_authority missing required field {field}")
+
+    require(
+        pfk_authority["authority_repo"] == "SocioProphet/Heller-Godel",
+        f"{path} pfk_authority.authority_repo must be SocioProphet/Heller-Godel",
+    )
+    require(
+        pfk_authority["authority_path"] == "proof_fabric_kernel/",
+        f"{path} pfk_authority.authority_path must be proof_fabric_kernel/",
+    )
+    require(
+        isinstance(pfk_authority["pinned_commit"], str) and SHA_RE.match(pfk_authority["pinned_commit"]) is not None,
+        f"{path} pfk_authority.pinned_commit must be a 40-character lowercase hex SHA",
+    )
+    consumed_schemas = pfk_authority["consumed_schemas"]
+    require(
+        isinstance(consumed_schemas, list) and consumed_schemas,
+        f"{path} pfk_authority.consumed_schemas must be a nonempty list",
+    )
+    require(
+        len(set(consumed_schemas)) == len(consumed_schemas),
+        f"{path} pfk_authority.consumed_schemas must not contain duplicates",
+    )
+    require(
+        set(consumed_schemas).issubset(VALID_PFK_SCHEMAS),
+        f"{path} pfk_authority.consumed_schemas contains unknown schema identifiers",
+    )
+    require(
+        pfk_authority.get("consumer_maturity", "M1-pinned-schema-dependency") in VALID_PFK_MATURITY,
+        f"{path} pfk_authority.consumer_maturity is invalid",
+    )
+    require(
+        pfk_authority.get("local_schema_authority", False) is False,
+        f"{path} pfk_authority.local_schema_authority must be false",
+    )
+    require(
+        pfk_authority["schema_validity_is_content_validity"] is False,
+        f"{path} pfk_authority.schema_validity_is_content_validity must be false",
+    )
+
+
 def validate_adapter(path: Path, adapter: dict[str, Any]) -> None:
     for field in ("adapter_version", "repo", "domain", "claims", "gates", "non_claims"):
         require(field in adapter, f"{path} missing required field {field}")
@@ -183,6 +267,11 @@ def validate_adapter(path: Path, adapter: dict[str, Any]) -> None:
     require(isinstance(adapter["claims"], list), f"{path} claims must be a list")
     require(isinstance(adapter["gates"], list), f"{path} gates must be a list")
     require(isinstance(adapter["non_claims"], list), f"{path} non_claims must be a list")
+
+    pfk_authority = adapter.get("pfk_authority")
+    if pfk_authority is not None:
+        require(isinstance(pfk_authority, dict), f"{path} pfk_authority must be an object")
+        validate_pfk_authority(path, pfk_authority)
 
     gate_ids = set()
     for gate in adapter["gates"]:
@@ -239,6 +328,7 @@ def main() -> int:
     load_json(CLAIM_SCHEMA)
     load_json(ADAPTER_SCHEMA)
     validate_registry()
+    validate_pfk_control_files()
 
     manifest = load_toml(PROOF_MANIFEST)
     repos = validate_manifest(manifest)
@@ -261,7 +351,7 @@ def main() -> int:
 
     print(
         "proof-apparatus validation passed: "
-        f"schemas=2 registry=1 manifest_repos={len(repos)} "
+        f"schemas=2 registry=1 pfk_controls=2 manifest_repos={len(repos)} "
         f"adapters_checked={checked_adapters} strict_adapters={args.strict_adapters}"
     )
     return 0

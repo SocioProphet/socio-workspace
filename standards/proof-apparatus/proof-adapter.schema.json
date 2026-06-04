@@ -30,6 +30,70 @@
       "type": "string",
       "const": "protocol/proof-apparatus-workspace/v0"
     },
+    "pfk_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority_repo",
+        "authority_path",
+        "pinned_commit",
+        "consumed_schemas",
+        "schema_validity_is_content_validity"
+      ],
+      "properties": {
+        "authority_repo": {
+          "type": "string",
+          "const": "SocioProphet/Heller-Godel"
+        },
+        "authority_path": {
+          "type": "string",
+          "const": "proof_fabric_kernel/"
+        },
+        "pinned_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "consumed_schemas": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "PFK-SCHEMA-001",
+              "PFK-SCHEMA-002",
+              "PFK-SCHEMA-003",
+              "PFK-SCHEMA-004"
+            ]
+          }
+        },
+        "consumer_maturity": {
+          "type": "string",
+          "enum": [
+            "M0-citation-only",
+            "M1-pinned-schema-dependency",
+            "M2-example-compatibility",
+            "M3-native-receipt-emission",
+            "M4-migration-disciplined-consumer"
+          ],
+          "default": "M1-pinned-schema-dependency"
+        },
+        "local_schema_authority": {
+          "type": "boolean",
+          "const": false,
+          "default": false
+        },
+        "schema_validity_is_content_validity": {
+          "type": "boolean",
+          "const": false
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
     "claims": {
       "type": "array",
       "items": {

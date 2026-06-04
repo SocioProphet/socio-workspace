@@ -24,6 +24,7 @@ on:
       - 'protocol/proof-apparatus-workspace/**'
       - 'standards/proof-apparatus/**'
       - 'registry/proof-adjacency-ranking.v0.yaml'
+      - 'catalog/proof-repo-roles.yaml'
       - 'templates/proof-research/**'
       - 'tools/validate_proof_apparatus.py'
       - 'tools/test_proof_adapter_negative_cases.py'
@@ -40,6 +41,7 @@ on:
       - 'protocol/proof-apparatus-workspace/**'
       - 'standards/proof-apparatus/**'
       - 'registry/proof-adjacency-ranking.v0.yaml'
+      - 'catalog/proof-repo-roles.yaml'
       - 'templates/proof-research/**'
       - 'tools/validate_proof_apparatus.py'
       - 'tools/test_proof_adapter_negative_cases.py'
@@ -163,7 +165,7 @@ jobs:
 
           ## Failure evidence
 
-          See \`strict-adapter-validation.log\` for the adapter validation output. See \`materialized-domain-proof-adapter.json\` for the adapter content checked at the triggering SHA when available.
+          See `strict-adapter-validation.log` for the adapter validation output. See `materialized-domain-proof-adapter.json` for the adapter content checked at the triggering SHA when available.
           EOF
         env:
           DOMAIN_REPO: ${{ inputs.domain_repo || github.event.client_payload.repository || github.repository }}

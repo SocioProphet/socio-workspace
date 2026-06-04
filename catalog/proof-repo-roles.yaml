@@ -1,0 +1,93 @@
+version: 0.1
+status: draft
+controller: SocioProphet/sociosphere
+
+roles:
+  proof_fabric_authority:
+    repositories:
+      - SocioProphet/Heller-Godel
+    responsibility: PFK schemas, framework identifiers, claim grammar, anti-seed discipline, dependency pins.
+
+  proof_workspace_controller:
+    repositories:
+      - SocioProphet/sociosphere
+    responsibility: Cross-repo proof workspace manifests, adapter validation, gate routing, promotion decisions, and snapshots.
+
+  workroom_and_platform_surfaces:
+    repositories:
+      - SocioProphet/prophet-workspace
+      - SocioProphet/prophet-platform
+    responsibility: Human proof workroom UX, platform contracts, APIs, dashboards, and runtime deployment surfaces.
+
+  execution_and_runtime_evidence:
+    repositories:
+      - SocioProphet/agentplane
+      - SocioProphet/lattice-forge
+      - SocioProphet/tritfabric
+      - SocioProphet/TriTRPC
+    responsibility: Bounded execution, replay, validation artifacts, runtime evidence, deterministic transport, and orchestration gates.
+
+  reasoning_search_and_memory:
+    repositories:
+      - SocioProphet/superconscious
+      - SocioProphet/holmes
+      - SocioProphet/sherlock-search
+      - SocioProphet/memory-mesh
+    responsibility: Claim proposal, explanation, contradiction reporting, evidence search, and review-only context proposals.
+
+  policy_authority:
+    repositories:
+      - SocioProphet/ProCybernetica
+      - SocioProphet/policy-fabric
+      - SocioProphet/guardrail-fabric
+      - SocioProphet/mcp-a2a-zero-trust
+      - SocioProphet/agent-registry
+    responsibility: Cybernetic control doctrine, policy packaging, claim/action admission, provider/tool/agent grants, and revocation posture.
+
+  semantic_authority:
+    repositories:
+      - SocioProphet/semantic-serdes
+      - SocioProphet/ontogenesis
+    responsibility: Semantic serialization, truth-class preservation, ontology lifecycle, JSON-LD/RDF/OWL governance, and SHACL gates.
+
+  model_governance:
+    repositories:
+      - SocioProphet/model-governance-ledger
+      - SocioProphet/model-router
+    responsibility: Model lifecycle records, eval receipts, route decisions, runtime/model Trust Chain bindings, and model-use boundaries.
+
+  graph_world_and_identity_evidence:
+    repositories:
+      - SocioProphet/meshrush
+      - SocioProphet/gaia-world-model
+      - SocioProphet/orion-field-intelligence
+      - SocioProphet/regis-entity-graph
+      - SocioProphet/HolographMe
+      - SocioProphet/human-digital-twin
+    responsibility: Graph traversal, world claims, field observations, identity graph edges, and consent-scoped projection records.
+
+  proof_domain_engines:
+    repositories:
+      - SocioProphet/Heller-Winters-Theorem
+      - SocioProphet/Heller-Einstein
+      - SocioProphet/Heller-Dirac
+      - SocioProphet/bsd-proof-program
+      - SocioProphet/np-program
+      - SocioProphet/ns-program
+      - SocioProphet/hodge-program-proof
+      - SocioProphet/identity-is-prime-reference
+    responsibility: Domain definitions, proof claims, non-claims, obstruction registers, fixtures, computations, papers, and repo-local gates.
+
+  learning_and_publication:
+    repositories:
+      - SocioProphet/systems-learning-loops
+      - SocioProphet/alexandrian-academy
+      - SocioProphet/slash-topics
+      - SocioProphet/new-hope
+    responsibility: Institutional learning loops, curriculum objects, teaching records, scoped topic surfaces, and publication membranes.
+
+invariants:
+  - PFK authority remains SocioProphet/Heller-Godel/proof_fabric_kernel.
+  - Sociosphere may orchestrate, but domain repositories keep mathematical interpretation and claim boundaries.
+  - Search, memory, model, and cognition systems produce proposals or evidence envelopes, not theorem conclusions.
+  - Promotion requires a named gate, artifact digest, prior state, new state, severity delta, claim-boundary update, and controller-visible decision.

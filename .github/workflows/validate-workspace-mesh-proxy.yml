@@ -9,6 +9,7 @@ on:
       - 'tools/validate_workspace_mesh_release_readiness.py'
       - 'tools/validate_workspace_mesh_gate1_artifact_review.py'
       - 'tools/review_workspace_mesh_gate1_generated_artifacts.py'
+      - 'tools/validate_workspace_mesh_gate2_planning.py'
       - 'docs/operations/workspace-mesh-proxy.md'
       - 'docs/operations/workspace-mesh-release-readiness.md'
       - 'docs/operations/workspace-mesh-gate1-generated-artifact-review-template.md'
@@ -16,9 +17,11 @@ on:
       - 'docs/operations/workspace-mesh-gate1-integration-proof.md'
       - 'docs/operations/workspace-mesh-gate1-local-review-runbook.md'
       - 'docs/operations/workspace-mesh-gate1-generated-artifact-inspector-status.md'
+      - 'docs/operations/workspace-mesh-gate2-id-substitution-planning.md'
       - 'registry/workspace-mesh-release-readiness.v0.json'
       - 'registry/workspace-mesh-gate1-generated-artifact-review.v0.json'
       - 'registry/workspace-mesh-gate1-status.v0.json'
+      - 'registry/workspace-mesh-gate2-id-substitution-planning.v0.json'
       - '.github/workflows/validate-workspace-mesh-proxy.yml'
   push:
     branches:
@@ -31,6 +34,7 @@ on:
       - 'tools/validate_workspace_mesh_release_readiness.py'
       - 'tools/validate_workspace_mesh_gate1_artifact_review.py'
       - 'tools/review_workspace_mesh_gate1_generated_artifacts.py'
+      - 'tools/validate_workspace_mesh_gate2_planning.py'
       - 'docs/operations/workspace-mesh-proxy.md'
       - 'docs/operations/workspace-mesh-release-readiness.md'
       - 'docs/operations/workspace-mesh-gate1-generated-artifact-review-template.md'
@@ -38,9 +42,11 @@ on:
       - 'docs/operations/workspace-mesh-gate1-integration-proof.md'
       - 'docs/operations/workspace-mesh-gate1-local-review-runbook.md'
       - 'docs/operations/workspace-mesh-gate1-generated-artifact-inspector-status.md'
+      - 'docs/operations/workspace-mesh-gate2-id-substitution-planning.md'
       - 'registry/workspace-mesh-release-readiness.v0.json'
       - 'registry/workspace-mesh-gate1-generated-artifact-review.v0.json'
       - 'registry/workspace-mesh-gate1-status.v0.json'
+      - 'registry/workspace-mesh-gate2-id-substitution-planning.v0.json'
       - '.github/workflows/validate-workspace-mesh-proxy.yml'
   workflow_dispatch:
 
@@ -65,3 +71,6 @@ jobs:
 
       - name: Validate Gate 1 artifact review
         run: python3 tools/validate_workspace_mesh_gate1_artifact_review.py
+
+      - name: Validate Gate 2 planning
+        run: python3 tools/validate_workspace_mesh_gate2_planning.py

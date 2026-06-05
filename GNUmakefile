@@ -11,6 +11,7 @@ FABRIC_MAKE ?= make -C $(FABRIC_REPO)
 
 .PHONY: \
 	fabric-repo-check \
+	workspace-mesh-proxy-validate \
 	doctor-workspace-ops \
 	validate-workspace-prototype \
 	validate-workspace-mesh \
@@ -32,6 +33,9 @@ FABRIC_MAKE ?= make -C $(FABRIC_REPO)
 fabric-repo-check:
 	@test -d "$(FABRIC_REPO)" || (echo "ERR: FABRIC_REPO not found: $(FABRIC_REPO)"; exit 1)
 	@test -f "$(FABRIC_REPO)/Makefile" || (echo "ERR: FABRIC_REPO Makefile missing: $(FABRIC_REPO)/Makefile"; exit 1)
+
+workspace-mesh-proxy-validate:
+	python3 tools/validate_workspace_mesh_proxy.py
 
 # Workspace operations mesh proxies. These keep Sociosphere as the topology
 # entrypoint while preserving prophet-platform-fabric-mlops-ts-suite as the

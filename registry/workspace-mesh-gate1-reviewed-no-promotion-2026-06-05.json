@@ -1,0 +1,31 @@
+{
+  "version": "v0",
+  "date": "2026-06-05",
+  "gate_id": "gate-1-generated-artifact-review",
+  "disposition": "reviewed_no_promotion",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_2_status": "not_started",
+  "proof_document": "docs/operations/workspace-mesh-gate1-reviewed-no-promotion-2026-06-05.md",
+  "evidence": {
+    "topology_validation": "passed",
+    "plan_safety": "passed",
+    "artifact_review": "passed",
+    "artifact_review_source": "plan_json",
+    "artifact_count": 4,
+    "actionable_plan_changes": 4
+  },
+  "reviewed_artifacts": [
+    "config.generated.json",
+    "clasp.generated.json",
+    "mesh-summary.generated.json",
+    "operator-next-steps.md"
+  ],
+  "status_flags": {
+    "dry_run_enabled": true,
+    "ids_remain_placeholders": true,
+    "project_services_enabled": false,
+    "workspace_groups_enabled": false,
+    "promotion_authorized": false
+  },
+  "next_allowed_state": "gate_2_planning_record_only"
+}

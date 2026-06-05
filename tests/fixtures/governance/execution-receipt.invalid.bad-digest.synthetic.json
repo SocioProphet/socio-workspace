@@ -1,0 +1,29 @@
+{
+  "actionRef": "institutional-action:invalid",
+  "artifactRefs": ["tests/fixtures/governance/evidence-bundle.valid.synthetic.json"],
+  "execution": {
+    "startedAt": "2026-06-05T21:45:00Z",
+    "status": "succeeded"
+  },
+  "executor": {
+    "capabilityRef": "capability:validate-governance-schema",
+    "executorId": "agent:sociosphere-validator",
+    "executorKind": "ci"
+  },
+  "integrity": {
+    "contentDigest": "not-a-sha256-digest",
+    "hashAlgorithm": "sha256"
+  },
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "receiptId": "receipt:invalid",
+  "recordType": "ExecutionReceipt",
+  "replay": {
+    "replayable": true
+  },
+  "schemaVersion": "governance.execution-receipt.v0.1"
+}

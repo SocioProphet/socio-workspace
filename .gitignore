@@ -31,6 +31,11 @@ coverage/
 # Local workspace overrides
 manifest/overrides.toml
 
+# Workspace mesh local-only review files
+.workspace-mesh/
+**/gate2-candidate-mapping.local.json
+**/*.candidate.local.json
+
 # Runtime metrics / logs (generated at runtime — not committed)
 metrics/*.jsonl
 metrics/registry-metrics.json

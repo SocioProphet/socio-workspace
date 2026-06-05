@@ -1,0 +1,33 @@
+name: Governance Schemas
+
+on:
+  pull_request:
+    paths:
+      - "schemas/governance/**"
+      - "tests/fixtures/governance/**"
+      - "tools/validate_governance_schemas.py"
+      - ".github/workflows/governance-schemas.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "schemas/governance/**"
+      - "tests/fixtures/governance/**"
+      - "tools/validate_governance_schemas.py"
+      - ".github/workflows/governance-schemas.yml"
+
+jobs:
+  validate-governance-schemas:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validator dependency
+        run: python -m pip install jsonschema
+      - name: Validate governance schemas
+        run: python tools/validate_governance_schemas.py

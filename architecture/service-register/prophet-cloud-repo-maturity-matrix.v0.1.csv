@@ -1,0 +1,123 @@
+repo_full_name,service_family,critical_path,prophet_cloud_role,current_maturity,next_action
+SociOS-Linux/SourceOS,managed-substrate,no,desktop shell substrate,positioned,review desktop shell build entrypoints
+SociOS-Linux/agentos-spine,managed-agentos,yes,managed AgentOS spine,positioned,define AgentOS workspace bootstrap contract
+SociOS-Linux/agentos-starter,managed-agentos,no,AgentOS starter scaffold,positioned,align with agentos-spine bootstrap path
+SociOS-Linux/cloudshell-fog,workspace-runtime,yes,cloud workspace fog runtime,positioned,bind to Prophet Cloud workspace session contract
+SociOS-Linux/embeddinglab,labs-model-training,no,embedding lab service,positioned,connect to model-training promotion lane
+SociOS-Linux/enhancements,managed-workstation,no,workstation enhancements,positioned,defer until workspace runtime baseline
+SociOS-Linux/graphlab,labs-model-training,no,graph lab service,positioned,connect to ontology and model-training lanes
+SociOS-Linux/imagelab,labs,no,image lab service,positioned,defer until workspace/lab surface
+SociOS-Linux/nlboot,boot-evidence,yes,boot evidence and managed boot contracts,contract-backed,keep boot evidence validator in critical path
+SociOS-Linux/nlplab,labs-model-training,no,NLP lab service,positioned,connect to Holmes and model-training lanes
+SociOS-Linux/ocrlab,labs,no,OCR lab service,positioned,defer until document intelligence surface
+SociOS-Linux/shortcut-overlay,managed-ux,no,operator UX overlay,positioned,defer until desktop shell integration
+SociOS-Linux/socios,managed-workstation,no,managed workstation automation,positioned,align with workspace onboarding path
+SociOS-Linux/socios-ignition,managed-workstation,no,workstation ignition,positioned,defer until SourceOS/SociOS installer path
+SociOS-Linux/socios-installer,managed-workstation,no,managed workstation installer,positioned,defer until deployment packaging pass
+SociOS-Linux/socioslinux-web,managed-ui,no,SociOS web surface,positioned,keep separate from SocioProphet UI shell
+SociOS-Linux/source-os,managed-desktop,no,desktop shell substrate,positioned,review relation to SourceOS-Linux/sourceos-shell
+SociOS-Linux/speechlab,labs,no,speech lab service,positioned,defer until multimodal product tranche
+SociOS-Linux/timeserieslab,labs-model-training,no,time-series lab service,positioned,connect to Fabric/MLOps lane
+SociOS-Linux/translationlab,labs,no,translation lab service,positioned,defer until Holmes/language fabric tranche
+SociOS-Linux/videolab,labs,no,video lab service,positioned,defer until multimodal product tranche
+SociOS-Linux/workstation-contracts,managed-contracts,yes,workstation and boot contract authority,contract-backed,keep contracts aligned to SourceOS/SociOS boot path
+SocioProphet/AgenticaForge,agent-runtime,no,agent runtime support,positioned,review for agent mesh reusable components
+SocioProphet/Heller-Dirac,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/Heller-Einstein,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/Heller-Godel,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/Heller-Winters-Theorem,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/HolographMe,professional-intelligence,no,professional intelligence product support,positioned,defer until product-surface tranche
+SocioProphet/Noetica,agent-runtime,no,agent runtime/reasoning support,positioned,review for agent mesh reasoning layer
+SocioProphet/ProCybernetica,cybernetic-governance,yes,cybernetic governance authority,contract-backed,implement governance-loop runtime before production gates
+SocioProphet/SCOPE-D,scope-policy,no,scope product and policy support,positioned,connect to policy and guardrail lane
+SocioProphet/TriTRPC,protocol-contract,yes,protocol contract authority,positioned,define runtime contract for workspace and agent mesh APIs
+SocioProphet/agent-inbox,agent-workroom,yes,agent/workroom inbox surface,positioned,bind to matrix/chat and agent event streams
+SocioProphet/agent-registry,agent-runtime,yes,agent capability registry,positioned,make registry queryable by AgentPlane and SocioSphere
+SocioProphet/agentplane,agent-runtime,yes,agent mesh control plane,positioned,stand up agent lifecycle API and execution receipts
+SocioProphet/alexandrian-academy,academy,no,academy product,positioned,defer until workspace product tranche
+SocioProphet/api-contracts,standards-protocol,yes,API contract support,positioned,normalize API contracts for workspace/agent mesh
+SocioProphet/bsd-proof-program,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/cairnpath-mesh,memory-graph,no,memory graph support,positioned,connect to memory-mesh/Lampstand later
+SocioProphet/cloudshell-fog,workspace-runtime,yes,cloud workspace runtime,positioned,resolve overlap with SociOS cloudshell-fog and bind workspace sessions
+SocioProphet/contractforge,professional-intelligence,no,contract intelligence product,positioned,defer until professional intelligence tranche
+SocioProphet/delivery-excellence,professional-intelligence,no,delivery excellence product,positioned,defer until professional intelligence tranche
+SocioProphet/delivery-excellence-automation,professional-intelligence,no,delivery automation support,positioned,defer until professional intelligence tranche
+SocioProphet/delivery-excellence-boards,professional-intelligence,no,delivery boards support,positioned,defer until professional intelligence tranche
+SocioProphet/delivery-excellence-bounties,professional-intelligence,no,bounty workflow support,positioned,defer until professional intelligence tranche
+SocioProphet/delivery-excellence-innersource,professional-intelligence,no,innersource workflow support,positioned,defer until professional intelligence tranche
+SocioProphet/economic-prophet,economic-coordination,no,economic coordination product,positioned,defer until core workspace/agent mesh live
+SocioProphet/exodus,migration,no,migration/onboarding product,positioned,defer until platform onboarding lane
+SocioProphet/functional-model-surfaces,research-model-standards,no,model surface standards,positioned,connect to model governance factsheets
+SocioProphet/gaia-world-model,gaia,no,GAIA product world model,positioned,defer until workspace shell and data plane are live
+SocioProphet/global-devsecops-intelligence,scope-policy,no,DevSecOps intelligence product,positioned,defer until policy/evidence plane live
+SocioProphet/graphbrain-contract,protocol-contract,no,graph/protocol contract support,positioned,connect to TriTRPC and ontology path
+SocioProphet/guardrail-fabric,policy-guardrail,yes,guardrail and policy enforcement,positioned,bind to agent mesh admission and model router
+SocioProphet/hellgraph,memory-graph,no,memory graph support,positioned,connect to memory graph runtime tranche
+SocioProphet/hodge-program-proof,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/holmes,query-search,yes,language/query intelligence,positioned,bind to workspace search and chat assistant flow
+SocioProphet/homebrew-prophet,developer-cli,no,developer distribution,positioned,defer until CLI packaging tranche
+SocioProphet/hphd-zeta-mirror-lattice,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/human-digital-twin,professional-intelligence,no,professional intelligence product,positioned,defer until professional intelligence tranche
+SocioProphet/hyperswarm-agent-composable-cluster-scaleup,compute-mesh,yes,compute mesh substrate,positioned,convert to schedulable agent execution lane
+SocioProphet/identity-is-prime-reference,identity-trust,yes,identity/trust reference,positioned,extract runtime identity contract or supersede with mcp-a2a-zero-trust
+SocioProphet/lampstand,lampstand-search,yes,local index/search authority,contract-backed,bind search contract to workspace and SocioSphere service graph
+SocioProphet/lattice-forge,prophet-lattice,yes,runtime/package lattice,positioned,define deployable runtime pack format for Prophet Cloud
+SocioProphet/mcp-a2a-zero-trust,identity-trust,yes,MCP/A2A zero-trust authority,verified,make verifier part of agent mesh admission path
+SocioProphet/memory-mesh,memory-graph,yes,memory graph and search feed substrate,positioned,bind to workspace chat memory and evidence plane
+SocioProphet/meshrush,memory-graph,no,memory graph support,positioned,review after memory-mesh baseline
+SocioProphet/model-governance-ledger,model-governance,yes,model/eval/promotion evidence ledger,positioned,bind to model router and agent execution receipts
+SocioProphet/model-router,model-governance,yes,model routing service,positioned,deploy router stub behind workspace chat and agent mesh
+SocioProphet/new-hope,query-search,no,search feed support,positioned,defer until Holmes/Sherlock baseline
+SocioProphet/np-program,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/ns-program,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SocioProphet/ontogenesis,ontology-semantics,yes,ontology/semantics authority,contract-backed,implement semantic registry and SHACL validation path
+SocioProphet/policy-fabric,policy-guardrail,yes,policy enforcement fabric,positioned,make admission checks for workspace/agent/model operations
+SocioProphet/profit-mpcc,economic-coordination,no,economic coordination support,positioned,defer until economic product tranche
+SocioProphet/prophet-cli,developer-cli,yes,operator/developer CLI,positioned,add commands for workspace deploy and agent mesh validation
+SocioProphet/prophet-core-catalog,core-runtime,yes,platform catalog service,positioned,bind catalog to SocioSphere service registry
+SocioProphet/prophet-core-contracts,core-runtime,yes,core runtime contract authority,positioned,normalize workspace/agent/compute contracts
+SocioProphet/prophet-core-infra,core-runtime,yes,platform infrastructure service,positioned,define deploy target for Prophet Cloud staging
+SocioProphet/prophet-core-ingest,core-runtime,yes,ingestion service,positioned,stand up ingestion API for workspace events and corpora
+SocioProphet/prophet-core-ledger,evidence-ledger,yes,evidence ledger authority,positioned,make execution receipts durable and queryable
+SocioProphet/prophet-core-libs,core-runtime,yes,shared runtime libraries,positioned,stabilize package interfaces for platform services
+SocioProphet/prophet-core-ops-brief,core-runtime,no,ops brief service,positioned,defer until observability tranche
+SocioProphet/prophet-core-policy,core-runtime,yes,core policy integration,positioned,connect policy-fabric and cybernetic governance gates
+SocioProphet/prophet-core-query,core-runtime,yes,query runtime,positioned,bind to Holmes/Sherlock and workspace chat search
+SocioProphet/prophet-core-scaffolder,core-runtime,no,scaffolder service,positioned,defer until developer experience tranche
+SocioProphet/prophet-domain-gaia-curation-vault,gaia,no,GAIA curation vault,positioned,defer until GAIA data plane tranche
+SocioProphet/prophet-domain-gaia-ontology,gaia-ontology,no,GAIA ontology support,positioned,bind after ontology-semantics baseline
+SocioProphet/prophet-platform,core-runtime,yes,platform runtime host,positioned,deploy staging API and service runtime for Prophet Cloud
+SocioProphet/prophet-platform-fabric-mlops-ts-suite,model-training,yes,Fabric/MLOps/model-training lane,positioned,bind to compute mesh and model governance
+SocioProphet/prophet-platform-standards,workspace-standards,yes,workspace/platform standards,positioned,normalize workspace deploy and governance standards
+SocioProphet/regis-entity-graph,identity-trust,yes,entity graph / identity support,positioned,bind identities to service and agent graph
+SocioProphet/semantic-serdes,protocol-ontology,no,semantic serialization support,positioned,connect to ontology and TriTRPC after baseline
+SocioProphet/sherlock-search,query-search,yes,search/feed service,positioned,collapse UI into SocioProphet UI and expose API to workspace
+SocioProphet/slash-topics,query-search,no,topic surface/search support,positioned,defer until search-feed UI tranche
+SocioProphet/smart-tree,query-search,no,tree/search support,positioned,defer until search runtime tranche
+SocioProphet/socioprophet,workspace-ui,yes,canonical web UI and workroom surface,positioned,implement workspace shell with matrix/chat and service graph
+SocioProphet/socioprophet-agent-standards,workspace-standards,yes,agent/workroom standards,positioned,bind agent standards to registry and workroom flow
+SocioProphet/socioprophet-standards-knowledge,workspace-standards,yes,knowledge/ontology standards,positioned,bind CBEXP and ontology semantics into standards graph
+SocioProphet/socioprophet-standards-storage,workspace-standards,no,standards storage,positioned,defer until standards backend tranche
+SocioProphet/sociosphere,workspace-controller,yes,workspace/service control plane,validated,implement runtime APIs for service graph and build matrix
+SocioProphet/sourceos-workspace,workspace-runtime,yes,SourceOS workspace integration,positioned,define local/cloud workspace bridge
+SocioProphet/speechlab,labs,no,speech lab service,positioned,defer until multimodal tranche
+SocioProphet/superconscious,model-training,yes,model-training/intelligence lane,positioned,bind to model governance and Fabric MLOps
+SocioProphet/synapseiq,query-search,no,query/search intelligence,positioned,review after Holmes/Sherlock baseline
+SocioProphet/systems-learning-loops,academy,no,learning-loop academy support,positioned,defer until academy product tranche
+SocioProphet/tritrpc-notes-archive,protocol-contract,no,protocol notes archive,reference,keep reference-only; do not make runtime authority
+SocioProphet/workspace-inventory,workspace-inventory,yes,canonical repo estate source,validated,keep export synchronized with service-register
+SocioProphet/yang-mills,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SourceOS-Linux/BearBrowser,browser-surface,no,browser/search surface,positioned,defer until product shell/browser tranche
+SourceOS-Linux/TurtleTerm,operator-terminal,yes,operator terminal surface,positioned,bind terminal to workspace/CLI operations
+SourceOS-Linux/agent-machine,agent-machine,yes,local/cloud agent machine substrate,contract-backed,bind lifecycle to AgentPlane and compute mesh
+SourceOS-Linux/agent-term,operator-terminal,no,agent terminal support,positioned,review after TurtleTerm baseline
+SourceOS-Linux/bsd-proof-program,research,no,research program,positioned,keep out of Prophet Cloud critical path
+SourceOS-Linux/homebrew-tap,package-distribution,no,SourceOS package distribution,positioned,defer until packaging tranche
+SourceOS-Linux/nix-openclaw,package-distribution,no,Nix/OpenClaw package support,positioned,defer until packaging tranche
+SourceOS-Linux/openclaw,package-distribution,no,OpenClaw package support,positioned,defer until packaging tranche
+SourceOS-Linux/sourceos-boot,boot-release,yes,SourceOS boot release substrate,positioned,bind boot release evidence into platform trust chain
+SourceOS-Linux/sourceos-devtools,image-build,no,SourceOS developer tools,positioned,defer until developer packaging tranche
+SourceOS-Linux/sourceos-model-carry,model-carry,yes,model carry/local runtime bridge,positioned,bind model carry to model governance and agent mesh
+SourceOS-Linux/sourceos-shell,local-runtime,yes,SourceOS local runtime shell,positioned,bind local runtime to workspace bridge
+SourceOS-Linux/sourceos-spec,image-build,yes,SourceOS image/build specification,positioned,bind image specs to boot/release and deployment docs
+SourceOS-Linux/sourceos-syncd,local-runtime,yes,local sync/provenance daemon,positioned,bind syncd to workspace storage and evidence receipts

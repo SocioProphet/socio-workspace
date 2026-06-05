@@ -1,0 +1,15 @@
+{
+  "version": "v0",
+  "gate_id": "gate-1-generated-artifact-review",
+  "status": "not_started",
+  "mesh_state": "prepared-but-not-deployed",
+  "review_artifacts_exist": true,
+  "review_performed": false,
+  "promotion_authorized": false,
+  "make_targets": [
+    "workspace-mesh-gate1-artifact-review-validate",
+    "workspace-mesh-topology-gates-validate"
+  ],
+  "ci_workflow": ".github/workflows/validate-workspace-mesh-proxy.yml",
+  "next_allowed_action": "review_generated_artifacts_without_id_substitution"
+}

@@ -1,0 +1,74 @@
+{
+  "version": "v0",
+  "gate_id": "gate-1-generated-artifact-review",
+  "status": "not_started",
+  "current_mesh_state": "prepared-but-not-deployed",
+  "purpose": "Review generated local artifacts before ID substitution or any live Workspace action.",
+  "expected_generated_directory": "infra/google-workspace-ops-mesh/generated/google-workspace-ops-mesh",
+  "artifacts": [
+    {
+      "name": "config.generated.json",
+      "kind": "apps_script_runtime_config",
+      "required_checks": [
+        "dryRun_true",
+        "spreadsheetId_placeholder_or_gate2_started",
+        "required_metadata_fields_present",
+        "calendar_ids_placeholder_or_gate2_started",
+        "no_secrets"
+      ]
+    },
+    {
+      "name": "clasp.generated.json",
+      "kind": "apps_script_clasp_config",
+      "required_checks": [
+        "scriptId_placeholder_or_gate2_started",
+        "rootDir_expected",
+        "filePushOrder_expected",
+        "no_secrets",
+        "not_a_clasp_push"
+      ]
+    },
+    {
+      "name": "mesh-summary.generated.json",
+      "kind": "mesh_summary",
+      "required_checks": [
+        "dry_run_true",
+        "project_services_enabled_false",
+        "workspace_groups_enabled_false",
+        "no_live_resource_creation_implied",
+        "no_secrets"
+      ]
+    },
+    {
+      "name": "operator-next-steps.md",
+      "kind": "operator_instructions",
+      "required_checks": [
+        "validates_repository_scaffold",
+        "lists_generated_files",
+        "requires_review_before_clasp_copy",
+        "keeps_dry_run_enabled",
+        "states_unsupported_surfaces",
+        "does_not_authorize_deployment"
+      ]
+    }
+  ],
+  "allowed_dispositions": [
+    "not_started",
+    "needs_changes",
+    "reviewed_no_promotion",
+    "reviewed_ready_for_gate_2"
+  ],
+  "current_disposition": "not_started",
+  "forbidden_by_this_gate": [
+    "id_substitution",
+    "tofu_apply",
+    "clasp_push",
+    "apps_script_execution",
+    "scheduled_triggers",
+    "live_calendar_access",
+    "workspace_group_creation",
+    "dashboard_creation",
+    "production_data_processing",
+    "native_socioprophet_migration"
+  ]
+}

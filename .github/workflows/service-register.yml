@@ -22,6 +22,7 @@ on:
       - "tools/check_fabric_atlas_model_carry_propagation_plan.py"
       - "tools/check_atlas_bundle_diff_status.py"
       - "tools/check_atlas_readme_extraction_checklist.py"
+      - "tools/check_prophet_cloud_execution_artifacts.py"
       - ".github/workflows/service-register.yml"
   push:
     branches: [main]
@@ -44,6 +45,7 @@ on:
       - "tools/check_fabric_atlas_model_carry_propagation_plan.py"
       - "tools/check_atlas_bundle_diff_status.py"
       - "tools/check_atlas_readme_extraction_checklist.py"
+      - "tools/check_prophet_cloud_execution_artifacts.py"
       - ".github/workflows/service-register.yml"
 
 jobs:
@@ -86,6 +88,8 @@ jobs:
         run: python3 tools/check_atlas_bundle_diff_status.py
       - name: Check Atlas README extraction checklist
         run: python3 tools/check_atlas_readme_extraction_checklist.py
+      - name: Check Prophet Cloud execution artifacts
+        run: python3 tools/check_prophet_cloud_execution_artifacts.py
       - name: Generate workspace inventory sync report
         run: python3 tools/generate_workspace_inventory_sync_report.py
       - name: Check workspace inventory sync report freshness

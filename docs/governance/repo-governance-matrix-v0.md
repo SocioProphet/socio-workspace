@@ -11,6 +11,7 @@ This matrix classifies current SocioProphet estate repositories by governance ro
 - `canonical`: authoritative repositories allowed to define current platform contracts, runtime behavior, release gates, transport semantics, execution semantics, ontology terms, public surface behavior, or governance state.
 - `promotion-candidate`: active repositories that need scope hardening, canonical consumers, validation, or ADR/Sociosphere registration before becoming authority sources.
 - `provenance-only`: historical, archival, salvage, mirror, or experimental material. Evidence, not authority.
+- `archive-retire`: superseded repository that should be archived rather than mined, promoted, or reactivated. Evidence only; no active extraction backlog.
 
 ## Canonical repositories
 
@@ -36,11 +37,16 @@ This matrix classifies current SocioProphet estate repositories by governance ro
 | `SocioProphet/gaia-world-model` | Auditable world-model scaffolding | Promote when GAIA domain model is explicitly imported by platform or ontology spine. | Domain scope outpaces validation. |
 | `SocioProphet/slash-topics` | Governed topic packs and semantic BI outputs | Promote when outputs feed live surface ontology, search, or analytics. | Topic taxonomy drift from `config/surfaces.json`. |
 
+## Archive-retire repositories
+
+| Repository | Use | Restriction |
+|---|---|---|
+| `mdheller/socioprophet-old` | Superseded historical implementation | Archive. Do not mine for current doctrine, do not promote, and do not treat as a salvage backlog source. |
+
 ## Provenance-only by default
 
 | Repository/pattern | Use | Restriction |
 |---|---|---|
-| `mdheller/socioprophet-old` | Historical implementation reference | Must not define current contracts. |
 | `SocioProphet/socioprophet-web-medium` | Historical web material | Must not define current public surface behavior. |
 | `SocioProphet/tritrpc-notes-archive` | TriTRPC notes archive | Must not supersede `TriTRPC`. |
 | WIP salvage or mirror branches/repos | Recovery and audit continuity | Must be explicitly promoted before use as authority. |
@@ -56,3 +62,4 @@ This matrix classifies current SocioProphet estate repositories by governance ro
 6. Ontology terms and SHACL validation belong in `ontogenesis`.
 7. Standards repos require explicit import, ADR, or registration to be authoritative.
 8. Provenance repos are evidence, not authority.
+9. Archive-retire repos are not extraction backlogs; they should be archived unless a later explicit governance reversal is recorded.

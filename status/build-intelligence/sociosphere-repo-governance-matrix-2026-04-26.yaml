@@ -7,9 +7,9 @@ subject: repo-governance-matrix
 status: proposed
 summary: >-
   Registers the SocioProphet repository governance matrix tranche. The tranche
-  classifies repositories as canonical, promotion-candidate, or provenance-only
-  and adds a zero-dependency validator plus CI gate for the machine-readable
-  matrix.
+  classifies repositories as canonical, promotion-candidate, provenance-only, or
+  archive-retire and adds a zero-dependency validator plus CI gate for the
+  machine-readable matrix.
 artifacts:
   - docs/governance/repo-governance-matrix-v0.md
   - registry/repo-governance-matrix-v0.yaml
@@ -32,8 +32,9 @@ governance_classes:
     - SocioProphet/socioprophet-standards-knowledge
     - SocioProphet/gaia-world-model
     - SocioProphet/slash-topics
-  provenance_only:
+  archive_retire:
     - mdheller/socioprophet-old
+  provenance_only:
     - SocioProphet/socioprophet-web-medium
     - SocioProphet/tritrpc-notes-archive
 validation:
@@ -43,6 +44,7 @@ risk: low
 limitations:
   - Matrix is draft v0 and should be reviewed against current org inventory before canonical promotion.
   - Validator is structural and intentionally does not yet query GitHub for repo existence or branch state.
+  - mdheller/socioprophet-old is superseded and should be archived rather than mined, promoted, or used as a salvage backlog source.
 next_steps:
   - Add repo-existence and archived-state checks.
   - Add ownership/RACI fields.

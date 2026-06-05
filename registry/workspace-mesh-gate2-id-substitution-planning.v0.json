@@ -1,0 +1,47 @@
+{
+  "version": "v0",
+  "gate_id": "gate-2-id-substitution-review",
+  "status": "planning_only",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_1_disposition": "reviewed_no_promotion",
+  "gate_2_disposition": "not_started",
+  "purpose": "Plan how placeholder identifiers would be reviewed later without including real identifiers or starting substitution.",
+  "placeholder_fields": [
+    {
+      "name": "spreadsheet_id",
+      "placeholder": "TODO_GOOGLE_SHEET_ID",
+      "target_artifact": "config.generated.json"
+    },
+    {
+      "name": "apps_script_project_id",
+      "placeholder": "TODO_APPS_SCRIPT_PROJECT_ID",
+      "target_artifact": "clasp.generated.json"
+    },
+    {
+      "name": "cloud_vendor_strategy_calendar_id",
+      "placeholder": "TODO_SP_CLOUD_VENDOR_STRATEGY_CALENDAR_ID",
+      "target_artifact": "config.generated.json"
+    },
+    {
+      "name": "launch_council_calendar_id",
+      "placeholder": "TODO_SP_LAUNCH_COUNCIL_CALENDAR_ID",
+      "target_artifact": "config.generated.json"
+    }
+  ],
+  "requirements_before_gate2_start": [
+    "gate0_complete",
+    "gate1_reviewed_no_promotion_record_exists",
+    "plan_safety_passes",
+    "generated_artifact_review_passes_from_plan_json",
+    "mesh_state_prepared_but_not_deployed"
+  ],
+  "forbidden_in_planning_record": [
+    "real_identifier_values",
+    "versioned_candidate_mapping",
+    "workspace_asset_mutation",
+    "script_execution",
+    "scheduled_jobs",
+    "promotion_beyond_planning"
+  ],
+  "next_allowed_state": "gate2_planning_validated"
+}

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Print the full Workspace mesh local checkpoint summary."""
+"""Print the full Workspace mesh local checkpoint summary.
+
+This script summarizes state after the standalone Make checkpoint has already
+run the detailed validators. It reads only committed state ledgers and prints
+non-sensitive status fields.
+"""
 
 from __future__ import annotations
 
@@ -42,6 +47,9 @@ def main() -> None:
         "gate_1": "reviewed_no_promotion",
         "gate_2": "planning_only",
         "gate_3": "blocked",
+        "gate_4": "not_started",
+        "gate_5": "blocked",
+        "gate_6": "blocked",
     }
     for gate, state in expected.items():
         if gates.get(gate, {}).get("state") != state:
@@ -53,17 +61,26 @@ def main() -> None:
         fail("candidate_values_printed must be false")
     if controls.get("live_execution") is not False:
         fail("live_execution must be false")
+    if controls.get("local_file_only_plan") is not True:
+        fail("local_file_only_plan must be true")
+    if controls.get("actionable_plan_changes") != 4:
+        fail("actionable_plan_changes must be 4")
 
-    print("Workspace Mesh Local Checkpoint")
-    print("===============================")
+    print("Workspace Mesh Full Local Checkpoint")
+    print("====================================")
     print("mesh_state=prepared-but-not-deployed")
     print("gate_0=complete")
     print("gate_1=reviewed_no_promotion")
     print("gate_2=planning_only")
     print("gate_3=blocked")
+    print("gate_4=not_started")
+    print("gate_5=blocked")
+    print("gate_6=blocked")
     print("plan_safety=passed")
-    print("artifact_review=passed")
-    print("candidate_lifecycle=passed")
+    print("local_file_only_plan=true")
+    print("actionable_plan_changes=4")
+    print("gate1_artifact_review=passed")
+    print("gate2_candidate_lifecycle=passed")
     print("promotion_blocker=active")
     print("current_state_ledger=valid")
     print("ids_substituted=false")

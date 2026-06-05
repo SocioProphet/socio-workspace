@@ -15,15 +15,16 @@ The repository contains only a placeholder template:
 templates/workspace-mesh/gate2-candidate-mapping.template.json
 ```
 
-The repository also contains a validator:
+The repository also contains validators and a local-file helper:
 
 ```text
 tools/validate_workspace_mesh_gate2_candidate_template.py
+tools/create_workspace_mesh_gate2_local_candidate_mapping.py
 ```
 
 ## Local-only file path
 
-If a future operator needs to prepare candidate values for review, copy the template to:
+If a future operator needs to prepare candidate values for review, the helper creates:
 
 ```text
 .workspace-mesh/gate2-candidate-mapping.local.json
@@ -31,18 +32,10 @@ If a future operator needs to prepare candidate values for review, copy the temp
 
 That local path is ignored by Git.
 
-## Validation commands
-
-Because the standalone make fragment may not always be included by the root wrapper, either command is acceptable:
+## Validation command
 
 ```bash
 make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-candidate-template-validate
-```
-
-or:
-
-```bash
-python3 tools/validate_workspace_mesh_gate2_candidate_template.py
 ```
 
 Expected output:
@@ -53,15 +46,30 @@ placeholders=4
 local_mapping_paths_ignored=true
 ```
 
-## Local copy command
+## Local helper command
 
 ```bash
-mkdir -p .workspace-mesh
-cp templates/workspace-mesh/gate2-candidate-mapping.template.json .workspace-mesh/gate2-candidate-mapping.local.json
+make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-local-candidate-create
+```
+
+Expected output:
+
+```text
+PASS: Workspace mesh Gate 2 local candidate mapping file created
+local_file=.workspace-mesh/gate2-candidate-mapping.local.json
+placeholder_copy=true
+git_ignored=true
+ids_substituted=false
+```
+
+If the local file already exists and should be reset to the placeholder template:
+
+```bash
+make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-local-candidate-create-force
 ```
 
 Do not commit `.workspace-mesh/gate2-candidate-mapping.local.json`.
 
 ## Boundary
 
-The template does not substitute identifiers, write repository configuration, execute scripts, schedule automation, or promote the mesh beyond planning.
+The template and helper do not substitute identifiers, write repository configuration, execute scripts, schedule automation, or promote the mesh beyond planning.

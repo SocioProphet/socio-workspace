@@ -1,0 +1,23 @@
+{
+  "evidenceBundleId": "evb:sociosphere:governance-action:invalid",
+  "integrity": {
+    "contentDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "hashAlgorithm": "sha256"
+  },
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "EvidenceBundle",
+  "schemaVersion": "governance.evidence-bundle.v0.1",
+  "sourceRefs": [
+    {
+      "authorityClass": "canonical",
+      "kind": "repo_file",
+      "ref": "docs/ecosystem/socioprophet.md"
+    }
+  ],
+  "subjectRef": "institutional-action:invalid"
+}

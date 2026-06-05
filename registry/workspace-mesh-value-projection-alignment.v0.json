@@ -1,0 +1,40 @@
+{
+  "version": "v0",
+  "alignment_id": "workspace_mesh_value_projection_alignment_v0",
+  "mesh_state": "prepared-but-not-deployed",
+  "topology_authority": "SocioProphet/sociosphere",
+  "value_projection_authority": "SocioProphet/prophet-platform",
+  "prophet_platform_fixture": {
+    "repository": "SocioProphet/prophet-platform",
+    "path": "contracts/workspace-prophet/e2e/value-claim-projection-workspace-prophet-v0.json",
+    "validator": "tools/validate_workspace_prophet_value_projection.py",
+    "projection_id": "workspace_prophet_value_claim_projection_v0",
+    "source_claim_id": "claim_workspace_readonly_diagnostics_completed_demo",
+    "source_receipt_id": "receipt_workspace_diagnostics_completed_demo",
+    "primary_value_driver": "productivity",
+    "secondary_value_drivers": [
+      "risk_reduction"
+    ],
+    "required_kpis": [
+      "validated_control_loop_steps",
+      "blocked_unapproved_action_classes"
+    ],
+    "production_ready": false,
+    "observation_window": "fixture_validation_only"
+  },
+  "sociosphere_alignment": {
+    "role": "workspace_mesh_topology_and_operations_governance",
+    "does_not_duplicate_value_logic": true,
+    "references_external_value_authority": true,
+    "dashboard_future_surface": "planned_only",
+    "gate_state_dependency": "gate_3_blocked"
+  },
+  "status_flags": {
+    "ids_substituted": false,
+    "candidate_values_printed": false,
+    "live_execution": false,
+    "production_processing": false,
+    "value_claim_projection_copied_into_sociosphere": false
+  },
+  "next_allowed_action": "alignment_validation_only"
+}

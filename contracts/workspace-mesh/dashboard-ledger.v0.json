@@ -1,0 +1,112 @@
+{
+  "version": "v0",
+  "contract_id": "workspace_mesh_dashboard_ledger_v0",
+  "mesh_state": "prepared-but-not-deployed",
+  "dashboard_state": "contract_only",
+  "sheet_id": "TODO_GOOGLE_SHEET_ID",
+  "dashboard_id": "TODO_DASHBOARD_ID",
+  "live_dashboard_created": false,
+  "tabs": {
+    "Meetings": {
+      "purpose": "Meeting/event ledger projection for Workspace mesh operations.",
+      "required_fields": [
+        "meeting_id",
+        "calendar_key",
+        "workstream",
+        "meeting_type",
+        "canonical_issue",
+        "expected_outputs",
+        "sync_state"
+      ]
+    },
+    "Automations": {
+      "purpose": "Automation inventory and planned execution posture.",
+      "required_fields": [
+        "automation_id",
+        "owner_surface",
+        "trigger_mode",
+        "dry_run_required",
+        "approval_gate",
+        "execution_state"
+      ]
+    },
+    "Workstreams": {
+      "purpose": "Workspace-to-SocioProphet workstream topology.",
+      "required_fields": [
+        "workstream_id",
+        "name",
+        "authority_repo",
+        "canonical_issue",
+        "gate_state"
+      ]
+    },
+    "Decisions": {
+      "purpose": "Decision log for governance-relevant operator choices.",
+      "required_fields": [
+        "decision_id",
+        "decision_date",
+        "decision_summary",
+        "authority",
+        "proof_ref"
+      ]
+    },
+    "Risks": {
+      "purpose": "Risk register for deployment, privacy, and governance boundaries.",
+      "required_fields": [
+        "risk_id",
+        "risk_class",
+        "severity",
+        "control",
+        "status"
+      ]
+    },
+    "Claims": {
+      "purpose": "Claim references linked to Prophet Platform value authority.",
+      "required_fields": [
+        "claim_id",
+        "claim_type",
+        "authority_repo",
+        "support_status",
+        "production_ready"
+      ]
+    },
+    "ValueProjections": {
+      "purpose": "Value projection references, not duplicated value logic.",
+      "required_fields": [
+        "projection_id",
+        "authority_repo",
+        "primary_driver",
+        "required_kpis",
+        "fixture_only"
+      ]
+    },
+    "GateProofs": {
+      "purpose": "Gate proof ledger for prepared-but-not-deployed control state.",
+      "required_fields": [
+        "gate_id",
+        "gate_state",
+        "proof_path",
+        "validated_by",
+        "validated_at"
+      ]
+    },
+    "OperatorActions": {
+      "purpose": "Operator command ledger for local proof runs.",
+      "required_fields": [
+        "action_id",
+        "command_summary",
+        "result",
+        "live_execution",
+        "proof_ref"
+      ]
+    }
+  },
+  "controls": {
+    "no_live_sheet_required": true,
+    "no_dashboard_publication": true,
+    "no_looker_studio_action": true,
+    "no_workspace_mutation": true,
+    "candidate_values_printed": false,
+    "live_execution": false
+  }
+}

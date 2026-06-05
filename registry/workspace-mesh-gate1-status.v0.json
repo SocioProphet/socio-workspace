@@ -11,5 +11,17 @@
     "workspace-mesh-topology-gates-validate"
   ],
   "ci_workflow": ".github/workflows/validate-workspace-mesh-proxy.yml",
-  "next_allowed_action": "review_generated_artifacts_without_id_substitution"
+  "next_allowed_action": "review_generated_artifacts_without_id_substitution",
+  "explicit_non_authorization": [
+    "id_substitution",
+    "tofu_apply",
+    "clasp_push",
+    "apps_script_execution",
+    "scheduled_triggers",
+    "live_calendar_access",
+    "workspace_group_creation",
+    "dashboard_creation",
+    "production_data_processing",
+    "native_socioprophet_migration"
+  ]
 }

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.ai/sociosphere/schemas/workspace-prophet-readiness.schema.json",
+  "title": "WorkspaceProphetReadinessRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "capability_id",
+    "readiness_state",
+    "production_ready",
+    "source_repos",
+    "validation_refs",
+    "evidence_refs",
+    "registry_decision",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1.0" },
+    "capability_id": { "type": "string", "minLength": 1 },
+    "readiness_state": {
+      "type": "string",
+      "enum": [
+        "missing_contract",
+        "contract_validated",
+        "runtime_observed",
+        "evidence_indexed",
+        "fixture_validated",
+        "ready_for_demo",
+        "production_ready"
+      ]
+    },
+    "production_ready": { "type": "boolean", "const": false },
+    "source_repos": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "validation_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "evidence_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "registry_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reason"],
+      "properties": {
+        "decision": { "type": "string", "enum": ["register_fixture_validated", "hold", "reject"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "blocked_from": { "type": "array", "items": { "type": "string" } },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "metadata": { "type": "object", "additionalProperties": true }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "version": "v0",
+  "status": "prepared-but-not-deployed",
+  "topology_repo": "SocioProphet/sociosphere",
+  "implementation_repo": "SocioProphet/prophet-platform-fabric-mlops-ts-suite",
+  "required_current_status": "prepared-but-not-deployed",
+  "gates": [
+    {
+      "id": "gate-0-local-topology-proof",
+      "status": "complete",
+      "required_evidence": [
+        "workspace-mesh-proxy-validate passed",
+        "terraform-workspace-mesh-plan-safe passed",
+        "default plan local-file-only",
+        "actionable_changes=4"
+      ]
+    },
+    {
+      "id": "gate-1-generated-artifact-review",
+      "status": "not_started"
+    },
+    {
+      "id": "gate-2-id-substitution-review",
+      "status": "not_started"
+    },
+    {
+      "id": "gate-3-apps-script-dry-run-rehearsal",
+      "status": "not_started"
+    },
+    {
+      "id": "gate-4-controlled-test-write",
+      "status": "not_started"
+    },
+    {
+      "id": "gate-5-scheduled-trigger-approval",
+      "status": "blocked"
+    },
+    {
+      "id": "gate-6-native-socioprophet-migration-review",
+      "status": "blocked"
+    }
+  ],
+  "forbidden_until_promoted": [
+    "tofu_apply_live_google_resources",
+    "workspace_group_creation",
+    "calendar_creation",
+    "sheet_creation_by_iac",
+    "apps_script_scheduled_triggers",
+    "looker_studio_dashboard_creation",
+    "production_data_processing",
+    "native_socioprophet_migration"
+  ]
+}

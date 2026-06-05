@@ -28,8 +28,9 @@ ALLOWED_REVIEW_STATUSES = {
     "reviewed_local_only",
     "rejected_local_only",
 }
+PRIVATE_KEY_MARKER = "-----BEGIN " + "PRIVATE KEY-----"
 FORBIDDEN_MARKERS = [
-    "-----BEGIN PRIVATE KEY-----",
+    PRIVATE_KEY_MARKER,
     "client_secret",
     "refresh_token",
     "access_token",

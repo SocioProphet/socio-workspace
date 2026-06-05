@@ -4,8 +4,9 @@ import re
 import sys
 
 MATRIX = Path("registry/repo-governance-matrix-v0.yaml")
-VALID_CLASSES = {"canonical", "promotion_candidate", "provenance_only"}
+VALID_CLASSES = {"canonical", "promotion_candidate", "provenance_only", "archive_retire"}
 REQUIRED_AUTHORITY_FIELDS = {"contracts", "runtime_behavior", "standards", "evidence_state"}
+REQUIRES_RESTRICTION = {"provenance_only", "archive_retire"}
 
 
 def fail(message: str) -> int:
@@ -74,7 +75,7 @@ def main() -> int:
                 return fail(f"{name} missing promotion_condition")
             if not str(repo.get("risk", "")).strip():
                 return fail(f"{name} missing risk")
-        if klass == "provenance_only" and not str(repo.get("restriction", "")).strip():
+        if klass in REQUIRES_RESTRICTION and not str(repo.get("restriction", "")).strip():
             return fail(f"{name} missing restriction")
     missing_classes = VALID_CLASSES - classes
     if missing_classes:

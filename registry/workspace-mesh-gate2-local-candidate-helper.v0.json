@@ -1,0 +1,19 @@
+{
+  "version": "v0",
+  "gate_id": "gate-2-id-substitution-review",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_2_state": "planning_only",
+  "helper_state": "available",
+  "template_path": "templates/workspace-mesh/gate2-candidate-mapping.template.json",
+  "helper_path": "tools/create_workspace_mesh_gate2_local_candidate_mapping.py",
+  "make_fragment": "workspace-mesh-gate2-candidate.mk",
+  "local_candidate_path": ".workspace-mesh/gate2-candidate-mapping.local.json",
+  "local_candidate_path_is_git_ignored": true,
+  "versioned_candidate_values_allowed": false,
+  "helper_outputs_placeholder_copy_only": true,
+  "commands": {
+    "validate_template": "make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-candidate-template-validate",
+    "create_local_placeholder_copy": "make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-local-candidate-create",
+    "reset_local_placeholder_copy": "make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-local-candidate-create-force"
+  }
+}

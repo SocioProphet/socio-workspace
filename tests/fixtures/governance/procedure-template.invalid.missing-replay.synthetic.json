@@ -1,0 +1,33 @@
+{
+  "approvalGate": {
+    "mode": "domain_owner",
+    "required": true
+  },
+  "evidenceRequirements": [
+    {
+      "description": "At least one canonical source file or governance document must be cited.",
+      "minAuthorityClass": "canonical",
+      "requirementId": "evidence:source-file"
+    }
+  ],
+  "outputContract": {
+    "permittedOutputs": ["documentation_change"],
+    "schemaRef": "schemas/governance/institutional-action.v0.1.schema.json"
+  },
+  "ownerRepo": "SocioProphet/sociosphere",
+  "policyBasisRefs": ["policy:human-in-command"],
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "ProcedureTemplate",
+  "requiredInputs": [
+    {"kind": "context", "name": "change_request", "required": true}
+  ],
+  "schemaVersion": "governance.procedure-template.v0.1",
+  "templateId": "procedure:invalid",
+  "title": "Invalid governed documentation update",
+  "version": "0.1.0"
+}

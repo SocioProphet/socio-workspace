@@ -42,7 +42,7 @@ workspace-mesh-proxy-validate:
 workspace-mesh-release-readiness-validate:
 	python3 tools/validate_workspace_mesh_release_readiness.py
 
-workspace-mesh-topology-validate: workspace-mesh-proxy-validate workspace-mesh-release-readiness-validate workspace-mesh-gate1-artifact-review-validate
+workspace-mesh-topology-validate: workspace-mesh-topology-gates-validate
 
 include workspace-mesh-gates.mk
 

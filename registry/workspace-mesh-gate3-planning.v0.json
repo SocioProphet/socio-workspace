@@ -1,0 +1,27 @@
+{
+  "version": "v0",
+  "gate_id": "gate-3-apps-script-dry-run-rehearsal",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_2_state": "planning_only",
+  "gate_3_state": "blocked",
+  "planning_state": "available",
+  "promotion_blocker_required": true,
+  "gate2_approval_required": true,
+  "gate3_start_record_required": true,
+  "dry_run_required": true,
+  "scheduled_trigger_state": "absent_required",
+  "production_processing_state": "disallowed",
+  "candidate_value_logging": "disallowed",
+  "required_prior_validations": [
+    "workspace-mesh-local-checkpoint",
+    "workspace-mesh-gate2-promotion-blocker-validate",
+    "workspace-mesh-current-state-validate"
+  ],
+  "status_flags": {
+    "ids_substituted": false,
+    "candidate_values_printed": false,
+    "live_execution": false,
+    "gate3_started": false
+  },
+  "next_allowed_action": "gate3_planning_validation_only"
+}

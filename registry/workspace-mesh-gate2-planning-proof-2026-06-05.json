@@ -1,0 +1,27 @@
+{
+  "version": "v0",
+  "date": "2026-06-05",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_0": "complete",
+  "gate_1": "reviewed_no_promotion",
+  "gate_2": "planning_only",
+  "gate_2_disposition": "not_started",
+  "proof_document": "docs/operations/workspace-mesh-gate2-planning-proof-2026-06-05.md",
+  "evidence": {
+    "operator_checkpoint": "passed",
+    "plan_safety": "passed",
+    "actionable_changes": 4,
+    "gate1_artifact_review": "passed",
+    "artifact_review_source": "plan_json",
+    "placeholder_count": 4,
+    "ids_substituted": false,
+    "live_execution": false
+  },
+  "placeholder_set": [
+    "TODO_GOOGLE_SHEET_ID",
+    "TODO_APPS_SCRIPT_PROJECT_ID",
+    "TODO_SP_CLOUD_VENDOR_STRATEGY_CALENDAR_ID",
+    "TODO_SP_LAUNCH_COUNCIL_CALENDAR_ID"
+  ],
+  "next_allowed_action": "gate_2_planning_record_only"
+}

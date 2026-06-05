@@ -11,8 +11,10 @@ on:
       - 'docs/operations/workspace-mesh-proxy.md'
       - 'docs/operations/workspace-mesh-release-readiness.md'
       - 'docs/operations/workspace-mesh-gate1-generated-artifact-review-template.md'
+      - 'docs/operations/workspace-mesh-gate1-status.md'
       - 'registry/workspace-mesh-release-readiness.v0.json'
       - 'registry/workspace-mesh-gate1-generated-artifact-review.v0.json'
+      - 'registry/workspace-mesh-gate1-status.v0.json'
       - '.github/workflows/validate-workspace-mesh-proxy.yml'
   push:
     branches:
@@ -27,8 +29,10 @@ on:
       - 'docs/operations/workspace-mesh-proxy.md'
       - 'docs/operations/workspace-mesh-release-readiness.md'
       - 'docs/operations/workspace-mesh-gate1-generated-artifact-review-template.md'
+      - 'docs/operations/workspace-mesh-gate1-status.md'
       - 'registry/workspace-mesh-release-readiness.v0.json'
       - 'registry/workspace-mesh-gate1-generated-artifact-review.v0.json'
+      - 'registry/workspace-mesh-gate1-status.v0.json'
       - '.github/workflows/validate-workspace-mesh-proxy.yml'
   workflow_dispatch:
 

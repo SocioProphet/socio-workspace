@@ -3,12 +3,20 @@
 Status: `not_started`
 Mesh state: `prepared-but-not-deployed`
 
+## Explicit status flags
+
+```text
+review_performed=false
+promotion_authorized=false
+```
+
 ## What exists
 
 Gate 1 now has:
 
 - human review template: `docs/operations/workspace-mesh-gate1-generated-artifact-review-template.md`
 - machine manifest: `registry/workspace-mesh-gate1-generated-artifact-review.v0.json`
+- status manifest: `registry/workspace-mesh-gate1-status.v0.json`
 - validator: `tools/validate_workspace_mesh_gate1_artifact_review.py`
 - make targets: `workspace-mesh-gate1-artifact-review-validate` and `workspace-mesh-topology-gates-validate`
 - CI coverage through `Validate Workspace Mesh Topology`

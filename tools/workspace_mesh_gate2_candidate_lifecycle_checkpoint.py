@@ -2,7 +2,8 @@
 """Print a compact Gate 2 candidate lifecycle checkpoint.
 
 This script reads only status/count information from the local candidate file and
-never prints candidate values.
+never prints candidate values. The standalone Make lifecycle target runs schema
+validation before this script; the final block records that contract.
 """
 
 from __future__ import annotations
@@ -14,6 +15,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCAL_FILE = ROOT / ".workspace-mesh" / "gate2-candidate-mapping.local.json"
+SCHEMA = ROOT / "schemas" / "workspace-mesh" / "gate2-candidate-review.schema.json"
+TEMPLATE = ROOT / "templates" / "workspace-mesh" / "gate2-candidate-mapping.template.json"
 EXPECTED_FIELDS = {
     "spreadsheet_id",
     "apps_script_project_id",
@@ -36,11 +39,27 @@ def git_ignored(path: Path) -> bool:
     return result.returncode == 0
 
 
+def load_json(path: Path) -> dict:
+    if not path.exists():
+        fail(f"missing file: {path.relative_to(ROOT)}")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def main() -> None:
     if not LOCAL_FILE.exists():
         fail(f"missing local candidate mapping: {LOCAL_FILE.relative_to(ROOT)}")
 
-    data = json.loads(LOCAL_FILE.read_text(encoding="utf-8"))
+    schema = load_json(SCHEMA)
+    template = load_json(TEMPLATE)
+    data = load_json(LOCAL_FILE)
+
+    schema_fields = set(schema["properties"]["candidate_values"]["properties"])
+    if schema_fields != EXPECTED_FIELDS:
+        fail("schema field set mismatch")
+    template_fields = set(template.get("candidate_values", {}))
+    if template_fields != EXPECTED_FIELDS:
+        fail("template field set mismatch")
+
     candidate_values = data.get("candidate_values", {})
     if set(candidate_values) != EXPECTED_FIELDS:
         fail("candidate field set mismatch")
@@ -68,6 +87,9 @@ def main() -> None:
     print("====================================================")
     print("mesh_state=prepared-but-not-deployed")
     print("gate_2=planning_only")
+    print("schema_present=true")
+    print("schema_template_compatible=true")
+    print("schema_validation=passed_by_lifecycle_target")
     print(f"local_candidate_file={LOCAL_FILE.relative_to(ROOT)}")
     print(f"mode={mode}")
     print(f"fields={len(EXPECTED_FIELDS)}")

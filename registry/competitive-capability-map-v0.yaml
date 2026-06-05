@@ -1,0 +1,112 @@
+version: 0.1.0
+status: draft
+date: 2026-06-05
+owner: sociosphere-governance
+subject: regulated-ai-control-plane-capability-map
+purpose: Map visible regulated AI product patterns into SocioProphet governed primitives.
+sources:
+  - id: openai-business
+    name: OpenAI Business
+    url: https://openai.com/business/
+    pattern: enterprise_ai_workspace
+  - id: openai-enterprise
+    name: ChatGPT Enterprise
+    url: https://chatgpt.com/business/enterprise/
+    pattern: enterprise_agents_connectors_security
+  - id: harvey-platform
+    name: Harvey platform
+    url: https://www.harvey.ai/
+    pattern: legal_professional_services_ai_platform
+  - id: harvey-security
+    name: Harvey security
+    url: https://www.harvey.ai/security
+    pattern: enterprise_security_controls
+  - id: ambience-healthcare
+    name: Ambience Healthcare
+    url: https://www.ambiencehealthcare.com/
+    pattern: healthcare_documentation_coding_workflow
+  - id: healthbench
+    name: HealthBench
+    url: https://arxiv.org/abs/2505.08775
+    pattern: physician_rubric_health_evaluation
+  - id: healthbench-professional
+    name: HealthBench Professional
+    url: https://arxiv.org/abs/2604.27470
+    pattern: clinician_task_evaluation
+capabilities:
+  - id: workspace-agents
+    source_patterns: [openai-business, openai-enterprise]
+    observed_capability: Shared agents for recurring workflows and team-tool usage.
+    governed_analogue: Governed agents represented as ProcedureTemplate and InstitutionalAction records.
+    required_objects: [ProcedureTemplate, InstitutionalAction, CapabilityGrant, ExecutionReceipt, WorkflowBench]
+    governance_delta: approval_gates_replay_receipts_graph_snapshots
+  - id: app-connectors
+    source_patterns: [openai-business, openai-enterprise, harvey-platform]
+    observed_capability: Connectors to enterprise apps, data sources, and embedded workflow tools.
+    governed_analogue: Connector registry with source permissions, action controls, and inherited permission posture.
+    required_objects: [ConnectorContract, SourcePermission, AppActionPolicy, ExecutionReceipt]
+    governance_delta: default_deny_scope_attestation_action_receipts
+  - id: legal-assistant
+    source_patterns: [harvey-platform]
+    observed_capability: Question answering, analysis, drafting, and source-grounded legal work.
+    governed_analogue: Human-in-command assistant with citation-first EvidenceBundle and authority checks.
+    required_objects: [InstitutionalAction, EvidenceBundle, PolicyBasis, AuthorityBoundary]
+    governance_delta: citation_provenance_jurisdiction_contradiction_tracking
+  - id: evidence-vault
+    source_patterns: [harvey-platform]
+    observed_capability: Secure document vault, review, extraction, and report generation.
+    governed_analogue: Evidence vault with extraction receipts, review-table lineage, graph snapshots, and redaction posture.
+    required_objects: [EvidenceBundle, ExtractionReceipt, ReviewTable, RedactionPolicy, GraphSnapshot]
+    governance_delta: extraction_lineage_redaction_policy_replay
+  - id: workflow-agents
+    source_patterns: [harvey-platform, openai-business]
+    observed_capability: Custom workflow agents, templates, conditionals, permissions, and sharing.
+    governed_analogue: Procedure-template-to-agent lane with role gates, capability grants, approval checkpoints, and replay tests.
+    required_objects: [ProcedureTemplate, CapabilityGrant, ApprovalEvent, ExecutionReceipt, WorkflowBench]
+    governance_delta: versioned_template_diff_human_approval_replay_test
+  - id: enterprise-security
+    source_patterns: [openai-business, harvey-security]
+    observed_capability: SSO, audit logs, role controls, data region posture, encryption, no-training statements, and security certifications.
+    governed_analogue: Machine-readable SecurityProfile, RetentionPolicy, ComplianceLogEvent, and audit receipts.
+    required_objects: [SecurityProfile, RetentionPolicy, ComplianceLogEvent, ExecutionReceipt]
+    governance_delta: enforceable_policy_objects_receipts_exports_retention
+  - id: clinical-documentation-coding
+    source_patterns: [ambience-healthcare]
+    observed_capability: Clinical documentation, coding support, workflow adaptation, documentation quality, and revenue-integrity support.
+    governed_analogue: Domain-specific procedure templates with clinician approval, coding-policy evidence, and workflow metrics.
+    required_objects: [ProcedureTemplate, EvidenceBundle, PolicyBasis, ExecutionReceipt, DomainBench, WorkflowBench]
+    governance_delta: clinician_approval_policy_trace_replay_quality_metrics
+  - id: domain-benchmarks
+    source_patterns: [healthbench, healthbench-professional]
+    observed_capability: Expert-rubric multi-turn health evaluation and clinician-task evaluation.
+    governed_analogue: DomainBench, WorkflowBench, GovernanceBench, and ReplayBench with rubric lineage and replayable scoring.
+    required_objects: [DomainBench, WorkflowBench, GovernanceBench, ReplayBench]
+    governance_delta: open_rubric_lineage_fixture_coverage_replayable_scores
+parity_plus_requirements:
+  - explicit_actor_role_authority_policy_capability
+  - evidence_bundle_with_provenance_digest_authority_class
+  - human_in_command_synthesis_recommendation_approval_execution_split
+  - execution_receipt_with_artifacts_graph_snapshot_replay_posture
+  - connector_actions_classified_by_read_write_action_risk
+  - benchmarks_with_rubric_lineage_failure_classes_thresholds
+  - runtime_claims_require_schema_fixture_validator_graph_query_admission
+next_schema_backlog:
+  - GovernanceBench
+  - WorkflowBench
+  - DomainBench
+  - ReplayBench
+  - ConnectorContract
+  - CapabilityGrant
+  - AppActionPolicy
+  - SecurityProfile
+  - ExtractionReceipt
+  - ReviewTable
+  - RedactionPolicy
+  - GraphSnapshot
+  - ComplianceLogEvent
+  - RetentionPolicy
+limitations:
+  - Capability map records product patterns, not runtime implementation claims.
+  - Source review should be refreshed before customer-facing use.
+  - Registry does not yet include per-capability acceptance tests.
+  - Registry does not yet include market scoring or pricing comparisons.

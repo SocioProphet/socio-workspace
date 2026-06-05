@@ -3,6 +3,7 @@
 
 Sociosphere should expose operator-friendly proxy targets while preserving
 prophet-platform-fabric-mlops-ts-suite as the mesh implementation authority.
+Gate-specific validators live in their own scripts.
 """
 
 from __future__ import annotations

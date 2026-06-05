@@ -13,6 +13,7 @@ The root `GNUmakefile` includes the existing `Makefile` and adds proxy targets t
 ```bash
 cd ~/dev/sociosphere
 git pull --ff-only
+make workspace-mesh-proxy-validate
 make terraform-workspace-mesh-plan-safe
 ```
 
@@ -22,9 +23,18 @@ make terraform-workspace-mesh-plan-safe
 make FABRIC_REPO=/path/to/prophet-platform-fabric-mlops-ts-suite terraform-workspace-mesh-plan-safe
 ```
 
+## Internal guard target
+
+```text
+fabric-repo-check
+```
+
+`fabric-repo-check` verifies that `FABRIC_REPO` exists and contains a root `Makefile` before proxy targets delegate to it. Operators normally run higher-level targets rather than invoking this guard directly.
+
 ## Available proxy targets
 
 ```text
+fabric-repo-check
 doctor-workspace-ops
 validate-workspace-prototype
 validate-workspace-mesh

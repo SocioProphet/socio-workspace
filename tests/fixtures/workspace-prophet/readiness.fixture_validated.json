@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1.0",
+  "capability_id": "workspace_operation_prophet_membrane_v0",
+  "readiness_state": "fixture_validated",
+  "production_ready": false,
+  "source_repos": [
+    "SocioProphet/prophet-core-contracts",
+    "SocioProphet/prophet-platform",
+    "SocioProphet/sherlock-search"
+  ],
+  "validation_refs": [
+    "prophet-core-contracts:make validate",
+    "prophet-platform:make validate-workspace-prophet-membrane-e2e",
+    "prophet-platform:python3 tools/validate_workspace_prophet_claim_projection.py",
+    "sherlock-search:make validate-workspace-prophet-evidence-index"
+  ],
+  "evidence_refs": [
+    "prophet-core-contracts:docs/platform-root-spine-v0.md",
+    "prophet-core-contracts:docs/prophet-execution-membrane-v0.md",
+    "prophet-core-contracts:schemas/scoped-capability.schema.json",
+    "prophet-core-contracts:schemas/action-receipt.schema.json",
+    "prophet-core-contracts:schemas/claim-record.schema.json",
+    "prophet-core-contracts:schemas/evidence-thread.schema.json",
+    "prophet-platform:contracts/workspace-prophet/e2e/workspace-operation-prophet-membrane-v0.json",
+    "prophet-platform:contracts/workspace-prophet/e2e/claim-projection-workspace-operation-prophet-v0.json",
+    "sherlock-search:examples/workspace-prophet/evidence-index.example.json"
+  ],
+  "registry_decision": {
+    "decision": "register_fixture_validated",
+    "reason": "Contracts, runtime fixture, claim projection, and Sherlock evidence index are locally validated. Production readiness is explicitly false."
+  },
+  "blocked_from": [
+    "production_ready",
+    "remote_execution",
+    "autonomous_remediation",
+    "customer_facing_claim"
+  ],
+  "updated_at": "2026-06-05T17:40:00Z",
+  "metadata": {
+    "operation_id": "op_readonly_diagnostics_demo",
+    "capability_id": "cap_local_command_readonly_demo",
+    "receipt_id": "receipt_workspace_diagnostics_completed_demo",
+    "claim_id": "claim_workspace_readonly_diagnostics_completed_demo",
+    "evidence_thread_id": "thread_workspace_readonly_diagnostics_completed_demo"
+  }
+}

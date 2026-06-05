@@ -10,6 +10,8 @@ classes:
     description: Active repositories that require promotion before becoming authoritative.
   provenance_only:
     description: Historical or experimental evidence sources, not current authority.
+  archive_retire:
+    description: Superseded repositories that should be archived rather than mined, promoted, or reactivated.
 repositories:
   - name: SocioProphet/socioprophet
     class: canonical
@@ -100,9 +102,9 @@ repositories:
     promotion_condition: Outputs feed live surface ontology search or analytics.
     risk: topic_taxonomy_drift_from_config_surfaces_json
   - name: mdheller/socioprophet-old
-    class: provenance_only
-    function: historical_implementation_reference
-    restriction: must_not_define_current_contracts
+    class: archive_retire
+    function: superseded_historical_implementation
+    restriction: archive_do_not_mine_promote_or_salvage
   - name: SocioProphet/socioprophet-web-medium
     class: provenance_only
     function: historical_web_material
@@ -120,6 +122,7 @@ authority_boundaries:
   - ontology_terms_and_SHACL_validation_belong_in_ontogenesis
   - standards_repos_require_explicit_import_ADR_or_registration_to_be_authoritative
   - provenance_repos_are_evidence_not_authority
+  - archive_retire_repos_are_not_extraction_backlogs_and_should_be_archived
 promotion_checklist:
   - declared_scope_boundary
   - canonical_repo_consumer

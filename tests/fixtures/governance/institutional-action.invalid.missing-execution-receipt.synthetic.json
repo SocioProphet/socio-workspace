@@ -1,0 +1,26 @@
+{
+  "actionId": "institutional-action:invalid",
+  "actor": {
+    "actorKind": "agent",
+    "actorRef": "agent:sociosphere-validator"
+  },
+  "approval": {
+    "required": true,
+    "status": "approved"
+  },
+  "authorityBoundaryRef": "authority:sociosphere-governance-docs",
+  "capabilityRef": "capability:validate-governance-schema",
+  "contextRefs": ["context:governance-schema-fixture"],
+  "evidenceBundleRef": "evb:sociosphere:governance-action:example",
+  "policyBasisRefs": ["policy:human-in-command"],
+  "procedureTemplateRef": "procedure:governed-doc-update",
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "InstitutionalAction",
+  "roleRef": "role:sociosphere-governance-owner",
+  "schemaVersion": "governance.institutional-action.v0.1"
+}

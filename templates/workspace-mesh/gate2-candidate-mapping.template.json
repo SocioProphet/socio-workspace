@@ -1,0 +1,54 @@
+{
+  "version": "v0",
+  "status": "template_only",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_id": "gate-2-id-substitution-review",
+  "purpose": "Template for a future local-only candidate mapping review. Keep real identifiers out of version control.",
+  "instructions": [
+    "Copy this file to .workspace-mesh/gate2-candidate-mapping.local.json for local review only.",
+    "Do not commit the local candidate mapping file.",
+    "Keep dry_run_required true.",
+    "Do not run execution commands from this template."
+  ],
+  "dry_run_required": true,
+  "candidate_values": {
+    "spreadsheet_id": {
+      "placeholder": "TODO_GOOGLE_SHEET_ID",
+      "candidate_value": "TODO_GOOGLE_SHEET_ID",
+      "source_evidence": "TODO_LOCAL_REVIEW_SOURCE",
+      "review_status": "not_started"
+    },
+    "apps_script_project_id": {
+      "placeholder": "TODO_APPS_SCRIPT_PROJECT_ID",
+      "candidate_value": "TODO_APPS_SCRIPT_PROJECT_ID",
+      "source_evidence": "TODO_LOCAL_REVIEW_SOURCE",
+      "review_status": "not_started"
+    },
+    "cloud_vendor_strategy_calendar_id": {
+      "placeholder": "TODO_SP_CLOUD_VENDOR_STRATEGY_CALENDAR_ID",
+      "candidate_value": "TODO_SP_CLOUD_VENDOR_STRATEGY_CALENDAR_ID",
+      "source_evidence": "TODO_LOCAL_REVIEW_SOURCE",
+      "review_status": "not_started"
+    },
+    "launch_council_calendar_id": {
+      "placeholder": "TODO_SP_LAUNCH_COUNCIL_CALENDAR_ID",
+      "candidate_value": "TODO_SP_LAUNCH_COUNCIL_CALENDAR_ID",
+      "source_evidence": "TODO_LOCAL_REVIEW_SOURCE",
+      "review_status": "not_started"
+    }
+  },
+  "required_review_checks": [
+    "source_evidence_recorded",
+    "candidate_values_verified_locally",
+    "dry_run_confirmed_true",
+    "no_execution_performed",
+    "rollback_to_placeholders_documented"
+  ],
+  "non_authorization": [
+    "no_repository_substitution",
+    "no_workspace_execution",
+    "no_scheduled_automation",
+    "no_production_processing",
+    "no_gate3_start"
+  ]
+}

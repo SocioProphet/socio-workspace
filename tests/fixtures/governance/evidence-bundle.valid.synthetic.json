@@ -1,0 +1,38 @@
+{
+  "contradictionRefs": [],
+  "evidenceBundleId": "evb:sociosphere:governance-action:example",
+  "integrity": {
+    "contentDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "hashAlgorithm": "sha256"
+  },
+  "policyBasisRefs": [
+    "policy:human-in-command"
+  ],
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "qualitySignals": [
+    {
+      "evidenceRef": "docs/ecosystem/socioprophet.md",
+      "signal": "source-present",
+      "status": "pass"
+    }
+  ],
+  "recordType": "EvidenceBundle",
+  "schemaVersion": "governance.evidence-bundle.v0.1",
+  "sourceRefs": [
+    {
+      "authorityClass": "canonical",
+      "contentDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "kind": "repo_file",
+      "observedAt": "2026-06-05T21:45:00Z",
+      "ref": "docs/ecosystem/socioprophet.md"
+    }
+  ],
+  "subjectRef": "institutional-action:example",
+  "summary": "Synthetic evidence bundle for governance schema validation."
+}

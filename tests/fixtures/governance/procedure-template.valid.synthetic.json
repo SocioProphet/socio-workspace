@@ -1,0 +1,63 @@
+{
+  "approvalGate": {
+    "approverRoleRefs": [
+      "role:sociosphere-governance-owner"
+    ],
+    "mode": "domain_owner",
+    "required": true
+  },
+  "authorityBoundaryRef": "authority:sociosphere-governance-docs",
+  "evidenceRequirements": [
+    {
+      "acceptedKinds": [
+        "repo_file",
+        "document"
+      ],
+      "description": "At least one canonical source file or governance document must be cited.",
+      "minAuthorityClass": "canonical",
+      "requirementId": "evidence:source-file"
+    }
+  ],
+  "outputContract": {
+    "permittedOutputs": [
+      "documentation_change",
+      "review_summary"
+    ],
+    "schemaRef": "schemas/governance/institutional-action.v0.1.schema.json"
+  },
+  "ownerRepo": "SocioProphet/sociosphere",
+  "policyBasisRefs": [
+    "policy:human-in-command"
+  ],
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "ProcedureTemplate",
+  "replayTest": {
+    "expectedReceiptKind": "ExecutionReceipt",
+    "fixtureRef": "tests/fixtures/governance/institutional-action.valid.synthetic.json",
+    "required": true
+  },
+  "requiredInputs": [
+    {
+      "kind": "context",
+      "name": "change_request",
+      "required": true
+    },
+    {
+      "kind": "evidence",
+      "name": "evidence_bundle",
+      "required": true,
+      "schemaRef": "schemas/governance/evidence-bundle.v0.1.schema.json"
+    }
+  ],
+  "schemaVersion": "governance.procedure-template.v0.1",
+  "status": "draft",
+  "templateId": "procedure:governed-doc-update",
+  "title": "Governed documentation update",
+  "version": "0.1.0"
+}

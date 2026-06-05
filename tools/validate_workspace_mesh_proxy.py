@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GNUMAKEFILE = ROOT / "GNUmakefile"
 DOC = ROOT / "docs" / "operations" / "workspace-mesh-proxy.md"
+OPTIONAL_MAKEFILES = [ROOT / "workspace-mesh-gates.mk"]
 
 REQUIRED_TARGETS = [
     "fabric-repo-check",
@@ -53,6 +54,9 @@ def read(path: Path) -> str:
 
 def main() -> None:
     make_text = read(GNUMAKEFILE)
+    for optional_makefile in OPTIONAL_MAKEFILES:
+        if optional_makefile.exists():
+            make_text += "\n" + optional_makefile.read_text(encoding="utf-8")
     doc_text = read(DOC)
 
     for needle in REQUIRED_NEEDLES:
@@ -61,7 +65,7 @@ def main() -> None:
 
     for target in REQUIRED_TARGETS:
         if f"{target}:" not in make_text:
-            fail(f"GNUmakefile missing target: {target}")
+            fail(f"GNUmakefile or included makefile missing target: {target}")
         if target not in doc_text:
             fail(f"workspace-mesh-proxy.md missing target documentation: {target}")
 

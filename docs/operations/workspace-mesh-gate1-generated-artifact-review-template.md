@@ -10,6 +10,8 @@ Gate 1 reviews local generated artifacts produced by the default Workspace mesh 
 
 This template does not authorize deployment. It exists to make generated artifact review repeatable, auditable, and separate from later gates.
 
+A completed Gate 1 review must be recorded as a separate dated proof artifact. This template and its manifest intentionally remain `not_started` until a real review record exists.
+
 ## Prerequisites
 
 - [ ] Gate 0 local topology proof is complete.

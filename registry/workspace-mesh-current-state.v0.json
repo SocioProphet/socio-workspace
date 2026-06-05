@@ -1,0 +1,62 @@
+{
+  "version": "v0",
+  "date": "2026-06-05",
+  "mesh_state": "prepared-but-not-deployed",
+  "topology_repo": "SocioProphet/sociosphere",
+  "implementation_repo": "SocioProphet/prophet-platform-fabric-mlops-ts-suite",
+  "gates": {
+    "gate_0": {
+      "id": "gate-0-local-topology-proof",
+      "state": "complete",
+      "proof": "docs/operations/workspace-mesh-release-readiness-proof-2026-06-05.md"
+    },
+    "gate_1": {
+      "id": "gate-1-generated-artifact-review",
+      "state": "reviewed_no_promotion",
+      "proofs": [
+        "docs/operations/workspace-mesh-gate1-generated-artifact-review-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate1-reviewed-no-promotion-2026-06-05.md"
+      ]
+    },
+    "gate_2": {
+      "id": "gate-2-id-substitution-review",
+      "state": "planning_only",
+      "proofs": [
+        "docs/operations/workspace-mesh-gate2-planning-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate2-candidate-template-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate2-local-candidate-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate2-local-candidate-verifier-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate2-candidate-lifecycle-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate2-schema-lifecycle-proof-2026-06-05.md",
+        "docs/operations/workspace-mesh-gate2-promotion-blocker-proof-2026-06-05.md"
+      ]
+    },
+    "gate_3": {
+      "id": "gate-3-apps-script-dry-run-rehearsal",
+      "state": "blocked",
+      "blocked_by": "registry/workspace-mesh-gate2-promotion-blocker.v0.json"
+    },
+    "gate_4": {
+      "id": "gate-4-controlled-test-write",
+      "state": "not_started"
+    },
+    "gate_5": {
+      "id": "gate-5-scheduled-trigger-approval",
+      "state": "blocked"
+    },
+    "gate_6": {
+      "id": "gate-6-native-socioprophet-migration-review",
+      "state": "blocked"
+    }
+  },
+  "controls": {
+    "plan_safety": "passed",
+    "local_file_only_plan": true,
+    "actionable_plan_changes": 4,
+    "candidate_values_printed": false,
+    "ids_substituted": false,
+    "live_execution": false,
+    "gate3_approval_artifact_present": false
+  },
+  "next_allowed_action": "current_state_validation_or_gate3_planning_scaffold_only"
+}

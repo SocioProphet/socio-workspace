@@ -1,0 +1,26 @@
+{
+  "version": "v0",
+  "date": "2026-06-05",
+  "mesh_state": "prepared-but-not-deployed",
+  "gate_2_state": "planning_only",
+  "candidate_mapping_state": "template_only",
+  "proof_document": "docs/operations/workspace-mesh-gate2-candidate-template-proof-2026-06-05.md",
+  "validation_command": "make -f workspace-mesh-gate2-candidate.mk workspace-mesh-gate2-candidate-template-validate",
+  "validation_result": "passed",
+  "placeholder_count": 4,
+  "local_mapping_paths_ignored": true,
+  "template_path": "templates/workspace-mesh/gate2-candidate-mapping.template.json",
+  "local_candidate_path": ".workspace-mesh/gate2-candidate-mapping.local.json",
+  "placeholder_set": [
+    "TODO_GOOGLE_SHEET_ID",
+    "TODO_APPS_SCRIPT_PROJECT_ID",
+    "TODO_SP_CLOUD_VENDOR_STRATEGY_CALENDAR_ID",
+    "TODO_SP_LAUNCH_COUNCIL_CALENDAR_ID"
+  ],
+  "status_flags": {
+    "ids_substituted": false,
+    "live_execution": false,
+    "gate_3_started": false,
+    "template_only": true
+  }
+}

@@ -13,12 +13,22 @@ REQUIRED_REPOS = {
     "SocioProphet/prophet-core-contracts",
     "SocioProphet/prophet-platform",
     "SocioProphet/sherlock-search",
+    "SocioProphet/sociosphere",
+    "SocioProphet/model-governance-ledger",
 }
 REQUIRED_BLOCKS = {
     "production_ready",
     "remote_execution",
     "autonomous_remediation",
     "customer_facing_claim",
+}
+ALLOWED_READINESS_STATES = {
+    "fixture_validated",
+    "runtime_receipt_fixture_validated",
+}
+ALLOWED_REGISTRY_DECISIONS = {
+    "register_fixture_validated",
+    "register_runtime_receipt_fixture_validated",
 }
 
 
@@ -38,8 +48,8 @@ def main() -> int:
         errors.append("schema_version must be 0.1.0")
     if record.get("capability_id") != "workspace_operation_prophet_membrane_v0":
         errors.append("unexpected capability_id")
-    if record.get("readiness_state") != "fixture_validated":
-        errors.append("readiness_state must be fixture_validated")
+    if record.get("readiness_state") not in ALLOWED_READINESS_STATES:
+        errors.append("readiness_state must be fixture_validated or runtime_receipt_fixture_validated")
     if record.get("production_ready") is not False:
         errors.append("production_ready must remain false")
 
@@ -51,8 +61,12 @@ def main() -> int:
     validation_refs = record.get("validation_refs", [])
     for expected in (
         "prophet-core-contracts:make validate",
-        "prophet-platform:make validate-workspace-prophet-membrane-e2e",
-        "sherlock-search:make validate-workspace-prophet-evidence-index",
+        "prophet-platform:python3 tools/validate_workspace_prophet_membrane_e2e.py",
+        "prophet-platform:python3 tools/validate_workspace_prophet_claim_projection.py",
+        "prophet-platform:python3 tools/validate_workspace_prophet_runtime_receipts.py",
+        "sherlock-search:python3 scripts/validate_workspace_prophet_search_packet.py",
+        "sociosphere:python3 tools/validate_workspace_prophet_readiness.py",
+        "model-governance-ledger:python3 tools/validate_workspace_prophet_ledger_entry.py",
     ):
         if expected not in validation_refs:
             errors.append(f"missing validation ref: {expected}")
@@ -64,7 +78,12 @@ def main() -> int:
         "claim-record.schema.json",
         "evidence-thread.schema.json",
         "workspace-operation-prophet-membrane-v0.json",
-        "evidence-index.example.json",
+        "action-receipt-workspace-operation-prophet-v0.json",
+        "claim-projection-workspace-operation-prophet-v0.json",
+        "runtime-receipts.generated.json",
+        "search-packet.example.json",
+        "workspace-prophet-readiness.yaml",
+        "ledger-entry.fixture_validated.json",
     ):
         if not any(fragment in ref for ref in evidence_refs):
             errors.append(f"missing evidence ref containing: {fragment}")
@@ -75,8 +94,15 @@ def main() -> int:
         errors.append(f"missing blocked_from entries: {missing_blocks}")
 
     decision = record.get("registry_decision", {})
-    if decision.get("decision") != "register_fixture_validated":
-        errors.append("registry_decision.decision must be register_fixture_validated")
+    if decision.get("decision") not in ALLOWED_REGISTRY_DECISIONS:
+        errors.append("registry_decision.decision must be an allowed fixture-readiness decision")
+
+    metadata = record.get("metadata", {})
+    if record.get("readiness_state") == "runtime_receipt_fixture_validated":
+        if metadata.get("runtime_receipts_generated") is not True:
+            errors.append("runtime_receipt_fixture_validated requires metadata.runtime_receipts_generated=true")
+        if not metadata.get("ledger_entry_id"):
+            errors.append("runtime_receipt_fixture_validated requires metadata.ledger_entry_id")
 
     if errors:
         print("ERR: Workspace PROPHET readiness validation failed", file=sys.stderr)

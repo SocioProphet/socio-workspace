@@ -1,11 +1,14 @@
-name: Validate Workspace Mesh Proxy
+name: Validate Workspace Mesh Topology
 
 on:
   pull_request:
     paths:
       - 'GNUmakefile'
       - 'tools/validate_workspace_mesh_proxy.py'
+      - 'tools/validate_workspace_mesh_release_readiness.py'
       - 'docs/operations/workspace-mesh-proxy.md'
+      - 'docs/operations/workspace-mesh-release-readiness.md'
+      - 'registry/workspace-mesh-release-readiness.v0.json'
       - '.github/workflows/validate-workspace-mesh-proxy.yml'
   push:
     branches:
@@ -14,13 +17,16 @@ on:
     paths:
       - 'GNUmakefile'
       - 'tools/validate_workspace_mesh_proxy.py'
+      - 'tools/validate_workspace_mesh_release_readiness.py'
       - 'docs/operations/workspace-mesh-proxy.md'
+      - 'docs/operations/workspace-mesh-release-readiness.md'
+      - 'registry/workspace-mesh-release-readiness.v0.json'
       - '.github/workflows/validate-workspace-mesh-proxy.yml'
   workflow_dispatch:
 
 jobs:
-  validate-workspace-mesh-proxy:
-    name: Validate Workspace Mesh Proxy
+  validate-workspace-mesh-topology:
+    name: Validate Workspace Mesh Topology
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,3 +39,6 @@ jobs:
 
       - name: Validate proxy surface
         run: python3 tools/validate_workspace_mesh_proxy.py
+
+      - name: Validate release readiness
+        run: python3 tools/validate_workspace_mesh_release_readiness.py

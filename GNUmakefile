@@ -12,6 +12,8 @@ FABRIC_MAKE ?= make -C $(FABRIC_REPO)
 .PHONY: \
 	fabric-repo-check \
 	workspace-mesh-proxy-validate \
+	workspace-mesh-release-readiness-validate \
+	workspace-mesh-topology-validate \
 	doctor-workspace-ops \
 	validate-workspace-prototype \
 	validate-workspace-mesh \
@@ -36,6 +38,11 @@ fabric-repo-check:
 
 workspace-mesh-proxy-validate:
 	python3 tools/validate_workspace_mesh_proxy.py
+
+workspace-mesh-release-readiness-validate:
+	python3 tools/validate_workspace_mesh_release_readiness.py
+
+workspace-mesh-topology-validate: workspace-mesh-proxy-validate workspace-mesh-release-readiness-validate
 
 # Workspace operations mesh proxies. These keep Sociosphere as the topology
 # entrypoint while preserving prophet-platform-fabric-mlops-ts-suite as the

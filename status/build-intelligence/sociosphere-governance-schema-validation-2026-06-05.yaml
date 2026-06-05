@@ -1,0 +1,88 @@
+record_type: build-intelligence
+record_version: 0.1.0
+date: 2026-06-05
+repo: SocioProphet/sociosphere
+branch: schemas/add-governance-schema-fixtures-v2
+subject: governance-schema-validation
+status: merged
+summary: >-
+  Registers the governance schema validation tranche. The tranche promotes the
+  initial regulated-domain institutional-action schema stubs from documentation-only
+  contracts into executable schema contracts with positive and negative fixtures,
+  a JSON Schema draft 2020-12 validator, and a dedicated CI workflow.
+merged_prs:
+  - number: 470
+    title: Add governance action schema stubs
+    merge_commit: 1b5cf7af1b463f57107abe803cbd0aabfcc4e220
+  - number: 472
+    title: Add governance schema fixtures and validator
+    merge_commit: ffff3308be5f48bbd88d450c167a7a5bb86d33b3
+superseded_prs:
+  - number: 471
+    reason: Replaced by PR 472 after stale-branch divergence.
+artifacts:
+  schemas:
+    - schemas/governance/institutional-action.v0.1.schema.json
+    - schemas/governance/procedure-template.v0.1.schema.json
+    - schemas/governance/evidence-bundle.v0.1.schema.json
+    - schemas/governance/execution-receipt.v0.1.schema.json
+  fixtures:
+    valid:
+      - tests/fixtures/governance/institutional-action.valid.synthetic.json
+      - tests/fixtures/governance/procedure-template.valid.synthetic.json
+      - tests/fixtures/governance/evidence-bundle.valid.synthetic.json
+      - tests/fixtures/governance/execution-receipt.valid.synthetic.json
+    invalid:
+      - tests/fixtures/governance/institutional-action.invalid.missing-execution-receipt.synthetic.json
+      - tests/fixtures/governance/procedure-template.invalid.missing-replay.synthetic.json
+      - tests/fixtures/governance/evidence-bundle.invalid.missing-policy.synthetic.json
+      - tests/fixtures/governance/execution-receipt.invalid.bad-digest.synthetic.json
+  validator: tools/validate_governance_schemas.py
+  ci_workflow: .github/workflows/governance-schemas.yml
+  documentation: schemas/governance/README.md
+validated_objects:
+  - InstitutionalAction
+  - ProcedureTemplate
+  - EvidenceBundle
+  - ExecutionReceipt
+validation:
+  validator_command: python tools/validate_governance_schemas.py
+  validator_dependency: jsonschema
+  schema_dialect: JSON Schema draft 2020-12
+  ci_workflow: Governance Schemas
+  ci_result: pass
+  broad_validate_result: pass
+  final_pr_head_sha: 53fb904aeea897850e661f36b56b0ae4c3cede4c
+ci_checks_observed:
+  - validate
+  - Governance Schemas
+  - standards-validate
+  - compliance
+  - ui-check
+  - workspace-spine
+  - SVF Validation
+  - lattice-asset-spine
+  - lattice-placement-spine
+  - lattice-federated-query-spine
+  - Multi-Domain Geospatial Standards Compliance
+  - Validate Workspace Mesh Topology
+scope_notes:
+  - The governance schemas remain v0.1 contract stubs.
+  - The fixtures are synthetic and non-secret.
+  - The validator proves schema syntax, valid-fixture acceptance, and invalid-fixture rejection.
+  - The tranche does not claim runtime middleware, storage implementation, HellGraph ingestion, AgentPlane receipt emission, or Prophet Platform API readiness.
+  - PR 472 also made existing workspace-mesh helper guard markers source-exposure-safe while preserving runtime marker detection.
+risk: low
+limitations:
+  - The validator does not yet perform cross-object referential-integrity checks.
+  - The validator does not yet emit machine-readable validation reports.
+  - The schemas are not yet registered in an ontology or SHACL/JSON-LD vocabulary authority.
+  - HellGraph ingestion fixtures and query fixtures are not yet implemented.
+  - Prophet Platform release/admission validators are documented but not yet wired to these concrete schemas.
+next_steps:
+  - Add referential-integrity checks across InstitutionalAction, ProcedureTemplate, EvidenceBundle, and ExecutionReceipt fixtures.
+  - Add machine-readable validation report output for CI artifacts.
+  - Add GovernanceBench, WorkflowBench, DomainBench, and ReplayBench schema stubs.
+  - Add HellGraph query fixtures for institutional-action, integration-drift, and release-readiness queries.
+  - Add Prophet Platform admission fixtures consuming the governance schema objects.
+  - Add competitive capability benchmark and registry in a separate PR.

@@ -5,7 +5,9 @@ Mesh state: `prepared-but-not-deployed`
 
 ## Purpose
 
-This runbook reviews generated local artifacts after the default plan-safety command creates them. It does not mark Gate 1 complete and does not authorize deployment.
+This runbook reviews the four local artifacts represented by the default plan-safety command. Because `tofu plan -out` does not create `local_file` outputs, the inspector reads real generated files only if they already exist. In the normal no-apply workflow, it reads the planned `local_file` contents from `default-plan.json`.
+
+It does not mark Gate 1 complete and does not authorize deployment.
 
 ## Safe command sequence
 
@@ -21,11 +23,14 @@ make workspace-mesh-gate1-generated-artifacts-review
 
 ```text
 PASS: Workspace mesh Gate 1 generated artifacts review clean
+source=plan_json
 generated_dir=...
 artifacts=4
 review_performed=false
 promotion_authorized=false
 ```
+
+If the generated files exist because a prior local-file-only apply was deliberately performed, `source` may be `generated_files`. The normal prepared-but-not-deployed path should use `source=plan_json`.
 
 ## What the local review checks
 

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/sociosphere/governance/institutional-action.v0.1.schema.json",
+  "title": "InstitutionalAction v0.1",
+  "description": "Complete governed action object binding actor, role, authority, context, evidence, policy, procedure, capability, approval, and execution receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "actionId", "actor", "roleRef", "authorityBoundaryRef", "contextRefs", "evidenceBundleRef", "policyBasisRefs", "procedureTemplateRef", "capabilityRef", "approval", "executionReceiptRef", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "governance.institutional-action.v0.1" },
+    "recordType": { "const": "InstitutionalAction" },
+    "actionId": { "type": "string", "minLength": 1 },
+    "actionKind": { "type": "string", "enum": ["recommendation", "draft", "approval", "override", "execution", "admission", "release_gate", "review"] },
+    "status": { "type": "string", "enum": ["proposed", "approved", "denied", "executed", "failed", "superseded"] },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actorRef", "actorKind"],
+      "properties": {
+        "actorRef": { "type": "string", "minLength": 1 },
+        "actorKind": { "type": "string", "enum": ["human", "agent", "service_account", "organization", "delegated_process"] }
+      }
+    },
+    "roleRef": { "type": "string", "minLength": 1 },
+    "authorityBoundaryRef": { "type": "string", "minLength": 1 },
+    "contextRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidenceBundleRef": { "type": "string", "minLength": 1 },
+    "policyBasisRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "procedureTemplateRef": { "type": "string", "minLength": 1 },
+    "capabilityRef": { "type": "string", "minLength": 1 },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "status"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["not_required", "pending", "approved", "denied", "overridden"] },
+        "approvalEventRef": { "type": "string", "minLength": 1 },
+        "overrideEventRef": { "type": "string", "minLength": 1 },
+        "approverRoleRef": { "type": "string", "minLength": 1 }
+      }
+    },
+    "executionReceiptRef": { "type": "string", "minLength": 1 },
+    "graphSnapshotRef": { "type": "string", "minLength": 1 },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    }
+  }
+}

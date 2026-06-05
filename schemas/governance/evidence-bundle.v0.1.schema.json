@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/sociosphere/governance/evidence-bundle.v0.1.schema.json",
+  "title": "EvidenceBundle v0.1",
+  "description": "Versioned set of sources, citations, retrieved context, artifacts, logs, graph snapshots, and validation outputs supporting a governed decision or execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "evidenceBundleId", "subjectRef", "sourceRefs", "policyBasisRefs", "provenance", "integrity"],
+  "properties": {
+    "schemaVersion": { "const": "governance.evidence-bundle.v0.1" },
+    "recordType": { "const": "EvidenceBundle" },
+    "evidenceBundleId": { "type": "string", "minLength": 1 },
+    "subjectRef": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "sourceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ref", "kind", "authorityClass"],
+        "properties": {
+          "ref": { "type": "string", "minLength": 1 },
+          "kind": {
+            "type": "string",
+            "enum": ["repo_file", "document", "artifact", "log", "graph_snapshot", "citation", "human_statement", "system_observation", "external_evidence"]
+          },
+          "authorityClass": {
+            "type": "string",
+            "enum": ["canonical", "policy", "procedure", "evidence", "context", "external", "advisory"]
+          },
+          "contentDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "observedAt": { "type": "string", "format": "date-time" },
+          "excerptRef": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "policyBasisRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "qualitySignals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["signal", "status"],
+        "properties": {
+          "signal": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["pass", "warn", "fail", "unknown"] },
+          "evidenceRef": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "contradictionRefs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contentDigest"],
+      "properties": {
+        "contentDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "signatureRef": { "type": "string", "minLength": 1 },
+        "hashAlgorithm": { "type": "string", "enum": ["sha256"] }
+      }
+    }
+  }
+}

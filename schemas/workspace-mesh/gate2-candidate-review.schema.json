@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.local/workspace-mesh/gate2-candidate-review.schema.json",
+  "title": "Workspace Mesh Gate 2 Candidate Review Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "mesh_state",
+    "gate_id",
+    "review_mode",
+    "dry_run_required",
+    "candidate_values",
+    "review_controls"
+  ],
+  "properties": {
+    "version": {
+      "const": "v0"
+    },
+    "mesh_state": {
+      "const": "prepared-but-not-deployed"
+    },
+    "gate_id": {
+      "const": "gate-2-id-substitution-review"
+    },
+    "review_mode": {
+      "enum": [
+        "placeholder_copy",
+        "local_candidate_review"
+      ]
+    },
+    "dry_run_required": {
+      "const": true
+    },
+    "candidate_values": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spreadsheet_id",
+        "apps_script_project_id",
+        "cloud_vendor_strategy_calendar_id",
+        "launch_council_calendar_id"
+      ],
+      "properties": {
+        "spreadsheet_id": {
+          "$ref": "#/$defs/candidateField"
+        },
+        "apps_script_project_id": {
+          "$ref": "#/$defs/candidateField"
+        },
+        "cloud_vendor_strategy_calendar_id": {
+          "$ref": "#/$defs/candidateField"
+        },
+        "launch_council_calendar_id": {
+          "$ref": "#/$defs/candidateField"
+        }
+      }
+    },
+    "review_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_values_printed",
+        "live_execution",
+        "git_ignored_required",
+        "versioned_candidate_values_allowed"
+      ],
+      "properties": {
+        "candidate_values_printed": {
+          "const": false
+        },
+        "live_execution": {
+          "const": false
+        },
+        "git_ignored_required": {
+          "const": true
+        },
+        "versioned_candidate_values_allowed": {
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "candidateField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "placeholder",
+        "candidate_value",
+        "source_evidence",
+        "review_status"
+      ],
+      "properties": {
+        "placeholder": {
+          "type": "string",
+          "pattern": "^TODO_"
+        },
+        "candidate_value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_status": {
+          "enum": [
+            "not_started",
+            "candidate_recorded_local_only",
+            "source_evidence_recorded",
+            "reviewed_local_only",
+            "rejected_local_only"
+          ]
+        }
+      }
+    }
+  }
+}

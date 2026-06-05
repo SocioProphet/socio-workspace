@@ -1,0 +1,39 @@
+{
+  "actionRef": "institutional-action:example",
+  "artifactRefs": ["tests/fixtures/governance/evidence-bundle.valid.synthetic.json"],
+  "evidenceBundleRef": "evb:sociosphere:governance-action:example",
+  "execution": {
+    "completedAt": "2026-06-05T21:45:00Z",
+    "decisionRef": "decision:allowed",
+    "environmentRef": "environment:ci",
+    "policyDecisionRef": "policy-decision:synthetic",
+    "startedAt": "2026-06-05T21:45:00Z",
+    "status": "succeeded"
+  },
+  "executor": {
+    "capabilityRef": "capability:validate-governance-schema",
+    "executorId": "agent:sociosphere-validator",
+    "executorKind": "ci",
+    "runtimeRef": "runtime:github-actions"
+  },
+  "integrity": {
+    "contentDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "hashAlgorithm": "sha256"
+  },
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "receiptId": "receipt:governance-action:example",
+  "recordType": "ExecutionReceipt",
+  "replay": {
+    "determinismClass": "synthetic",
+    "graphSnapshotRef": "graph:snapshot:synthetic",
+    "replayArtifactRef": "artifact:replay:synthetic",
+    "replayable": true
+  },
+  "schemaVersion": "governance.execution-receipt.v0.1"
+}

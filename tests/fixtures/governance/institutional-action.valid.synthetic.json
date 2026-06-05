@@ -1,0 +1,33 @@
+{
+  "actionId": "institutional-action:example",
+  "actionKind": "execution",
+  "actor": {
+    "actorKind": "agent",
+    "actorRef": "agent:sociosphere-validator"
+  },
+  "approval": {
+    "approvalEventRef": "approval:domain-owner:synthetic",
+    "approverRoleRef": "role:sociosphere-governance-owner",
+    "required": true,
+    "status": "approved"
+  },
+  "authorityBoundaryRef": "authority:sociosphere-governance-docs",
+  "capabilityRef": "capability:validate-governance-schema",
+  "contextRefs": ["context:governance-schema-fixture"],
+  "evidenceBundleRef": "evb:sociosphere:governance-action:example",
+  "executionReceiptRef": "receipt:governance-action:example",
+  "graphSnapshotRef": "graph:snapshot:synthetic",
+  "policyBasisRefs": ["policy:human-in-command"],
+  "procedureTemplateRef": "procedure:governed-doc-update",
+  "provenance": {
+    "createdAt": "2026-06-05T21:45:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "InstitutionalAction",
+  "roleRef": "role:sociosphere-governance-owner",
+  "schemaVersion": "governance.institutional-action.v0.1",
+  "status": "approved"
+}

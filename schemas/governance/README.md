@@ -14,6 +14,10 @@ This directory defines the first machine-readable object contracts for the regul
 | `evidence-bundle.v0.1.schema.json` | Versioned source/evidence bundle supporting a governed decision or execution. |
 | `execution-receipt.v0.1.schema.json` | Hashable record proving what executed a governed action and which artifacts/replay refs support it. |
 
+## Fixture coverage
+
+Each schema is paired with one valid synthetic fixture and one invalid synthetic fixture under `tests/fixtures/governance/`. The validator must accept the valid fixture and reject the invalid fixture.
+
 ## Boundary
 
 These files are schema stubs only. They do not imply runtime middleware, storage implementation, HellGraph ingestion, AgentPlane receipt emission, or Prophet Platform API readiness. Runtime adoption requires downstream fixtures, validators, graph queries, and admission tests.

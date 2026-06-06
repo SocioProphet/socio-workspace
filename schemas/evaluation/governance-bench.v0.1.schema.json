@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GovernanceBench v0.1",
+  "description": "Governance evaluation contract for policy, approval, override, audit, and authority behavior.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "benchId", "ownerRepo", "policyCoverage", "approvalCoverage", "overrideCoverage", "auditCoverage", "authorityCoverage", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "evaluation.governance-bench.v0.1" },
+    "recordType": { "const": "GovernanceBench" },
+    "benchId": { "type": "string", "minLength": 1 },
+    "ownerRepo": { "type": "string", "minLength": 1 },
+    "policyCoverage": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "approvalCoverage": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "overrideCoverage": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "auditCoverage": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "authorityCoverage": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "fixtureRefs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    }
+  }
+}

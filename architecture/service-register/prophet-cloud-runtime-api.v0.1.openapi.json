@@ -1,0 +1,29 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Prophet Cloud Runtime API",
+    "version": "0.1.0",
+    "description": "Runtime API over SocioSphere service-register artifacts for Prophet Cloud workspace, service graph, repo maturity, and deployment planning."
+  },
+  "paths": {
+    "/services": {"get": {"operationId": "listServices", "summary": "List services from the service architecture register."}},
+    "/services/{service_id}": {"get": {"operationId": "getService", "summary": "Get one service with dependencies and repo bindings."}},
+    "/repos": {"get": {"operationId": "listRepos", "summary": "List canonical repos and their service roles."}},
+    "/critical-path": {"get": {"operationId": "getCriticalPath", "summary": "Return service-register critical path and blockers."}},
+    "/prophet-cloud/maturity": {"get": {"operationId": "getProphetCloudMaturity", "summary": "Return Prophet Cloud maturity matrix."}},
+    "/prophet-cloud/deployment-plan": {"get": {"operationId": "getProphetCloudDeploymentPlan", "summary": "Return Prophet Cloud deployment plan and phases."}}
+  },
+  "x-sociosphere-artifacts": {
+    "services": "architecture/service-register/service-architecture-register.v1.0.csv",
+    "repos": "architecture/service-register/canonical-repo-estate.v1.0.csv",
+    "dependencies": "architecture/service-register/service-dependency-edges.v0.1.csv",
+    "critical_path": "architecture/service-register/critical-path-blocking-report.v0.2.csv",
+    "prophet_cloud_maturity": "architecture/service-register/prophet-cloud-repo-maturity-matrix.v0.1.csv",
+    "prophet_cloud_deployment_plan": "architecture/service-register/prophet-cloud-critical-path.v0.1.md"
+  },
+  "x-required-receipts": [
+    "service-graph-query-receipt",
+    "repo-maturity-query-receipt",
+    "deployment-plan-query-receipt"
+  ]
+}

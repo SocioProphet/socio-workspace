@@ -1,0 +1,31 @@
+name: Competitive Capability Map
+
+on:
+  pull_request:
+    paths:
+      - "registry/competitive-capability-map-v0.yaml"
+      - "tools/validate_competitive_capability_map.py"
+      - ".github/workflows/competitive-capability-map.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "registry/competitive-capability-map-v0.yaml"
+      - "tools/validate_competitive_capability_map.py"
+      - ".github/workflows/competitive-capability-map.yml"
+
+jobs:
+  validate-competitive-capability-map:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validator dependency
+        run: python -m pip install pyyaml
+      - name: Validate competitive capability map
+        run: python tools/validate_competitive_capability_map.py

@@ -132,3 +132,71 @@ records:
         - https://github.com/SocioProphet/sociosphere/pull/476
     confidence: medium
     status: observed
+
+  - event_id: gti-2026-0003
+    observed_at: '2026-06-06'
+    source_context:
+      context_type: connector_response
+      notes: >-
+        Attempted to verify the workflow added at commit c7634bbd68bc6f27aee04567d79b07b151d60407
+        using the available fetch_commit_workflow_runs connector action.
+    repository:
+      full_name: SocioProphet/sociosphere
+      default_branch: main
+    refs:
+      branch: main
+      head_sha: c7634bbd68bc6f27aee04567d79b07b151d60407
+    github_objects:
+      commit_sha: c7634bbd68bc6f27aee04567d79b07b151d60407
+    tool_context:
+      tool_namespace: GitHub
+      tool_action: fetch_commit_workflow_runs
+      normalized_response_only: true
+      raw_payload_preserved: false
+      pagination_known_complete: false
+      mutation_attempted: false
+      mutation_receipt_verified: false
+    operation_intended: >-
+      Verify whether the newly added GitHub Tool Impedance Ledger workflow ran for the direct push.
+    observed_failure: >-
+      The connector returned workflow_runs: [] for the commit. The discovered action description states
+      that the wrapper filters to pull-request-triggered runs and returns the first page only, so the
+      empty result is not complete proof that no push-triggered workflow ran.
+    failure_classes:
+      - CONNECTOR_PARTIAL_SURFACE
+      - SEARCH_INDEX_GAP
+    impedance_symbols:
+      - Gamma_i
+      - pi_1
+      - nu_n
+      - epsilon_r
+      - C_m
+    pr_operational_state: not_applicable
+    attribution:
+      native_github: none
+      connector_wrapper: primary
+      assistant_operator: none
+      permission_boundary: none
+      real_repo_defect: none
+      notes: >-
+        This is a direct example of observability impedance caused by a partial workflow-run surface.
+    retry_and_remediation:
+      retried: false
+      retry_count: 0
+      retry_idempotence_class: safe_read_only
+      fallback_used: None available in the discovered connector surface for complete push-run listing.
+      remediation: >-
+        Add connector capability matrix and require a controller surface that lists workflow runs by
+        workflow, event type, branch, commit SHA, and pagination cursor.
+      controller_requirement_created: true
+      controller_requirement_ref: CheckResolver, CapabilityMatrix, RawEvidenceStore
+    evidence:
+      narrative_summary: >-
+        Connector returned workflow_runs: [] when asked for commit c7634bbd68bc6f27aee04567d79b07b151d60407,
+        but the action is documented as PR-trigger-filtered and first-page-only.
+      commit_shas:
+        - c7634bbd68bc6f27aee04567d79b07b151d60407
+      artifact_paths:
+        - .github/workflows/github-tool-impedance-ledger.yml
+    confidence: high
+    status: verified

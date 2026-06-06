@@ -1,0 +1,60 @@
+{
+  "version": "v0",
+  "date": "2026-06-06",
+  "package_id": "workspace_mesh_predeployment_package_2026_06_06",
+  "mesh_state": "prepared-but-not-deployed",
+  "package_state": "predeployment_proof_bundle",
+  "topology_repo": "SocioProphet/sociosphere",
+  "implementation_repo": "SocioProphet/prophet-platform-fabric-mlops-ts-suite",
+  "value_projection_authority": "SocioProphet/prophet-platform",
+  "proofs": {
+    "gate0_release_readiness": "docs/operations/workspace-mesh-release-readiness-proof-2026-06-05.md",
+    "gate1_generated_artifact_review": "docs/operations/workspace-mesh-gate1-generated-artifact-review-proof-2026-06-05.md",
+    "gate1_reviewed_no_promotion": "docs/operations/workspace-mesh-gate1-reviewed-no-promotion-2026-06-05.md",
+    "gate2_planning": "docs/operations/workspace-mesh-gate2-planning-proof-2026-06-05.md",
+    "gate2_candidate_template": "docs/operations/workspace-mesh-gate2-candidate-template-proof-2026-06-05.md",
+    "gate2_local_candidate": "docs/operations/workspace-mesh-gate2-local-candidate-proof-2026-06-05.md",
+    "gate2_local_verifier": "docs/operations/workspace-mesh-gate2-local-candidate-verifier-proof-2026-06-05.md",
+    "gate2_candidate_lifecycle": "docs/operations/workspace-mesh-gate2-candidate-lifecycle-proof-2026-06-05.md",
+    "gate2_schema_lifecycle": "docs/operations/workspace-mesh-gate2-schema-lifecycle-proof-2026-06-05.md",
+    "gate2_promotion_blocker": "docs/operations/workspace-mesh-gate2-promotion-blocker-proof-2026-06-05.md",
+    "current_state": "docs/operations/workspace-mesh-current-state-proof-2026-06-05.md",
+    "full_local_checkpoint": "docs/operations/workspace-mesh-full-local-checkpoint-proof-2026-06-05.md",
+    "make_integration": "docs/operations/workspace-mesh-make-integration-proof-2026-06-05.md",
+    "gate3_planning": "docs/operations/workspace-mesh-gate3-planning-proof-2026-06-05.md",
+    "value_projection_alignment": "docs/operations/workspace-mesh-value-projection-alignment-proof-2026-06-05.md",
+    "dashboard_ledger": "docs/operations/workspace-mesh-dashboard-ledger-proof-2026-06-06.md",
+    "google_workspace_operating_model": "docs/operations/google-workspace-operating-model-proof-2026-06-06.md",
+    "cloud_isv_operating_model": "docs/operations/cloud-isv-operating-model-proof-2026-06-06.md"
+  },
+  "validated_artifacts": {
+    "current_state_ledger": "registry/workspace-mesh-current-state.v0.json",
+    "gate2_promotion_blocker": "registry/workspace-mesh-gate2-promotion-blocker.v0.json",
+    "gate3_planning": "registry/workspace-mesh-gate3-planning.v0.json",
+    "value_projection_alignment": "registry/workspace-mesh-value-projection-alignment.v0.json",
+    "dashboard_ledger_contract": "contracts/workspace-mesh/dashboard-ledger.v0.json",
+    "google_workspace_operating_model": "registry/google-workspace-operating-model.v0.json",
+    "cloud_isv_operating_model": "registry/cloud-isv-operating-model.v0.json"
+  },
+  "gate_states": {
+    "gate_0": "complete",
+    "gate_1": "reviewed_no_promotion",
+    "gate_2": "planning_only",
+    "gate_3": "blocked",
+    "gate_4": "not_started",
+    "gate_5": "blocked",
+    "gate_6": "blocked"
+  },
+  "controls": {
+    "ids_substituted": false,
+    "candidate_values_printed": false,
+    "live_execution": false,
+    "workspace_assets_created": false,
+    "cloud_deployment_authorized": false,
+    "scheduled_triggers_authorized": false,
+    "production_processing_authorized": false,
+    "native_migration_started": false,
+    "vendor_lock_in_accepted": false
+  },
+  "next_allowed_action": "predeployment_package_validation_only"
+}

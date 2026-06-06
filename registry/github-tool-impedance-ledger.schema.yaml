@@ -1,0 +1,343 @@
+schema_id: github-tool-impedance-ledger-v0
+status: governance_schema
+purpose: >-
+  Define a structured ledger for GitHub, connector, CI, branch-protection,
+  and assistant-operation impedance events observed during GitOps work.
+non_authorization: >-
+  This schema does not authorize repository mutation, branch deletion,
+  issue closure, PR merge, production execution, or connector credential expansion.
+version: 0
+
+required_record_fields:
+  - event_id
+  - observed_at
+  - source_context
+  - repository
+  - operation_intended
+  - observed_failure
+  - failure_classes
+  - impedance_symbols
+  - attribution
+  - evidence
+  - confidence
+
+record:
+  event_id:
+    type: string
+    description: Stable identifier for the impedance event.
+    example: gti-2026-0001
+  observed_at:
+    type: string
+    format: date-time-or-date
+    description: When the event was observed, if known.
+  source_context:
+    type: object
+    required:
+      - context_type
+    properties:
+      context_type:
+        enum:
+          - chat_turn
+          - github_pr
+          - github_issue
+          - github_action_run
+          - local_cli
+          - connector_response
+          - memory_summary
+          - other
+      chat_label:
+        type: string
+      chat_turn_ref:
+        type: string
+      notes:
+        type: string
+  repository:
+    type: object
+    required:
+      - full_name
+    properties:
+      full_name:
+        type: string
+        example: SocioProphet/sociosphere
+      default_branch:
+        type: string
+        example: main
+  refs:
+    type: object
+    properties:
+      branch:
+        type: string
+      base_ref:
+        type: string
+      head_ref:
+        type: string
+      base_sha:
+        type: string
+      head_sha:
+        type: string
+      expected_head_sha:
+        type: string
+  github_objects:
+    type: object
+    properties:
+      pr_number:
+        type: integer
+      issue_number:
+        type: integer
+      workflow_run_id:
+        type: string
+      check_run_id:
+        type: string
+      artifact_id:
+        type: string
+      commit_sha:
+        type: string
+  tool_context:
+    type: object
+    properties:
+      tool_namespace:
+        type: string
+        example: GitHub
+      tool_action:
+        type: string
+        example: merge_pull_request
+      connector_id:
+        type: string
+      normalized_response_only:
+        type: boolean
+      raw_payload_preserved:
+        type: boolean
+      pagination_known_complete:
+        type: boolean
+      mutation_attempted:
+        type: boolean
+      mutation_receipt_verified:
+        type: boolean
+  operation_intended:
+    type: string
+    description: What the operator or assistant intended to do.
+    example: Merge PR after visible CI pass.
+  observed_failure:
+    type: string
+    description: What actually happened or what impedance was observed.
+    example: Branch protection still expected required lint context on current head.
+  failure_classes:
+    type: array
+    items:
+      enum:
+        - CONNECTOR_SCHEMA
+        - CONNECTOR_SAFETY_LAYER
+        - CONNECTOR_PARTIAL_SURFACE
+        - GITHUB_ASYNC_STATE
+        - BRANCH_PROTECTION
+        - STATUS_CONTEXT_MISMATCH
+        - CI_ENVIRONMENT_DRIFT
+        - STALE_BRANCH
+        - DRAFT_READY_TRANSITION
+        - AUTO_MERGE_UNAVAILABLE
+        - PERMISSION_BOUNDARY
+        - RATE_LIMIT
+        - SEARCH_INDEX_GAP
+        - PAYLOAD_SIZE_OR_SHAPE
+        - ASSISTANT_MISUSE
+        - REAL_REPO_DEFECT
+        - UNKNOWN
+  impedance_symbols:
+    type: array
+    items:
+      enum:
+        - Gamma_i
+        - tau_s
+        - chi_m
+        - rho_r
+        - nu_n
+        - pi_1
+        - sigma_p
+        - alpha_m
+        - beta_p
+        - delta_r
+        - epsilon_r
+        - kappa_r
+        - omega_p
+        - lambda_v
+        - mu_h
+        - T_i
+        - R_0
+        - Pi_s
+        - Delta_n
+        - Delta_c
+        - Delta_a
+        - E_plus
+        - G_not_B
+        - H_star
+        - I_r
+        - S_d
+        - N_not_E
+        - C_m
+        - A_i
+        - W_to_K
+  pr_operational_state:
+    enum:
+      - unknown
+      - draft
+      - ready
+      - green
+      - green_but_unprotected
+      - blocked_expected_context
+      - mergeability_pending
+      - stale
+      - superseded
+      - probe_only
+      - canonical
+      - merged
+      - closed_unmerged
+      - abandoned
+      - not_applicable
+  attribution:
+    type: object
+    required:
+      - native_github
+      - connector_wrapper
+      - assistant_operator
+      - permission_boundary
+      - real_repo_defect
+    properties:
+      native_github:
+        type: string
+        enum: [none, possible, likely, primary, unknown]
+      connector_wrapper:
+        type: string
+        enum: [none, possible, likely, primary, unknown]
+      assistant_operator:
+        type: string
+        enum: [none, possible, likely, primary, unknown]
+      permission_boundary:
+        type: string
+        enum: [none, possible, likely, primary, unknown]
+      real_repo_defect:
+        type: string
+        enum: [none, possible, likely, primary, unknown]
+      notes:
+        type: string
+  retry_and_remediation:
+    type: object
+    properties:
+      retried:
+        type: boolean
+      retry_count:
+        type: integer
+      retry_idempotence_class:
+        enum:
+          - safe_read_only
+          - safe_expected_sha
+          - unsafe_possible_duplicate
+          - unsafe_unknown_partial_success
+          - not_retried
+          - unknown
+      fallback_used:
+        type: string
+      remediation:
+        type: string
+      controller_requirement_created:
+        type: boolean
+      controller_requirement_ref:
+        type: string
+  evidence:
+    type: object
+    required:
+      - narrative_summary
+    properties:
+      narrative_summary:
+        type: string
+      urls:
+        type: array
+        items:
+          type: string
+      commit_shas:
+        type: array
+        items:
+          type: string
+      workflow_run_ids:
+        type: array
+        items:
+          type: string
+      check_names:
+        type: array
+        items:
+          type: string
+      raw_payload_hashes:
+        type: array
+        items:
+          type: string
+      artifact_paths:
+        type: array
+        items:
+          type: string
+      citations:
+        type: array
+        items:
+          type: string
+  confidence:
+    enum:
+      - low
+      - medium
+      - high
+  status:
+    enum:
+      - proposed
+      - observed
+      - verified
+      - superseded
+      - rejected
+      - needs_evidence
+
+example_records:
+  - event_id: gti-example-0001
+    observed_at: '2026-06-06'
+    source_context:
+      context_type: github_pr
+      notes: Probe PR used only to force observable PR-triggered CI.
+    repository:
+      full_name: SocioProphet/sociosphere
+      default_branch: main
+    github_objects:
+      pr_number: 476
+    tool_context:
+      tool_namespace: GitHub
+      normalized_response_only: true
+      raw_payload_preserved: false
+      pagination_known_complete: false
+      mutation_attempted: false
+      mutation_receipt_verified: true
+    operation_intended: Force observable PR-triggered CI for execution artifact validation.
+    observed_failure: Normal workflow observability was insufficient, requiring a probe PR with no implementation content.
+    failure_classes:
+      - CONNECTOR_PARTIAL_SURFACE
+      - SEARCH_INDEX_GAP
+    impedance_symbols:
+      - Gamma_i
+      - omega_p
+      - epsilon_r
+      - N_not_E
+    pr_operational_state: probe_only
+    attribution:
+      native_github: possible
+      connector_wrapper: possible
+      assistant_operator: none
+      permission_boundary: none
+      real_repo_defect: none
+      notes: Attribution remains provisional without raw run and connector payload capture.
+    retry_and_remediation:
+      retried: false
+      retry_count: 0
+      retry_idempotence_class: not_retried
+      fallback_used: Probe PR.
+      remediation: Capture run outcome and close probe without merge.
+      controller_requirement_created: true
+      controller_requirement_ref: ProbeManager
+    evidence:
+      narrative_summary: PR body states the temporary marker existed only to force observable PR-triggered CI and was not implementation content.
+      urls:
+        - https://github.com/SocioProphet/sociosphere/pull/476
+    confidence: medium
+    status: observed

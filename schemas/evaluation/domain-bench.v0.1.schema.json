@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DomainBench v0.1",
+  "description": "Domain-specific evaluation contract with rubric lineage, task coverage, and scoring policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "benchId", "title", "domain", "ownerRepo", "rubric", "taskSet", "scoring", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "evaluation.domain-bench.v0.1" },
+    "recordType": { "const": "DomainBench" },
+    "benchId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "domain": { "type": "string", "minLength": 1 },
+    "ownerRepo": { "type": "string", "minLength": 1 },
+    "rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rubricId", "lineageRefs", "criteria"],
+      "properties": {
+        "rubricId": { "type": "string", "minLength": 1 },
+        "lineageRefs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "criteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "taskSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskSetId", "taskRefs"],
+      "properties": {
+        "taskSetId": { "type": "string", "minLength": 1 },
+        "taskRefs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "passThreshold"],
+      "properties": {
+        "method": { "type": "string", "enum": ["rubric_weighted", "pass_fail", "ordinal"] },
+        "passThreshold": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    }
+  }
+}

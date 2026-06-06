@@ -1,0 +1,29 @@
+name: GitHub Tool Impedance Ledger
+
+on:
+  pull_request:
+    paths:
+      - 'registry/github-tool-impedance-ledger.yaml'
+      - 'registry/github-tool-impedance-ledger.schema.yaml'
+      - 'tools/validate_github_tool_impedance_ledger.py'
+      - '.github/workflows/github-tool-impedance-ledger.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'registry/github-tool-impedance-ledger.yaml'
+      - 'registry/github-tool-impedance-ledger.schema.yaml'
+      - 'tools/validate_github_tool_impedance_ledger.py'
+      - '.github/workflows/github-tool-impedance-ledger.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-github-tool-impedance-ledger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate GitHub tool impedance ledger
+        run: python3 tools/validate_github_tool_impedance_ledger.py

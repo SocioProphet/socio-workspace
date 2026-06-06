@@ -1,0 +1,68 @@
+{
+  "version": "v0",
+  "model_id": "google_workspace_operating_model_v0",
+  "mesh_state": "prepared-but-not-deployed",
+  "operating_model_state": "contract_only",
+  "workspace_role": "provisional_management_layer",
+  "native_target": "SocioProphet",
+  "surfaces": {
+    "calendars": {
+      "role": "event_time_substrate",
+      "planned_use": "meeting_and_workstream_event_ingestion",
+      "state": "planned_only",
+      "live_asset_creation": false
+    },
+    "groups": {
+      "role": "audience_and_authorization_substrate",
+      "planned_use": "operator_and_council_boundary_modeling",
+      "state": "planned_only",
+      "live_asset_creation": false
+    },
+    "sheets": {
+      "role": "provisional_ledger_substrate",
+      "planned_use": "dashboard_ledger_fixture_projection",
+      "state": "contract_only",
+      "live_asset_creation": false
+    },
+    "apps_script": {
+      "role": "temporary_orchestration_substrate",
+      "planned_use": "dry_run_parser_and_sync_rehearsal_after_gate3_approval",
+      "state": "blocked_until_gate3_approval",
+      "live_execution": false
+    },
+    "dashboards": {
+      "role": "provisional_visibility_substrate",
+      "planned_use": "contract_defined_management_visibility",
+      "state": "contract_only",
+      "live_asset_creation": false
+    },
+    "socioprophet_native": {
+      "role": "eventual_control_plane",
+      "planned_use": "replace_workspace_prototype_with_native_governed_operations",
+      "state": "future_migration_review",
+      "live_migration": false
+    }
+  },
+  "authority_boundaries": {
+    "sociosphere": "workspace_topology_and_operating_model",
+    "prophet_platform": "value_projection_authority",
+    "prophet_platform_fabric_mlops_ts_suite": "workspace_prototype_implementation_authority"
+  },
+  "required_existing_contracts": [
+    "contracts/workspace-mesh/dashboard-ledger.v0.json",
+    "registry/workspace-mesh-value-projection-alignment.v0.json",
+    "registry/workspace-mesh-gate3-planning.v0.json",
+    "registry/workspace-mesh-current-state.v0.json"
+  ],
+  "controls": {
+    "no_live_calendar_creation": true,
+    "no_live_group_creation": true,
+    "no_live_sheet_creation": true,
+    "no_apps_script_execution": true,
+    "no_dashboard_publication": true,
+    "no_native_migration": true,
+    "candidate_values_printed": false,
+    "live_execution": false
+  },
+  "next_allowed_action": "operating_model_validation_only"
+}

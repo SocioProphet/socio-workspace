@@ -1,0 +1,53 @@
+{
+  "version": "v0",
+  "model_id": "cloud_isv_operating_model_v0",
+  "model_state": "planning_only",
+  "mesh_state": "prepared-but-not-deployed",
+  "vendor_neutral_control_plane": "SocioProphet",
+  "cloud_roles": {
+    "aws": {
+      "role": "compute_model_marketplace_and_channel_strategy",
+      "planned_use": "model_runtime_packaging_marketplace_distribution_and_enterprise_channel_alignment",
+      "state": "planning_only",
+      "deployment_authorized": false,
+      "account_identifier_present": false
+    },
+    "google": {
+      "role": "workspace_identity_collaboration_and_prototype_strategy",
+      "planned_use": "workspace_management_layer_calendar_group_sheet_script_and_dashboard_prototyping",
+      "state": "contract_only",
+      "deployment_authorized": false,
+      "project_identifier_present": false
+    },
+    "azure": {
+      "role": "enterprise_identity_microsoft_ecosystem_and_procurement_strategy",
+      "planned_use": "enterprise_identity_integration_microsoft_tenant_alignment_and_commercial_channel_planning",
+      "state": "planning_only",
+      "deployment_authorized": false,
+      "subscription_identifier_present": false
+    },
+    "socioprophet": {
+      "role": "vendor_neutral_orchestration_governance_and_native_control_plane",
+      "planned_use": "normalize_vendor_capabilities_into_governed_operations_claims_evidence_and_value_projection",
+      "state": "authority_layer",
+      "deployment_authorized": false,
+      "native_migration_live": false
+    }
+  },
+  "required_existing_artifacts": [
+    "registry/google-workspace-operating-model.v0.json",
+    "contracts/workspace-mesh/dashboard-ledger.v0.json",
+    "registry/workspace-mesh-value-projection-alignment.v0.json",
+    "registry/workspace-mesh-current-state.v0.json"
+  ],
+  "controls": {
+    "no_vendor_lock_in": true,
+    "no_cloud_deployment": true,
+    "no_credentials": true,
+    "no_tenant_ids": true,
+    "no_subscription_ids": true,
+    "no_project_ids": true,
+    "live_execution": false
+  },
+  "next_allowed_action": "cloud_isv_model_validation_only"
+}

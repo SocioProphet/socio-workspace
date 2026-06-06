@@ -1,0 +1,134 @@
+ledger_id: github-tool-impedance-ledger-v0
+status: seed
+schema: registry/github-tool-impedance-ledger.schema.yaml
+purpose: >-
+  Record GitHub, connector, CI, branch-protection, and assistant-operation
+  impedance events as durable governance telemetry.
+records:
+  - event_id: gti-2026-0001
+    observed_at: '2026-06-06'
+    source_context:
+      context_type: chat_turn
+      notes: >-
+        Direct-to-main creation of the GitHub tool impedance dictionary and ledger
+        schema during codification work. The connector exposed contents-api file
+        create/update actions but no explicit branch-create action in the discovered
+        surface for this turn.
+    repository:
+      full_name: SocioProphet/sociosphere
+      default_branch: main
+    refs:
+      branch: main
+    github_objects:
+      commit_sha: 29f2e05b40a21bd0e49125d78b221cd364bfab04
+    tool_context:
+      tool_namespace: GitHub
+      tool_action: create_file
+      normalized_response_only: true
+      raw_payload_preserved: false
+      pagination_known_complete: false
+      mutation_attempted: true
+      mutation_receipt_verified: true
+    operation_intended: >-
+      Add governance-only GitHub tool impedance dictionary artifact.
+    observed_failure: >-
+      Preferred branch-first GitOps was not followed because the available connector
+      surface in this turn did not expose a direct branch-create action; a low-risk
+      direct-to-main documentation write was used and then independently verified.
+    failure_classes:
+      - CONNECTOR_PARTIAL_SURFACE
+      - ASSISTANT_MISUSE
+    impedance_symbols:
+      - Gamma_i
+      - delta_r
+      - epsilon_r
+      - A_i
+      - W_to_K
+    pr_operational_state: not_applicable
+    attribution:
+      native_github: none
+      connector_wrapper: possible
+      assistant_operator: likely
+      permission_boundary: none
+      real_repo_defect: none
+      notes: >-
+        This event is intentionally self-referential: it records a procedural
+        exception discovered while creating the impedance doctrine itself.
+    retry_and_remediation:
+      retried: false
+      retry_count: 0
+      retry_idempotence_class: not_retried
+      fallback_used: Direct-to-main contents API write followed by fetch-file receipt.
+      remediation: >-
+        Add ledger entry, validator, and future GitHub Controller requirement for
+        branch creation or explicit direct-to-main exception recording.
+      controller_requirement_created: true
+      controller_requirement_ref: StateHydrator, MutationReceiptVerifier, CapabilityMatrix
+    evidence:
+      narrative_summary: >-
+        Dictionary was committed and then fetched back from main as a post-action receipt.
+      urls:
+        - https://github.com/SocioProphet/sociosphere/blob/main/docs/governance/github-tool-impedance-dictionary.md
+      commit_shas:
+        - 29f2e05b40a21bd0e49125d78b221cd364bfab04
+      artifact_paths:
+        - docs/governance/github-tool-impedance-dictionary.md
+    confidence: high
+    status: verified
+
+  - event_id: gti-2026-0002
+    observed_at: '2026-06-06'
+    source_context:
+      context_type: github_pr
+      notes: >-
+        Sociosphere probe PR used to force observable PR-triggered CI behavior.
+    repository:
+      full_name: SocioProphet/sociosphere
+      default_branch: main
+    github_objects:
+      pr_number: 476
+    tool_context:
+      tool_namespace: GitHub
+      normalized_response_only: true
+      raw_payload_preserved: false
+      pagination_known_complete: false
+      mutation_attempted: false
+      mutation_receipt_verified: true
+    operation_intended: >-
+      Force observable PR-triggered CI for execution artifact validation.
+    observed_failure: >-
+      Normal workflow observability was insufficient, requiring a temporary marker PR
+      with no implementation content.
+    failure_classes:
+      - CONNECTOR_PARTIAL_SURFACE
+      - SEARCH_INDEX_GAP
+    impedance_symbols:
+      - Gamma_i
+      - omega_p
+      - epsilon_r
+      - N_not_E
+    pr_operational_state: probe_only
+    attribution:
+      native_github: possible
+      connector_wrapper: possible
+      assistant_operator: none
+      permission_boundary: none
+      real_repo_defect: none
+      notes: >-
+        Attribution remains provisional without raw run and connector payload capture.
+    retry_and_remediation:
+      retried: false
+      retry_count: 0
+      retry_idempotence_class: not_retried
+      fallback_used: Probe PR.
+      remediation: Capture run outcome and close probe without merge.
+      controller_requirement_created: true
+      controller_requirement_ref: ProbeManager, FailureLedger
+    evidence:
+      narrative_summary: >-
+        PR body stated the temporary marker existed only to force observable PR-triggered CI
+        and was not implementation content.
+      urls:
+        - https://github.com/SocioProphet/sociosphere/pull/476
+    confidence: medium
+    status: observed

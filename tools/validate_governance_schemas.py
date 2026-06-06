@@ -41,6 +41,26 @@ CASES = {
         "valid": "institutional-action.valid.synthetic.json",
         "invalid": "institutional-action.invalid.missing-execution-receipt.synthetic.json",
     },
+    "governance-bench": {
+        "schema": "governance-bench.v0.1.schema.json",
+        "valid": "governance-bench.valid.synthetic.json",
+        "invalid": "governance-bench.invalid.missing-thresholds.synthetic.json",
+    },
+    "workflow-bench": {
+        "schema": "workflow-bench.v0.1.schema.json",
+        "valid": "workflow-bench.valid.synthetic.json",
+        "invalid": "workflow-bench.invalid.missing-metrics.synthetic.json",
+    },
+    "domain-bench": {
+        "schema": "domain-bench.v0.1.schema.json",
+        "valid": "domain-bench.valid.synthetic.json",
+        "invalid": "domain-bench.invalid.missing-adjudication.synthetic.json",
+    },
+    "replay-bench": {
+        "schema": "replay-bench.v0.1.schema.json",
+        "valid": "replay-bench.valid.synthetic.json",
+        "invalid": "replay-bench.invalid.missing-replay-tests.synthetic.json",
+    },
 }
 
 

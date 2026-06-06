@@ -1,0 +1,13 @@
+{
+  "capability_id": "health_ai_eval_and_clinical_value_v0",
+  "state": "planning_only",
+  "production_ready": false,
+  "patient_care_action": false,
+  "autonomous_clinical_action": false,
+  "customer_facing_healthcare_claim": false,
+  "evidence": [
+    "SocioProphet/prophet-core-contracts#18",
+    "SocioProphet/sherlock-search#64"
+  ],
+  "next_allowed_action": "planning_record_only"
+}

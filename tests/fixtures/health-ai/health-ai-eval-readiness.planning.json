@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1.0",
+  "capability_id": "health_ai_eval_and_clinical_value_v0",
+  "readiness_state": "planning_only",
+  "production_ready": false,
+  "patient_care_action": false,
+  "autonomous_clinical_action": false,
+  "customer_facing_healthcare_claim": false,
+  "source_repos": [
+    "SocioProphet/prophet-core-contracts",
+    "SocioProphet/sherlock-search",
+    "SocioProphet/sociosphere"
+  ],
+  "validated_inputs": [
+    "prophet-core-contracts:schemas/health-eval-rubric.schema.json",
+    "prophet-core-contracts:schemas/clinical-value-claim.schema.json",
+    "sherlock-search:schemas/health-ai-search-packet.schema.json"
+  ],
+  "blocked_from": [
+    "production_ready",
+    "patient_care_action",
+    "autonomous_clinical_action",
+    "customer_facing_healthcare_claim",
+    "real_clinical_data_processing",
+    "protected_benchmark_reproduction"
+  ],
+  "next_allowed_action": "planning_record_only",
+  "notes": "Healthcare AI evaluation and clinical value work is registered as planning-only. Ambience-derived claims remain external source claims. HealthBench-derived content remains benchmark-design guidance without protected examples, answer keys, or canary content."
+}

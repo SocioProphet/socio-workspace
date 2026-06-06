@@ -1,0 +1,16 @@
+{
+  "actionRefs": [
+    "institutional-action:example"
+  ],
+  "benchId": "bench:replay:invalid",
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "ReplayBench",
+  "schemaVersion": "governance.replay-bench.v0.1",
+  "title": "Invalid replay benchmark"
+}

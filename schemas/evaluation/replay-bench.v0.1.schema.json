@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReplayBench v0.1",
+  "description": "Replay evaluation contract for graph snapshots, evidence retention, artifact availability, and determinism posture.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "benchId", "ownerRepo", "replayTargets", "requiredArtifacts", "determinismClasses", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "evaluation.replay-bench.v0.1" },
+    "recordType": { "const": "ReplayBench" },
+    "benchId": { "type": "string", "minLength": 1 },
+    "ownerRepo": { "type": "string", "minLength": 1 },
+    "replayTargets": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "requiredArtifacts": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["graph_snapshot", "evidence_bundle", "execution_receipt", "replay_artifact", "validation_report"] } },
+    "determinismClasses": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["deterministic", "bounded_nondeterministic", "synthetic", "not_replayable"] } },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    }
+  }
+}

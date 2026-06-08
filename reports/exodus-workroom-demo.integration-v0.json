@@ -1,0 +1,100 @@
+{
+  "schema_version": "sociosphere.exodus-workroom-demo-integration.v0",
+  "source_issue": "SocioProphet/sociosphere#478",
+  "status": "synthetic_cross_repo_chain_established_report_only",
+  "generated_at": "2026-06-08T20:15:00Z",
+  "non_goals": [
+    "real_provider_credential_ingestion",
+    "live_provider_api_operation",
+    "provider_side_writes",
+    "destructive_migration_behavior",
+    "production_migration_readiness",
+    "polished_ui_readiness",
+    "full_estate_workspace_resolved_lock_completion"
+  ],
+  "repos": {
+    "exodus": {
+      "repo": "SocioProphet/exodus",
+      "merged_pr": 18,
+      "merge_commit": "65215b83ed7fd67d210acaecae125baace0866af",
+      "artifacts": [
+        "schemas/exodus-run.v0.schema.json",
+        "examples/synthetic-tenant-a/exodus-run.json",
+        "scripts/validate_exodus_demo.py",
+        ".github/workflows/ci.yml",
+        "docs/synthetic-workroom-demo.md"
+      ],
+      "validation_command": "python3 scripts/validate_exodus_demo.py",
+      "claim": "deterministic synthetic Apple Google Microsoft exit-readiness run is represented and validated"
+    },
+    "prophet_workspace": {
+      "repo": "SocioProphet/prophet-workspace",
+      "merged_pr": 20,
+      "merge_commit": "9869c0932358ad0502b2b83f21479d050455f7de",
+      "artifacts": [
+        "contracts/workspace/exodus-workroom-bridge.schema.json",
+        "contracts/workspace/exodus-workroom-bridge.v0.1.example.json",
+        "contracts/workspace/exodus-migration-workroom.v0.1.example.json",
+        "tools/validate_professional_workrooms.py",
+        "docs/exodus-migration-workroom.md"
+      ],
+      "validation_command": "python3 tools/validate_professional_workrooms.py",
+      "claim": "Professional Workroom can carry the Exodus run through a thin bridge without forking the workroom model"
+    },
+    "sociosphere": {
+      "repo": "SocioProphet/sociosphere",
+      "artifacts": [
+        "reports/exodus-workroom-demo.integration-v0.md",
+        "reports/exodus-workroom-demo.integration-v0.json"
+      ],
+      "supporting_artifacts": [
+        "docs/workspace-session-resume.md",
+        "reports/workspace-control-plane-context-integration.md",
+        "reports/workspace-disposition-summary.baseline.json",
+        "manifest/workspace.dispositions.json",
+        "reports/workspace-manifest-cleanup.readiness-v0.md",
+        "reports/workspace-manifest-cleanup.readiness-v0.json"
+      ],
+      "claim": "Sociosphere records the synthetic demo chain as durable control-plane state"
+    }
+  },
+  "control_plane_layers": [
+    {
+      "layer": "domain_run",
+      "repo": "SocioProphet/exodus",
+      "artifact": "examples/synthetic-tenant-a/exodus-run.json",
+      "status": "merged"
+    },
+    {
+      "layer": "workspace_containment",
+      "repo": "SocioProphet/prophet-workspace",
+      "artifact": "contracts/workspace/exodus-migration-workroom.v0.1.example.json",
+      "status": "merged"
+    },
+    {
+      "layer": "workspace_bridge",
+      "repo": "SocioProphet/prophet-workspace",
+      "artifact": "contracts/workspace/exodus-workroom-bridge.v0.1.example.json",
+      "status": "merged"
+    },
+    {
+      "layer": "control_plane_integration",
+      "repo": "SocioProphet/sociosphere",
+      "artifact": "reports/exodus-workroom-demo.integration-v0.md",
+      "status": "this_pr"
+    }
+  ],
+  "next_recommended_tranche": {
+    "title": "Add cross-repo Exodus workroom demo readiness check",
+    "repo": "SocioProphet/sociosphere",
+    "expected_artifacts": [
+      "tools/check_exodus_workroom_demo.py",
+      "docs/exodus-workroom-demo-runbook.md"
+    ],
+    "default_checkout_roots": [
+      "~/dev/exodus",
+      "~/dev/prophet-workspace",
+      "~/dev/sociosphere"
+    ]
+  }
+}

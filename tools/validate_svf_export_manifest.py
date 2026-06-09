@@ -62,6 +62,11 @@ def digest_record_valid(record: Any) -> bool:
     )
 
 
+def sha256_of_file(path: Path) -> str:
+    import hashlib
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def main() -> int:
     manifest = load(MANIFEST)
     problems: list[str] = []
@@ -111,6 +116,34 @@ def main() -> int:
     missing_non = sorted(REQUIRED_NON_CERTIFIED - non_certified)
     if missing_non:
         problems.append(f"non_certified_claims missing required non-claims: {missing_non}")
+
+    # Artifact files must exist and match manifest digests
+    run_artifact = manifest.get("run_artifact", "")
+    receipt_artifact = manifest.get("receipt_artifact", "")
+    run_path = ROOT / run_artifact if run_artifact else None
+    receipt_path = ROOT / receipt_artifact if receipt_artifact else None
+
+    if run_path and not run_path.exists():
+        problems.append(f"run_artifact file missing: {run_artifact}")
+    elif run_path and run_path.exists():
+        actual_run_digest = sha256_of_file(run_path)
+        expected_run_digest = (manifest.get("run_digest") or {}).get("digest", "")
+        if actual_run_digest != expected_run_digest:
+            problems.append(
+                f"run_artifact digest mismatch: manifest={expected_run_digest[:16]}… "
+                f"actual={actual_run_digest[:16]}…"
+            )
+
+    if receipt_path and not receipt_path.exists():
+        problems.append(f"receipt_artifact file missing: {receipt_artifact}")
+    elif receipt_path and receipt_path.exists():
+        actual_receipt_digest = sha256_of_file(receipt_path)
+        expected_receipt_digest = (manifest.get("receipt_digest") or {}).get("digest", "")
+        if actual_receipt_digest != expected_receipt_digest:
+            problems.append(
+                f"receipt_artifact digest mismatch: manifest={expected_receipt_digest[:16]}… "
+                f"actual={actual_receipt_digest[:16]}…"
+            )
 
     non_claims = manifest.get("non_claims", [])
     for phrase in (

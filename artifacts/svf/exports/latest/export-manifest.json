@@ -1,24 +1,4 @@
 {
-  "schema_version": "1.0",
-  "export_id": "svf:export:sociosphere.registry-dogfood.latest",
-  "repo": "SocioProphet/sociosphere",
-  "profile_ref": "svf:profile:sociosphere.dogfood",
-  "plan_ref": "svf:plan:sociosphere.registry-dogfood",
-  "policy_ref": "svf:policy:sociosphere.local-readonly",
-  "run_ref": "svf:run:sociosphere.registry-dogfood.verified",
-  "receipt_ref": "svf:receipt:sociosphere.registry-dogfood.verified",
-  "run_artifact": "artifacts/svf/exports/latest/validation-run.json",
-  "receipt_artifact": "artifacts/svf/exports/latest/validation-receipt.json",
-  "run_digest": {
-    "algorithm": "sha256",
-    "digest": "1111111111111111111111111111111111111111111111111111111111111111"
-  },
-  "receipt_digest": {
-    "algorithm": "sha256",
-    "digest": "2222222222222222222222222222222222222222222222222222222222222222"
-  },
-  "exported_at": "2026-05-31T18:46:09Z",
-  "verification_status": "verified",
   "certified_claims": [
     "schema_conformant",
     "non_production_only",
@@ -26,6 +6,12 @@
     "artifact_integrity_verified",
     "receipt_integrity_verified"
   ],
+  "downstream_consumers": [
+    "SocioProphet/prophet-platform#549",
+    "SocioProphet/prophet-platform#588"
+  ],
+  "export_id": "svf:export:sociosphere.registry-dogfood.latest",
+  "exported_at": "2026-06-09T11:53:47Z",
   "non_certified_claims": [
     "production_readiness",
     "live_infrastructure_safety",
@@ -35,13 +21,27 @@
     "signadot_vendor_parity",
     "network_isolation_enforced"
   ],
-  "downstream_consumers": [
-    "SocioProphet/prophet-platform#549",
-    "SocioProphet/prophet-platform#562"
-  ],
   "non_claims": [
     "Export manifest identifies stable SVF run and receipt artifacts for downstream consumers.",
     "Export manifest does not authorize downstream systems to issue or sign Sociosphere receipts.",
     "Export manifest does not certify production readiness, live infrastructure safety, or Signadot vendor parity."
-  ]
+  ],
+  "plan_ref": "svf:plan:sociosphere.registry-dogfood",
+  "policy_ref": "svf:policy:sociosphere.local-readonly",
+  "profile_ref": "svf:profile:sociosphere.dogfood",
+  "receipt_artifact": "artifacts/svf/exports/latest/validation-receipt.json",
+  "receipt_digest": {
+    "algorithm": "sha256",
+    "digest": "cf6a273478391d908cc1668812d5038dd18feea386860a84d6a52ed8049cd5ac"
+  },
+  "receipt_ref": "svf:receipt:cda7b48ccd1b03b1",
+  "repo": "SocioProphet/sociosphere",
+  "run_artifact": "artifacts/svf/exports/latest/validation-run.json",
+  "run_digest": {
+    "algorithm": "sha256",
+    "digest": "4806e0098632d8539159657529ab0d5b8c6274162e3089c0b66ab374d2186b18"
+  },
+  "run_ref": "svf:run:cda7b48ccd1b03b1",
+  "schema_version": "1.0",
+  "verification_status": "verified"
 }

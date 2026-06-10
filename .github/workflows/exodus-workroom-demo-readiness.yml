@@ -1,0 +1,52 @@
+name: Exodus Workroom Demo Readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/exodus-workroom-demo-readiness.yml"
+      - "tools/check_exodus_workroom_demo.py"
+      - "docs/exodus-workroom-demo-runbook.md"
+      - "reports/exodus-workroom-demo.integration-v0.md"
+      - "reports/exodus-workroom-demo.integration-v0.json"
+      - "reports/exodus-workroom-demo.proof-v0.md"
+
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Sociosphere
+        uses: actions/checkout@v4
+        with:
+          path: sociosphere
+
+      - name: Checkout Exodus
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/exodus
+          path: exodus
+
+      - name: Checkout Prophet Workspace
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/prophet-workspace
+          path: prophet-workspace
+
+      - name: Run cross-repo readiness check
+        run: |
+          mkdir -p sociosphere/reports/runtime
+          python3 sociosphere/tools/check_exodus_workroom_demo.py \
+            --exodus "$GITHUB_WORKSPACE/exodus" \
+            --prophet-workspace "$GITHUB_WORKSPACE/prophet-workspace" \
+            --sociosphere "$GITHUB_WORKSPACE/sociosphere" \
+            --run-validators \
+            --json | tee sociosphere/reports/runtime/exodus-workroom-demo-readiness.json
+
+      - name: Upload readiness report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exodus-workroom-demo-readiness
+          path: sociosphere/reports/runtime/exodus-workroom-demo-readiness.json

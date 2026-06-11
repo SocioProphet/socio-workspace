@@ -1,0 +1,63 @@
+{
+  "_comment": "Captured output of tools/check_exodus_workroom_demo.py — 2026-06-10. Readiness: ready. All three repos verified present.",
+  "demo_boundary": "synthetic_offline_no_provider_credentials_no_provider_api_calls_no_provider_side_writes",
+  "mode": "artifact_presence_only",
+  "readiness_status": "ready",
+  "repo_results": {
+    "exodus": {
+      "artifact_count": 5,
+      "missing": [],
+      "missing_count": 0,
+      "present": [
+        "schemas/exodus-run.v0.schema.json",
+        "examples/synthetic-tenant-a/exodus-run.json",
+        "scripts/validate_exodus_demo.py",
+        ".github/workflows/ci.yml",
+        "docs/synthetic-workroom-demo.md"
+      ],
+      "present_count": 5,
+      "repo_key": "exodus",
+      "status": "ready",
+      "validators": []
+    },
+    "prophet_workspace": {
+      "artifact_count": 5,
+      "missing": [],
+      "missing_count": 0,
+      "present": [
+        "contracts/workspace/exodus-workroom-bridge.schema.json",
+        "contracts/workspace/exodus-workroom-bridge.v0.1.example.json",
+        "contracts/workspace/exodus-migration-workroom.v0.1.example.json",
+        "tools/validate_professional_workrooms.py",
+        "docs/exodus-migration-workroom.md"
+      ],
+      "present_count": 5,
+      "repo_key": "prophet_workspace",
+      "status": "ready",
+      "validators": []
+    },
+    "sociosphere": {
+      "artifact_count": 10,
+      "missing": [],
+      "missing_count": 0,
+      "present": [
+        "reports/exodus-workroom-demo.integration-v0.md",
+        "reports/exodus-workroom-demo.integration-v0.json",
+        "docs/workspace-session-resume.md",
+        "reports/workspace-control-plane-context-integration.md",
+        "reports/workspace-disposition-summary.baseline.json",
+        "manifest/workspace.dispositions.json",
+        "reports/workspace-manifest-cleanup.readiness-v0.md",
+        "reports/workspace-manifest-cleanup.readiness-v0.json",
+        "tools/validate_workspace_dispositions.py",
+        "tools/report_workspace_disposition_summary.py"
+      ],
+      "present_count": 10,
+      "repo_key": "sociosphere",
+      "status": "ready",
+      "validators": []
+    }
+  },
+  "schema_version": "sociosphere.exodus-workroom-demo-readiness.v0",
+  "source_issue": "SocioProphet/sociosphere#478"
+}

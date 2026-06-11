@@ -1,0 +1,92 @@
+{
+  "schema_version": "sociosphere.exodus-workroom-demo-state.v0",
+  "kind": "DemoStateManifest",
+  "generated_at": "2026-06-10T00:00:00Z",
+  "source_issue": "SocioProphet/sociosphere#478",
+  "demo_boundary": "synthetic_offline_no_provider_credentials_no_provider_api_calls_no_provider_side_writes",
+  "repos": [
+    {
+      "repo": "SocioProphet/exodus",
+      "role": "Migration engine — deterministic synthetic Apple/Google/Microsoft exit-readiness run",
+      "primary_artifacts": [
+        {
+          "path": "schemas/exodus-run.v0.schema.json",
+          "description": "Exodus run schema v0"
+        },
+        {
+          "path": "examples/synthetic-tenant-a/exodus-run.json",
+          "description": "Synthetic tenant-A exodus run fixture"
+        },
+        {
+          "path": "scripts/validate_exodus_demo.py",
+          "description": "Exodus demo validator"
+        }
+      ],
+      "validator_command": "python3 scripts/validate_exodus_demo.py",
+      "ci_workflow": ".github/workflows/ci.yml"
+    },
+    {
+      "repo": "SocioProphet/prophet-workspace",
+      "role": "Workspace action contracts — exodus workroom bridge, migration workroom schema",
+      "primary_artifacts": [
+        {
+          "path": "contracts/workspace/exodus-workroom-bridge.schema.json",
+          "description": "Exodus workroom bridge schema"
+        },
+        {
+          "path": "contracts/workspace/exodus-workroom-bridge.v0.1.example.json",
+          "description": "Bridge contract example"
+        },
+        {
+          "path": "contracts/workspace/exodus-migration-workroom.v0.1.example.json",
+          "description": "Migration workroom example"
+        }
+      ],
+      "validator_command": "python3 tools/validate_professional_workrooms.py",
+      "ci_workflow": null
+    },
+    {
+      "repo": "SocioProphet/sociosphere",
+      "role": "Readiness gate, integration report, workspace dispositions, demo runbook",
+      "primary_artifacts": [
+        {
+          "path": "tools/check_exodus_workroom_demo.py",
+          "description": "Readiness checker (CI-backed)"
+        },
+        {
+          "path": "reports/exodus-workroom-demo.integration-v0.json",
+          "description": "Cross-repo integration status report"
+        },
+        {
+          "path": "fixtures/exodus-workroom-demo-readiness.output.json",
+          "description": "Captured readiness output fixture — 2026-06-10"
+        },
+        {
+          "path": "manifest/exodus-workroom-demo-state.v0.json",
+          "description": "This file — demo-state manifest"
+        }
+      ],
+      "validator_command": "python3 tools/check_exodus_workroom_demo.py",
+      "ci_workflow": ".github/workflows/exodus-workroom-demo-readiness.yml"
+    }
+  ],
+  "readiness_state": {
+    "status": "ready",
+    "captured_at": "2026-06-10T00:00:00Z",
+    "fixture": "fixtures/exodus-workroom-demo-readiness.output.json",
+    "all_repos_verified": true
+  },
+  "non_goals": [
+    "real_provider_credential_ingestion",
+    "live_provider_api_operation",
+    "provider_side_writes",
+    "destructive_migration_behavior",
+    "production_migration_readiness",
+    "polished_ui_readiness",
+    "full_estate_workspace_resolved_lock_completion"
+  ],
+  "next_milestone": {
+    "description": "Real-provider readiness planning (Apple/Google/Microsoft) — no credentials required at this stage",
+    "prerequisites": ["explicit owner approval", "access confirmation", "dedicated session"]
+  }
+}

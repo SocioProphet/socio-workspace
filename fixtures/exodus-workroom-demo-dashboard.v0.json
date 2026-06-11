@@ -1,0 +1,116 @@
+{
+  "schema_version": "sociosphere.exodus-workroom-demo-dashboard.v0",
+  "kind": "ExodusWorkroomDemoDashboard",
+  "generated_at": "2026-06-10T00:00:00Z",
+  "source_run": "exodus-run-synthetic-tenant-a-001",
+  "demo_boundary": "synthetic_offline_no_provider_credentials_no_provider_api_calls_no_provider_side_writes",
+  "non_production_claim": "All ERI scores, PCS values, blockers, and recommendations are synthetic and derived from fixture data only. No real provider API calls, credentials, or account data were used.",
+  "eri_summary": {
+    "label": "Exit Readiness Index",
+    "description": "Composite score (0–100) reflecting synthetic asset census completeness, export schema coverage, and blocker count across all providers.",
+    "overall": 61,
+    "by_provider": [
+      {
+        "provider_id": "provider.apple",
+        "name": "Apple",
+        "eri_score": 58,
+        "confidence": "medium",
+        "basis": "synthetic — iCloud Drive + Photos + Notes schema coverage estimated; Siri Shortcuts export path undocumented"
+      },
+      {
+        "provider_id": "provider.google",
+        "name": "Google",
+        "eri_score": 71,
+        "confidence": "medium",
+        "basis": "synthetic — Takeout covers most domains; Workspace calendar/contacts well-covered; Drive delta-sync export path partial"
+      },
+      {
+        "provider_id": "provider.microsoft",
+        "name": "Microsoft",
+        "eri_score": 54,
+        "confidence": "medium",
+        "basis": "synthetic — M365 export APIs documented; OneDrive delta undocumented; Teams export requires admin consent flow"
+      }
+    ]
+  },
+  "pcs_summary": {
+    "label": "Provider Coverage Score",
+    "description": "Per-domain coverage fraction (0.0–1.0) for each provider's control surfaces.",
+    "by_provider": [
+      {
+        "provider_id": "provider.apple",
+        "name": "Apple",
+        "domains": [
+          { "domain": "identity",              "pcs": 0.70, "note": "Apple ID export well-defined" },
+          { "domain": "storage",               "pcs": 0.65, "note": "iCloud Drive: file listing covered, delta-sync not" },
+          { "domain": "photos",                "pcs": 0.60, "note": "Photos: HEIC export supported; metadata completeness partial" },
+          { "domain": "notes",                 "pcs": 0.50, "note": "Notes: HTML export only, no structured schema" },
+          { "domain": "calendar",              "pcs": 0.80, "note": "iCal export well-standardized" },
+          { "domain": "contacts",              "pcs": 0.80, "note": "vCard export well-standardized" },
+          { "domain": "assistant_workflows",   "pcs": 0.20, "note": "Siri Shortcuts: no documented bulk export path" }
+        ]
+      },
+      {
+        "provider_id": "provider.google",
+        "name": "Google",
+        "domains": [
+          { "domain": "identity",              "pcs": 0.75, "note": "Google Account Takeout covers identity" },
+          { "domain": "storage",               "pcs": 0.70, "note": "Drive Takeout complete; delta-sync incomplete" },
+          { "domain": "photos",                "pcs": 0.75, "note": "Google Photos Takeout: metadata JSON included" },
+          { "domain": "mail",                  "pcs": 0.85, "note": "Gmail MBOX export well-supported" },
+          { "domain": "calendar",              "pcs": 0.85, "note": "Google Calendar iCal export well-supported" },
+          { "domain": "contacts",              "pcs": 0.80, "note": "Google Contacts vCard/CSV export complete" },
+          { "domain": "workspace",             "pcs": 0.55, "note": "Workspace Docs/Sheets: native format only, conversion partial" }
+        ]
+      },
+      {
+        "provider_id": "provider.microsoft",
+        "name": "Microsoft",
+        "domains": [
+          { "domain": "identity",              "pcs": 0.65, "note": "Entra ID export requires tenant admin" },
+          { "domain": "storage",               "pcs": 0.60, "note": "OneDrive: file export complete; delta API requires consent" },
+          { "domain": "mail",                  "pcs": 0.75, "note": "Outlook: PST/MBOX export documented" },
+          { "domain": "calendar",              "pcs": 0.75, "note": "Outlook calendar iCal export standard" },
+          { "domain": "contacts",              "pcs": 0.70, "note": "Outlook contacts vCard export standard" },
+          { "domain": "collaboration",         "pcs": 0.40, "note": "Teams: export requires admin consent, messages API limited" },
+          { "domain": "documents",             "pcs": 0.65, "note": "Office formats well-defined; embedded macros excluded" }
+        ]
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "provider_id": "provider.apple",
+      "severity": "high",
+      "blocker": "No documented bulk export path for Siri Shortcuts / assistant workflows",
+      "mitigation": "Manual export or third-party bridge required; deprioritize in Phase 2 scope"
+    },
+    {
+      "provider_id": "provider.apple",
+      "severity": "medium",
+      "blocker": "Notes export is HTML-only; no structured schema available",
+      "mitigation": "HTML→structured conversion tooling needed; schema in exodus-run.v0 does not cover this domain yet"
+    },
+    {
+      "provider_id": "provider.microsoft",
+      "severity": "high",
+      "blocker": "Teams message export requires tenant admin consent and is API-rate-limited",
+      "mitigation": "Admin consent flow must be documented in workroom bridge; deprioritize or stage separately"
+    },
+    {
+      "provider_id": "provider.microsoft",
+      "severity": "medium",
+      "blocker": "OneDrive delta-sync export path undocumented in current synthetic fixture",
+      "mitigation": "Add delta-sync schema to exodus-run.v0 in next schema revision"
+    }
+  ],
+  "recommendations": [
+    "Prioritize Apple calendar + contacts + storage domains for Phase 2 — highest PCS, lowest risk",
+    "Google Gmail + Calendar are best-covered; use as reference implementation for other providers",
+    "Defer Microsoft Teams to a separate workroom phase pending admin consent flow documentation",
+    "Add structured Notes schema to exodus-run.v0 before Apple migration workroom goes live",
+    "Add delta-sync export path spec to OneDrive domain before Microsoft storage migration"
+  ],
+  "demo_state_manifest": "manifest/exodus-workroom-demo-state.v0.json",
+  "readiness_fixture": "fixtures/exodus-workroom-demo-readiness.output.json"
+}

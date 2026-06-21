@@ -89,3 +89,17 @@ A `role=third_party` entry has no `rev` in the lock. Fix: add an explicit rev.
    ```
 3. Commit both changes together with a short rationale and a link to the relevant issue.
 4. Push; CI will re-run `lock-verify` to confirm the update is consistent.
+
+## Runner semantics — workspace CI conventions
+
+sociosphere owns runner semantics; every workspace repo's CI should follow these so hosted-runner
+builds stay deterministic and a single repo's flake can't block the mesh.
+
+- **Feasibility checks build app-only — never package installers in CI.** A "does it build" gate
+  must compile and bundle the *app*, but must NOT run installer/image packaging (Tauri DMG via
+  `hdiutil` / `bundle_dmg.sh`, etc.): that step is flaky on hosted macOS runners and irrelevant to
+  feasibility. Use `tauri build --bundles app`. _Applied: Noetica `validate.yml` → `tauri-macos`._
+- **Distribution packaging lives in the release workflow,** gated on a tag/release, where a
+  packaging flake fails loudly on a deliberate cut instead of blocking every PR.
+- **A re-run is a symptom, not a fix.** When a check fails on infra flake, remove the flaky step
+  from the PR gate (or move it to release) rather than just re-running until it's green.

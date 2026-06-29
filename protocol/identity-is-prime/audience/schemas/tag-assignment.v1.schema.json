@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/audience/tag-assignment.v1.schema.json",
+  "title": "Tag Assignment v1",
+  "description": "Assignment of an audience tag to a subject — the tag_assignment_event of the audience-tagging framework, expressed as a ResolutionDecision profile so it inherits explainability, confidence/uncertainty, policy veto, reversibility and audit. The subject is referenced through a tokenized/masked id (never raw), and CONSTRAINTS-family tags gate activation via the policy polytope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "assignment_id",
+    "subject_ref",
+    "tag_ref",
+    "method",
+    "confidence",
+    "scope_realm",
+    "policy_verdict",
+    "reversible",
+    "decided_by",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity-prime.tag-assignment.v1" },
+    "assignment_id": { "type": "string", "pattern": "^ta_[a-zA-Z0-9_.:-]+$" },
+    "subject_ref": { "type": "string", "description": "Tokenized/masked subject id (e.g. a chameleon token), never a raw identifier." },
+    "masking_decision_ref": { "type": ["string", "null"], "pattern": "^md_[a-zA-Z0-9_.:-]+$", "description": "The masking decision that tokenized the subject for this realm." },
+    "tag_ref": { "type": "string", "pattern": "^at_[a-zA-Z0-9_.:-]+$" },
+    "method": {
+      "type": "string",
+      "enum": ["self_declared", "firmographic", "behavioral", "model_inferred", "rule", "review_corrected"]
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "uncertainty"],
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "uncertainty": { "type": "number", "minimum": 0, "maximum": 1 },
+        "abstained": { "type": "boolean", "default": false }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Pointers to the signals/witnesses that justify the assignment (auditable for bias/ethics review).",
+      "items": { "type": "string" }
+    },
+    "scope_realm": {
+      "type": "string",
+      "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$"
+    },
+    "policy_verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict"],
+      "description": "Activation gate. A CONSTRAINTS-family tag (or forbidden mixture) can veto regardless of confidence.",
+      "properties": {
+        "verdict": { "type": "string", "enum": ["allowed", "vetoed", "review_required"] },
+        "gated_by_constraint": { "type": ["string", "null"], "description": "tag_id of the CONSTRAINTS tag that gated activation, if any." },
+        "forbidden_mixture": { "type": ["array", "null"], "items": { "type": "string" } },
+        "reason_codes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "reversible": { "type": "boolean", "description": "Assignments are revocable; revocation appends a ledger entry (not a delete)." },
+    "expiry_ts": { "type": ["string", "null"], "format": "date-time", "description": "Tags decay; INTENT_STAGE especially is volatile." },
+    "decided_by": { "type": "string" },
+    "resolver_version": { "type": ["string", "null"] },
+    "policy_version": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

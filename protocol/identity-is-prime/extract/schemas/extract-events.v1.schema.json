@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/extract/extract-events.v1.schema.json",
+  "title": "Extract Events (Event/Relation Extraction) Method Contract v1",
+  "description": "Request/response contract for the event- and relation-extraction phase. Consumes mentions and emits typed action/event triggers and relationships, normalized toward Event-IR (action + primes + attrs) so downstream ER can block and resolve. Nearline/CITIZEN_CLOUD by default.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "method", "request", "response"],
+  "properties": {
+    "schema_version": { "const": "extract.events.v1" },
+    "method": { "const": "ExtractEvents" },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "source_record_refs", "scope", "extractor_version"],
+      "properties": {
+        "request_id": { "type": "string" },
+        "source_record_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^sr_[a-zA-Z0-9_.:-]+$" }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["realm", "device", "app"],
+          "properties": {
+            "realm": { "type": "string", "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$" },
+            "device": { "type": "string" },
+            "app": { "type": "string" }
+          }
+        },
+        "extractor_version": { "type": "string" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "result", "events", "extractor_version", "created_at"],
+      "properties": {
+        "request_id": { "type": "string" },
+        "result": { "type": "string", "enum": ["OK", "ABSTAINED", "REJECTED"] },
+        "events": {
+          "type": "array",
+          "description": "Extracted action/event triggers, Event-IR-aligned.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["action", "primes"],
+            "properties": {
+              "action": { "type": "string", "description": "Action / event-trigger label." },
+              "actor_mention_ref": { "type": ["string", "null"] },
+              "target_mention_ref": { "type": ["string", "null"] },
+              "relation": { "type": ["string", "null"], "description": "Relationship type when this is a relation extraction." },
+              "primes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+              "ts": { "type": ["string", "null"], "format": "date-time" },
+              "attrs": { "type": "object", "additionalProperties": true },
+              "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "extractor_version": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

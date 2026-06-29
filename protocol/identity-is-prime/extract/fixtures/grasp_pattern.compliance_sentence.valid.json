@@ -1,0 +1,23 @@
+{
+  "schema_version": "identity-prime.grasp-pattern.v1",
+  "pattern_id": "gp_compliance_shall_0001",
+  "target_phenomenon": "compliance_sentence",
+  "pattern_class": "positive",
+  "window": 10,
+  "gaps_allowed": true,
+  "feature_sets": [
+    { "layers": [ { "layer": "named_entity", "value": "noun.person" } ] },
+    { "layers": [ { "layer": "token", "value": "shall" } ] },
+    { "layers": [ { "layer": "pos", "value": "VB" } ] },
+    { "layers": [ { "layer": "token", "value": "the" } ] },
+    { "layers": [ { "layer": "pos", "value": "IN" } ] }
+  ],
+  "ranking": { "info_gain": 0.41, "frequency": 0.012, "normalized_mutual_information": 0.18 },
+  "emits": {
+    "mention_entity_class": "POLICY_TERM",
+    "edge_witness_feature": "compliance_obligation_cue"
+  },
+  "alphabet_version": "grasp.alphabet.general-nlp@0.1.0",
+  "extractor_version": "grasp.reference@0.1.0",
+  "created_at": "2026-06-29T15:10:00Z"
+}

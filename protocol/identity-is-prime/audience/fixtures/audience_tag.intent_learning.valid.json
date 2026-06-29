@@ -1,0 +1,18 @@
+{
+  "schema_version": "identity-prime.audience-tag.v1",
+  "tag_id": "at_intent_learning",
+  "family": "INTENT_STAGE",
+  "label": "Learning intent",
+  "definition": "User is actively seeking to learn / upskill.",
+  "include_signals": ["consumes tutorials/courses", "follows learning newsletters", "searches 'how to'"],
+  "exclude_signals": ["only reads news", "no learning actions"],
+  "data_sources": ["web_behavior", "content_taxonomy", "search_terms"],
+  "privacy_risk_level": 2,
+  "ontology_term_ref": "https://socioprophet.github.io/ontogenesis/Middle/intent#LearningIntent",
+  "prime_topic_refs": ["learning"],
+  "gates_activation": false,
+  "activation_channels": ["search", "newsletters", "communities"],
+  "preferred_surfaces": ["tutorial pages", "course landing pages", "webinars"],
+  "version": "0.1.0",
+  "created_at": "2026-06-29T16:00:00Z"
+}

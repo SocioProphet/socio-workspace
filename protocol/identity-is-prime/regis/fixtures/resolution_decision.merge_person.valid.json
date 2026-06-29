@@ -1,0 +1,41 @@
+{
+  "schema_version": "regis.resolution-decision.v1",
+  "decision_id": "rd_merge_person_0001",
+  "operation": "merge",
+  "decision": "merge",
+  "subjects": ["sr_citizenfog_mail_0001", "sr_citizenfog_calendar_0002"],
+  "result_entity_ref": "ce_person_michael_0001",
+  "scope_realm": "CITIZEN_FOG",
+  "explanation": {
+    "top_features": [
+      { "feature": "exact_email", "contribution": 0.62 },
+      { "feature": "device_id_match", "contribution": 0.21 },
+      { "feature": "name_jaccard", "contribution": 0.09 }
+    ],
+    "summary": "Mail and calendar records share an exact email and device id in CITIZEN_FOG with no forbidden prime-topic mixture; congruence lane confirms same nonce stream."
+  },
+  "policy_verdict": {
+    "verdict": "allowed",
+    "reason_codes": ["NO_FORBIDDEN_MIXTURE"],
+    "forbidden_mixture": null,
+    "policy_decision_ref": null
+  },
+  "witness_chain": ["ew_person_email_device_0001"],
+  "confidence": { "score": 0.92, "uncertainty": 0.05, "band": "high", "abstained": false },
+  "reversibility": {
+    "reversible": true,
+    "action_class": "reversible_write",
+    "undo_ref": "dl_unmerge_person_0001"
+  },
+  "proof_artifact_ref": "cert:regis:concordance:ce_person_michael_0001@2026-06-20",
+  "review": { "required": false, "state": "not_required", "reviewer_ref": null },
+  "decided_by": "regis-policy-agent",
+  "resolver_version": "regis.resolver.reference@0.1.0",
+  "policy_version": "regis.identity.polytope.core@0.1.0",
+  "schema_pins": {
+    "fixture_version": "0.1.0",
+    "input_hash": "sha256:placeholder-input",
+    "result_hash": "sha256:placeholder-result"
+  },
+  "created_at": "2026-06-20T14:13:01Z"
+}

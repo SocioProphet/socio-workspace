@@ -1,0 +1,38 @@
+{
+  "schema_version": "identity-prime.masking-decision.v1",
+  "decision_id": "md_reidentify_legal_0001",
+  "subject_ref": "tp_patient_mrn_chameleon::tok_2Fad78",
+  "requesting_realm": "INSTITUTION",
+  "audience": { "role": "legal_counsel", "openid_profile_attr": "can_reidentify=true" },
+  "requested_op": "re_identify",
+  "verdict": "allow",
+  "reason_codes": ["PROFILE_ATTR_AUTHORIZED", "REASON_RECORDED"],
+  "forbidden_mixture": null,
+  "applied_transforms": [
+    {
+      "field_path": "$.patient.mrn",
+      "profile_ref": "tp_patient_mrn_chameleon",
+      "scheme": "chameleon_token",
+      "reversibility": "reversible",
+      "key_epoch": 3,
+      "target_domain": null
+    }
+  ],
+  "re_identification": {
+    "permitted": true,
+    "reason_for_action": "Subpoena MBA-2025-06-27-CS: counsel must verify MRN against filed exhibit AF-0007.",
+    "authorized_by": "custodian:mdheller",
+    "separation_of_duty": true,
+    "release_pack_ref": "rp_legal_reidentify_0001"
+  },
+  "side_channel_mitigations": ["separation_of_duty", "trusted_third_party", "monitoring", "policy"],
+  "receipt": {
+    "policy_decision_ref": "pd_reidentify_legal_0001",
+    "beacon_commit_receipt": "beacon:placeholder-reidentify-legal",
+    "certificate_hash": "sha256:masking-reidentify-legal-placeholder"
+  },
+  "policy_version": "regis.identity.polytope.core@0.1.0",
+  "scheme_version": "identity-prime.tokenization-profile.v1",
+  "decided_by": "masking-pdp-agent",
+  "created_at": "2026-06-29T15:06:00Z"
+}

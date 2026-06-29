@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/regis/edge-witness.v1.schema.json",
+  "title": "Regis Edge Witness v1",
+  "description": "The justifying evidence for a single edge in the Regis Entity Graph. No edge exists without a witness: every linkage carries its contributing features, congruence evidence, policy verdict, and confidence/uncertainty so it is explainable and auditable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "witness_id",
+    "edge_type",
+    "source_ref",
+    "target_ref",
+    "evidence",
+    "policy_verdict",
+    "confidence",
+    "resolver_version",
+    "policy_version",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "regis.edge-witness.v1" },
+    "witness_id": { "type": "string", "pattern": "^ew_[a-zA-Z0-9_.:-]+$" },
+    "edge_type": {
+      "type": "string",
+      "enum": [
+        "record_to_entity",
+        "record_to_record",
+        "entity_to_entity",
+        "concordance_link",
+        "admissible_transition",
+        "relationship_mention",
+        "contradiction_pointer"
+      ]
+    },
+    "source_ref": { "type": "string", "description": "Endpoint id (sr_/ce_/...)." },
+    "target_ref": { "type": "string", "description": "Endpoint id (sr_/ce_/...)." },
+    "directed": { "type": "boolean", "default": false },
+    "decision_ref": { "type": ["string", "null"], "pattern": "^rd_[a-zA-Z0-9_.:-]+$", "description": "ResolutionDecision that materialized this edge." },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature_contributions"],
+      "description": "Additive/boosted evidence breakdown — the explanation surface (boost.explain style).",
+      "properties": {
+        "feature_contributions": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Top contributing features with signed contributions to the link score.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["feature", "contribution"],
+            "properties": {
+              "feature": { "type": "string" },
+              "value": { "type": ["number", "string", "boolean", "null"] },
+              "contribution": { "type": "number", "description": "Signed contribution to the additive/boosted score." }
+            }
+          }
+        },
+        "prime_topic_overlap": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        },
+        "congruence_evidence": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "description": "Modular / non-escape evidence lane (NonceStream / congruence-class reachability).",
+          "properties": {
+            "modulus": { "type": ["integer", "null"], "minimum": 1 },
+            "residue": { "type": ["integer", "null"] },
+            "reachable": { "type": ["boolean", "null"] },
+            "distance": { "type": ["integer", "null"], "minimum": 0 }
+          }
+        },
+        "exclusive_conflict": {
+          "type": "boolean",
+          "default": false,
+          "description": "True if a stable-exclusive attribute conflict blocks this edge."
+        }
+      }
+    },
+    "policy_verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict"],
+      "description": "Policy veto outcome for this edge (merge_allowed / forbidden-mixture check).",
+      "properties": {
+        "verdict": { "type": "string", "enum": ["allowed", "vetoed", "review_required"] },
+        "reason_codes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "policy_decision_ref": { "type": ["string", "null"] }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score"],
+      "description": "Calibrated link score plus uncertainty band, so abstention is first-class.",
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "uncertainty": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "band": { "type": ["string", "null"], "enum": [null, "low", "medium", "high"] }
+      }
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_ref", "observed_at"],
+        "properties": {
+          "source_ref": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" },
+          "evidence_hash": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "resolver_version": { "type": "string" },
+    "policy_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

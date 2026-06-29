@@ -30,9 +30,9 @@ and accessible" now means *implementing executors*, in dependency order, not wri
 
 | # | Gap | Repo | Why first | Usable when |
 |---|---|---|---|---|
-| 1 | **Wire the new validator into the conformance runner / CI** (add `regis-graph-contracts`, `sherlock-index-contracts`, masking/extract/audience lanes to the lane list + a Makefile/CI target) | sociosphere | Cheapest accessibility win; turns files into an enforced gate on every checkout | a clean checkout fails if a contract regresses |
-| 2 | **CHK-01..10 gate executor + zone-promotion guard** (resume `feature/exodus-zone-gate-engine`, do **not** fork main) | exodus | "Catalog is control plane" keystone; zones are inert without it | an artifact cannot illegally cross a zone boundary |
-| 3 | **BLAKE3-required + CBOR (RFC 8949) canonicalizer** | exodus | Every integrity claim/hash/replay depends on a deterministic canonical byte sequence | hashes are independently replayable (FRE 902(14)) |
+| 1 | ✅ **DONE** — aggregate runner `tools/conformance/run_identity_prime_conformance.sh` + `validate_regis_extract_masking_fixtures.py` (13 schemas / 7 fixtures / 2 tritrpc, deep jsonschema). Remaining: add a CI step that invokes the runner. | sociosphere | Cheapest accessibility win; turns files into an enforced gate | ✅ one command validates the whole lane |
+| 2 | ✅ **DONE** — `scripts/exodus_gate.py` (CHK-01..10 executor, fail-closed, ZonePromotion/PolicyException CustodyEvents) + `validate_gate_engine.py` (8 cases). Committed `e2db96d` on `feat/exodus-chk-gate-executor`. | exodus | "Catalog is control plane" keystone | ✅ an artifact cannot illegally cross a zone boundary |
+| 3 | **BLAKE3-required + CBOR (RFC 8949) canonicalizer** ← **next** | exodus | Every integrity claim/hash/replay depends on a deterministic canonical byte sequence | hashes are independently replayable (FRE 902(14)) |
 
 ### P1 — Differentiators (the moat; after P0)
 
@@ -73,7 +73,7 @@ and accessible" now means *implementing executors*, in dependency order, not wri
 
 ## 3. Recommended next action
 
-Do **P0 #1** immediately (cheap, makes everything enforced), then **P0 #2** (CHK executor on the existing
-gate-engine branch — highest leverage: it makes "catalog is control plane" real). Then **P1 #4 → #5**
-(tokenization crate → masking PDP in the Gateway) because that is the single most visible competitive win
-(matches *and* out-proves WKC's dynamic masking). Everything else sequences off those.
+P0 #1 and #2 are **done** (runner + CHK gate executor). Next: **P0 #3** (BLAKE3-required + CBOR canonicalizer)
+to make every integrity hash independently replayable, then **P1 #4 → #5** (Chameleon/key-evolving tokenization
+crate → masking PDP wired into the Catalog Gateway) — the single most visible competitive win (matches *and*
+out-proves WKC's dynamic masking). Everything else sequences off those.

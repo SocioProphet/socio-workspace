@@ -32,7 +32,7 @@ and accessible" now means *implementing executors*, in dependency order, not wri
 |---|---|---|---|---|
 | 1 | ✅ **DONE** — aggregate runner `tools/conformance/run_identity_prime_conformance.sh` + `validate_regis_extract_masking_fixtures.py` (13 schemas / 7 fixtures / 2 tritrpc, deep jsonschema). Remaining: add a CI step that invokes the runner. | sociosphere | Cheapest accessibility win; turns files into an enforced gate | ✅ one command validates the whole lane |
 | 2 | ✅ **DONE** — `scripts/exodus_gate.py` (CHK-01..10 executor, fail-closed, ZonePromotion/PolicyException CustodyEvents) + `validate_gate_engine.py` (8 cases). Committed `e2db96d` on `feat/exodus-chk-gate-executor`. | exodus | "Catalog is control plane" keystone | ✅ an artifact cannot illegally cross a zone boundary |
-| 3 | **BLAKE3-required + CBOR (RFC 8949) canonicalizer** ← **next** | exodus | Every integrity claim/hash/replay depends on a deterministic canonical byte sequence | hashes are independently replayable (FRE 902(14)) |
+| 3 | ✅ **DONE** — `scripts/exodus_canon.py` (RFC 8949 core-deterministic CBOR + SHA-256/BLAKE3, CANON-v0.1) + `validate_canon.py` (22 RFC vectors + ordering + replay). Committed `cf7e465` on `feat/exodus-cbor-canonicalizer`. | exodus | Every integrity claim/hash/replay depends on a deterministic canonical byte sequence | ✅ hashes are independently replayable |
 
 ### P1 — Differentiators (the moat; after P0)
 
@@ -73,7 +73,8 @@ and accessible" now means *implementing executors*, in dependency order, not wri
 
 ## 3. Recommended next action
 
-P0 #1 and #2 are **done** (runner + CHK gate executor). Next: **P0 #3** (BLAKE3-required + CBOR canonicalizer)
-to make every integrity hash independently replayable, then **P1 #4 → #5** (Chameleon/key-evolving tokenization
-crate → masking PDP wired into the Catalog Gateway) — the single most visible competitive win (matches *and*
-out-proves WKC's dynamic masking). Everything else sequences off those.
+All of **P0 is done** (runner + CHK gate executor + CBOR canonicalizer). Next: **P1 #4 → #5**
+(Chameleon/key-evolving tokenization crate → masking PDP wired into the Catalog Gateway) — the single most
+visible competitive win (matches *and* out-proves WKC's dynamic masking). The tokenization crate is real crypto
+(updatable/key-evolving tokenization + FPE + KMIP/HSM) and warrants its own focused build + a language call
+(Rust crate vs Python module). Everything else (P2) sequences off #4–#6.

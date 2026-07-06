@@ -1,0 +1,32 @@
+{
+  "schema_version": "regis.edge-witness.v1",
+  "witness_id": "ew_person_email_device_0001",
+  "edge_type": "record_to_record",
+  "source_ref": "sr_citizenfog_mail_0001",
+  "target_ref": "sr_citizenfog_calendar_0002",
+  "directed": false,
+  "decision_ref": "rd_merge_person_0001",
+  "evidence": {
+    "feature_contributions": [
+      { "feature": "exact_email", "value": "m@example.org", "contribution": 0.62 },
+      { "feature": "device_id_match", "value": true, "contribution": 0.21 },
+      { "feature": "name_jaccard", "value": 0.8, "contribution": 0.09 }
+    ],
+    "prime_topic_overlap": ["personal", "civic"],
+    "congruence_evidence": { "modulus": 97, "residue": 14, "reachable": true, "distance": 3 },
+    "exclusive_conflict": false
+  },
+  "policy_verdict": {
+    "verdict": "allowed",
+    "reason_codes": ["NO_FORBIDDEN_MIXTURE"],
+    "policy_decision_ref": null
+  },
+  "confidence": { "score": 0.92, "uncertainty": 0.05, "band": "high" },
+  "provenance": [
+    { "source_ref": "event:mail:0001", "observed_at": "2026-06-20T14:11:02Z", "evidence_hash": "sha256:placeholder-mail-0001" },
+    { "source_ref": "event:calendar:0002", "observed_at": "2026-06-20T14:12:40Z", "evidence_hash": "sha256:placeholder-cal-0002" }
+  ],
+  "resolver_version": "regis.resolver.reference@0.1.0",
+  "policy_version": "regis.identity.polytope.core@0.1.0",
+  "created_at": "2026-06-20T14:13:00Z"
+}

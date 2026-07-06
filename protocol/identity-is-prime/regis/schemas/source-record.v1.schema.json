@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/regis/source-record.v1.schema.json",
+  "title": "Regis Source Record v1",
+  "description": "An immutable observed record (mentions + extracted attributes) projected from one or more Event-IR events. SourceRecords are the leaves clustered into CanonicalEntities; they are never edited in place.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "source_id",
+    "scope",
+    "observed_at",
+    "assertions",
+    "provenance",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "regis.source-record.v1" },
+    "record_id": { "type": "string", "pattern": "^sr_[a-zA-Z0-9_.:-]+$" },
+    "source_id": { "type": "string" },
+    "source_record_id": { "type": ["string", "null"], "description": "Native id in the originating source, if any." },
+    "scope": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["realm", "device", "app"],
+      "description": "Conforms to Event-IR scope: realm/device/app required; jurisdiction/peer optional.",
+      "properties": {
+        "realm": {
+          "type": "string",
+          "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$"
+        },
+        "device": { "type": "string" },
+        "app": { "type": "string" },
+        "jurisdiction": { "type": ["string", "null"] },
+        "peer": { "type": ["string", "null"] }
+      }
+    },
+    "observed_at": { "type": "string", "format": "date-time", "description": "Forensic observation time (Event-IR ts)." },
+    "event_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Event-IR events this record was projected from.",
+      "items": { "type": "string" }
+    },
+    "primes": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Prime-topic labels carried from the source events.",
+      "items": { "type": "string" }
+    },
+    "mentions": {
+      "type": "array",
+      "description": "NER/EL output: typed spans grounded (or pending grounding) to entities.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "entity_class"],
+        "properties": {
+          "text": { "type": "string" },
+          "entity_class": { "type": "string" },
+          "span": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { "start": { "type": "integer", "minimum": 0 }, "end": { "type": "integer", "minimum": 0 } }
+          },
+          "overlapping": { "type": "boolean", "description": "True when this span overlaps or multi-labels with another (span pipeline, not plain non-overlapping NER)." },
+          "kb_candidate_ref": { "type": ["string", "null"], "description": "Entity-linking candidate id, if grounded." },
+          "link_confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "assertions": {
+      "type": "object",
+      "description": "Extracted attribute key/values for this record (name, ticker, country, identifiers, ...).",
+      "additionalProperties": true
+    },
+    "attrs": {
+      "type": "object",
+      "description": "Raw Event-IR attrs carried forward for replay/audit (cookies, ids, handles, nonces, headers).",
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_ref", "observed_at"],
+        "properties": {
+          "source_ref": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" },
+          "claim_ref": { "type": ["string", "null"] },
+          "evidence_hash": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "notes": { "type": ["string", "null"] }
+  }
+}

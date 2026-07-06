@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/extract/grasp-pattern.v1.schema.json",
+  "title": "GrASP Pattern v1",
+  "description": "A Greedy Augmented Sequential Pattern: an interpretable, ranked, multilayer pattern indicative of a target phenomenon (claim/evidence/argumentation/compliance/policy-trigger). Each position is a feature SET drawn from several augmentation layers; gaps are allowed within a window; patterns may target the negative class. A GrASP match emits source-record.v1 mentions and supplies the human-readable feature_contributions consumed by edge-witness / resolution-decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pattern_id",
+    "target_phenomenon",
+    "pattern_class",
+    "feature_sets",
+    "ranking",
+    "alphabet_version",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity-prime.grasp-pattern.v1" },
+    "pattern_id": { "type": "string", "pattern": "^gp_[a-zA-Z0-9_.:-]+$" },
+    "target_phenomenon": {
+      "type": "string",
+      "enum": [
+        "claim_sentence",
+        "evidence_expert",
+        "evidence_study",
+        "argumentation",
+        "textual_entailment",
+        "compliance_sentence",
+        "policy_trigger",
+        "consent_cue",
+        "prime_topic_cue",
+        "other"
+      ]
+    },
+    "pattern_class": {
+      "type": "string",
+      "description": "GrASP can learn patterns for the negative class, not only positive.",
+      "enum": ["positive", "negative"]
+    },
+    "window": { "type": "integer", "minimum": 1, "description": "Max span (in tokens) within which the feature sets must match; gaps are allowed inside it." },
+    "gaps_allowed": { "type": "boolean", "default": true },
+    "feature_sets": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered positions. Each position is a SET of layer attributes that must all hold for one token (cross-layer generalization within a word).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["layers"],
+        "properties": {
+          "layers": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["layer"],
+              "properties": {
+                "layer": {
+                  "type": "string",
+                  "enum": ["token", "pos", "named_entity", "sentiment", "hypernym", "syntactic_relation", "lexicon", "topic", "topic_lexicon"]
+                },
+                "value": { "type": ["string", "null"], "description": "Layer value, e.g. pos=NN, named_entity=Person, syntactic_relation=@obj, lexicon='<express:v:2', topic=TOPIC." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["info_gain"],
+      "description": "GrASP alphabet/pattern selection metrics.",
+      "properties": {
+        "info_gain": { "type": "number", "description": "Correlation with the label (drives top-K selection)." },
+        "frequency": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "normalized_mutual_information": { "type": ["number", "null"], "description": "Redundancy control vs already-selected patterns." }
+      }
+    },
+    "emits": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Binding: how a match projects into the identity spine.",
+      "properties": {
+        "mention_entity_class": { "type": ["string", "null"], "description": "entity_class stamped on the emitted source-record mention." },
+        "edge_witness_feature": { "type": ["string", "null"], "description": "feature name contributed to an EdgeWitness/ResolutionDecision explanation." }
+      }
+    },
+    "alphabet_version": { "type": "string" },
+    "extractor_version": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

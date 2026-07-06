@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/sherlock/search-index-record.v1.schema.json",
+  "title": "Sherlock Search Index Record v1",
+  "description": "The indexed unit Sherlock Search exposes for Regis/Holmes/HELL-ER evidence. Sherlock is an indexing/retrieval adapter, never the system of record: it cites graph/ledger/certificate pointers and asserts no canonical truth. Backs conformance lane `sherlock-index-contracts` and the existing sherlock.search.v1.IndexEvidenceRecord method (artifact_type=SearchIndexRecord).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "record_id",
+    "indexed_kind",
+    "lookup_keys",
+    "cited_pointers",
+    "claims_canonical_truth",
+    "provenance",
+    "index_version",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "sherlock.search-index-record.v1" },
+    "record_type": { "const": "SearchIndexRecord" },
+    "record_id": { "type": "string", "description": "Sherlock-namespace IRI/id for this index record." },
+    "indexed_kind": {
+      "type": "string",
+      "description": "What Regis/Holmes/HELL-ER object this record indexes.",
+      "enum": [
+        "canonical_entity",
+        "source_record",
+        "edge_witness",
+        "resolution_decision",
+        "decision_ledger_entry",
+        "proof_certificate",
+        "contradiction_object",
+        "release_pack",
+        "investigation_case",
+        "evidence_finding",
+        "worldline_event"
+      ]
+    },
+    "title": { "type": ["string", "null"] },
+    "summary": { "type": ["string", "null"], "description": "Non-secret, display-safe summary. No raw credentials/secrets." },
+    "lookup_keys": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true,
+      "description": "Indexed retrieval keys (entity_id, decision_id, case_id, prime_topics, scope_realm, ...).",
+      "properties": {
+        "entity_ref": { "type": ["string", "null"] },
+        "decision_ref": { "type": ["string", "null"] },
+        "scope_realm": { "type": ["string", "null"], "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$" },
+        "prime_topics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "cited_pointers": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Graph/ledger/certificate/source pointers this record cites. Retrieval returns these, not synthesized truth.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pointer_type", "ref"],
+        "properties": {
+          "pointer_type": { "type": "string", "enum": ["graph_node", "graph_edge", "ledger_entry", "proof_certificate", "release_pack", "source_record", "case", "finding"] },
+          "ref": { "type": "string" }
+        }
+      }
+    },
+    "search_facets": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Faceting dimensions for browse (indexed_kind, scope_realm, evidence_grade, freshness, time bucket).",
+      "properties": {
+        "evidence_grade": { "type": ["string", "null"], "enum": [null, "E1", "E2", "E3", "E4", "E5"] },
+        "freshness": { "type": ["string", "null"], "enum": [null, "fresh", "stale", "deprecated"] },
+        "time_bucket": { "type": ["string", "null"], "description": "Coarse time slice for time-sliced graph search." }
+      }
+    },
+    "source_quality": {
+      "type": ["string", "null"],
+      "description": "Sherlock source-quality vocabulary; research-only values force implementation_safe=false.",
+      "enum": [null, "confirmed_official", "confirmed_bibliographic", "confirmed_pdf", "confirmed_artifact", "plausible_needs_source", "speculative_do_not_use"]
+    },
+    "implementation_safe": { "type": "boolean", "default": false },
+    "ranking_hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Retrieval weights that do not alter evidence truth.",
+      "properties": {
+        "authoritative_evidence_boost": { "type": ["number", "null"] },
+        "draft_penalty": { "type": ["number", "null"] },
+        "policy_decision_boost": { "type": ["number", "null"] },
+        "preference_weight": { "type": ["number", "null"], "description": "Preference-weighted ranking (local-first, opt-in)." }
+      }
+    },
+    "policy_decision_refs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true, "description": "Policy-fabric decisions governing whether this record is returnable/visible per realm + role." },
+    "delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Delta-indexing receipt for local-first/cache-first runtime.",
+      "properties": {
+        "cursor": { "type": ["string", "null"] },
+        "op": { "type": ["string", "null"], "enum": [null, "upsert", "remove"] }
+      }
+    },
+    "claims_canonical_truth": { "const": false },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_by", "created_at", "non_secret"],
+      "properties": {
+        "created_by": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "non_secret": { "const": true, "description": "Index records never carry raw secrets/credentials." },
+        "ledger_pointer": { "type": ["string", "null"] },
+        "certificate_hash": { "type": ["string", "null"] }
+      }
+    },
+    "index_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/regis/decision-ledger-entry.v1.schema.json",
+  "title": "Regis Decision Ledger Entry v1",
+  "description": "Append-only ledger entry. The Regis graph is a materialized view rebuildable by replaying these entries in order. Merge and unmerge are first-class entries; nothing mutates canonical state except through the ledger.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "entry_id",
+    "seq",
+    "op",
+    "decision_ref",
+    "targets",
+    "prev_entry_ref",
+    "entry_hash",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "regis.decision-ledger-entry.v1" },
+    "entry_id": { "type": "string", "pattern": "^dl_[a-zA-Z0-9_.:-]+$" },
+    "seq": { "type": "integer", "minimum": 0, "description": "Monotonic sequence within the ledger lane." },
+    "op": {
+      "type": "string",
+      "enum": ["upsert_entity", "upsert_record", "merge", "unmerge", "split", "link", "unlink", "annotate", "revoke", "expire"]
+    },
+    "decision_ref": { "type": "string", "pattern": "^rd_[a-zA-Z0-9_.:-]+$", "description": "ResolutionDecision that authorized this mutation." },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    },
+    "before_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Entity/record ids whose state this entry supersedes (enables deterministic unmerge/replay).",
+      "items": { "type": "string" }
+    },
+    "after_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    },
+    "reverses_entry_ref": {
+      "type": ["string", "null"],
+      "pattern": "^dl_[a-zA-Z0-9_.:-]+$",
+      "description": "When op is unmerge/unlink, the prior entry being reversed."
+    },
+    "prev_entry_ref": {
+      "type": ["string", "null"],
+      "pattern": "^dl_[a-zA-Z0-9_.:-]+$",
+      "description": "Hash-chained predecessor; null for the genesis entry."
+    },
+    "entry_hash": { "type": "string", "description": "Hash over (prev_entry_hash, op, decision_ref, targets, payload) for tamper-evident replay." },
+    "policy_version": { "type": ["string", "null"] },
+    "resolver_version": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

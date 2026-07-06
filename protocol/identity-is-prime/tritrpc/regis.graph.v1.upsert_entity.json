@@ -1,0 +1,32 @@
+{
+  "fixture_id": "tritrpc.regis.graph.upsert_entity.v0.1",
+  "fixture_version": "0.1.0",
+  "schema_version": "tritrpc-fixture.v0.1",
+  "policy_version": "regis.identity.polytope.core@0.1.0",
+  "resolver_version": "regis.resolver.reference@0.1.0",
+  "service": "regis.graph.v1.RegisGraphService",
+  "method": "UpsertEntity",
+  "description": "Materialize a merge into the Regis Entity Graph. The mutation is authorized by a ResolutionDecision and recorded as an append-only DecisionLedgerEntry; canonical state is never free-written.",
+  "request": {
+    "request_id": "REQ_REGIS_UPSERT_PERSON_V001",
+    "op": "merge",
+    "decision_ref": "rd_merge_person_0001",
+    "subjects": ["sr_citizenfog_mail_0001", "sr_citizenfog_calendar_0002"],
+    "result_entity_ref": "ce_person_michael_0001",
+    "witness_chain": ["ew_person_email_device_0001"]
+  },
+  "response": {
+    "result": "VERIFIED",
+    "schema_version": "regis.decision-ledger-entry.v1",
+    "policy_version": "regis.identity.polytope.core@0.1.0",
+    "resolver_version": "regis.resolver.reference@0.1.0",
+    "fixture_version": "0.1.0",
+    "entry_id": "dl_merge_person_0001",
+    "seq": 0,
+    "op": "merge",
+    "entity_ref": "ce_person_michael_0001",
+    "reason_codes": ["POLICY_ALLOWED", "WITNESS_CHAIN_PRESENT"],
+    "entry_hash": "sha256:regis-upsert-person-placeholder",
+    "certificate_hash": "sha256:regis-upsert-cert-placeholder"
+  }
+}

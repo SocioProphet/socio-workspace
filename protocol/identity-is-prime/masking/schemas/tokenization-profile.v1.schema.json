@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/masking/tokenization-profile.v1.schema.json",
+  "title": "Tokenization / Field-Transformation Profile v1",
+  "description": "Per-field desensitisation policy (the 'field transformation policy' of a de-identification pipeline). Declares the scheme, reversibility, owning domain/realm, key epoch, HSM backing, and format/semantic preservation. Chameleon-style tokens are deterministic within a domain and never cross-domain-linkable; key-evolving schemes rotate via epoch tweaks without re-tokenising stored data.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "field_selector",
+    "scheme",
+    "reversibility",
+    "domain_scope",
+    "cross_domain_linkable",
+    "scheme_version",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity-prime.tokenization-profile.v1" },
+    "profile_id": { "type": "string", "pattern": "^tp_[a-zA-Z0-9_.:-]+$" },
+    "field_selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "description": "Which field(s) this profile governs (JSON pointer / column path).",
+      "properties": {
+        "path": { "type": "string" },
+        "data_class": { "type": ["string", "null"], "description": "e.g. direct_identifier, quasi_identifier, free_text — aligns to HELL-ER hazard_class." }
+      }
+    },
+    "scheme": {
+      "type": "string",
+      "description": "Desensitisation scheme. *_token = pseudonym; *_encryption = reversible cipher; one_way_* = irreversible.",
+      "enum": [
+        "none",
+        "reversible_encryption",
+        "length_preserving_encryption",
+        "format_preserving_encryption",
+        "semantic_preserving_encryption",
+        "chameleon_token",
+        "legacy_token_an10",
+        "hmac_pseudonym",
+        "one_way_hash",
+        "redact",
+        "generalize",
+        "suppress"
+      ]
+    },
+    "reversibility": {
+      "type": "string",
+      "description": "Whether the original value is recoverable. one_way schemes are non-reversible by construction.",
+      "enum": ["reversible", "one_way"]
+    },
+    "domain_scope": {
+      "type": "string",
+      "description": "Owning domain/realm. Chameleon tokens are deterministic within this scope only.",
+      "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$"
+    },
+    "cross_domain_linkable": {
+      "const": false,
+      "description": "Invariant: tokens MUST NOT be linkable across domains (un-linkable identifiers mitigate side-channel leakage). Cross-domain movement happens only via an explicit, policy-gated re-tokenisation tweak."
+    },
+    "preserve": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Output-shape guarantees so masked data still validates downstream.",
+      "properties": {
+        "length": { "type": "boolean", "default": false },
+        "format": { "type": "boolean", "default": false },
+        "semantic": { "type": "boolean", "default": false },
+        "checksum": { "type": "boolean", "default": false, "description": "Recompute valid checksum (LUHN/IBAN) after transform." }
+      }
+    },
+    "key": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Key-evolving tokenization: rotation produces an epoch tweak that updates tokens without full re-tokenisation.",
+      "properties": {
+        "key_ref": { "type": ["string", "null"], "description": "KMIP/PKCS#11 key handle. Never the key material." },
+        "key_epoch": { "type": "integer", "minimum": 0 },
+        "update_tweak_ref": { "type": ["string", "null"], "description": "Tweak that migrates tokens from epoch n-1 to n (consistency-preserving)." }
+      }
+    },
+    "hsm": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backed": { "type": "boolean", "default": false },
+        "fips_level": { "type": ["string", "null"], "enum": [null, "FIPS_140-2_L1", "FIPS_140-2_L3"] }
+      }
+    },
+    "reidentification_class": {
+      "type": "string",
+      "description": "Who may reverse this field; aligns to Metadata Standards witness_retention.",
+      "enum": ["none", "local_only", "exportable_to_legal_counsel", "exportable_under_protective_order", "public_record"]
+    },
+    "policy_tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "scheme_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "scheme": { "enum": ["one_way_hash", "hmac_pseudonym", "redact", "suppress", "generalize"] } } },
+      "then": { "properties": { "reversibility": { "const": "one_way" } } }
+    }
+  ]
+}

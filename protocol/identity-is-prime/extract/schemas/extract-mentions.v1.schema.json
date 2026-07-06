@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/extract/extract-mentions.v1.schema.json",
+  "title": "Extract Mentions (NER/EL) Method Contract v1",
+  "description": "Request/response contract for the NER + entity-linking phase. NER finds typed spans; EL grounds them to KB candidates. Output mentions conform to regis.source-record.v1 mentions[] so they attach directly to a SourceRecord. Placement follows the fog-scope task matrix (lightweight on CITIZEN_FOG; statistical/SpanCategorizer on CITIZEN_CLOUD).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "method", "request", "response"],
+  "properties": {
+    "schema_version": { "const": "extract.mentions.v1" },
+    "method": { "const": "ExtractMentions" },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "input", "scope", "extractor_version"],
+      "properties": {
+        "request_id": { "type": "string" },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Exactly one of inline text or a source/document reference.",
+          "properties": {
+            "text": { "type": ["string", "null"] },
+            "source_ref": { "type": ["string", "null"] },
+            "content_hash": { "type": ["string", "null"] }
+          }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["realm", "device", "app"],
+          "description": "Event-IR scope; realm drives local-vs-cloud placement.",
+          "properties": {
+            "realm": { "type": "string", "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$" },
+            "device": { "type": "string" },
+            "app": { "type": "string" },
+            "jurisdiction": { "type": ["string", "null"] }
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allow_overlapping_spans": { "type": "boolean", "default": true },
+            "entity_classes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+            "ground_to_kb": { "type": "boolean", "default": true },
+            "pii_minimization": { "type": "boolean", "default": true }
+          }
+        },
+        "extractor_version": { "type": "string" },
+        "ontology_version": { "type": ["string", "null"] }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "result", "mentions", "extractor_version", "created_at"],
+      "properties": {
+        "request_id": { "type": "string" },
+        "result": { "type": "string", "enum": ["OK", "ABSTAINED", "REJECTED"] },
+        "source_record_ref": { "type": ["string", "null"], "pattern": "^sr_[a-zA-Z0-9_.:-]+$", "description": "SourceRecord the mentions are emitted into, if persisted." },
+        "mentions": {
+          "type": "array",
+          "description": "Conforms to regis.source-record.v1 mentions[]. Overlapping/multi-labeled spans are expected.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text", "entity_class"],
+            "properties": {
+              "text": { "type": "string" },
+              "entity_class": { "type": "string" },
+              "span": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": { "start": { "type": "integer", "minimum": 0 }, "end": { "type": "integer", "minimum": 0 } }
+              },
+              "overlapping": { "type": "boolean" },
+              "prime_topic_hint": { "type": ["string", "null"] },
+              "policy_sensitive": { "type": "boolean", "default": false },
+              "kb_candidate_ref": { "type": ["string", "null"] },
+              "link_confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "extractor_version": { "type": "string" },
+        "ontology_version": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

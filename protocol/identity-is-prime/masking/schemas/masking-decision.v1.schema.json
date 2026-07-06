@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/masking/masking-decision.v1.schema.json",
+  "title": "Masking / Tokenization Decision v1",
+  "description": "The externalized output of the masking Policy Decision Point (PDP), evaluated at read / export / activation / re-identification time. It records the policy verdict, the transforms applied per field, any governed re-identification (with mandatory reason-for-action), and a verifiable receipt. Unlike a passive masking rule, every decision is itself evidence: it carries a policy-decision ref and an optional BEACON_COMMIT custody receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_id",
+    "subject_ref",
+    "requesting_realm",
+    "requested_op",
+    "verdict",
+    "applied_transforms",
+    "receipt",
+    "policy_version",
+    "decided_by",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity-prime.masking-decision.v1" },
+    "decision_id": { "type": "string", "pattern": "^md_[a-zA-Z0-9_.:-]+$" },
+    "subject_ref": { "type": "string", "description": "Asset/record/field the decision ranges over." },
+    "requesting_realm": {
+      "type": "string",
+      "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$"
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Who is asking (role/profile). Re-identification gates on a profile attribute (OpenID Connect).",
+      "properties": {
+        "role": { "type": ["string", "null"] },
+        "openid_profile_attr": { "type": ["string", "null"] }
+      }
+    },
+    "requested_op": {
+      "type": "string",
+      "enum": ["read", "export", "activate", "re_identify", "re_tokenize"]
+    },
+    "verdict": {
+      "type": "string",
+      "description": "PDP outcome. allow_masked = returnable only through the applied transforms.",
+      "enum": ["allow", "allow_masked", "deny", "review_required"]
+    },
+    "reason_codes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "forbidden_mixture": {
+      "type": ["array", "null"],
+      "description": "Populated when the deny is a policy-polytope veto (e.g. health + adtech).",
+      "items": { "type": "string" }
+    },
+    "applied_transforms": {
+      "type": "array",
+      "description": "Per-field transform actually applied for this audience/realm.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field_path", "scheme", "reversibility"],
+        "properties": {
+          "field_path": { "type": "string" },
+          "profile_ref": { "type": ["string", "null"], "pattern": "^tp_[a-zA-Z0-9_.:-]+$" },
+          "scheme": { "type": "string" },
+          "reversibility": { "type": "string", "enum": ["reversible", "one_way"] },
+          "key_epoch": { "type": ["integer", "null"], "minimum": 0 },
+          "target_domain": { "type": ["string", "null"], "description": "For re_tokenize: destination domain reached via homomorphic tweak." }
+        }
+      }
+    },
+    "re_identification": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "Present only when requested_op = re_identify. Re-id is a governed, audited, reversible release.",
+      "required": ["permitted", "reason_for_action"],
+      "properties": {
+        "permitted": { "type": "boolean" },
+        "reason_for_action": { "type": "string", "minLength": 1, "description": "Mandatory free-text justification — recorded for audit." },
+        "authorized_by": { "type": ["string", "null"] },
+        "separation_of_duty": { "type": "boolean", "default": false },
+        "release_pack_ref": { "type": ["string", "null"], "description": "HELL-ER release pack, if a bundle is emitted." }
+      }
+    },
+    "side_channel_mitigations": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Active mitigations against the 4 re-identification risks.",
+      "items": { "type": "string", "enum": ["sandbox", "monitoring", "policy", "collusion_prevention", "separation_of_duty", "trusted_third_party", "key_rotation", "unlinkable_identifiers"] }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_decision_ref"],
+      "description": "Makes the decision itself verifiable evidence.",
+      "properties": {
+        "policy_decision_ref": { "type": "string" },
+        "beacon_commit_receipt": { "type": ["string", "null"], "description": "TriTRPC BEACON_COMMIT receipt sealing this decision into the custody chain." },
+        "certificate_hash": { "type": ["string", "null"] }
+      }
+    },
+    "policy_version": { "type": "string" },
+    "scheme_version": { "type": ["string", "null"] },
+    "decided_by": { "type": "string", "description": "Agent identity (e.g. masking-pdp-agent)." },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "requested_op": { "const": "re_identify" } } },
+      "then": { "required": ["re_identification"] }
+    }
+  ]
+}

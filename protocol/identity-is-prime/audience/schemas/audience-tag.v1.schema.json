@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/identity-is-prime/audience/audience-tag.v1.schema.json",
+  "title": "Audience Tag v1",
+  "description": "A glossary-bound audience tag definition (the Tag_Dictionary row of the audience-tagging framework, made conformant). A tag is not a free string: it binds to an ontology/glossary term and to prime-topics, and the CONSTRAINTS family gates activation through the policy polytope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "tag_id",
+    "family",
+    "label",
+    "definition",
+    "privacy_risk_level",
+    "gates_activation",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity-prime.audience-tag.v1" },
+    "tag_id": { "type": "string", "pattern": "^at_[a-zA-Z0-9_.:-]+$" },
+    "family": {
+      "type": "string",
+      "enum": [
+        "IDENTITY_ROLE",
+        "ORG_AFFILIATION",
+        "DOMAIN_INTEREST",
+        "INTENT_STAGE",
+        "CAPABILITY_STACK",
+        "NETWORK_ROLE",
+        "CONTEXT_CHANNEL",
+        "VALUES_MISSION",
+        "CONSTRAINTS"
+      ]
+    },
+    "label": { "type": "string" },
+    "definition": { "type": "string" },
+    "include_signals": { "type": "array", "items": { "type": "string" } },
+    "exclude_signals": { "type": "array", "items": { "type": "string" } },
+    "data_sources": { "type": "array", "items": { "type": "string" } },
+    "privacy_risk_level": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "ontology_term_ref": { "type": ["string", "null"], "description": "Glossary/ontogenesis term IRI this tag binds to (versioned, provenanced)." },
+    "prime_topic_refs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "gates_activation": { "type": "boolean", "description": "True for CONSTRAINTS-family tags; activation is vetoed by the policy polytope when set." },
+    "activation_channels": { "type": "array", "items": { "type": "string" } },
+    "preferred_surfaces": { "type": "array", "items": { "type": "string" } },
+    "version": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "family": { "const": "CONSTRAINTS" } } },
+      "then": { "properties": { "gates_activation": { "const": true } } }
+    }
+  ]
+}

@@ -28,10 +28,39 @@ EXPECTED = {
 
 NAME_RE = re.compile(r'^name\s*=\s*"([^"]+)"\s*$', re.MULTILINE)
 
+def _repo_names_from_toml(text: str) -> list[str] | None:
+    """Repo names from [[repos]] only, via a real TOML parse.
+
+    The regex below matches any `name = "..."` line, which also catches
+    [workspace].name — the workspace's own identity, not a repo. That made
+    `sociosphere` look like a duplicate of the legitimate [[repos]] entry of the
+    same name. Returns None if the text isn't parseable TOML (e.g. a bare
+    fragment), so callers can fall back to the regex.
+    """
+    try:
+        import tomllib
+    except ModuleNotFoundError:  # py<3.11
+        return None
+    try:
+        data = tomllib.loads(text)
+    except Exception:
+        return None
+    repos = data.get("repos")
+    if repos is None:
+        # Parsed cleanly and there are simply no [[repos]] — that is zero repos,
+        # NOT a reason to fall back to the regex (which would then wrongly harvest
+        # [workspace].name, the very bug this exists to prevent).
+        return []
+    if not isinstance(repos, list):
+        return None
+    return [r["name"] for r in repos if isinstance(r, dict) and isinstance(r.get("name"), str)]
+
+
 
 def names(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8")
-    return NAME_RE.findall(text)
+    parsed = _repo_names_from_toml(text)
+    return parsed if parsed is not None else NAME_RE.findall(text)
 
 
 def duplicates(values: list[str]) -> list[str]:

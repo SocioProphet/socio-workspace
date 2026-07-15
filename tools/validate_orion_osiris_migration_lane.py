@@ -75,6 +75,12 @@ def collect_repos(value: Any) -> set[str]:
     if isinstance(value, dict):
         if isinstance(value.get("repo"), str):
             repos.add(value["repo"])
+        # `owner` carries a repo slug too (owner: SocioProphet/sociosphere) — the
+        # coordinating repo is a participant in the lane, and REQUIRED_REPOS has
+        # always expected it. Guard on "/" so only slug-shaped owners count.
+        owner = value.get("owner")
+        if isinstance(owner, str) and "/" in owner:
+            repos.add(owner)
         for child in value.values():
             repos |= collect_repos(child)
     elif isinstance(value, list):

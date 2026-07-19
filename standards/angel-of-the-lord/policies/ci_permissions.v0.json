@@ -1,0 +1,43 @@
+{
+  "schema_version": "sociosphere.angel-ci-permissions-policy/v0.1",
+  "name": "Angel of the Lord CI permissions policy",
+  "default_result_when_warnings_only": "warn",
+  "required_workflow_permissions_block": true,
+  "required_job_permissions_block": false,
+  "deny_permissions_shorthand": [
+    "write-all"
+  ],
+  "allowed_write_scopes": [
+    "attestations",
+    "checks",
+    "contents",
+    "deployments",
+    "discussions",
+    "id-token",
+    "issues",
+    "packages",
+    "pages",
+    "pull-requests",
+    "security-events",
+    "statuses"
+  ],
+  "workflow_write_exceptions": [
+    {
+      "path": ".github/workflows/create-branch-prs.yml",
+      "scope": "pull-requests",
+      "reason": "Manual workflow_dispatch helper intentionally creates pull requests from pre-existing branches."
+    }
+  ],
+  "blocked_write_scopes_without_exception": [
+    "contents",
+    "packages",
+    "deployments",
+    "pages",
+    "security-events",
+    "id-token"
+  ],
+  "warn_on_unpinned_actions": true,
+  "trusted_local_action_prefixes": [
+    "./"
+  ]
+}

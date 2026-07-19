@@ -1,0 +1,66 @@
+schema_version: "sociosphere.build-intelligence/v0.1"
+recorded_at: "2026-04-26T17:55:00-04:00"
+controller_repo: "SocioProphet/sociosphere"
+subject_repo: "SocioProphet/prophet-platform"
+status: "active"
+
+scope:
+  program: "SourceOS / Boot and Recovery Plane"
+  lane: "sourceos-boot-fingerprint-compliance"
+  intent: "Register merged reusable compliance helper for validating SourceOS boot Fingerprint against assigned ReleaseSet and BootReleaseSet."
+
+merged_tranches:
+  - pr: 229
+    title: "sourceos: add boot fingerprint compliance helper"
+    merge_commit: "aaf45ddb03023eeccd5066c1605d47a077df3b0d"
+    branch: "work/sourceos-boot-fingerprint-compliance-helper"
+    gates_closed:
+      - checked active SourceOS/compliance/fingerprint PR surface before work
+      - added reusable boot Fingerprint compliance helper
+      - updated synthetic boot Fingerprint smoke to invoke helper
+      - emitted boot-fingerprint-compliance.json in smoke path
+      - required compliance status pass for generated boot Fingerprint
+      - preserved validation-only safety boundary
+      - merged PR 229 by squash after mergeability check
+    artifacts:
+      - "tools/check_sourceos_boot_fingerprint_compliance.py"
+      - "tools/smoke_sourceos_synthetic_boot_fingerprint.py"
+
+linked_tranches:
+  - repo: "SocioProphet/prophet-platform"
+    pr: 226
+    merge_commit: "58ba8eb66d22408e7a635faac633f739efe78503"
+    role: "Adds synthetic boot Fingerprint emission."
+  - repo: "SocioProphet/prophet-platform"
+    pr: 227
+    merge_commit: "847c4f99db63c5bb36b849ea9f7098ccbd892e72"
+    role: "Adds captured nlboot-plan fixture for boot Fingerprint smoke."
+
+software_review:
+  correctness:
+    - "prophet-platform now validates boot Fingerprint output against assigned ReleaseSet and BootReleaseSet through a reusable helper."
+    - "The helper checks release ref, boot release ref, policy bundle ref, subject kind, runtime isolation, boot mode, rollback availability, network scope, and filesystem scope."
+    - "The synthetic boot Fingerprint smoke now emits and validates a compliance result."
+  safety_boundary:
+    - "No live boot execution was added."
+    - "No nlboot execution was added."
+    - "No artifact fetching was added."
+    - "No host mutation was added."
+    - "No disk writes were added."
+    - "No kexec execution was added."
+    - "No remote state mutation was added."
+  weaknesses:
+    - "Compliance result is currently helper-specific and not yet backed by a formal JSON schema."
+    - "The helper validates deterministic proof fixtures, not live boot telemetry."
+    - "Trust-bundle authenticity is not yet wired into the compliance input chain."
+
+next_hardening:
+  - "Add schema for SourceOSBootFingerprintComplianceResult once fields settle."
+  - "Wire trust-bundle authenticity into SourceOS adapter/fingerprint/compliance path."
+  - "Make nlboot consume registry-published SourceOS manifest fixtures without side effects."
+  - "Generate captured nlboot-plan output in CI through side-effect-free invocation."
+
+running_backlog:
+  - "Connect registry-published SourceOS proof artifacts to nlboot fixture inputs."
+  - "Add SourceOS lifecycle proof-slice aggregation across prophet-platform, nlboot, and sociosphere."
+  - "Continue avoiding hidden remote mutation without explicit policy gates."

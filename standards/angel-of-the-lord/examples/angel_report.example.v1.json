@@ -1,0 +1,65 @@
+{
+  "schema_version": "sociosphere.angel-of-the-lord-report/v1",
+  "generated_at": "2026-04-26T15:00:00Z",
+  "target": {
+    "repository": "SocioProphet/sociosphere",
+    "ref": "main",
+    "commit": "dc09e63922167b2b6825fae9c147875ccfcf1ecb"
+  },
+  "review_context": {
+    "lane": "ci_permissions",
+    "mode": "ci",
+    "workflow": "validate",
+    "actor": "angel-of-the-lord"
+  },
+  "surfaces_inspected": [
+    ".github/workflows/validate.yml",
+    ".github/workflows/workspace-spine.yml"
+  ],
+  "result": "warn",
+  "findings": [
+    {
+      "id": "ci-actions-version-tag",
+      "severity": "medium",
+      "surface": "ci_permissions",
+      "path": ".github/workflows/validate.yml",
+      "message": "Workflow uses marketplace actions pinned to a version tag rather than an immutable commit SHA.",
+      "evidence_ref": ".github/workflows/validate.yml",
+      "remediation": "Pin marketplace actions to reviewed immutable commit SHAs or record an explicit exception.",
+      "restricted": false
+    }
+  ],
+  "trust_boundaries": {
+    "found": [
+      "repository contents are read-only in the validate workflow"
+    ],
+    "missing": [
+      "immutable action pinning policy is not yet enforced"
+    ]
+  },
+  "evidence": {
+    "accepted": [
+      "workflow-level permissions block",
+      "job-level permissions block"
+    ],
+    "missing": [
+      "action digest or commit pin evidence"
+    ]
+  },
+  "decision": {
+    "merge": "manual_review",
+    "release": "not_applicable",
+    "publish": "manual_review",
+    "deploy": "not_applicable",
+    "restricted_handling_required": false
+  },
+  "remediation_backlog": [
+    {
+      "id": "AOL-CI-001",
+      "title": "Pin marketplace actions to reviewed immutable refs or define exception policy",
+      "priority": "P1",
+      "owner": "sociosphere",
+      "status": "open"
+    }
+  ]
+}

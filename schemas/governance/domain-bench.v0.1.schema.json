@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/sociosphere/governance/domain-bench.v0.1.schema.json",
+  "title": "DomainBench v0.1",
+  "description": "Benchmark contract for domain-specific rubrics, expert adjudication, task coverage, and source lineage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "benchId", "domain", "title", "ownerRepo", "rubricLineage", "tasks", "adjudication", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "governance.domain-bench.v0.1" },
+    "recordType": { "const": "DomainBench" },
+    "benchId": { "type": "string", "minLength": 1 },
+    "domain": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "ownerRepo": { "type": "string", "minLength": 1 },
+    "rubricLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rubricId", "sourceRefs", "expertRoleRefs"],
+      "properties": {
+        "rubricId": { "type": "string", "minLength": 1 },
+        "sourceRefs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "expertRoleRefs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["taskId", "taskKind", "fixtureRef", "expectedEvidenceClass"],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 1 },
+          "taskKind": { "type": "string", "minLength": 1 },
+          "fixtureRef": { "type": "string", "minLength": 1 },
+          "expectedEvidenceClass": { "type": "string", "enum": ["canonical", "policy", "procedure", "evidence", "context", "external", "advisory"] }
+        }
+      }
+    },
+    "adjudication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "minReviewers"],
+      "properties": {
+        "method": { "type": "string", "enum": ["expert_rubric", "paired_review", "automated_fixture", "hybrid"] },
+        "minReviewers": { "type": "integer", "minimum": 0 },
+        "disagreementPolicyRef": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    }
+  }
+}

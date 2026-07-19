@@ -1,0 +1,321 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/sociosphere/impulse-reflection/reflection-decision.schema.v0.1.json",
+  "title": "SocioSphere Reflection Decision v0.1",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "decisionId",
+    "impulseRef",
+    "decidedAt",
+    "decision",
+    "mode",
+    "gates",
+    "ownership",
+    "routing",
+    "risk",
+    "consistency",
+    "evidenceRequirements",
+    "stateTransition"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "sociosphere.impulse-reflection/v1"
+    },
+    "kind": {
+      "const": "ReflectionDecision"
+    },
+    "decisionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "impulseRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decision": {
+      "enum": [
+        "absorb",
+        "absorb_and_propagate",
+        "deflect",
+        "quarantine",
+        "reject"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "hard_absorb",
+        "soft_absorb",
+        "absorb_as_pin",
+        "absorb_as_fixture",
+        "absorb_as_barrier",
+        "direct_deflection",
+        "mediated_deflection",
+        "policy_deflection",
+        "quarantine_deflection",
+        "rejective_deflection"
+      ]
+    },
+    "gates": {
+      "type": "object",
+      "required": [
+        "canonicalOwnership",
+        "topology",
+        "determinism",
+        "propagation",
+        "executionContract",
+        "riskSourceExposure",
+        "barrier"
+      ],
+      "properties": {
+        "canonicalOwnership": { "$ref": "#/$defs/gateResult" },
+        "topology": { "$ref": "#/$defs/gateResult" },
+        "determinism": { "$ref": "#/$defs/gateResult" },
+        "propagation": { "$ref": "#/$defs/gateResult" },
+        "executionContract": { "$ref": "#/$defs/gateResult" },
+        "riskSourceExposure": { "$ref": "#/$defs/gateResult" },
+        "barrier": { "$ref": "#/$defs/gateResult" }
+      },
+      "additionalProperties": false
+    },
+    "ownership": {
+      "type": "object",
+      "required": [
+        "sociosphereOwns",
+        "primaryOwnerRepo",
+        "downstreamOwnerRepos",
+        "rationale"
+      ],
+      "properties": {
+        "sociosphereOwns": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "topology",
+              "manifest",
+              "lock",
+              "registry",
+              "standard",
+              "schema",
+              "fixture",
+              "validation",
+              "propagation",
+              "scheduler",
+              "coherence",
+              "barrier",
+              "source_exposure",
+              "none"
+            ]
+          }
+        },
+        "primaryOwnerRepo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "downstreamOwnerRepos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "routing": {
+      "type": "object",
+      "required": [
+        "parentIssueRef",
+        "childIssueRefs",
+        "blockedOn",
+        "nextAction"
+      ],
+      "properties": {
+        "parentIssueRef": {
+          "type": ["string", "null"]
+        },
+        "childIssueRefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blockedOn": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "nextAction": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "risk": {
+      "type": "object",
+      "required": [
+        "severity",
+        "riskClasses",
+        "reviewRequired",
+        "reason"
+      ],
+      "properties": {
+        "severity": { "enum": ["low", "medium", "high", "critical"] },
+        "riskClasses": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "scope_drift",
+              "topology_violation",
+              "source_exposure",
+              "security",
+              "release",
+              "runtime_admission",
+              "stale_state",
+              "policy_change",
+              "dependency_drift",
+              "unknown"
+            ]
+          }
+        },
+        "reviewRequired": { "type": "boolean" },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "consistency": {
+      "type": "object",
+      "required": [
+        "defaultModel",
+        "barriersRequired",
+        "cacheCoherenceStates"
+      ],
+      "properties": {
+        "defaultModel": { "enum": ["weak_eventual", "strong", "barrier_required", "not_applicable"] },
+        "barriersRequired": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "merge_release",
+              "runtime_admission",
+              "policy_promotion",
+              "model_route_promotion",
+              "boot_trust_artifact",
+              "security_revocation",
+              "authoritative_memory_promotion",
+              "source_exposure_review"
+            ]
+          }
+        },
+        "cacheCoherenceStates": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "invalid",
+              "shared_valid",
+              "exclusive_authoritative",
+              "modified_uncommitted",
+              "stale",
+              "revoked",
+              "pending_review",
+              "promoted"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidenceRequirements": {
+      "type": "object",
+      "required": [
+        "required",
+        "refs",
+        "validationCommands"
+      ],
+      "properties": {
+        "required": { "type": "boolean" },
+        "refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "validationCommands": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "stateTransition": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "followOnStates"
+      ],
+      "properties": {
+        "from": {
+          "enum": [
+            "impulse_received",
+            "classified",
+            "ownership_resolved",
+            "risk_scored",
+            "topology_checked",
+            "reflection_decision",
+            "absorbed",
+            "absorbed_and_propagated",
+            "deflected",
+            "quarantined",
+            "rejected"
+          ]
+        },
+        "to": {
+          "enum": [
+            "absorbed",
+            "absorbed_and_propagated",
+            "deflected",
+            "quarantined",
+            "rejected",
+            "spec_written",
+            "child_issue_opened",
+            "needs_context"
+          ]
+        },
+        "followOnStates": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes": {
+      "type": ["string", "null"]
+    }
+  },
+  "$defs": {
+    "gateResult": {
+      "type": "object",
+      "required": [
+        "status",
+        "rationale"
+      ],
+      "properties": {
+        "status": { "enum": ["pass", "fail", "needs_review", "not_applicable"] },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

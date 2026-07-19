@@ -1,0 +1,16 @@
+{
+  "attempted_link_surface": "cross-workroom-topic-bridge",
+  "cleanup_refs": [
+    "cleanup:quarantine-topic-bridge-candidate"
+  ],
+  "decision_ref": "privacy-decision:require-review:incident-to-product-topic-bridge",
+  "disposition": "require_review",
+  "generated_at": "2026-06-02T00:00:00Z",
+  "graph_edge_refs": [],
+  "join_key_refs": [],
+  "left_scope_ref": "workroom:incident-review",
+  "operation_ref": "workspace-operation:topic-bridge:incident-review-to-product-planning",
+  "receipt_kind": "WorkspaceNonLinkabilityReceipt",
+  "right_scope_ref": "workroom:product-planning",
+  "timestamp": "2026-06-02T00:00:00Z"
+}

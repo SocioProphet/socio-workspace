@@ -1,0 +1,110 @@
+schema_version: 0.1.0
+registry_id: seven-model-civic-stack-governance
+status: draft
+owner_repo: SocioProphet/sociosphere
+narrative_doc: docs/architecture/seven-model-civic-stack-governance-binding.md
+semantic_anchors:
+  - repo: SocioProphet/ontogenesis
+    issues: [80, 81]
+    pull_requests: [83, 85]
+  - repo: SocioProphet/sociosphere
+    issues: [323]
+
+principle: >-
+  SocioSphere coordinates the civic-stack governance surface; domain repositories
+  own their semantics, execution, policies, metrics, environmental facts,
+  assurance evidence, graph storage, and entity registration.
+
+object_envelope:
+  required:
+    - id
+    - type
+    - semantic_ref
+    - canonical_repo
+    - producer_repo
+    - owner
+    - lifecycle_state
+    - risk_state
+  optional:
+    - consumer_repos
+    - responsible_post
+    - policy_basis
+    - service_ref
+    - dataset_ref
+    - runtime_ref
+    - overlay_ref
+    - gaia_environment_ref
+    - delivery_score_ref
+    - evidence_ref
+    - provenance_ref
+    - created_at
+    - updated_at
+
+boards:
+  service_governance:
+    primary_terms: [srm:Service, srm:Dependency, srm:SLA]
+    producer_repos: [SocioProphet/ontogenesis, SocioProphet/prophet-platform, SocioProphet/agentplane]
+    consumer_repos: [SocioProphet/delivery-excellence, SocioProphet/hellgraph]
+    workflow_triggers: [service_created, service_changed, sla_breach, dependency_risk]
+  policy_governance:
+    primary_terms: [cgrm:Policy, cgrm:LegalBasis, cgrm:Obligation, cgrm:AccessBasis]
+    producer_repos: [SocioProphet/ontogenesis, SocioProphet/policy-fabric]
+    consumer_repos: [SocioProphet/agentplane, SocioProphet/ProCybernetica]
+    workflow_triggers: [policy_created, policy_changed, policy_denied, access_basis_missing]
+  data_governance:
+    primary_terms: [drm:Dataset, drm:DataContract, drm:LineageEvent, drm:QualityMetric]
+    producer_repos: [SocioProphet/ontogenesis, SocioProphet/regis-entity-graph]
+    consumer_repos: [SocioProphet/policy-fabric, SocioProphet/hellgraph]
+    workflow_triggers: [dataset_created, lineage_changed, quality_degraded, access_grant_requested]
+  environment_governance:
+    primary_terms: [enrm:Exposure, enrm:Externality, enrm:EnvironmentalEvidence, enrm:CriticalInfrastructure]
+    producer_repos: [SocioProphet/ontogenesis, SocioProphet/gaia-world-model]
+    consumer_repos: [SocioProphet/delivery-excellence, SocioProphet/sociosphere]
+    workflow_triggers: [exposure_changed, externality_threshold_breached, infrastructure_risk_changed]
+  delivery_governance:
+    primary_terms: [prm:Target, prm:Observation, prm:Scorecard, prm:MetricContract]
+    producer_repos: [SocioProphet/delivery-excellence]
+    consumer_repos: [SocioProphet/sociosphere, SocioProphet/ProCybernetica]
+    workflow_triggers: [score_breach, missing_evidence, target_changed]
+  runtime_assurance:
+    primary_terms: [trm:Runtime, trm:Workload, trm:Attestation, trm:Deployment]
+    producer_repos: [SocioProphet/agentplane, SocioProphet/ProCybernetica]
+    consumer_repos: [SocioProphet/policy-fabric, SocioProphet/hellgraph]
+    workflow_triggers: [attestation_missing, deployment_changed, runtime_degraded]
+  rationale_governance:
+    primary_terms: [Goal, Softgoal, Task, Resource, Contribution, Dependency, Defeater]
+    producer_repos: [SocioProphet/ontogenesis, SocioProphet/socioprophet-standards-knowledge]
+    consumer_repos: [SocioProphet/delivery-excellence, SocioProphet/sociosphere]
+    workflow_triggers: [defeater_opened, assumption_invalidated, dependency_blocked]
+  artifact_governance:
+    primary_terms: [OQLPlan, OACManifest, CompilerAdapter, Artifact, EvidenceVaultRecord, Placement, Status]
+    producer_repos: [SocioProphet/agentplane, SocioProphet/socioprophet-standards-storage, SocioProphet/prophet-platform-standards]
+    consumer_repos: [SocioProphet/policy-fabric, SocioProphet/hellgraph, SocioProphet/regis-entity-graph]
+    workflow_triggers: [artifact_admission_requested, evidence_missing, placement_denied]
+  p2p_commons_governance:
+    primary_terms: [Overlay, PeerNode, StorageReplica, ReplicationPolicy, SearchIndex, SignedMessage, MonitoringSignal, ThreatScenario]
+    producer_repos: [SourceOS-Linux/sourceos-syncd, SocioProphet/ontogenesis, SocioProphet/socioprophet-standards-storage]
+    consumer_repos: [SocioProphet/ProCybernetica, SocioProphet/delivery-excellence, SocioProphet/hellgraph]
+    workflow_triggers: [overlay_test_failed, replica_conflict, search_budget_exceeded, threat_test_failed]
+
+cross_repo_invariants:
+  - id: semantics_upstream
+    statement: Ontogenesis owns canonical ontology semantics for the civic stack.
+  - id: routing_control_plane
+    statement: SocioSphere owns board routing, registry projection, and conformance visibility.
+  - id: metrics_externalized
+    statement: Delivery Excellence owns score contracts and delivery metrics.
+  - id: world_model_externalized
+    statement: Gaia owns environmental facts and world-model evidence.
+  - id: policy_externalized
+    statement: PolicyFabric owns executable policy decisions.
+  - id: runtime_externalized
+    statement: AgentPlane owns runtime action evidence.
+  - id: assurance_externalized
+    statement: ProCybernetica owns risk, control, incident, and evidence-pack doctrine.
+  - id: graph_externalized
+    statement: HellGraph owns graph query and reasoning substrate.
+  - id: registry_externalized
+    statement: Regis owns concrete entity and relationship registration.
+  - id: p2p_substrate_externalized
+    statement: SourceOS owns local-first P2P storage and communication substrate implementation.

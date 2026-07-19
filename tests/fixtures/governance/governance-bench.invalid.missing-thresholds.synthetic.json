@@ -1,0 +1,30 @@
+{
+  "benchId": "bench:governance:invalid",
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "GovernanceBench",
+  "rubric": {
+    "criteria": [
+      {
+        "criterionId": "authority-boundary-present",
+        "description": "Action must resolve an authority boundary before admission.",
+        "weight": 1
+      }
+    ],
+    "rubricId": "rubric:governance:invalid"
+  },
+  "schemaVersion": "governance.governance-bench.v0.1",
+  "testCases": [
+    {
+      "caseId": "case:invalid",
+      "expectedDecision": "fail_closed",
+      "fixtureRef": "tests/fixtures/governance/institutional-action.invalid.missing-execution-receipt.synthetic.json"
+    }
+  ],
+  "title": "Invalid governance benchmark"
+}

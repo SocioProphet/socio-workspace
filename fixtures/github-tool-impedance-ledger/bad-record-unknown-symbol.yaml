@@ -1,0 +1,27 @@
+ledger_id: github-tool-impedance-ledger-v0
+status: fixture
+schema: registry/github-tool-impedance-ledger.schema.yaml
+purpose: sample record with unknown impedance symbol for validator coverage
+records:
+  - event_id: gti-sample-0002
+    observed_at: '2026-06-06'
+    source_context:
+      context_type: chat_turn
+    repository:
+      full_name: SocioProphet/sociosphere
+    operation_intended: Sample complete record with an unknown symbol.
+    observed_failure: Sample record used by validator test coverage.
+    failure_classes:
+      - CONNECTOR_PARTIAL_SURFACE
+    impedance_symbols:
+      - NotARealSymbol
+    attribution:
+      native_github: none
+      connector_wrapper: possible
+      assistant_operator: none
+      permission_boundary: none
+      real_repo_defect: none
+    evidence:
+      narrative_summary: Sample narrative.
+    confidence: medium
+    status: observed

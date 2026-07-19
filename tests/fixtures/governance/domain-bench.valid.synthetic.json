@@ -1,0 +1,37 @@
+{
+  "adjudication": {
+    "disagreementPolicyRef": "policy:domain-review-disagreement",
+    "method": "expert_rubric",
+    "minReviewers": 1
+  },
+  "benchId": "bench:domain:synthetic",
+  "domain": "regulated-ai-governance",
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "DomainBench",
+  "rubricLineage": {
+    "expertRoleRefs": [
+      "role:sociosphere-governance-owner"
+    ],
+    "rubricId": "rubric:domain:synthetic",
+    "sourceRefs": [
+      "registry/competitive-capability-map-v0.yaml"
+    ]
+  },
+  "schemaVersion": "governance.domain-bench.v0.1",
+  "tasks": [
+    {
+      "expectedEvidenceClass": "canonical",
+      "fixtureRef": "tests/fixtures/governance/evidence-bundle.valid.synthetic.json",
+      "taskId": "task:domain:evidence-grounding",
+      "taskKind": "evidence_grounding"
+    }
+  ],
+  "title": "Synthetic domain benchmark"
+}

@@ -1,0 +1,25 @@
+{
+  "actionRefs": [
+    "institutional-action:example"
+  ],
+  "benchId": "bench:replay:synthetic",
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "ReplayBench",
+  "replayTests": [
+    {
+      "executionReceiptRef": "receipt:governance-action:example",
+      "expectedOutcome": "replay_success",
+      "graphSnapshotRef": "graph:snapshot:synthetic",
+      "testId": "test:replay:synthetic"
+    }
+  ],
+  "schemaVersion": "governance.replay-bench.v0.1",
+  "title": "Synthetic replay benchmark"
+}

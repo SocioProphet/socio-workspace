@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkflowBench v0.1",
+  "description": "Operational workflow evaluation contract for adoption, timing, quality, correction, and override metrics.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "benchId", "workflowRef", "ownerRepo", "metrics", "thresholds", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "evaluation.workflow-bench.v0.1" },
+    "recordType": { "const": "WorkflowBench" },
+    "benchId": { "type": "string", "minLength": 1 },
+    "workflowRef": { "type": "string", "minLength": 1 },
+    "ownerRepo": { "type": "string", "minLength": 1 },
+    "metrics": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["adoption", "time_saved", "quality", "correction_rate", "override_rate", "latency", "completion_rate"] } },
+    "thresholds": { "type": "object", "additionalProperties": { "type": "number" }, "minProperties": 1 },
+    "fixtureRefs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdBy", "createdAt", "sourceRepo", "nonSecret"],
+      "properties": {
+        "createdBy": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "sourceRepo": { "type": "string", "minLength": 1 },
+        "sourceCommit": { "type": "string", "minLength": 1 },
+        "nonSecret": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SocioProphet/sociosphere/standards/boundary-calculus/boundary-calculus-claim-ledger.schema.json",
+  "title": "Boundary Calculus Claim Ledger Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_id",
+    "repo",
+    "source_ref",
+    "chapter_anchor",
+    "domain",
+    "claim_status",
+    "load_bearing",
+    "claim_statement",
+    "local_model",
+    "boundary_or_interface",
+    "non_claims",
+    "evidence_refs",
+    "validation_gates",
+    "promotion_criteria",
+    "known_limits",
+    "controller",
+    "policy_result"
+  ],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "pattern": "^BC-[A-Z0-9][A-Z0-9_.-]*$"
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "chapter_anchor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "transport-control",
+        "spacetime-dynamics",
+        "inverse-problem",
+        "spectral-network",
+        "langlands-boundary",
+        "component-catalog",
+        "superconductivity-weak-interaction",
+        "security-decision",
+        "governed-cognition",
+        "policy"
+      ]
+    },
+    "claim_status": {
+      "type": "string",
+      "enum": [
+        "theorem",
+        "established",
+        "heuristic",
+        "conjectural",
+        "metaphor",
+        "dropped"
+      ]
+    },
+    "previous_claim_status": {
+      "type": "string",
+      "enum": [
+        "theorem",
+        "established",
+        "heuristic",
+        "conjectural",
+        "metaphor",
+        "dropped"
+      ]
+    },
+    "load_bearing": {
+      "type": "boolean"
+    },
+    "claim_statement": {
+      "type": "string",
+      "minLength": 1
+    },
+    "local_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "scope"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "operators": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "boundary_or_interface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "statement"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "interface_law",
+            "forward_operator",
+            "spectral_object",
+            "decision_rule",
+            "component_bridge",
+            "metaphor_boundary",
+            "non_claim_boundary"
+          ]
+        },
+        "statement": {
+          "type": "string"
+        },
+        "dimension_notes": {
+          "type": "string"
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ref_type",
+          "ref"
+        ],
+        "properties": {
+          "ref_type": {
+            "type": "string",
+            "enum": [
+              "monograph",
+              "paper",
+              "repo_file",
+              "test",
+              "issue",
+              "pr",
+              "external_standard"
+            ]
+          },
+          "ref": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "validation_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gate_id",
+          "status"
+        ],
+        "properties": {
+          "gate_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "blocked",
+              "not_run",
+              "not_required"
+            ]
+          },
+          "command": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "observed": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "promotion_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "known_limits": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "security_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hypothesis_space_complete",
+        "denominator_discipline",
+        "dependency_model",
+        "discriminating_evidence",
+        "loss_matrix",
+        "decision_threshold"
+      ],
+      "properties": {
+        "hypothesis_space_complete": {
+          "type": "boolean"
+        },
+        "denominator_discipline": {
+          "type": "string",
+          "enum": [
+            "calibrated",
+            "bounded",
+            "missing"
+          ]
+        },
+        "dependency_model": {
+          "type": "string",
+          "enum": [
+            "explicit",
+            "partial",
+            "missing"
+          ]
+        },
+        "discriminating_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "loss_matrix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "false_positive",
+            "false_negative"
+          ],
+          "properties": {
+            "false_positive": {
+              "type": "number",
+              "minimum": 0
+            },
+            "false_negative": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "decision_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "standard",
+        "decision"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "const": "SocioProphet/sociosphere"
+        },
+        "standard": {
+          "type": "string",
+          "const": "boundary-calculus"
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "register",
+            "promote",
+            "demote",
+            "quarantine",
+            "archive"
+          ]
+        }
+      }
+    },
+    "policy_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "rules"
+      ],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "warn",
+            "block"
+          ]
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "claim_status": {
+            "const": "metaphor"
+          }
+        },
+        "required": [
+          "claim_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "load_bearing": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "domain": {
+            "const": "security-decision"
+          }
+        },
+        "required": [
+          "domain"
+        ]
+      },
+      "then": {
+        "required": [
+          "security_decision"
+        ]
+      }
+    }
+  ]
+}

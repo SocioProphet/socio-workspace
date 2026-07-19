@@ -1,0 +1,165 @@
+schema_version: 0.1.0
+registry_id: zero-trust-p2p-osn-commons-alignment
+status: draft
+owner_repo: SocioProphet/sociosphere
+narrative_doc: docs/architecture/zero-trust-p2p-osn-commons-alignment.md
+source_research:
+  arxiv_id: arXiv:2001.02611v1
+  title: Peer-to-Peer based Social Networks: A Comprehensive Survey
+  profile_role: zero_trust_p2p_osn_commons_profile
+
+principle: >-
+  Truth annealing is an application layer over a zero-trust P2P OSN / commons
+  substrate. Overlay, storage, communication, social primitives, privacy,
+  security, and metering decisions must be explicit, measurable, and
+  adversarially testable.
+
+four_fold_architecture:
+  overlay:
+    canonical_repos: [SocioProphet/ontogenesis, SourceOS-Linux/sourceos-syncd]
+    governance_objects: [Overlay, PeerNode, RoutingClaim, ChurnClaim, EclipseResistanceClaim]
+    required_declarations: [overlay_class, routing_claim, churn_claim, eclipse_resistance_claim]
+  storage_and_communication:
+    canonical_repos: [SourceOS-Linux/sourceos-syncd, SocioProphet/socioprophet-standards-storage]
+    governance_objects: [StorageReplica, ReplicationPolicy, ErasureCodingPolicy, SignedMessage, CommunicationChannel]
+    required_declarations: [redundancy, update_policy, replica_discovery, conflict_policy]
+  social_networking_elements:
+    canonical_repos: [SocioProphet/ontogenesis, SocioProphet/sociosphere, SocioProphet/agentplane]
+    governance_objects: [Identity, Conversation, Sharing, Presence, RelationshipEdge, Group, SharedSpace, Claim, Test, Attestation]
+    required_declarations: [identity, conversation, sharing, presence, relationships, groups, search]
+  gui:
+    canonical_repos: [SocioProphet/socioprophet, mdheller/socioprophet-web]
+    governance_objects: [BoardView, SharedSpaceView, EvidenceView, OperatorView]
+    required_declarations: [social_primitives_visible, evidence_chain_visible, metering_visible]
+
+functional_requirements:
+  - identity
+  - conversation
+  - sharing
+  - presence
+  - relationships
+  - groups
+  - personal_space_management
+  - social_connection_management
+  - social_graph_traversal
+  - synchronous_communication
+  - asynchronous_communication
+  - public_communication
+  - private_communication
+  - shared_access_controlled_spaces
+  - search
+
+non_functional_requirements:
+  privacy:
+    - confidentiality
+    - ownership_privacy
+    - social_interaction_privacy
+    - activity_privacy
+  security:
+    - channel_availability
+    - channel_authentication
+    - data_integrity
+    - data_authenticity
+    - conditional_non_repudiation
+  metering:
+    required: true
+    metrics:
+      - retrieval_success_rate
+      - bounded_hop_lookup_behavior
+      - update_convergence
+      - stale_replica_rate
+      - conflict_rate
+      - search_network_cost
+      - churn_impact
+      - attack_availability
+      - privacy_security_test_outcomes
+      - monitoring_completeness
+
+reputation_policy:
+  global_reputation_oracle: forbidden
+  allowed_forms:
+    - local_private_inference
+    - contextual_trust_signal
+    - cryptographic_attestation
+  routing_note: >-
+    SocioSphere may route attestations and contextual trust signals, but must not
+    normalize them into a platform-wide karma score.
+
+design_contract_shape:
+  overlay:
+    class: structured | unstructured | hybrid | multi-overlay
+    routing_claim: string
+    churn_claim: string
+    eclipse_resistance_claim: string
+  search:
+    mode: key_lookup | prefix | proximity | semantic | keyword | hybrid
+    exact_lookup_claim: string
+    network_cost_budget: string
+  storage:
+    redundancy: replication | caching | erasure_coding | hybrid
+    update_policy: pessimistic | optimistic | append_only | CRDT | event_sourced
+    replica_discovery: coordinated | opportunistic | unknown
+    conflict_policy: string
+  metering:
+    required: true
+    exported_signals: list
+
+threat_taxonomy:
+  topology:
+    - DoS
+    - DDoS
+    - MITM
+    - eclipse_attack
+    - wrong_routing_forward
+    - attrition_attack
+    - identity_theft
+    - churn_attack
+  storage_lookup:
+    - low_quality_content
+    - degraded_content
+    - false_labeling
+    - worm_propagation
+    - rational_free_rider_attack
+    - storage_attack
+    - retrieval_attack
+    - index_poisoning
+    - pollution_attack
+    - query_flooding
+
+claim_test_shape:
+  required:
+    - requirement
+    - mechanism
+    - measurement
+    - adversarial_test
+    - evidence_ref
+    - owner
+    - responsible_repo
+  optional:
+    - policy_basis
+    - confidence
+    - valid_from
+    - valid_until
+
+repo_alignment:
+  ontology_profile: SocioProphet/ontogenesis
+  control_plane: SocioProphet/sociosphere
+  local_first_substrate: SourceOS-Linux/sourceos-syncd
+  threat_tests: SocioProphet/ProCybernetica
+  metrics: SocioProphet/delivery-excellence
+  policy: SocioProphet/policy-fabric
+  runtime_agents: SocioProphet/agentplane
+  graph_reasoning: SocioProphet/hellgraph
+  entity_registry: SocioProphet/regis-entity-graph
+  knowledge_standards: SocioProphet/socioprophet-standards-knowledge
+  storage_standards: SocioProphet/socioprophet-standards-storage
+  platform_standards: SocioProphet/prophet-platform-standards
+
+board_projection:
+  overlay_governance: [Overlay, PeerNode, RoutingClaim, ChurnClaim]
+  storage_and_replication: [StorageReplica, ReplicationPolicy, ErasureCodingPolicy, ConflictPolicy]
+  search_and_retrieval: [SearchIndex, ExactLookupClaim, SearchCostBudget]
+  privacy_and_security: [AccessControlClaim, AnonymityClaim, SignatureClaim, IntegrityClaim]
+  metering_and_falsification: [MonitoringSignal, MeasurementClaim, TestResult]
+  threat_validation: [ThreatScenario, AdversarialTest, ControlEvidence]
+  social_primitives: [Identity, Conversation, Sharing, Presence, RelationshipEdge, Group, SharedSpace]

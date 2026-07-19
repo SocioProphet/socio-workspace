@@ -1,0 +1,39 @@
+{
+  "benchId": "bench:governance:synthetic",
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "GovernanceBench",
+  "rubric": {
+    "criteria": [
+      {
+        "criterionId": "authority-boundary-present",
+        "description": "Action must resolve an authority boundary before admission.",
+        "weight": 1
+      }
+    ],
+    "rubricId": "rubric:governance:synthetic"
+  },
+  "schemaVersion": "governance.governance-bench.v0.1",
+  "scopeRefs": [
+    "schemas/governance/institutional-action.v0.1.schema.json"
+  ],
+  "testCases": [
+    {
+      "caseId": "case:missing-authority-boundary",
+      "expectedDecision": "fail_closed",
+      "failureClass": "authority_boundary_missing",
+      "fixtureRef": "tests/fixtures/governance/institutional-action.invalid.missing-execution-receipt.synthetic.json"
+    }
+  ],
+  "thresholds": {
+    "failClosedRequired": true,
+    "minPassRate": 1
+  },
+  "title": "Synthetic governance admission benchmark"
+}

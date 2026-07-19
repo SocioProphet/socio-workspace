@@ -1,0 +1,280 @@
+{
+  "apiVersion": "agentic-workbench.socios@1",
+  "kind": "Workflow",
+  "metadata": {
+    "name": "ml-gcp-train",
+    "version": "v1",
+    "createdAt": "2026-05-04T00:00:00Z",
+    "labels": {
+      "domain": "ml",
+      "mode": "gcp",
+      "purpose": "training"
+    },
+    "source": {
+      "git": {
+        "repo": "SocioProphet/sociosphere",
+        "rev": "main",
+        "dirty": false
+      }
+    }
+  },
+  "spec": {
+    "input": {
+      "schemaRef": "https://sourceos.local/schemas/ml/v1/train_request.schema.json"
+    },
+    "output": {
+      "schemaRef": "https://sourceos.local/schemas/ml/v1/train_result.schema.json"
+    },
+    "defaults": {
+      "timeoutSec": 7200,
+      "retryMax": 2,
+      "retryBackoffSec": 60,
+      "cacheMode": "read",
+      "ledgerMode": "required",
+      "humanGateRequired": false,
+      "lane": "prod"
+    },
+    "policy": {
+      "policyPackRef": "policy://ml.gcp.prod.v1",
+      "policyPackHash": "sha256:689a03f98b6be2eaacb322173e04f31aa89ecfc263fb0c56b0a314b50cfc6a77",
+      "trustProfileRef": "trust://ml.gcp.prod.v1",
+      "defaultQuorumRule": "human:2-of-3",
+      "attestationRequired": true,
+      "ledgerMode": "required"
+    },
+    "steps": [
+      {
+        "stepId": "resolve-dataset-snapshot",
+        "name": "Resolve production dataset snapshot",
+        "transport": "local",
+        "capabilityRef": "capd://caps.data.asset.resolve_snapshot.v1",
+        "effect": "read",
+        "target": {
+          "executorRef": "exec://control/prod",
+          "operation": "resolve_snapshot"
+        },
+        "inputBindings": {
+          "datasetRef": "$.input.datasetRef"
+        },
+        "outputBindings": {
+          "datasetSnapshotRef": "$.steps.resolve-dataset-snapshot.output.snapshotRef"
+        },
+        "timeoutSec": 60,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 10,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://control/prod",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "standard",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "beam-transform-features",
+        "name": "Transform and materialize features in GCP",
+        "transport": "local",
+        "capabilityRef": "capd://caps.data.beam.transform.v1",
+        "effect": "compute",
+        "target": {
+          "executorRef": "exec://beam/dataflow/us-central1",
+          "operation": "transform_features"
+        },
+        "inputBindings": {
+          "datasetSnapshotRef": "$.steps.resolve-dataset-snapshot.output.snapshotRef",
+          "transformSpecRef": "$.input.transformSpecRef"
+        },
+        "outputBindings": {
+          "featureSetRef": "$.steps.beam-transform-features.output.featureSetRef",
+          "lineageRef": "$.steps.beam-transform-features.output.lineageRef"
+        },
+        "timeoutSec": 1800,
+        "retry": {
+          "maxAttempts": 2,
+          "backoffSec": 60,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://beam/dataflow/us-central1",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "full",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "publish-feature-dataset",
+        "name": "Publish feature dataset artifact",
+        "transport": "local",
+        "capabilityRef": "capd://caps.data.asset.publish_dataset.v1",
+        "effect": "write",
+        "target": {
+          "executorRef": "exec://artifact-store/gcs/us-central1",
+          "operation": "publish_dataset"
+        },
+        "inputBindings": {
+          "featureSetRef": "$.steps.beam-transform-features.output.featureSetRef",
+          "lineageRef": "$.steps.beam-transform-features.output.lineageRef"
+        },
+        "outputBindings": {
+          "publishedFeatureSetRef": "$.steps.publish-feature-dataset.output.artifactRef"
+        },
+        "timeoutSec": 180,
+        "retry": {
+          "maxAttempts": 2,
+          "backoffSec": 30,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://artifact-store/gcs/us-central1",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "standard",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "ray-train-model",
+        "name": "Train model with Ray on GCP",
+        "transport": "local",
+        "capabilityRef": "capd://caps.ml.ray.train.v1",
+        "effect": "compute",
+        "target": {
+          "executorRef": "exec://ray/gcp/train-us-central1",
+          "operation": "train_model"
+        },
+        "inputBindings": {
+          "featureSetRef": "$.steps.publish-feature-dataset.output.artifactRef",
+          "modelSpecRef": "$.input.modelSpecRef",
+          "trainingParamsRef": "$.input.trainingParamsRef"
+        },
+        "outputBindings": {
+          "checkpointRef": "$.steps.ray-train-model.output.checkpointRef",
+          "metricsRef": "$.steps.ray-train-model.output.metricsRef",
+          "trainManifestRef": "$.steps.ray-train-model.output.trainManifestRef"
+        },
+        "timeoutSec": 5400,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 60,
+          "idempotentRequired": false
+        },
+        "placement": {
+          "executorRef": "exec://ray/gcp/train-us-central1",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "full",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "ray-validate-model",
+        "name": "Validate production model outputs",
+        "transport": "local",
+        "capabilityRef": "capd://caps.ml.ray.validate.v1",
+        "effect": "compute",
+        "target": {
+          "executorRef": "exec://ray/gcp/train-us-central1",
+          "operation": "validate_model"
+        },
+        "inputBindings": {
+          "checkpointRef": "$.steps.ray-train-model.output.checkpointRef",
+          "metricsRef": "$.steps.ray-train-model.output.metricsRef",
+          "validationSpecRef": "$.input.validationSpecRef"
+        },
+        "outputBindings": {
+          "modelArtifactRef": "$.steps.ray-validate-model.output.modelArtifactRef",
+          "validationReportRef": "$.steps.ray-validate-model.output.validationReportRef",
+          "sbomRef": "$.steps.ray-validate-model.output.sbomRef"
+        },
+        "timeoutSec": 900,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 30,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://ray/gcp/train-us-central1",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "full",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "publish-model-and-sbom",
+        "name": "Register model and SBOM in CK",
+        "transport": "local",
+        "capabilityRef": "capd://caps.ml.asset.publish_model.v1",
+        "effect": "write",
+        "target": {
+          "executorRef": "exec://ck/prod",
+          "operation": "register_model"
+        },
+        "inputBindings": {
+          "modelArtifactRef": "$.steps.ray-validate-model.output.modelArtifactRef",
+          "metricsRef": "$.steps.ray-train-model.output.metricsRef",
+          "validationReportRef": "$.steps.ray-validate-model.output.validationReportRef",
+          "sbomRef": "$.steps.ray-validate-model.output.sbomRef",
+          "dataSources": "$.steps.publish-feature-dataset.output.artifactRef"
+        },
+        "outputBindings": {
+          "registeredModelRef": "$.steps.publish-model-and-sbom.output.registeredModelRef"
+        },
+        "timeoutSec": 300,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 30,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://ck/prod",
+          "side": "twin",
+          "dataZone": "ck-prod",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "standard",
+          "redactRulesRef": "redact://prod.default"
+        }
+      }
+    ],
+    "edges": [
+      { "fromStepId": "resolve-dataset-snapshot", "toStepId": "beam-transform-features", "onStatus": "success" },
+      { "fromStepId": "beam-transform-features", "toStepId": "publish-feature-dataset", "onStatus": "success" },
+      { "fromStepId": "publish-feature-dataset", "toStepId": "ray-train-model", "onStatus": "success" },
+      { "fromStepId": "ray-train-model", "toStepId": "ray-validate-model", "onStatus": "success" },
+      { "fromStepId": "ray-validate-model", "toStepId": "publish-model-and-sbom", "onStatus": "success" }
+    ],
+    "bundleProjection": {
+      "targetRepo": "agentplane",
+      "artifactOutDir": "./artifacts/ml-gcp-train",
+      "executorStrategy": "placement",
+      "backendIntentDefault": "fleet"
+    }
+  }
+}

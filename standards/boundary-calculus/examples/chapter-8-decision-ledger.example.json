@@ -1,0 +1,87 @@
+{
+  "claim_id": "BC-CH8-COORDINATED-COMPROMISE",
+  "repo": "SocioProphet/ProCybernetica",
+  "source_ref": "Boundary Calculus Program Monograph, Chapter 8",
+  "chapter_anchor": "8.2-8.7 Bayesian decision discipline",
+  "domain": "security-decision",
+  "claim_status": "established",
+  "load_bearing": true,
+  "claim_statement": "A coordinated-compromise assessment must compute posterior odds from calibrated or bounded likelihoods and an explicit loss matrix before recommending escalation or de-escalation.",
+  "local_model": {
+    "name": "Bayesian security decision model",
+    "scope": "coordinated-compromise hypothesis assessment against benign alternatives",
+    "operators": [
+      "posterior odds",
+      "likelihood ratio",
+      "loss matrix",
+      "decision threshold"
+    ],
+    "assumptions": [
+      "hypotheses are enumerated",
+      "evidence items are specified",
+      "dependencies are modeled"
+    ]
+  },
+  "boundary_or_interface": {
+    "type": "decision_rule",
+    "statement": "Escalate when posterior odds exceed LFP/LFN; if denominators are missing, the assessment is incomplete.",
+    "limits": [
+      "does not endorse attribution without discriminating evidence"
+    ]
+  },
+  "non_claims": [
+    "Does not assert that any specific system is compromised.",
+    "Does not permit default escalation from capability presence alone."
+  ],
+  "evidence_refs": [
+    {
+      "ref_type": "monograph",
+      "ref": "Boundary Calculus Program Monograph, Chapter 8"
+    },
+    {
+      "ref_type": "external_standard",
+      "ref": "NIST SP 800-61 r2"
+    }
+  ],
+  "validation_gates": [
+    {
+      "gate_id": "BC-SECURITY-DENOMINATOR-DISCIPLINE",
+      "status": "pass",
+      "expected": "security_decision present with non-missing denominator discipline"
+    }
+  ],
+  "promotion_criteria": [
+    "Provide same-population baseline telemetry or explicitly bounded denominator ranges.",
+    "Register discriminating evidence before adversarial attribution."
+  ],
+  "known_limits": [
+    "Likelihood-ratio computation depends on reference data and remains uncertain when baselines are unavailable."
+  ],
+  "security_decision": {
+    "hypothesis_space_complete": true,
+    "denominator_discipline": "bounded",
+    "dependency_model": "explicit",
+    "discriminating_evidence": [
+      "timestamped impossible-to-replay cross-process operation",
+      "known-benign alternatives enumerated"
+    ],
+    "loss_matrix": {
+      "false_positive": 1,
+      "false_negative": 20
+    },
+    "decision_threshold": 0.047619
+  },
+  "controller": {
+    "repo": "SocioProphet/sociosphere",
+    "standard": "boundary-calculus",
+    "decision": "register"
+  },
+  "policy_result": {
+    "result": "allow",
+    "rules": [
+      "security_decision_present",
+      "denominator_not_missing",
+      "loss_matrix_present"
+    ]
+  }
+}

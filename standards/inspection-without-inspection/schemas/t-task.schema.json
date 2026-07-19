@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/inspection-without-inspection/t-task.schema.json",
+  "title": "Inspection Without Inspection TTask",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "task_name", "selection_predicate_id", "expected_diagnostic_signature"],
+  "properties": {
+    "task_id": {"type": "string", "enum": ["T1", "T2", "T3", "T4", "T5", "T6"]},
+    "task_name": {
+      "type": "string",
+      "enum": [
+        "sanity_check",
+        "mistake_debugging",
+        "unknown_or_oov",
+        "poor_slice_performance",
+        "human_labeling",
+        "distribution_mismatch"
+      ]
+    },
+    "selection_predicate_id": {"type": "string", "minLength": 1},
+    "expected_diagnostic_signature": {"type": "string", "minLength": 1}
+  }
+}

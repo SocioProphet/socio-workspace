@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.local/sociosphere/angel-of-the-lord-report.v1.json",
+  "title": "Angel of the Lord Hardening Report v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "target",
+    "review_context",
+    "surfaces_inspected",
+    "result",
+    "findings",
+    "trust_boundaries",
+    "evidence",
+    "decision",
+    "remediation_backlog"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "sociosphere.angel-of-the-lord-report/v1"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "target": {
+      "type": "object",
+      "required": ["repository", "ref", "commit"],
+      "properties": {
+        "repository": {"type": "string"},
+        "ref": {"type": "string"},
+        "commit": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "review_context": {
+      "type": "object",
+      "required": ["lane", "mode"],
+      "properties": {
+        "lane": {"type": "string"},
+        "mode": {"enum": ["ci", "manual", "release_gate", "workspace"]},
+        "workflow": {"type": ["string", "null"]},
+        "actor": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "surfaces_inspected": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"}
+    },
+    "result": {
+      "enum": ["pass", "warn", "fail"]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "surface", "message", "remediation"],
+        "properties": {
+          "id": {"type": "string"},
+          "severity": {"enum": ["blocker", "high", "medium", "low", "info"]},
+          "surface": {"type": "string"},
+          "path": {"type": ["string", "null"]},
+          "message": {"type": "string"},
+          "evidence_ref": {"type": ["string", "null"]},
+          "remediation": {"type": "string"},
+          "restricted": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "trust_boundaries": {
+      "type": "object",
+      "required": ["found", "missing"],
+      "properties": {
+        "found": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "missing": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["accepted", "missing"],
+      "properties": {
+        "accepted": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "missing": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "decision": {
+      "type": "object",
+      "required": ["merge", "release", "publish", "deploy", "restricted_handling_required"],
+      "properties": {
+        "merge": {"enum": ["allow", "block", "manual_review"]},
+        "release": {"enum": ["allow", "block", "manual_review", "not_applicable"]},
+        "publish": {"enum": ["allow", "block", "manual_review", "not_applicable"]},
+        "deploy": {"enum": ["allow", "block", "manual_review", "not_applicable"]},
+        "restricted_handling_required": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "remediation_backlog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "priority", "owner", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+          "owner": {"type": "string"},
+          "status": {"enum": ["open", "in_progress", "blocked", "done"]}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

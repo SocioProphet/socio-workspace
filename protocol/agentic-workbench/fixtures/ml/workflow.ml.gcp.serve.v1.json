@@ -1,0 +1,209 @@
+{
+  "apiVersion": "agentic-workbench.socios@1",
+  "kind": "Workflow",
+  "metadata": {
+    "name": "ml-gcp-serve",
+    "version": "v1",
+    "createdAt": "2026-05-04T00:00:00Z",
+    "labels": {
+      "domain": "ml",
+      "mode": "gcp",
+      "purpose": "serve"
+    },
+    "source": {
+      "git": {
+        "repo": "SocioProphet/sociosphere",
+        "rev": "main",
+        "dirty": false
+      }
+    }
+  },
+  "spec": {
+    "input": {
+      "schemaRef": "https://sourceos.local/schemas/ml/v1/serve_request.schema.json"
+    },
+    "output": {
+      "schemaRef": "https://sourceos.local/schemas/ml/v1/serve_result.schema.json"
+    },
+    "defaults": {
+      "timeoutSec": 1800,
+      "retryMax": 1,
+      "retryBackoffSec": 30,
+      "cacheMode": "off",
+      "ledgerMode": "required",
+      "humanGateRequired": false,
+      "lane": "prod"
+    },
+    "policy": {
+      "policyPackRef": "policy://ml.gcp.prod.v1",
+      "policyPackHash": "sha256:689a03f98b6be2eaacb322173e04f31aa89ecfc263fb0c56b0a314b50cfc6a77",
+      "trustProfileRef": "trust://ml.gcp.prod.v1",
+      "defaultQuorumRule": "human:2-of-3",
+      "attestationRequired": true,
+      "ledgerMode": "required"
+    },
+    "steps": [
+      {
+        "stepId": "resolve-ck-model-version",
+        "name": "Resolve CK model version",
+        "transport": "local",
+        "capabilityRef": "capd://caps.data.asset.resolve_snapshot.v1",
+        "effect": "read",
+        "target": {
+          "executorRef": "exec://ck/prod",
+          "operation": "resolve_model_version"
+        },
+        "inputBindings": {
+          "registeredModelRef": "$.input.registeredModelRef"
+        },
+        "outputBindings": {
+          "ckModelRef": "$.steps.resolve-ck-model-version.output.ckModelRef",
+          "artifactHash": "$.steps.resolve-ck-model-version.output.artifactHash",
+          "fallbackModelRef": "$.steps.resolve-ck-model-version.output.fallbackModelRef"
+        },
+        "timeoutSec": 60,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 5,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://ck/prod",
+          "side": "twin",
+          "dataZone": "ck-prod",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "standard",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "resolve-serving-config",
+        "name": "Resolve serving config",
+        "transport": "local",
+        "capabilityRef": "capd://caps.data.asset.resolve_snapshot.v1",
+        "effect": "read",
+        "target": {
+          "executorRef": "exec://control/prod",
+          "operation": "resolve_serving_config"
+        },
+        "inputBindings": {
+          "deploymentSpecRef": "$.input.deploymentSpecRef"
+        },
+        "outputBindings": {
+          "deploymentSpecResolvedRef": "$.steps.resolve-serving-config.output.deploymentSpecResolvedRef"
+        },
+        "timeoutSec": 60,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 5,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://control/prod",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "standard",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "deploy-ray-serve-canary",
+        "name": "Deploy Ray Serve canary",
+        "transport": "local",
+        "capabilityRef": "capd://caps.ml.ray.serve.deploy.v1",
+        "effect": "exec",
+        "target": {
+          "executorRef": "exec://ray/gcp/serve-us-central1",
+          "operation": "deploy_canary"
+        },
+        "inputBindings": {
+          "ckModelRef": "$.steps.resolve-ck-model-version.output.ckModelRef",
+          "artifactHash": "$.steps.resolve-ck-model-version.output.artifactHash",
+          "fallbackModelRef": "$.steps.resolve-ck-model-version.output.fallbackModelRef",
+          "deploymentSpecResolvedRef": "$.steps.resolve-serving-config.output.deploymentSpecResolvedRef"
+        },
+        "outputBindings": {
+          "deploymentRef": "$.steps.deploy-ray-serve-canary.output.deploymentRef",
+          "deploymentStatusRef": "$.steps.deploy-ray-serve-canary.output.deploymentStatusRef"
+        },
+        "timeoutSec": 600,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 30,
+          "idempotentRequired": false
+        },
+        "approval": {
+          "required": true,
+          "quorumRule": "human:1-of-2",
+          "approverSetRef": "approvers://ml-governance",
+          "escalationPolicyRef": "escalation://ml-serve"
+        },
+        "placement": {
+          "executorRef": "exec://ray/gcp/serve-us-central1",
+          "side": "twin",
+          "dataZone": "gcs-us-central1",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "full",
+          "redactRulesRef": "redact://prod.default"
+        }
+      },
+      {
+        "stepId": "record-serve-deployment",
+        "name": "Record serve deployment in CK",
+        "transport": "local",
+        "capabilityRef": "capd://caps.ml.asset.publish_model.v1",
+        "effect": "write",
+        "target": {
+          "executorRef": "exec://ck/prod",
+          "operation": "record_serve_deployment"
+        },
+        "inputBindings": {
+          "ckModelRef": "$.steps.resolve-ck-model-version.output.ckModelRef",
+          "deploymentRef": "$.steps.deploy-ray-serve-canary.output.deploymentRef",
+          "deploymentStatusRef": "$.steps.deploy-ray-serve-canary.output.deploymentStatusRef"
+        },
+        "outputBindings": {
+          "serveDeploymentRef": "$.steps.record-serve-deployment.output.serveDeploymentRef"
+        },
+        "timeoutSec": 180,
+        "retry": {
+          "maxAttempts": 1,
+          "backoffSec": 15,
+          "idempotentRequired": true
+        },
+        "placement": {
+          "executorRef": "exec://ck/prod",
+          "side": "twin",
+          "dataZone": "ck-prod",
+          "residency": "us-central1",
+          "networkZone": "prod-vpc"
+        },
+        "observability": {
+          "traceLevel": "standard",
+          "redactRulesRef": "redact://prod.default"
+        }
+      }
+    ],
+    "edges": [
+      { "fromStepId": "resolve-ck-model-version", "toStepId": "resolve-serving-config", "onStatus": "success" },
+      { "fromStepId": "resolve-serving-config", "toStepId": "deploy-ray-serve-canary", "onStatus": "success" },
+      { "fromStepId": "deploy-ray-serve-canary", "toStepId": "record-serve-deployment", "onStatus": "success" }
+    ],
+    "bundleProjection": {
+      "targetRepo": "agentplane",
+      "artifactOutDir": "./artifacts/ml-gcp-serve",
+      "executorStrategy": "placement",
+      "backendIntentDefault": "fleet"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "claim_id": "BC-CH1-FLUX-MATCHING",
+  "repo": "SocioProphet/sociosphere",
+  "source_ref": "Boundary Calculus Program Monograph, Chapter 1",
+  "chapter_anchor": "1.3 Interface laws across conformal patches",
+  "domain": "transport-control",
+  "claim_status": "theorem",
+  "load_bearing": true,
+  "claim_statement": "For scalar transport across conformally flat patches, continuity of the scalar and normal flux yields a dimension-dependent conformal prefactor in the interface condition.",
+  "local_model": {
+    "name": "conformally-flat scalar transport",
+    "scope": "Riemannian patches with metric g = Omega^2 delta and conserved scalar current",
+    "operators": [
+      "Laplace-Beltrami",
+      "normal flux",
+      "Euclidean equivalent diffusivity"
+    ],
+    "assumptions": [
+      "smooth hypersurface interface",
+      "constant scalar transport coefficient per side",
+      "short-range conserved flux model"
+    ]
+  },
+  "boundary_or_interface": {
+    "type": "interface_law",
+    "statement": "[Omega^(n-2) partial_n phi]_Sigma = 0 with scalar continuity across Sigma.",
+    "dimension_notes": "The exponent is n-2; n=2 drops the conformal factor and n=3 gives Omega^1.",
+    "limits": [
+      "does not apply unchanged to arbitrary non-conformally-flat or Lorentzian metrics"
+    ]
+  },
+  "non_claims": [
+    "Does not claim thermodynamic bounds are bypassed.",
+    "Does not claim arbitrary porous media realize the ideal interface law without measurement."
+  ],
+  "evidence_refs": [
+    {
+      "ref_type": "monograph",
+      "ref": "Boundary Calculus Program Monograph, Chapter 1"
+    }
+  ],
+  "validation_gates": [
+    {
+      "gate_id": "BC-SCHEMA-VALID",
+      "status": "pass",
+      "command": "python3 tools/validate_boundary_calculus.py"
+    }
+  ],
+  "promotion_criteria": [],
+  "known_limits": [
+    "Engineering realization requires graded material coefficients and disorder bounds."
+  ],
+  "controller": {
+    "repo": "SocioProphet/sociosphere",
+    "standard": "boundary-calculus",
+    "decision": "register"
+  },
+  "policy_result": {
+    "result": "allow",
+    "rules": [
+      "claim_status_present",
+      "non_claims_present"
+    ]
+  }
+}

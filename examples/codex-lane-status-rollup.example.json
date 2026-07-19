@@ -1,0 +1,34 @@
+{
+  "apiVersion": "sociosphere.socioprophet.dev/v1",
+  "kind": "CodexLaneStatusRollup",
+  "metadata": {
+    "name": "codex-lane-status-rollup",
+    "version": "0.1.0",
+    "generatedAt": "2026-04-30T14:58:00Z"
+  },
+  "spec": {
+    "program": "SocioProphet Model Fabric",
+    "reviewTrigger": "@codex review",
+    "implementationTrigger": "@codex Please take this...",
+    "deliveryRule": "Codex comments are engagement or findings evidence. Implementation delivery requires a verifiable GitHub PR, branch, commit, or merge.",
+    "codexLaneStatusRollup": {
+      "codex_dispatched": 3,
+      "codex_engaged": 2,
+      "codex_findings_posted": 1,
+      "codex_pr_open": 1,
+      "codex_pr_merged": 0,
+      "codex_unverified_output": 2
+    },
+    "operatingDecision": "Use Codex primarily for review, investigation, and adversarial validation. Use Copilot or coordinator materialization for implementation when Codex cannot create a verifiable GitHub artifact.",
+    "knownLeakage": [
+      "Codex implementation comments may claim local commits or make_pr payloads that do not materialize as GitHub PRs.",
+      "Routine Copilot assignment can assign the human owner unless assignee cleanup is performed."
+    ],
+    "controlActions": [
+      "Use @codex review for PR review tasks.",
+      "Verify every Codex implementation claim with PR, branch, commit, or merge search.",
+      "Treat unverified Codex implementation comments as codex_unverified_output.",
+      "Route materialization fallback to Copilot or coordinator branch when Codex cannot push."
+    ]
+  }
+}

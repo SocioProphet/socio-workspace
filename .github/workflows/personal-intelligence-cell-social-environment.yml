@@ -1,0 +1,33 @@
+name: personal-intelligence-cell-social-environment
+
+on:
+  pull_request:
+    paths:
+      - "standards/personal-intelligence-cell/**"
+      - "tools/validate_personal_intelligence_cell_social_environment.py"
+      - "README.md"
+      - "docs/**/*.md"
+      - ".github/workflows/personal-intelligence-cell-social-environment.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "standards/personal-intelligence-cell/**"
+      - "tools/validate_personal_intelligence_cell_social_environment.py"
+      - "README.md"
+      - "docs/**/*.md"
+      - ".github/workflows/personal-intelligence-cell-social-environment.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-personal-intelligence-cell-social-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate Personal Intelligence Cell social and reputation standards
+        run: python3 tools/validate_personal_intelligence_cell_social_environment.py

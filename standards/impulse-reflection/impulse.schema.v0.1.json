@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/sociosphere/impulse-reflection/impulse.schema.v0.1.json",
+  "title": "SocioSphere Impulse v0.1",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "kind",
+    "impulseId",
+    "receivedAt",
+    "source",
+    "summary",
+    "requestedAction",
+    "initialScope",
+    "affectedResources",
+    "initialSignals"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "sociosphere.impulse-reflection/v1"
+    },
+    "kind": {
+      "const": "Impulse"
+    },
+    "impulseId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "receivedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "sourceType",
+        "actor",
+        "externalRef"
+      ],
+      "properties": {
+        "sourceType": {
+          "enum": [
+            "human_instruction",
+            "github_issue",
+            "github_pr",
+            "github_comment",
+            "ci_status",
+            "upstream_release",
+            "policy_event",
+            "capability_event",
+            "artifact_event",
+            "security_alert",
+            "runtime_event",
+            "stale_cache_signal",
+            "scheduled_check",
+            "other"
+          ]
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "externalRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRepo": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "correlationId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedAction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "initialScope": {
+      "enum": [
+        "control_plane",
+        "component",
+        "adapter",
+        "standard",
+        "third_party",
+        "docs",
+        "governance",
+        "security",
+        "release",
+        "unknown",
+        "mixed"
+      ]
+    },
+    "affectedResources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "resourceType",
+          "resourceRef"
+        ],
+        "properties": {
+          "resourceType": {
+            "enum": [
+              "repo",
+              "issue",
+              "pull_request",
+              "document",
+              "schema",
+              "manifest",
+              "lock",
+              "standard",
+              "fixture",
+              "workflow",
+              "artifact",
+              "capability",
+              "policy",
+              "runtime",
+              "cache",
+              "other"
+            ]
+          },
+          "resourceRef": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ownerRepo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "initialSignals": {
+      "type": "object",
+      "required": [
+        "controlPlaneAffected",
+        "componentImplementationAffected",
+        "crossRepo",
+        "securitySensitive",
+        "sourceExposureSensitive",
+        "requiresBarrier"
+      ],
+      "properties": {
+        "controlPlaneAffected": {
+          "type": "boolean"
+        },
+        "componentImplementationAffected": {
+          "type": "boolean"
+        },
+        "crossRepo": {
+          "type": "boolean"
+        },
+        "securitySensitive": {
+          "type": "boolean"
+        },
+        "sourceExposureSensitive": {
+          "type": "boolean"
+        },
+        "requiresBarrier": {
+          "type": "boolean"
+        },
+        "knownDownstreamRepos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

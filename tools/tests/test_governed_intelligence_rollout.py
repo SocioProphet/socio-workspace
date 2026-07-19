@@ -19,7 +19,7 @@ def test_governed_intelligence_rollout_validator_passes() -> None:
         check=False,
     )
     assert result.returncode == 0, result.stderr + result.stdout
-    assert "OK: validated governed intelligence rollout registry" in result.stdout
+    assert "OK: governed intelligence rollout registry validated" in result.stdout
 
 
 def test_governed_intelligence_rollout_status_projection_values() -> None:

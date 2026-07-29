@@ -40,13 +40,32 @@ def test_committed_register_is_valid() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_committed_register_reports_the_engine_drift() -> None:
-    """Both engine copies must be surfaced as stale, not silently accepted."""
+def test_committed_register_reports_the_staleness_it_actually_has() -> None:
+    """Whatever is stale must be SURFACED as stale, never silently accepted.
+
+    Rewritten when VFP-0001 closed. It used to assert the two engine copies were stale,
+    which was the truth on 2026-07-29 morning and stopped being the truth that afternoon
+    when prophet-platform #1030 and #1032 landed 0.4.45 in both. A test that asserts a
+    finding which has been FIXED is a test that must be edited to stay green, and the
+    thing to assert is the invariant, not the snapshot: staleness is reported.
+
+    The staleness that remains is sourceos-spec, and it is real — two consumers pinning
+    two different commits of one schema family, both behind upstream 65925aed.
+    """
     result = run(Path("registry/vendor-freshness.yaml"), "--skip-disk")
-    assert "STALE hellgraph-engine@hellgraph-service" in result.stdout
-    assert "STALE hellgraph-engine@lifecycle-warden" in result.stdout
-    # the guard that never runs is a declared finding in its own right
-    assert "GUARD-NOT-INVOKED hellgraph-engine@lifecycle-warden" in result.stdout
+    assert "STALE sourceos-spec-schemas@market-replay" in result.stdout
+    assert "STALE sourceos-spec-schemas@hellgraph-service" in result.stdout
+    # A guard nobody calls stays a declared finding in its own right — and these two are
+    # now here on EVIDENCE rather than on assertion; see the invoked_by_ci tests below.
+    assert "GUARD-NOT-INVOKED sourceos-spec-schemas@market-replay" in result.stdout
+    assert "GUARD-NOT-INVOKED sourceos-spec-schemas@hellgraph-service" in result.stdout
+
+
+def test_committed_register_keeps_the_engine_closed() -> None:
+    """VFP-0001 is closed and must stay closed: neither engine copy may read stale."""
+    result = run(Path("registry/vendor-freshness.yaml"), "--skip-disk")
+    assert result.returncode == 0, result.stderr
+    assert "STALE hellgraph-engine@" not in result.stdout
 
 
 POSITIVE = ["good-minimal.yaml", "good-reference-observation-tolerated.yaml"]
@@ -291,3 +310,220 @@ def test_absent_consumer_repo_is_skipped_not_passed(tmp_path: Path) -> None:
     result = run(register, "--repo-root=prophet-platform=/nonexistent-path")
     assert result.returncode == 0, result.stderr
     assert "SKIPPED on-disk verification" in result.stdout
+
+
+# ── invoked_by_ci is VERIFIED, never asserted (W12.6) ────────────────────────
+#
+# The hole this closes, in its own words: hellgraph-service's engine guard was declared
+# in package.json as `check:engine`, invoked by no workflow, no Makefile target and no
+# Dockerfile, and had never once run — while being cited as the authority that stale
+# engines get caught. A boolean anyone can type is not evidence. These tests build a
+# synthetic consumer repo so the chain-follower is exercised against real files rather
+# than against a mock of itself.
+
+GUARD_REL = "apps/hellgraph-service/scripts/check-engine-version.mjs"
+
+
+def with_guard(root: Path, *, workflow: str | None = None, makefile: str | None = None,
+               scripts: dict | None = None, floor: str = "0.4.45") -> None:
+    """Add a guard script to a consumer repo, plus whatever claims to invoke it."""
+    guard = root / GUARD_REL
+    guard.parent.mkdir(parents=True, exist_ok=True)
+    guard.write_text(f"const MIN_ENGINE = '{floor}'\n", encoding="utf-8")
+    if workflow is not None:
+        wf = root / ".github" / "workflows"
+        wf.mkdir(parents=True, exist_ok=True)
+        (wf / "ci.yml").write_text(workflow, encoding="utf-8")
+    if makefile is not None:
+        (root / "Makefile").write_text(makefile, encoding="utf-8")
+    if scripts is not None:
+        package = root / "apps" / "hellgraph-service" / "package.json"
+        manifest = json.loads(package.read_text(encoding="utf-8"))
+        manifest["scripts"] = scripts
+        package.write_text(json.dumps(manifest), encoding="utf-8")
+
+
+def register_with_guard(tmp_path: Path, digest: str, guard: dict) -> Path:
+    text = (FIXTURES / "good-minimal.yaml").read_text(encoding="utf-8")
+    text = text.replace(
+        "    owner: '@mdheller'",
+        f"    vendored_digest: '{digest}'\n"
+        + "    guard:\n"
+        + "".join(f"      {k}: {v}\n" for k, v in guard.items())
+        + "    owner: '@mdheller'",
+    )
+    path = tmp_path / "register.yaml"
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+def guarded(tmp_path: Path, guard: dict, **repo: object) -> subprocess.CompletedProcess[str]:
+    payload = b"engine tarball bytes"
+    digest = "sha256:" + hashlib.sha256(payload).hexdigest()
+    root = tmp_path / "prophet-platform"
+    build_consumer(root, "0.4.45", payload)
+    with_guard(root, **repo)  # type: ignore[arg-type]
+    register = register_with_guard(tmp_path, digest, guard)
+    return run(register, f"--repo-root=prophet-platform={root}")
+
+
+def test_invoked_by_ci_true_with_no_caller_anywhere_fails(tmp_path: Path) -> None:
+    """The check:engine case exactly: the guard exists, and nothing runs it."""
+    result = guarded(tmp_path, {"path": GUARD_REL, "invoked_by_ci": "true"})
+    assert result.returncode == 1
+    assert "declares guard.invoked_by_ci: true" in result.stderr
+
+
+def test_invoked_by_ci_true_with_an_npm_script_nobody_runs_still_fails(tmp_path: Path) -> None:
+    """A package.json script IS the hole, not the fix. Declaring is not invoking."""
+    result = guarded(
+        tmp_path, {"path": GUARD_REL, "invoked_by_ci": "true"},
+        scripts={"check:engine": "node scripts/check-engine-version.mjs"},
+        workflow="name: ci\njobs:\n  build:\n    steps:\n      - run: npm ci\n",
+    )
+    assert result.returncode == 1
+    assert "no package.json script that runs it is itself run" in result.stderr
+
+
+def test_invoked_by_ci_true_via_a_make_target_in_a_workflow_passes(tmp_path: Path) -> None:
+    """The real prophet-platform shape: workflow matrix -> make engine-guards -> node."""
+    result = guarded(
+        tmp_path, {"path": GUARD_REL, "invoked_by_ci": "true"},
+        makefile=f"engine-guards:\n\tnode {GUARD_REL}\n",
+        workflow="name: ci\njobs:\n  d:\n    strategy:\n      matrix:\n"
+                 "        target:\n          - engine-guards\n"
+                 "    steps:\n      - run: make ${{ matrix.target }}\n",
+    )
+    assert result.returncode == 0, result.stderr
+    assert "GUARD-INVOKED" in result.stdout
+
+
+def test_a_make_target_no_workflow_runs_is_not_evidence(tmp_path: Path) -> None:
+    """Reachability is from CI. A target only a human types has never run in CI."""
+    result = guarded(
+        tmp_path, {"path": GUARD_REL, "invoked_by_ci": "true"},
+        makefile=f"engine-guards:\n\tnode {GUARD_REL}\n",
+        workflow="name: ci\njobs:\n  d:\n    steps:\n      - run: make lint\n",
+    )
+    assert result.returncode == 1
+    assert "no CI-reachable make target runs it" in result.stderr
+
+
+def test_a_prerequisite_of_a_ci_target_counts(tmp_path: Path) -> None:
+    """`make validate` pulling in engine-guards is a real invocation, one hop down."""
+    result = guarded(
+        tmp_path, {"path": GUARD_REL, "invoked_by_ci": "true"},
+        makefile=f"validate: lint engine-guards\n\ttrue\n\nengine-guards:\n\tnode {GUARD_REL}\n",
+        workflow="name: ci\njobs:\n  d:\n    steps:\n      - run: make validate\n",
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_a_sibling_apps_guard_is_not_evidence_for_this_one(tmp_path: Path) -> None:
+    """Both apps ship a file called check-engine-version.mjs.
+
+    A basename match would report lifecycle-warden's invocation as proof that
+    hellgraph-service's guard runs — which is the precise confusion that let a second
+    stale copy of the same tarball sit unnoticed through five releases.
+    """
+    result = guarded(
+        tmp_path, {"path": GUARD_REL, "invoked_by_ci": "true"},
+        makefile="engine-guards:\n\tnode apps/lifecycle-warden/scripts/check-engine-version.mjs\n",
+        workflow="name: ci\njobs:\n  d:\n    steps:\n      - run: make engine-guards\n",
+    )
+    assert result.returncode == 1
+    assert "declares guard.invoked_by_ci: true" in result.stderr
+
+
+def test_a_guard_floor_that_drifted_from_the_file_is_detected(tmp_path: Path) -> None:
+    """The register recorded MIN_ENGINE 0.4.40 for weeks after the file moved to 0.4.45."""
+    result = guarded(
+        tmp_path,
+        {"path": GUARD_REL, "floor_constant": "MIN_ENGINE", "floor_value": "0.4.40",
+         "invoked_by_ci": "true"},
+        floor="0.4.45",
+        makefile=f"engine-guards:\n\tnode {GUARD_REL}\n",
+        workflow="name: ci\njobs:\n  d:\n    steps:\n      - run: make engine-guards\n",
+    )
+    assert result.returncode == 1
+    assert "guard floor: register records MIN_ENGINE=0.4.40" in result.stderr
+
+
+def test_a_floor_constant_the_file_does_not_define_is_detected(tmp_path: Path) -> None:
+    result = guarded(
+        tmp_path,
+        {"path": GUARD_REL, "floor_constant": "NOT_A_REAL_CONSTANT", "floor_value": "0.4.45",
+         "invoked_by_ci": "true"},
+        makefile=f"engine-guards:\n\tnode {GUARD_REL}\n",
+        workflow="name: ci\njobs:\n  d:\n    steps:\n      - run: make engine-guards\n",
+    )
+    assert result.returncode == 1
+    assert "which SocioProphet/prophet-platform" in result.stderr
+    assert "does not define" in result.stderr
+
+
+def test_invoked_by_ci_false_while_the_repo_does_invoke_it_is_reported(tmp_path: Path) -> None:
+    """Understating is not a build failure, but it is drift and must be visible."""
+    result = guarded(
+        tmp_path, {"path": GUARD_REL, "invoked_by_ci": "false"},
+        makefile=f"engine-guards:\n\tnode {GUARD_REL}\n",
+        workflow="name: ci\njobs:\n  d:\n    steps:\n      - run: make engine-guards\n",
+    )
+    assert result.returncode == 0, result.stderr
+    assert "GUARD-UNDERSTATED" in result.stdout
+
+
+# ── vfp:guardedBy needs a Contract node, not a path string ───────────────────
+
+def test_guards_contract_must_name_a_declared_contract(tmp_path: Path) -> None:
+    text = (FIXTURES / "good-minimal.yaml").read_text(encoding="utf-8")
+    text = text.replace(
+        "    owner: '@mdheller'",
+        "    guard:\n      path: null\n      guards_contract: [no-such-contract]\n"
+        "    owner: '@mdheller'",
+    )
+    path = tmp_path / "register.yaml"
+    path.write_text(text, encoding="utf-8")
+    result = run(path, "--skip-disk")
+    assert result.returncode == 1
+    assert "guards_contract names 'no-such-contract'" in result.stderr
+
+
+def test_contract_id_and_id_must_agree(tmp_path: Path) -> None:
+    """Both spellings are carried because two readers want different ones.
+
+    This register says `contract_id`; the engine's ingest reads `id`. Carrying both is
+    only safe if they cannot silently diverge into two different Contract nodes.
+    """
+    text = (FIXTURES / "good-minimal.yaml").read_text(encoding="utf-8")
+    text = text.replace(
+        "    observation_method: fixture",
+        "    observation_method: fixture\n"
+        "    contracts:\n      - contract_id: enrich-receipt\n        contract_kind: receipt-shape",
+    )
+    text = text.replace(
+        "      - version: '0.4.45'\n        ref: v0.4.45",
+        "      - version: '0.4.45'\n        ref: v0.4.45\n"
+        "        changes_contract:\n"
+        "          - contract_id: enrich-receipt\n            id: cypher-projection\n"
+        "            kind: receipt-shape",
+    )
+    path = tmp_path / "register.yaml"
+    path.write_text(text, encoding="utf-8")
+    result = run(path, "--skip-disk")
+    assert result.returncode == 1
+    assert "they name the same Contract node and must agree" in result.stderr
+
+
+def test_every_scenario_fixture_is_exercised() -> None:
+    """Same rule as the bad-/good- vectors: a fixture nobody runs proves nothing."""
+    on_disk = {p.name for p in FIXTURES.glob("scenario-*.yaml")}
+    used = set(Path("tests/test_vendor_freshness_detector.py").read_text(encoding="utf-8").split())
+    unexercised = {name for name in on_disk if not any(name in token for token in used)}
+    assert not unexercised, f"unexercised scenario fixtures: {sorted(unexercised)}"
+
+
+def test_the_scenario_fixture_is_itself_a_valid_register() -> None:
+    """A fixture the validator would reject cannot be evidence about the validator."""
+    result = run(FIXTURES / "scenario-engine-behind.yaml", "--skip-disk")
+    assert result.returncode == 0, result.stderr

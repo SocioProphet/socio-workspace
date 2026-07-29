@@ -284,7 +284,10 @@ disk check fails otherwise, which is the intended coupling.
    artifacts it governs did.
 4. **On-disk reality** — declared paths exist, recorded digests match the bytes, and
    any `*.tgz` under `vendor/` or `file:` dependency with no register entry is an
-   `UNDECLARED` finding. **Declared > discovered.**
+   `UNDECLARED` finding. **Declared > discovered.** The same pass VERIFIES
+   `guard.invoked_by_ci` by following the invocation chain in the consumer repo, and
+   compares a declared guard floor against the value the guard file actually holds
+   (W12.6 below).
 5. **Graph vocabulary** — every `vfp:` term used in a lift graph is declared in the
    vocabulary, and the four spine terms exist.
 
@@ -293,17 +296,19 @@ absent it reports `SKIPPED`, **never** passed. Consumer repos are located via
 `--repo-root NAME=PATH`, `VENDOR_FRESHNESS_REPO_ROOTS`, the materialized workspace
 path, then `~/dev/<name>`.
 
+Real output, against both consumer repos materialized (abridged):
+
 ```
 $ make vendor-freshness-validate
 NOTE: WORKSPACE-UNBOUND source 'kbpedia-kko': SocioProphet/kbpedia is not declared in the workspace manifest (declared, with reason)
-NOTE: STALE hellgraph-engine@hellgraph-service: vendored 0.4.40 is behind upstream 0.4.45 [disposition remediation-open]
-NOTE: GUARD-NOT-INVOKED hellgraph-engine@hellgraph-service: apps/hellgraph-service/scripts/check-engine-version.mjs
-NOTE: STALE hellgraph-engine@lifecycle-warden: vendored 0.4.40 is behind upstream 0.4.45 [disposition remediation-required]
-NOTE: GUARD-NOT-INVOKED hellgraph-engine@lifecycle-warden: no guard declared
+NOTE: CONTRACT-REVIEW-PENDING source 'hellgraph-engine': 44 release(s) 0.1.0..0.4.39 were appended by the detector and nobody has said what they moved
+NOTE: STALE sourceos-spec-schemas@market-replay: vendored commit 487e4b61… != upstream 65925aed… [disposition remediation-required]
+NOTE: GUARD-NOT-INVOKED sourceos-spec-schemas@market-replay: apps/market-replay/src/market_replay/contract.py
+NOTE: GUARD-INVOKED hellgraph-engine@hellgraph-service: apps/hellgraph-service/scripts/check-engine-version.mjs <- `make engine-guards` in .github/workflows/validate-target-diagnostics.yml (Makefile) runs apps/hellgraph-service/scripts/check-engine-version.mjs
 validated 11 declared vendored artifact(s) in vendor-freshness.yaml
 ```
 
-Ten negative vectors in `fixtures/vendor-freshness/`, each executed by
+Negative vectors in `fixtures/vendor-freshness/`, each executed by
 `tests/test_vendor_freshness.py` and asserted to fail **for its own reason** — plus a
 test asserting that no fixture sits in the directory unrun, because a written-but-never-executed
 fixture is the same failure class as a never-invoked guard.
@@ -512,6 +517,103 @@ gh api -X POST repos/SocioProphet/sociosphere/rulesets ... \
 sociosphere currently has exactly one ruleset (Copilot review) and no required status
 checks at all, so this is a deliberate, separate decision — not something to smuggle
 in with a feature PR.
+
+---
+
+# Increment 6 — the register stops taking its own word for it (W12.6)
+
+Increment 5 made the gate fail closed on **contradiction**. This one removes the
+remaining places where the register was believed rather than checked.
+
+## `invoked_by_ci` is verified, not asserted
+
+It was a boolean anyone could type. That is the *same shape* as the finding the plane
+was built on: `check:engine` was declared in `apps/hellgraph-service/package.json`,
+called by no workflow, no Makefile target and no Dockerfile, had never once run — and
+was cited as the authority that stale engines get caught. Re-creating an unfalsifiable
+claim inside the tool built to destroy unfalsifiable claims is the one outcome worth
+refusing outright.
+
+So the validator follows the chain, in the consumer repo, on disk:
+
+| shape | evidence required |
+|---|---|
+| direct | the guard path appears in a workflow file |
+| via make | the guard path is in the recipe of a target reachable, through prerequisites, from a target a workflow names |
+| via npm | the guard path is in a `package.json` script that a workflow, or a CI-reachable make target, actually **runs** |
+
+Anything else is *unverified*, and `invoked_by_ci: true` with no evidence is an ERROR.
+Three deliberate properties:
+
+- **Declaring is not invoking.** A `package.json` script naming the guard is not
+  evidence; something has to run the script. That is the original hole, restated as a
+  test (`test_invoked_by_ci_true_with_an_npm_script_nobody_runs_still_fails`).
+- **Reachability is from CI**, not from a developer's terminal. A make target no
+  workflow names has never run in CI, however correct it is.
+- **Paths match repo-relative, never by basename.** `apps/hellgraph-service` and
+  `apps/lifecycle-warden` both ship a file called `check-engine-version.mjs`. A
+  basename match would report one app's invocation as proof for the other — the exact
+  confusion that let a second copy of the same stale tarball sit unnoticed.
+
+**What it found the first time it ran**, which is the only real test of a check like
+this — two of the four guards claiming `invoked_by_ci: true` did not survive it:
+
+- `apps/market-replay/src/market_replay/contract.py` asserts `SCHEMA_SHA256` at
+  *import*. Its only importers are market-replay's own emitter and tests, and nothing
+  in CI runs them: `make test-python-apps` enumerates five apps and market-replay is
+  not among them; the one workflow naming it is `images.yml`, which is
+  push-to-main/dispatch only and whose Dockerfile `pip install`s and copies `src`
+  without importing anything.
+- `apps/hellgraph-service/src/contract.ts` enforces four digests in `loadSchema()`.
+  Imported only by `contract.test.ts` and `membrane.ts`; the app's `test` script would
+  run it, and no workflow or CI-reachable make target runs that script.
+
+Both are now `invoked_by_ci: false` with the finding written down. The two engine
+guards passed on evidence: `validate-target-diagnostics.yml` matrix → `make
+engine-guards` → `node apps/<app>/scripts/check-engine-version.mjs`.
+
+## A declared floor must be the floor the file holds
+
+The register recorded `MIN_ENGINE = 0.4.40` for both engine pins. The file on
+`origin/main` says `0.4.45` — it moved with the tarball in #1030/#1032 and the register
+did not follow. A floor nobody re-reads rots exactly the way a tarball does, so
+`floor_constant` + `floor_value` are now read out of the guard file and compared.
+
+## `vfp:guardedBy` is finally written
+
+It was declared in the vocabulary and exported in the engine's edge constants
+(`VFP_EDGE.guardedBy`) and **never once emitted**, because the register described a
+guard as a `path` — a string, which cannot be the object of a `VendorPin → Contract`
+edge. `guard.guards_contract` supplies the endpoint, its ids are checked against the
+source's `contracts:` catalog, and `lift.engine-pins.ttl` now emits the edge.
+
+## Contract crossings, declared
+
+`hellgraph-engine` now carries the full 49-release chain and a `contracts:` catalog.
+The split of labour is the point:
+
+| maintained by `make vendor-freshness-detect` | stays hand-declared |
+|---|---|
+| `version`, `ref`, `commit` for every observed tag | `contracts:` — the catalog of what this upstream can move |
+| `also_tagged` for tags sharing a commit | `changes_contract` on a release |
+| `observed_at`, `observation_method` | `contract_review: done` |
+| `upstream_latest_*` | `observation_gap`, `tier`, `tier_reason`, dispositions a human owns |
+
+The detector **never** invents `changes_contract`. A newly appended release is
+`contract_review: pending`, which means *nobody has said*, not *nothing moved* —
+0.4.45 was a patch bump and it changed what a Cypher query answers, so reading risk off
+a version number is the guess-instead-of-check this plane exists to stop.
+
+## The scenario is a fixture, not the live register
+
+The detector's scenario tests used to run against `registry/vendor-freshness.yaml`. So
+when VFP-0001 closed and both consumers moved to 0.4.45, eight tests went red — not
+because anything regressed but because the estate got **fixed**. A suite that goes red
+on remediation teaches people to edit tests during a re-vendor, which is the worst
+moment for that habit. The five-release gap is now frozen in
+`fixtures/vendor-freshness/scenario-engine-behind.yaml`; the live register is still
+exercised for what is properly about it (internal consistency, rewrite fidelity, append
+idempotency, chain reaching its head).
 
 ---
 

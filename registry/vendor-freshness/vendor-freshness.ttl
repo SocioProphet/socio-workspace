@@ -112,6 +112,9 @@ vfp:guardInvokedByCi a rdfs:Property ; rdfs:range xsd:boolean ;
 vfp:versionMarker a rdfs:Property ; rdfs:range xsd:string ;
   rdfs:comment "String that must be present INSIDE the packed artifact to prove the bytes are the claimed release." .
 
+vfp:alsoTagged a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "Another tag on this release's commit. Recorded so the ABSENCE of that version from the supersession chain is evidenced rather than mysterious: hellgraph v0.4.42 points at the v0.4.41 commit, whose package.json says 0.4.41, so it is a second tag and not a second release. Modelling it as one would add a hop to every gap through that range." .
+
 vfp:contractKind a rdfs:Property ; rdfs:range xsd:string ;
   rdfs:comment "receipt-shape | schema | fsm" .
 vfp:receiptFixture a rdfs:Property ; rdfs:range xsd:string .

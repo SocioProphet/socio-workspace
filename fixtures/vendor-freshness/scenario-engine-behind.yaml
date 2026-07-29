@@ -1,0 +1,185 @@
+manifest_id: vendor-freshness-scenario-engine-behind
+status: seed
+schema: registry/vendor-freshness.schema.yaml
+purpose: >-
+  The estate as it stood on the morning of 2026-07-29: prophet-platform shipping engine
+  0.4.40 to production while hellgraph main was 0.4.45. This is the case the plane was
+  built for, frozen as a fixture so the detector's behaviour against it can be asserted
+  forever.
+
+# ── Why this fixture exists ──────────────────────────────────────────────────
+#
+# The scenario tests used to run against registry/vendor-freshness.yaml itself. That
+# made them assert a SNAPSHOT rather than a MECHANISM: the moment VFP-0001 closed and
+# both consumers moved to 0.4.45, eight tests went red — not because the detector
+# regressed, but because the estate got FIXED. A suite that goes red when a finding is
+# remediated trains people to edit tests during a re-vendor, which is the one moment
+# you least want the tests malleable.
+#
+# So the scenario lives here, at 0.4.40, permanently. The live register is still tested
+# — it must be internally consistent, its rewrite must round-trip, and its chain must
+# reach its head — but "what does a five-release gap produce" is asked of a fixture that
+# nobody will re-vendor.
+#
+# Every value below was read out of git or off disk on 2026-07-29, not invented: the
+# 0.4.40 tarball digest, the two golden receipt digests, the tag commits, and the alias
+# (v0.4.42 points at the v0.4.41 commit, whose package.json says 0.4.41).
+
+policy:
+  observation_max_age_days: 90
+  default_freshness_policy: track-minor
+  tier_observation_max_age_days:
+    foundation: 30
+    reference: 90
+
+coverage:
+  mechanically_scanned:
+    - npm-tarball vendored under a consumer `vendor/` directory
+  declared_only:
+    - not applicable — this fixture declares one source
+
+sources:
+  - source_id: hellgraph-engine
+    repo: SocioProphet/hellgraph
+    url: https://github.com/SocioProphet/hellgraph
+    artifact_kind: npm-tarball
+    version_scheme: semver
+    package_name: '@socioprophet/hellgraph'
+    upstream_ref: main
+    upstream_latest_version: 0.4.45
+    upstream_latest_ref: v0.4.45
+    observed_at: '2026-07-29'
+    observation_method: >-
+      git ls-remote --tags https://github.com/SocioProphet/hellgraph -> newest semver tag v0.4.45 (dbe854faf5b8)
+    contracts:
+      - contract_id: enrich-receipt
+        contract_kind: receipt-shape
+        note: >-
+          The sealed enrich/explore receipt. apps/compute-gateway pins two golden
+          receipts to it.
+      - contract_id: cypher-projection
+        contract_kind: schema
+        note: What a Cypher pattern is answered WITH.
+    releases:
+      - version: '0.4.40'
+        ref: v0.4.40
+        commit: 419472c
+        digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+        contract_review: done
+      - version: '0.4.41'
+        ref: v0.4.41
+        commit: 5f72cf3
+        # v0.4.42 is a second tag on this same commit. Not a distinct artifact, so not a
+        # release — the fixture that proves the gap must not itself inflate the gap.
+        also_tagged: [v0.4.42]
+        contract_review: done
+      - version: '0.4.43'
+        ref: v0.4.43
+        commit: 6251971
+        contract_review: done
+        changes_contract:
+          - contract_id: enrich-receipt
+            id: enrich-receipt
+            kind: receipt-shape
+            note: attribute-rank peer discovery re-implemented as an inverted index
+            receipt_fixture: apps/compute-gateway/tests/test_engine_seal.py
+            digest: 'sha256:018f2febf0c76f91752ba9726c9a32a4a8d3ca03895a5d877b780c312d34cc71'
+      - version: '0.4.44'
+        ref: v0.4.44
+        commit: 17c30c7
+        contract_review: done
+      - version: '0.4.45'
+        ref: v0.4.45
+        commit: dbe854f
+        version_marker: 'PROP_NS = "prop:"'
+        contract_review: done
+        changes_contract:
+          - contract_id: cypher-projection
+            id: cypher-projection
+            kind: schema
+            note: >-
+              MATCH (n:Label) RETURN n answered ONE EMPTY ROW against 9,825 real events,
+              HTTP 200, with a receipt. A patch bump that changed what a query answers.
+
+artifacts:
+  - artifact_id: hellgraph-engine@hellgraph-service
+    tier: foundation
+    tier_reason: >-
+      The graph engine THE spine runs on; a stale copy shipped a silent-wrong Cypher
+      projection to production.
+    source_id: hellgraph-engine
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/hellgraph-service
+    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz
+    vendored_version: 0.4.40
+    vendored_digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+    freshness_policy: track-minor
+    owner: '@mdheller'
+    # A human's position, naming a real open PR. The detector must not downgrade it just
+    # because it also computes `stale` — remediation-open already agrees with stale.
+    disposition: remediation-open
+    remediation:
+      pull_request: https://github.com/SocioProphet/prophet-platform/pull/1030
+      target_version: 0.4.45
+    declared_in:
+      - path: apps/hellgraph-service/package.json
+        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.40.tgz'
+      - path: apps/hellgraph-service/package-lock.json
+        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.40.tgz (two occurrences)'
+      - path: apps/hellgraph-service/scripts/check-engine-version.mjs
+        note: "MIN_ENGINE = '0.4.40' — the floor and the tarball must move together"
+    guard:
+      path: apps/hellgraph-service/scripts/check-engine-version.mjs
+      floor_constant: MIN_ENGINE
+      floor_value: 0.4.40
+      # False AS OF THIS SCENARIO, and the whole point of it: the guard was declared in
+      # package.json as `check:engine`, called by no workflow, no Makefile and no
+      # Dockerfile, and had never once run.
+      invoked_by_ci: false
+      guards_contract: [enrich-receipt, cypher-projection]
+    version_marker:
+      marker: 'PROP_NS = "prop:"'
+      present_in: 0.4.45
+      absent_in: 0.4.40
+      note: >-
+        Must be asserted inside the packed ts/dist/index.js, not against package.json.
+        `graph:labels` is explicitly NOT a valid marker — it is present in both releases.
+    receipt_fixtures:
+      - path: apps/compute-gateway/tests/test_engine_seal.py
+        digest: 'sha256:018f2febf0c76f91752ba9726c9a32a4a8d3ca03895a5d877b780c312d34cc71'
+        note: 'ENRICH_JSON golden, over graph snapshot {seq:58,nodes:10,edges:8}'
+      - path: apps/compute-gateway/tests/test_engine_seal.py
+        digest: 'sha256:35a9df2dd74a25fcbb966a41d2949cd7646912d743aeec730a36fa1a1d3a00af'
+        note: 'EXPLORE_JSON golden, same snapshot'
+
+  - artifact_id: hellgraph-engine@lifecycle-warden
+    tier: foundation
+    tier_reason: >-
+      Executes L5 retention and legal-hold; if its engine drifts, governance decisions
+      are made on different semantics than the rest of the estate.
+    source_id: hellgraph-engine
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/lifecycle-warden
+    artifact_path: apps/lifecycle-warden/vendor/socioprophet-hellgraph-0.4.40.tgz
+    vendored_version: 0.4.40
+    vendored_digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+    freshness_policy: track-minor
+    owner: '@mdheller'
+    disposition: remediation-required
+    remediation:
+      finding_id: VFP-0001
+      target_version: 0.4.45
+      due: '2026-09-30'
+    declared_in:
+      - path: apps/lifecycle-warden/package.json
+        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.40.tgz'
+    guard:
+      # No guard at all in this scenario — a per-app vendor directory multiplied the
+      # surface without multiplying the checks.
+      path: null
+      invoked_by_ci: false
+    findings:
+      - >-
+        Second, separate copy of the same tarball. Same bytes, same staleness, no guard.

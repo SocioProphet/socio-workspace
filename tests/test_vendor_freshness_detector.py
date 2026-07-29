@@ -23,6 +23,16 @@ import detect_vendor_freshness as detector  # noqa: E402
 import validate_vendor_freshness as validator  # noqa: E402
 
 REGISTER = Path("registry/vendor-freshness.yaml")
+
+# The five-release gap, frozen. These tests used to run against REGISTER itself, which
+# meant they asserted a SNAPSHOT rather than a mechanism: when VFP-0001 closed and both
+# consumers moved to 0.4.45, eight of them went red — not because the detector regressed
+# but because the estate got fixed. A suite that goes red on remediation teaches people
+# to edit tests mid-re-vendor, which is the worst possible moment for that habit. So the
+# scenario is a fixture nobody will ever re-vendor, and REGISTER is still exercised for
+# the things that are properly about the live file: rewrite fidelity, append idempotency,
+# and that its own chain reaches its own head.
+SCENARIO = Path("fixtures/vendor-freshness/scenario-engine-behind.yaml")
 TODAY = date(2026, 7, 29)
 
 # The engine as it will look the day 0.4.46 is cut — the case the plane exists for.
@@ -42,7 +52,7 @@ OBSERVED_0_4_46 = {
 }
 
 
-def replay(tmp_path: Path, observations: dict, register: Path = REGISTER):
+def replay(tmp_path: Path, observations: dict, register: Path = SCENARIO):
     path = tmp_path / "observations.json"
     path.write_text(json.dumps(observations), encoding="utf-8")
     return detector.run(register, TODAY, {"hellgraph-engine"}, path)
@@ -214,13 +224,13 @@ def test_a_human_disposition_that_already_agrees_is_never_overwritten(tmp_path: 
     human's position just because it also computes `stale`."""
     observations = tmp_path / "obs.json"
     observations.write_text(json.dumps(OBSERVED_0_4_46), encoding="utf-8")
-    _, _, _, proposals = detector.run(REGISTER, TODAY, {"hellgraph-engine"}, observations)
+    _, _, _, proposals = detector.run(SCENARIO, TODAY, {"hellgraph-engine"}, observations)
     assert not any(p["artifact_id"] == "hellgraph-engine@hellgraph-service" for p in proposals)
 
 
 def test_finding_ids_never_collide_within_one_run(tmp_path: Path) -> None:
     register = tmp_path / "register.yaml"
-    text = REGISTER.read_text(encoding="utf-8")
+    text = SCENARIO.read_text(encoding="utf-8")
     text = text.replace("disposition: remediation-open", "disposition: current", 1)
     text = text.replace("disposition: remediation-required", "disposition: current", 1)
     register.write_text(text, encoding="utf-8")

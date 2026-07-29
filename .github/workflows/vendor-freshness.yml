@@ -23,6 +23,13 @@
 # `--skip-disk` and `--require-disk` together are rejected as contradictory, so the
 # escape hatch cannot be reintroduced quietly.
 #
+# ── What the materialized checkout buys, beyond digests (W12.6) ─────────────────
+# The on-disk layer also VERIFIES `guard.invoked_by_ci` — it follows workflow -> make
+# target -> guard path inside the consumer repo and fails a `true` it cannot evidence.
+# That check is worth nothing without the checkout, which is the second reason
+# --require-disk matters: without the bytes, the claim goes back to being a boolean
+# anyone can type, which is the hole the whole plane exists to close.
+#
 # NOT DONE HERE, deliberately: making this a REQUIRED status check on `main` is a
 # repository-ruleset change, not a workflow change, and a required context that does
 # not yet exist on main blocks every open PR in the repo the moment it is added. It

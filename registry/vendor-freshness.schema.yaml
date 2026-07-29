@@ -226,9 +226,23 @@ source:
               contract_id:
                 type: string
                 description: Must reference one of this source's contracts[].contract_id.
+              id:
+                type: string
+                description: >-
+                  The SAME value as contract_id, under the spelling the engine's ingest
+                  reads (hellgraph ts/src/vendor-graph.ts derives the Contract node id
+                  from `id`, falling back to `<version>/<kind>`). Both are carried so one
+                  file serves both readers; the validator ERRORS if they disagree, so the
+                  redundancy cannot silently become two different Contract nodes.
               kind:
                 enum: [receipt-shape, schema, fsm]
-                description: Pre-contracts form, still accepted. Prefer contract_id.
+                description: >-
+                  Required by the engine's ingest. Also the pre-contracts form: accepted
+                  alone, but prefer declaring it alongside contract_id.
+              receipt_fixture:
+                type: string
+                description: A golden fixture whose bytes must be re-verified across this release.
+              digest: {type: string}
               note: {type: string}
   external:
     type: boolean
@@ -377,15 +391,36 @@ artifact:
       is a declared finding in its own right: a guard nobody calls is not a guard.
     properties:
       path: {type: string}
-      floor_constant: {type: string}
-      floor_value: {type: string}
-      invoked_by_ci: {type: boolean}
+      floor_constant:
+        type: string
+        description: >-
+          Name of the constant holding the floor. VERIFIED when the consumer repo is
+          materialized: the guard file must actually define it.
+      floor_value:
+        type: string
+        description: >-
+          The floor the register believes is in force. VERIFIED against the value the
+          guard file holds. It read 0.4.40 for both engine pins while the file said
+          0.4.45 — a floor nobody re-reads drifts the way the tarball did.
+      invoked_by_ci:
+        type: boolean
+        description: >-
+          VERIFIED, never taken on trust. When the consumer repo is materialized the
+          validator follows the invocation chain — a workflow naming the guard path, a
+          CI-reachable make target whose recipe runs it, or a package.json script that
+          something actually runs — and `true` with no such evidence is an ERROR.
+          Declaring is not invoking: check:engine was declared in package.json, called
+          by nothing, and had never once run while being cited as authority. Paths match
+          repo-relative, never by basename — two apps ship a file called
+          check-engine-version.mjs and a basename match would credit one for the other.
       guards_contract:
         type: array
         description: >-
           contract_ids from the source's contracts[]. The target of vfp:guardedBy: a
           guard guards a CONTRACT, not a path. The floor exists because these are the
-          contracts that move with the artifact.
+          contracts that move with the artifact. Every id is checked against the
+          source's catalog, so this cannot become a second unverified assertion inside
+          the field that exists to stop unverified assertions.
   version_marker:
     type: object
     description: >-

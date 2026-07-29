@@ -25,7 +25,10 @@ registry/vendor-freshness.schema.yaml, in four layers:
 4. On-disk reality — when a consumer repo is materialized locally, every
    declared path must exist and every recorded version and digest must match the
    bytes actually vendored. The same sweep looks for vendored artifacts that are
-   NOT declared here; an undeclared artifact is itself a finding.
+   NOT declared here; an undeclared artifact is itself a finding. It also VERIFIES
+   `guard.invoked_by_ci` by following the invocation chain in the consumer repo
+   rather than believing the field, and checks that a declared guard floor is the
+   value the guard file actually holds.
 
 Layers 1-3 are pure register checks and always run. Layer 4 needs the consumer
 repos on disk; where they are absent it is reported as SKIPPED, never as passed.
@@ -444,7 +447,18 @@ def check_release_chain(sources: dict[str, dict], artifacts: list[dict], errors:
                 if not isinstance(change, dict):
                     errors.append(f"source {source_id!r} release {release.get('version')} changes_contract entries must be mappings")
                     continue
-                contract_id = change.get("contract_id")
+                # `contract_id` is this register's spelling; `id` is the one the engine's
+                # ingest reads (hellgraph ts/src/vendor-graph.ts derives the Contract node
+                # id from it, falling back to `<version>/<kind>`). Both are carried so the
+                # same bytes serve both readers — which is only safe if they cannot drift,
+                # so disagreement is an error rather than a preference.
+                contract_id, alias = change.get("contract_id"), change.get("id")
+                if contract_id is not None and alias is not None and contract_id != alias:
+                    errors.append(
+                        f"source {source_id!r} release {release.get('version')} declares contract_id "
+                        f"{contract_id!r} and id {alias!r}; they name the same Contract node and must agree"
+                    )
+                contract_id = contract_id if contract_id is not None else alias
                 if contract_id is None:
                     if not change.get("kind"):
                         errors.append(
@@ -457,15 +471,33 @@ def check_release_chain(sources: dict[str, dict], artifacts: list[dict], errors:
                         f"source {source_id!r} release {release.get('version')} references unknown "
                         f"contract_id {contract_id!r}; declare it under the source's contracts:"
                     )
+        # vfp:guardedBy is VendorPin -> Contract. It existed in the engine's exported edge
+        # constants and was never once written, because the register only ever declared a
+        # guard PATH — a string, which cannot be the object of that edge. `guards_contract`
+        # supplies the missing endpoint, and is checked here so it does not become a second
+        # unverified assertion in the field that exists to stop unverified assertions.
+        for artifact in artifacts:
+            if artifact.get("source_id") != source_id:
+                continue
+            guard = artifact.get("guard") or {}
+            for contract_id in guard.get("guards_contract") or []:
+                if contract_id not in catalog:
+                    errors.append(
+                        f"artifact {artifact.get('artifact_id')!r} guard guards_contract names "
+                        f"{contract_id!r}, which source {source_id!r} does not declare under contracts:"
+                    )
+
         # Contract-silence is a legitimate, common state — most releases move nothing
         # load-bearing — so it is reported, never failed. Failing it would push people
         # to declare a contract change they had not actually checked for.
-        pending = [str(r.get("version")) for r in releases
+        order = sorted(releases, key=lambda r: semver(str(r.get("version"))) or (0, 0, 0))
+        pending = [str(r.get("version")) for r in order
                    if isinstance(r, dict) and r.get("contract_review") == "pending"]
         if pending:
             notes.append(
-                f"CONTRACT-REVIEW-PENDING source {source_id!r}: {sorted(pending)} were appended by the "
-                "detector and nobody has said what they moved"
+                f"CONTRACT-REVIEW-PENDING source {source_id!r}: {len(pending)} release(s) "
+                f"{pending[0]}..{pending[-1]} were appended by the detector and nobody has said "
+                "what they moved"
             )
         elif contract_silent:
             notes.append(f"CONTRACT-SILENT source {source_id!r}: {sorted(contract_silent)}")
@@ -546,6 +578,214 @@ def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict],
             notes.append(f"GUARD-NOT-INVOKED {artifact_id}: {guard.get('path') or 'no guard declared'}")
 
 
+# ── layer 4a: is the guard actually invoked? (verified, never asserted) ──────
+#
+# `invoked_by_ci` used to be a field anyone could set to true. That reproduces the
+# exact hole this plane exists to close: hellgraph-service's check:engine was declared
+# in package.json, invoked by no workflow, no Makefile and no Dockerfile, and had
+# never once run — while being cited as the authority that stale engines get caught.
+# A claim that cannot be checked is decoration. So the claim is now CHECKED, by
+# following the invocation chain in the consumer repo itself.
+#
+# Deliberately bounded. Three shapes are recognised, all of them ones the estate
+# actually uses, and anything else reads as unverified rather than being guessed at:
+#
+#   direct    — the guard path appears in a workflow file.
+#   via make  — the guard path appears in the recipe of a make target that is
+#               reachable (through prerequisites) from a target a workflow names.
+#   via npm   — the guard path appears in a package.json script that a workflow, or a
+#               CI-reachable make target, actually runs.
+#
+# Paths are matched REPO-RELATIVE in make/workflow context and PACKAGE-RELATIVE in
+# npm-script context. Never by basename: apps/hellgraph-service and
+# apps/lifecycle-warden both contain a file called check-engine-version.mjs, and a
+# basename match would report one app's guard as evidence for the other — which is
+# the precise confusion that let the second stale copy hide.
+
+MAKE_TARGET_RE = re.compile(r"^([A-Za-z0-9_][A-Za-z0-9_.\-/]*)\s*:(?!=)([^=].*)?$")
+MAKEFILE_NAMES = ("Makefile", "GNUmakefile", "makefile")
+
+
+def _read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return ""
+
+
+def _word(token: str) -> re.Pattern[str]:
+    """Token match that will not fire on a longer name containing it."""
+    return re.compile(rf"(?<![\w./-]){re.escape(token)}(?![\w./-])")
+
+
+def _workflow_texts(root: Path) -> dict[str, str]:
+    directory = root / ".github" / "workflows"
+    if not directory.is_dir():
+        return {}
+    return {
+        p.relative_to(root).as_posix(): _read(p)
+        for p in sorted(directory.iterdir())
+        if p.suffix in (".yml", ".yaml") and p.is_file()
+    }
+
+
+def _make_graph(root: Path) -> dict[str, dict[str, Any]]:
+    """{target: {recipe, prereqs, file}} across the repo's makefiles."""
+    files = [root / name for name in MAKEFILE_NAMES] + sorted(root.glob("*.mk"))
+    graph: dict[str, dict[str, Any]] = {}
+    for path in files:
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root).as_posix()
+        current: list[str] = []
+        for line in _read(path).splitlines():
+            if line.startswith("\t"):
+                for name in current:
+                    graph[name]["recipe"] += line + "\n"
+                continue
+            match = MAKE_TARGET_RE.match(line)
+            if not match:
+                if line.strip():
+                    current = []
+                continue
+            names = [n for n in match.group(1).split() if not n.startswith(".")]
+            prereqs = (match.group(2) or "").split()
+            current = []
+            for name in names:
+                entry = graph.setdefault(name, {"recipe": "", "prereqs": [], "file": rel})
+                entry["prereqs"].extend(prereqs)
+                current.append(name)
+    return graph
+
+
+def _ci_reachable_targets(graph: dict[str, dict[str, Any]], workflows: dict[str, str]) -> dict[str, str]:
+    """Make targets a workflow runs, plus everything they pull in. {target: why}."""
+    reachable: dict[str, str] = {}
+    frontier: list[str] = []
+    for target in graph:
+        for wf, text in workflows.items():
+            if _word(target).search(text):
+                reachable[target] = f"`make {target}` in {wf}"
+                frontier.append(target)
+                break
+    while frontier:
+        target = frontier.pop()
+        for prereq in graph.get(target, {}).get("prereqs", []):
+            if prereq in graph and prereq not in reachable:
+                reachable[prereq] = f"{reachable[target]} -> prerequisite `{prereq}`"
+                frontier.append(prereq)
+    return reachable
+
+
+def _npm_scripts(root: Path) -> list[tuple[Path, str, str]]:
+    """(package_dir, script_name, script_body) for every package.json outside node_modules."""
+    found: list[tuple[Path, str, str]] = []
+    for package_json in sorted(root.rglob("package.json")):
+        if "node_modules" in package_json.parts:
+            continue
+        try:
+            manifest = json.loads(package_json.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            continue
+        for name, body in (manifest.get("scripts") or {}).items():
+            if isinstance(body, str):
+                found.append((package_json.parent, name, body))
+    return found
+
+
+def guard_invocation_evidence(root: Path, guard_path: str, cache: dict[str, Any]) -> list[str]:
+    """Every way CI is shown to reach this guard. Empty means unverified."""
+    workflows = cache.setdefault("workflows", _workflow_texts(root))
+    graph = cache.setdefault("make", _make_graph(root))
+    reachable = cache.setdefault("reachable", _ci_reachable_targets(graph, workflows))
+    scripts = cache.setdefault("npm", _npm_scripts(root))
+
+    rel = guard_path.strip().lstrip("./")
+    pattern = _word(rel)
+    evidence: list[str] = []
+
+    for wf, text in workflows.items():
+        if pattern.search(text):
+            evidence.append(f"named directly in {wf}")
+
+    for target, why in sorted(reachable.items()):
+        if pattern.search(graph[target]["recipe"]):
+            evidence.append(f"{why} ({graph[target]['file']}) runs {rel}")
+
+    for package_dir, name, body in scripts:
+        try:
+            inner = Path(rel).relative_to(package_dir.relative_to(root)).as_posix()
+        except ValueError:
+            continue
+        if not _word(inner).search(body):
+            continue
+        # The script exists. Now: does anything RUN it? This is the check:engine case
+        # exactly — a script that names the guard and that nobody ever calls.
+        invoker = _word(f"run {name}")
+        where = [wf for wf, text in workflows.items() if invoker.search(text)]
+        where += [
+            f"`make {target}` ({graph[target]['file']})"
+            for target in sorted(reachable) if invoker.search(graph[target]["recipe"])
+        ]
+        if where:
+            pkg = (package_dir / "package.json").relative_to(root).as_posix()
+            evidence.append(f"npm script `{name}` in {pkg}, run by {', '.join(where)}")
+    return evidence
+
+
+def check_guard(artifact: dict, root: Path, repo: str, cache: dict[str, Any],
+                errors: list[str], notes: list[str]) -> None:
+    guard = artifact.get("guard") or {}
+    guard_path = guard.get("path")
+    artifact_id = artifact.get("artifact_id")
+    if not guard_path:
+        return
+    path = root / guard_path
+    if not path.exists():
+        errors.append(f"artifact {artifact_id!r} guard path does not exist: {repo}/{guard_path}")
+        return
+
+    evidence = guard_invocation_evidence(root, guard_path, cache)
+    claimed = guard.get("invoked_by_ci")
+    if claimed is True and not evidence:
+        errors.append(
+            f"artifact {artifact_id!r} declares guard.invoked_by_ci: true, but nothing in "
+            f"{repo} invokes {guard_path}: no workflow names it, no CI-reachable make target "
+            "runs it, and no package.json script that runs it is itself run. An unverified "
+            "invoked_by_ci is the check:engine hole with a tick next to it — either wire the "
+            "guard or declare invoked_by_ci: false and carry it as the finding it is."
+        )
+    elif claimed is True:
+        notes.append(f"GUARD-INVOKED {artifact_id}: {guard_path} <- {evidence[0]}")
+    elif evidence:
+        notes.append(
+            f"GUARD-UNDERSTATED {artifact_id}: invoked_by_ci is {claimed!r} but {evidence[0]} "
+            "— the register is behind the repo"
+        )
+
+    # A floor is only a floor if the file holds the value the register says it holds.
+    # The register recorded MIN_ENGINE 0.4.40 for weeks after the re-vendor moved it to
+    # 0.4.45; a floor nobody re-reads drifts the same way the tarball did.
+    constant, expected = guard.get("floor_constant"), guard.get("floor_value")
+    if not constant or expected is None:
+        return
+    found = re.search(
+        rf"^[^\S\n]*(?:export\s+)?(?:const|let|var|final|static)?[^\S\n]*"
+        rf"{re.escape(str(constant))}[^\S\n]*(?::[^=\n]+)?=[^\S\n]*(['\"]?)([^'\"\s,;)]+)\1",
+        _read(path), re.MULTILINE,
+    )
+    if found is None:
+        errors.append(
+            f"artifact {artifact_id!r} declares guard.floor_constant {constant!r}, "
+            f"which {repo}/{guard_path} does not define"
+        )
+    elif found.group(2) != str(expected):
+        errors.append(
+            f"DRIFT artifact {artifact_id!r} guard floor: register records {constant}="
+            f"{expected} but {repo}/{guard_path} holds {found.group(2)}"
+        )
+
+
 # ── layer 4: on-disk reality and undeclared-artifact sweep ───────────────────
 
 def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: dict[str, Path],
@@ -574,6 +814,9 @@ def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: di
             errors.append(f"--require-disk names {name!r}, which no artifact declares as a consumer_repo")
 
     declared_paths: dict[str, set[str]] = {repo: set() for repo in roots}
+    # One parse of each consumer repo's workflows/makefiles/package scripts, reused by
+    # every guard declared against it.
+    guard_cache: dict[str, dict[str, Any]] = {}
 
     for artifact in artifacts:
         repo = artifact.get("consumer_repo")
@@ -619,10 +862,7 @@ def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: di
             if rel and not (root / rel).exists():
                 errors.append(f"artifact {artifact_id!r} declared_in path does not exist: {repo}/{rel}")
 
-        guard = artifact.get("guard") or {}
-        guard_path = guard.get("path")
-        if guard_path and not (root / guard_path).exists():
-            errors.append(f"artifact {artifact_id!r} guard path does not exist: {repo}/{guard_path}")
+        check_guard(artifact, root, repo, guard_cache.setdefault(repo, {}), errors, notes)
 
     # undeclared-artifact sweep over the mechanically scannable classes
     for repo, root in roots.items():

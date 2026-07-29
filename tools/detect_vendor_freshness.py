@@ -177,8 +177,15 @@ def observe_source(source: dict, today: date) -> dict:
                 "tags": [version for _, version, _ in tags],
                 "tag_commits": {version: commit for _, version, commit in tags},
                 "tag_aliases": tag_aliases(tags),
+                # Deliberately NOT `--refs`: this observation is only reproducible without
+                # it. `--refs` suppresses the peeled `^{}` lines, and without those an
+                # annotated tag reports the sha of the TAG OBJECT rather than of the commit
+                # — which is how v0.4.41 and v0.4.42 (both annotated, both naming 5f72cf3)
+                # read as two releases when there is one artifact. Printing a flag the tool
+                # does not use would make the method line un-repeatable, and "precisely
+                # enough to repeat" is the whole job of this field.
                 "observation_method": (
-                    f"git ls-remote --tags --refs {url} -> newest semver tag v{latest} ({sha[:12]})"
+                    f"git ls-remote --tags {url} -> newest semver tag v{latest} ({sha[:12]})"
                 ),
             })
         elif scheme == "commit":
@@ -259,10 +266,13 @@ def contract_crossings(source: dict, gap: list[str]) -> list[dict]:
         if str(release.get("version")) not in gap:
             continue
         for change in release.get("changes_contract") or []:
-            contract = catalog.get(change.get("contract_id"), {})
+            # `contract_id` is this register's spelling, `id` the engine ingest's. The
+            # validator errors if both are present and disagree, so either is safe to read.
+            contract_id = change.get("contract_id") or change.get("id")
+            contract = catalog.get(contract_id, {})
             crossings.append({
                 "version": str(release["version"]),
-                "contract_id": change.get("contract_id"),
+                "contract_id": contract_id,
                 # A Contract node carries the kind; the change references the node.
                 # `kind` inline is the pre-contracts form, still read so an upstream
                 # that has not been given a contract catalog yet is not silently
@@ -509,6 +519,11 @@ def append_releases(lines: list[str], start: int, end: int, source: dict, observ
     item_indent = " " * (len(lines[start]) - len(lines[start].lstrip()) + 2)
     entry_indent = item_indent + "  "
     commits = observation.get("tag_commits") or {}
+    # A dropped alias must be RECORDED, not merely dropped. Otherwise 0.4.42's absence
+    # from the chain looks like an oversight, and the next reader "fixes" it by adding a
+    # release that is not an artifact — re-inflating every gap through that range by one.
+    alias_of = {kept: rest for versions in (observation.get("tag_aliases") or {}).values()
+                for kept, *rest in [sorted(versions, key=lambda v: semver(v) or (0, 0, 0))]}
 
     anchor = None
     for index in range(start + 1, end):
@@ -523,6 +538,12 @@ def append_releases(lines: list[str], start: int, end: int, source: dict, observ
             f"{entry_indent}- version: '{version}'",
             f"{entry_indent}  ref: v{version}",
             f"{entry_indent}  commit: {commits.get(version, 'unknown')[:7]}",
+        ])
+        if alias_of.get(version):
+            block.append(
+                f"{entry_indent}  also_tagged: [{', '.join('v' + v for v in alias_of[version])}]"
+            )
+        block.extend([
             f"{entry_indent}  observed_by: detect_vendor_freshness.py on {observation['observed_at']}",
             f"{entry_indent}  contract_review: pending",
         ])

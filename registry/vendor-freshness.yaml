@@ -1,0 +1,504 @@
+manifest_id: vendor-freshness-plane-v0
+status: seed
+schema: registry/vendor-freshness.schema.yaml
+purpose: >-
+  Declare every vendored artifact in the estate — a copy of one repo's build output,
+  schema, or ontology living inside another repo, invisible to that repo's dependency
+  tooling. Merging an upstream PR does not ship it. Only a re-vendor ships it.
+
+# Seeded 2026-07-29 from a direct walk of ~/dev/prophet-platform and ~/dev/hellgraph.
+# Every version, digest, and constant below was read off disk or out of git, not
+# inferred. Digests are sha256 over the exact bytes at the recorded path.
+
+policy:
+  observation_max_age_days: 90
+  default_freshness_policy: track-minor
+
+coverage:
+  mechanically_scanned:
+    - npm-tarball vendored under a consumer `vendor/` directory
+    - package.json `file:` dependency specifiers outside node_modules
+  declared_only:
+    - json-schema copies (no naming convention distinguishes them from first-party schemas)
+    - rdf-ontology copies
+    - source-port copies
+    - derived-output copies
+  note: >-
+    Increment 1 can only catch an undeclared artifact in the two mechanically_scanned
+    classes. Everything in declared_only depends on a human declaring it, and can
+    still go missing from this register without the validator noticing. Closing that
+    gap needs provenance markers at the vendoring site, not a smarter scanner.
+
+# ── Sources ─────────────────────────────────────────────────────────────────
+
+sources:
+  - source_id: hellgraph-engine
+    repo: SocioProphet/hellgraph
+    url: https://github.com/SocioProphet/hellgraph
+    artifact_kind: npm-tarball
+    version_scheme: semver
+    package_name: '@socioprophet/hellgraph'
+    upstream_ref: main
+    upstream_latest_version: 0.4.45
+    upstream_latest_ref: v0.4.45
+    observed_at: '2026-07-29'
+    observation_method: >-
+      git -C ~/dev/hellgraph show origin/main:package.json -> 0.4.45;
+      git tag --list 'v0.4.*' --sort=-v:refname | head -1 -> v0.4.45;
+      git rev-parse origin/main -> dbe854faf5b8
+
+  - source_id: sourceos-spec-schemas
+    repo: SourceOS-Linux/sourceos-spec
+    url: https://github.com/SourceOS-Linux/sourceos-spec
+    artifact_kind: json-schema
+    version_scheme: commit
+    upstream_ref: main
+    upstream_latest_digest: unknown
+    observed_at: '2026-07-29'
+    observation_method: >-
+      Not observed. sourceos-spec is not materialized in ~/dev, so upstream head was
+      not read. The two consumers below pin two DIFFERENT commits of the same schema
+      family, which is itself the finding.
+
+  - source_id: kbpedia-kko
+    repo: SocioProphet/kbpedia
+    url: https://github.com/SocioProphet/kbpedia
+    artifact_kind: rdf-ontology
+    version_scheme: digest
+    upstream_ref: master
+    upstream_latest_digest: 'sha256:d907919fb40f20ed39a7fde0e8d114027449d9354a1976ce8248db5634cb7b07'
+    workspace_binding: unbound
+    workspace_binding_reason: >-
+      SocioProphet/kbpedia is not declared in manifest/workspace.toml,
+      manifest/workspace.lock.json, or any committed *.repos.toml overlay. The estate
+      vendors an ontology from a sovereign fork the workspace manifest does not know
+      exists. Binding it is a workspace-composition change with knock-on effects on
+      lock coverage and canonical-source validators, so it is declared here and left
+      to a follow-up rather than folded in silently.
+    observed_at: '2026-07-19'
+    observation_method: >-
+      Digest recorded in the vendored PROVENANCE.md at retrieval time from
+      versions/2.10/kko-demo.n3 on the sovereign fork. Both vendored copies still
+      match it byte for byte. Upstream head not re-read on 2026-07-29.
+
+  - source_id: kbpedia-reference-concepts
+    repo: SocioProphet/kbpedia
+    url: https://github.com/SocioProphet/kbpedia
+    artifact_kind: rdf-ontology
+    version_scheme: digest
+    upstream_ref: master
+    upstream_latest_digest: unknown
+    workspace_binding: unbound
+    workspace_binding_reason: >-
+      Same unbound fork as kbpedia-kko. See that source for the reason.
+    observed_at: '2026-07-29'
+    observation_method: >-
+      Not observed. The vendored ABox carries no PROVENANCE.md and no digest
+      assertion, so there is nothing recording what it was copied from.
+
+  - source_id: ontogenesis-ontology-index
+    repo: SocioProphet/ontogenesis
+    url: https://github.com/SocioProphet/ontogenesis
+    artifact_kind: derived-output
+    version_scheme: commit
+    upstream_ref: main
+    observed_at: '2026-07-29'
+    observation_method: >-
+      Vendored artifact self-describes its provenance in its own header
+      ("commit":"e791402"). Upstream head not read.
+
+  - source_id: tritrpc-go-bindings
+    repo: SocioProphet/TriTRPC
+    url: https://github.com/SocioProphet/TriTRPC
+    artifact_kind: source-port
+    version_scheme: commit
+    upstream_ref: main
+    observed_at: '2026-07-29'
+    observation_method: >-
+      Declared in libs/go/tritrpcbridge/PROVENANCE.md. sociosphere already pins
+      TriTRPC as a submodule at rev efc114b0132b61472d3abb29007441597bca0cfc in
+      manifest/workspace.lock.json; the Go copy in prophet-platform is a second,
+      unlinked pin of the same upstream.
+
+  - source_id: regis-entity-graph-schemas
+    repo: SocioProphet/regis-entity-graph
+    url: https://github.com/SocioProphet/regis-entity-graph
+    artifact_kind: json-schema
+    version_scheme: digest
+    upstream_ref: main
+    upstream_latest_digest: unknown
+    observed_at: '2026-07-29'
+    observation_method: >-
+      Not observed. Vendoring is declared in prose only
+      (apps/regis-acr-api/src/regis_acr_api/er_spine.py) with no digest assertion.
+
+  - source_id: mcp-a2a-zero-trust-kernel-schemas
+    repo: SocioProphet/mcp-a2a-zero-trust
+    url: https://github.com/SocioProphet/mcp-a2a-zero-trust
+    artifact_kind: json-schema
+    version_scheme: digest
+    upstream_ref: main
+    upstream_latest_digest: unknown
+    observed_at: '2026-07-29'
+    observation_method: >-
+      Not observed, and the upstream attribution is itself unconfirmed. The consumer
+      calls these schemas "vendored" in compute_gateway/zerotrust.py but names no
+      source repo; the $id host is sourceos.local. Attributed here to the zero-trust
+      kernel on the strength of the schema names (Grant, PolicyDecision, QuorumProof,
+      AttestationBundle, ToolGrantCheck, MCP Capability Registry). Treat as a lead,
+      not a fact.
+
+# ── Artifacts ───────────────────────────────────────────────────────────────
+
+artifacts:
+
+  # ── The engine: two copies, same tarball, different fates ──
+  - artifact_id: hellgraph-engine@hellgraph-service
+    source_id: hellgraph-engine
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/hellgraph-service
+    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz
+    vendored_version: 0.4.40
+    vendored_digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+    freshness_policy: track-minor
+    owner: '@mdheller'
+    disposition: remediation-open
+    declared_in:
+      - path: apps/hellgraph-service/package.json
+        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.40.tgz'
+      - path: apps/hellgraph-service/package-lock.json
+        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.40.tgz (two occurrences)'
+      - path: apps/hellgraph-service/scripts/check-engine-version.mjs
+        note: "MIN_ENGINE = '0.4.40' — the floor and the tarball must move together"
+      - path: apps/compute-gateway/src/compute_gateway/engine_receipts.py
+        note: 'receipt key order documented as pinned from the vendored 0.4.40 dist'
+      - path: apps/compute-gateway/tests/test_engine_seal.py
+        note: 'golden sealed receipts declared as real 0.4.40 engine output'
+      - path: deploy/values/hellgraph-service.yaml
+        note: 'memory budget measured against the 0.4.40 batched loader'
+    guard:
+      path: apps/hellgraph-service/scripts/check-engine-version.mjs
+      floor_constant: MIN_ENGINE
+      floor_value: 0.4.40
+      invoked_by_ci: false
+    version_marker:
+      marker: 'PROP_NS = "prop:"'
+      present_in: 0.4.45
+      absent_in: 0.4.40
+      note: >-
+        Must be asserted inside the packed ts/dist/index.js, not against package.json.
+        `graph:labels` is explicitly NOT a valid marker — it is present in both
+        releases; it was always the write-side key, and the defect was that the read
+        side never matched it.
+    receipt_fixtures:
+      - path: apps/compute-gateway/tests/test_engine_seal.py
+        digest: 'sha256:018f2febf0c76f91752ba9726c9a32a4a8d3ca03895a5d877b780c312d34cc71'
+        note: 'ENRICH_JSON golden, over graph snapshot {seq:58,nodes:10,edges:8}'
+      - path: apps/compute-gateway/tests/test_engine_seal.py
+        digest: 'sha256:35a9df2dd74a25fcbb966a41d2949cd7646912d743aeec730a36fa1a1d3a00af'
+        note: 'EXPLORE_JSON golden, same snapshot'
+    remediation:
+      pull_request: https://github.com/SocioProphet/prophet-platform/pull/1030
+      target_version: 0.4.45
+      note: >-
+        Open, not merged. Moves the tarball 0.4.40 -> 0.4.45 and MIN_ENGINE with it,
+        deletes the old tarball, and reports 81/81 tests green. Until it merges,
+        production still answers from 0.4.40.
+    findings:
+      - >-
+        Five releases invisible in production. 0.4.45 fixed a silent-wrong Cypher
+        defect: MATCH (n:Label) RETURN n answered ONE EMPTY ROW against 9,825 real
+        events, HTTP 200, with a queryHash and an evaluatedAtSeq on it. Node-only
+        patterns compiled to zero clauses, which findMatches satisfies with one empty
+        binding.
+      - >-
+        The guard that should have caught this is never invoked. check:engine is
+        declared as an npm script and has no caller anywhere in prophet-platform — no
+        workflow, no Makefile target, no Dockerfile step. Its upstream-staleness step
+        is additionally warn-only by construction.
+
+  - artifact_id: hellgraph-engine@lifecycle-warden
+    source_id: hellgraph-engine
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/lifecycle-warden
+    artifact_path: apps/lifecycle-warden/vendor/socioprophet-hellgraph-0.4.40.tgz
+    vendored_version: 0.4.40
+    vendored_digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+    freshness_policy: track-minor
+    owner: '@mdheller'
+    disposition: remediation-required
+    declared_in:
+      - path: apps/lifecycle-warden/package.json
+        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.40.tgz'
+      - path: apps/lifecycle-warden/package-lock.json
+        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.40.tgz (two occurrences)'
+    guard:
+      path: null
+      invoked_by_ci: false
+    version_marker:
+      marker: 'PROP_NS = "prop:"'
+      present_in: 0.4.45
+      absent_in: 0.4.40
+    remediation:
+      finding_id: VFP-0001
+      target_version: 0.4.45
+      due: '2026-09-30'
+      note: >-
+        No PR. Explicitly out of scope of PR #1030, which says so in its own body.
+        This copy is byte-identical to the hellgraph-service one and equally stale,
+        and it is the reason this register exists: the second copy was never noticed
+        because nothing enumerated the first.
+    findings:
+      - >-
+        Second, separate copy of the same tarball. Same bytes
+        (sha256:a1f47796...), same staleness, no guard at all — no
+        check-engine-version.mjs, no check:engine script. A per-app vendor directory
+        multiplies the surface without multiplying the checks.
+
+  # ── sourceos-spec schema copies ──
+  - artifact_id: sourceos-spec-schemas@market-replay
+    source_id: sourceos-spec-schemas
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/market-replay
+    artifact_path: apps/market-replay/src/market_replay/schemas/MarketDataEvent.json
+    vendored_digest: 'sha256:7d18865d1a435f8a2e78977ef51f865b842c810f4648faa8755b506fe8b13d55'
+    vendored_commit: 487e4b614b79e556af3aea2c70471eca13281377
+    freshness_policy: track-latest
+    owner: '@mdheller'
+    disposition: observation-required
+    declared_in:
+      - path: apps/market-replay/src/market_replay/contract.py
+        note: 'SCHEMA_SHA256 asserted at import; RuntimeError on drift. SPEC_VERSION = 0.1.0'
+    guard:
+      path: apps/market-replay/src/market_replay/contract.py
+      floor_constant: SCHEMA_SHA256
+      floor_value: '7d18865d1a435f8a2e78977ef51f865b842c810f4648faa8755b506fe8b13d55'
+      invoked_by_ci: true
+    findings:
+      - >-
+        The digest guard is real and passing — it detects local tampering. It cannot
+        detect upstream movement, which is the failure mode this plane exists for. A
+        content pin proves the copy is intact, never that it is current.
+      - >-
+        Pins sourceos-spec commit 487e4b61, while apps/hellgraph-service pins
+        7d74db81 for the same schema family from the same merged PR (#204). Two
+        vendoring sites, two upstream commits, two independent digest mechanisms
+        (Python and TypeScript), nothing reconciling them.
+
+  - artifact_id: sourceos-spec-schemas@hellgraph-service
+    source_id: sourceos-spec-schemas
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/hellgraph-service
+    vendored_commit: 7d74db818a943f2070285c2fc16e22f975d1b8d0
+    freshness_policy: track-latest
+    owner: '@mdheller'
+    disposition: observation-required
+    artifact_paths:
+      - path: apps/hellgraph-service/src/schemas/EffectDecision.json
+        digest: 'sha256:29b7c4d9ce07b033b18f22382c3160e4eae9b56444a30cdf69b0c7a7c108d9e1'
+      - path: apps/hellgraph-service/src/schemas/EffectRequest.json
+        digest: 'sha256:99829aa50b0ebb7d663072028c37e3a29cf4cb6d2fbbbe5d6af0dda979264084'
+      - path: apps/hellgraph-service/src/schemas/ExecutionReport.json
+        digest: 'sha256:3eef1c1ce0e4b2bcbe0fb6f9419c0e65773f50c6b9c3e69b459f979c96ac91e1'
+      - path: apps/hellgraph-service/src/schemas/OrderIntent.json
+        digest: 'sha256:40ff7f8a47dd4288e343aacc74c62e24b092111d5a19d3c692d88e315235f6ce'
+    declared_in:
+      - path: apps/hellgraph-service/src/contract.ts
+        note: 'SCHEMA_SHA256 record, enforced in loadSchema(). All four verified matching on disk.'
+    guard:
+      path: apps/hellgraph-service/src/contract.ts
+      floor_constant: SCHEMA_SHA256
+      invoked_by_ci: true
+    findings:
+      - >-
+        EffectRequest.json is the schema this plane's own escalation path emits
+        against (see docs/governance/vendor-freshness-plane.md). The vendored copy of
+        the contract the gate speaks is itself an undeclared-until-now vendored
+        artifact.
+
+  # ── Ontology copies ──
+  - artifact_id: kbpedia-kko@hellgraph
+    source_id: kbpedia-kko
+    consumer_repo: SocioProphet/hellgraph
+    consumer_url: https://github.com/SocioProphet/hellgraph
+    consumer_app: ontology/kko
+    artifact_path: ontology/kko/kko-2.10.n3
+    vendored_digest: 'sha256:d907919fb40f20ed39a7fde0e8d114027449d9354a1976ce8248db5634cb7b07'
+    freshness_policy: pin-exact
+    pin_reason: >-
+      KKO 2.10 (owl:versionIRI kbpedia/v200) is a released ontology version, not a
+      moving head. It moves only on a deliberate ontology upgrade.
+    owner: '@mdheller'
+    disposition: current
+    declared_in:
+      - path: ontology/kko/PROVENANCE.md
+        note: >-
+          Records upstream path versions/2.10/kko-demo.n3, retrieval date 2026-07-19,
+          sha256 and byte count. Verified correct against the file on disk.
+      - path: scripts/gen-kko.mjs
+        note: 'regenerates the derived ts/src/kko-data.ts from this file'
+    findings:
+      - >-
+        This is the estate's best-formed vendoring: named upstream, exact upstream
+        path, retrieval date, asserted digest, and a named regeneration script. It is
+        the shape the other entries should be held to.
+
+  - artifact_id: kbpedia-kko@owl-reasoner
+    source_id: kbpedia-kko
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/owl-reasoner
+    artifact_path: apps/owl-reasoner/src/owl_reasoner/data/kko-2.10.n3
+    vendored_digest: 'sha256:d907919fb40f20ed39a7fde0e8d114027449d9354a1976ce8248db5634cb7b07'
+    freshness_policy: pin-exact
+    pin_reason: 'Same released KKO 2.10 TBox as the engine copy; moves only with it.'
+    owner: '@mdheller'
+    disposition: current
+    declared_in:
+      - path: apps/owl-reasoner/src/owl_reasoner/data/PROVENANCE.md
+        note: 'states it is byte-identical to the TBox the HellGraph engine vendors'
+      - path: apps/owl-reasoner/src/owl_reasoner/reasoner.py
+        note: '_kko_tbox() loads it'
+    findings:
+      - >-
+        Third byte-identical copy of the same TBox across two repos. Currently
+        consistent, but nothing enforces that — this copy has a documented digest and
+        no runtime assertion, so the two can silently diverge on the next upgrade of
+        either one.
+
+  - artifact_id: kbpedia-reference-concepts@hellgraph-service
+    source_id: kbpedia-reference-concepts
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/hellgraph-service
+    artifact_path: apps/hellgraph-service/ontology/kbpedia-rc-2.10.n3.gz
+    vendored_digest: 'sha256:e48d0ff7708d647cb35b1bcbcca05a041c731e5a1bfcea296209a086b72da06a'
+    freshness_policy: pin-exact
+    pin_reason: 'Released KBpedia 2.10 reference-concept ABox.'
+    owner: '@mdheller'
+    disposition: observation-required
+    declared_in:
+      - path: apps/hellgraph-service/src/server.ts
+        note: 'loaded at runtime'
+      - path: deploy/values/hellgraph-service.yaml
+        note: 'referenced by the deployment values'
+    findings:
+      - >-
+        No PROVENANCE.md, no digest assertion, no recorded retrieval date. Nothing in
+        the repo states which upstream artifact this is a copy of; the digest above
+        was computed here for the first time. Weakest provenance of any vendored
+        artifact found.
+
+  # ── Derived output and source ports ──
+  - artifact_id: ontogenesis-ontology-index@lattice-studio
+    source_id: ontogenesis-ontology-index
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/lattice-studio
+    vendored_commit: e791402
+    freshness_policy: track-latest
+    owner: '@mdheller'
+    disposition: observation-required
+    artifact_paths:
+      - path: apps/lattice-studio/src/lattice_studio/data/ontogenesis_index.json
+        digest: 'sha256:4e1f2f2b32530b9bff5d852b587d0ecc4b608bcf1dab8d70e79f26d71a0f81b5'
+      - path: apps/lattice-studio/src/lattice_studio/data/ontogenesis_shapes.ttl
+        digest: 'sha256:ccc66329a0b28d4361a26f0681fc1934bb467356d480555e389f55e120f8570d'
+    declared_in:
+      - path: apps/lattice-studio/tools/gen_ontogenesis_index.py
+        note: 'regenerates the index from a local ~/dev/ontogenesis checkout'
+    findings:
+      - >-
+        The artifact records its own source commit (e791402) in its header, which is
+        good, but regeneration depends on a developer having ontogenesis checked out
+        locally. sociosphere already declares ontogenesis in manifest/workspace.toml
+        at components/ontogenesis — the regeneration should read the materialized
+        workspace copy rather than an assumed home directory.
+
+  - artifact_id: tritrpc-go-bindings@tritrpcbridge
+    source_id: tritrpc-go-bindings
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: libs/go/tritrpcbridge
+    artifact_path: libs/go/tritrpcbridge/PROVENANCE.md
+    freshness_policy: track-minor
+    owner: '@mdheller'
+    disposition: observation-required
+    declared_in:
+      - path: libs/go/tritrpcbridge/PROVENANCE.md
+        note: 'declares libs/go/tritrpcbridge/tritrpcv1/* copied from SocioProphet/TriTRPC'
+    findings:
+      - >-
+        sociosphere already pins TriTRPC as a governed submodule
+        (manifest/workspace.lock.json, rev efc114b0132b61472d3abb29007441597bca0cfc,
+        third_party/tritrpc). The Go copy in prophet-platform is a second pin of the
+        same upstream that no lock file governs — the exact divergence
+        docs/TOPOLOGY.md rule 4 exists to prevent, occurring outside the submodule
+        mechanism it constrains.
+
+  - artifact_id: regis-entity-graph-schemas@regis-acr-api
+    source_id: regis-entity-graph-schemas
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/regis-acr-api
+    freshness_policy: track-latest
+    owner: '@mdheller'
+    disposition: observation-required
+    artifact_paths:
+      - path: apps/regis-acr-api/schemas/edge.schema.json
+        digest: 'sha256:1b0583b24f834ffc21f6cae237abf250fc74855cc39d029302e0be986284e997'
+      - path: apps/regis-acr-api/schemas/graph_delta.schema.json
+        digest: 'sha256:cbe623964229240ccc290fce0bb21c5cbd3783ae5c5ade392c5fb36a05fcaaf1'
+      - path: apps/regis-acr-api/schemas/node.schema.json
+        digest: 'sha256:0baf82a996e9ca0fc041df8de5be0c6d74a394ff7b3ec71811cf72d81d75ecd0'
+      - path: apps/regis-acr-api/schemas/proof-certificate.schema.json
+        digest: 'sha256:b77a7aad719f269563d9b7b607350e73138ab61c64dc00874a41b639ed114b06'
+    declared_in:
+      - path: apps/regis-acr-api/src/regis_acr_api/er_spine.py
+        note: 'prose statement that the ER spine is vendored from regis-entity-graph'
+      - path: docs/REGIS_ACR_SERVICE_INTEGRATION.md
+        note: 'repeats the vendoring claim'
+    findings:
+      - >-
+        Vendored in prose only. No digest assertion, no upstream commit, no retrieval
+        date. Digests above computed here for the first time, so this register is now
+        the only record of what these bytes are.
+
+  - artifact_id: mcp-a2a-zero-trust-kernel-schemas@compute-gateway
+    source_id: mcp-a2a-zero-trust-kernel-schemas
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/compute-gateway
+    freshness_policy: track-latest
+    owner: '@mdheller'
+    disposition: observation-required
+    artifact_paths:
+      - path: apps/compute-gateway/src/compute_gateway/schemas/attestation_bundle.schema.json
+        digest: 'sha256:485d0ed689cc1b3184a18d555bb3eba75c4110f7087d0c3c6c54c575447a4272'
+      - path: apps/compute-gateway/src/compute_gateway/schemas/capability_registry.schema.json
+        digest: 'sha256:f3e793394baee2c4782762de565e988b4fc527639b41839aa859d2f9cbb3d73d'
+      - path: apps/compute-gateway/src/compute_gateway/schemas/grant.schema.json
+        digest: 'sha256:2aac20b5fc9ce2ef72c0609bc1687f2b4b17a2167ef3148fa8ad3c4c1494f0b1'
+      - path: apps/compute-gateway/src/compute_gateway/schemas/policy_decision.schema.json
+        digest: 'sha256:fa836113aeda2b1d65b9a3868cb692e266fa51d516bb3a3f248e58e74d6dfc89'
+      - path: apps/compute-gateway/src/compute_gateway/schemas/quorum_proof.schema.json
+        digest: 'sha256:d3ceec20d3268c30c1f0fda17f0981654a850ad39073ac5b1ff4aff62a0b2bb2'
+      - path: apps/compute-gateway/src/compute_gateway/schemas/tool_grant_check.schema.json
+        digest: 'sha256:360c5c98c43742aa7f930a472fd8662eff28bba32eca9b20dd8e76d3077c923c'
+    declared_in:
+      - path: apps/compute-gateway/src/compute_gateway/zerotrust.py
+        note: 'calls the schema set vendored; names no source repo'
+    findings:
+      - >-
+        Called vendored in a comment, with no source repo named anywhere. The
+        attribution recorded on this artifact's source is a lead from the schema
+        names, not an established fact — it must be confirmed before any re-vendor.
+      - >-
+        These are the zero-trust decision schemas (Grant, PolicyDecision,
+        QuorumProof, AttestationBundle). Copies of the policy contracts, with
+        unconfirmed provenance and no digest assertion, sitting inside the gateway
+        that enforces them.

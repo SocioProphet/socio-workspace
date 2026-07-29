@@ -1,0 +1,306 @@
+schema_id: vendor-freshness-plane-v0
+status: governance_schema
+version: 0
+purpose: >-
+  Declare every vendored artifact in the estate — a copy of one repo's build output,
+  schema, or ontology that lives inside another repo and is therefore invisible to
+  that repo's dependency tooling. Merging an upstream PR does not ship it; a vendored
+  copy only moves when someone re-vendors it. This register makes that fact declared
+  rather than discovered.
+non_authorization: >-
+  This schema does not authorize repository mutation, dependency upgrade, PR merge,
+  production deployment, or automatic re-vendoring. It declares state and computes
+  findings. Acting on a finding is a separate, gated decision (see
+  docs/governance/vendor-freshness-plane.md § Emitting an EffectRequest).
+
+rationale: >-
+  prophet-platform shipped @socioprophet/hellgraph 0.4.40 to production while the
+  engine's main was 0.4.45. Five merged releases were invisible, including a
+  silent-wrong Cypher defect that answered MATCH (n:Label) RETURN n with one row of
+  empty strings against 9,825 real events. A second copy of the same tarball sits in
+  apps/lifecycle-warden and was not noticed at all. Nobody was negligent; there was
+  no mechanism.
+
+# ── Top level ────────────────────────────────────────────────────────────────
+
+required_top_level_fields:
+  - manifest_id
+  - status
+  - schema
+  - purpose
+  - policy
+  - coverage
+  - sources
+  - artifacts
+
+top_level:
+  manifest_id:
+    type: string
+    description: Stable identifier for this register.
+    example: vendor-freshness-plane-v0
+  status:
+    enum: [seed, active, superseded]
+  schema:
+    type: string
+    description: Path to this schema file.
+  policy:
+    type: object
+    required: [observation_max_age_days, default_freshness_policy]
+    properties:
+      observation_max_age_days:
+        type: integer
+        description: >-
+          An upstream observation older than this is itself stale. The register must
+          not be allowed to rot the same way the artifacts it governs did.
+      default_freshness_policy:
+        enum: [pin-exact, track-minor, track-latest]
+  coverage:
+    type: object
+    required: [mechanically_scanned, declared_only]
+    description: >-
+      Honest statement of what the validator can discover on its own versus what a
+      human must declare. Anything in `declared_only` can go missing from this
+      register without the scanner noticing; that is a known limit of increment 1.
+    properties:
+      mechanically_scanned:
+        type: array
+        description: Artifact classes the undeclared-artifact scan can find unaided.
+      declared_only:
+        type: array
+        description: Artifact classes that depend on a human declaring them.
+
+# ── Sources: the upstream that produces an artifact ──────────────────────────
+
+required_source_fields:
+  - source_id
+  - repo
+  - url
+  - artifact_kind
+  - version_scheme
+  - upstream_ref
+  - observed_at
+  - observation_method
+
+source:
+  source_id:
+    type: string
+    description: Stable identifier, referenced by artifacts[].source_id.
+    example: hellgraph-engine
+  repo:
+    type: string
+    description: owner/name of the producing repository.
+    example: SocioProphet/hellgraph
+  url:
+    type: string
+    description: >-
+      Canonical HTTPS URL. Must resolve to a repo declared in manifest/workspace.toml,
+      manifest/workspace.lock.json, or a committed manifest/*.repos.toml overlay —
+      this is what binds the vendor plane to the workspace manifest rather than
+      standing beside it as a parallel system.
+  artifact_kind:
+    enum:
+      - npm-tarball        # packed dist, consumed via a package.json `file:` specifier
+      - json-schema        # spec schema copied into a consumer, usually digest-asserted
+      - rdf-ontology       # .ttl / .n3 / .n3.gz ontology or TBox copy
+      - source-port        # source files copied across a repo boundary
+      - derived-output     # an artifact produced by running a tool, then committed
+  version_scheme:
+    enum: [semver, digest, commit]
+    description: >-
+      How freshness is decided for this source. `semver` compares versions; `digest`
+      compares content hashes; `commit` compares upstream commit SHAs.
+  package_name:
+    type: string
+    description: Package identifier where one exists.
+    example: '@socioprophet/hellgraph'
+  upstream_ref:
+    type: string
+    description: The branch or tag this source is tracked against.
+    example: main
+  upstream_latest_version:
+    type: string
+    description: Latest released version at observed_at. Required when version_scheme is semver.
+  upstream_latest_ref:
+    type: string
+    description: Tag or commit corresponding to upstream_latest_version.
+  upstream_latest_digest:
+    type: string
+    description: >-
+      sha256 of the current upstream bytes. Required when version_scheme is digest,
+      unless recorded as `unknown`, which forces disposition observation-required on
+      every artifact from this source.
+  observed_at:
+    type: string
+    format: date
+    description: When the upstream state above was actually looked at.
+  observation_method:
+    type: string
+    description: How it was looked at, precisely enough to repeat.
+    example: git tag --list 'v0.4.*' --sort=-v:refname
+  external:
+    type: boolean
+    description: >-
+      True when the upstream is not ours. External sources are still declared, but
+      re-vendor discipline for them is upstream-release-driven rather than ours.
+
+# ── Artifacts: one vendored copy, in one consumer ────────────────────────────
+
+required_artifact_fields:
+  - artifact_id
+  - source_id
+  - consumer_repo
+  - consumer_url
+  - consumer_app
+  - artifact_path
+  - freshness_policy
+  - owner
+  - disposition
+
+artifact:
+  artifact_id:
+    type: string
+    description: Unique within the register. Convention `<source_id>@<consumer_app>`.
+    example: hellgraph-engine@hellgraph-service
+  source_id:
+    type: string
+    description: Must reference a declared sources[].source_id.
+  consumer_repo:
+    type: string
+    example: SocioProphet/prophet-platform
+  consumer_url:
+    type: string
+    description: Must resolve to a repo declared in the workspace manifest.
+  consumer_app:
+    type: string
+    description: Path of the consuming app within the consumer repo.
+    example: apps/hellgraph-service
+  artifact_path:
+    type: string
+    description: >-
+      Path of the vendored artifact relative to the consumer repo root. Checked for
+      existence whenever the consumer repo is materialized locally.
+  artifact_paths:
+    type: array
+    description: >-
+      For multi-file artifacts (a schema set, an ontology pair). Each entry is
+      {path, digest}. Use instead of artifact_path when a single artifact is
+      several files whose digests are asserted independently.
+  vendored_version:
+    type: string
+    description: >-
+      Version actually vendored on disk today. Null only when version_scheme is
+      digest or commit.
+  vendored_digest:
+    type: string
+    description: sha256 of the vendored bytes, `sha256:` prefixed.
+  vendored_commit:
+    type: string
+    description: Upstream commit the copy was taken from, when known.
+  declared_in:
+    type: array
+    description: >-
+      Every place in the consumer that textually names the pin. A re-vendor that
+      misses one of these leaves the repo internally inconsistent.
+    items:
+      required: [path, note]
+      properties:
+        path: {type: string}
+        note: {type: string}
+  freshness_policy:
+    enum: [pin-exact, track-minor, track-latest]
+    description: >-
+      pin-exact  — intentionally frozen; requires pin_reason; never computes stale.
+      track-minor — must follow upstream within the same major.
+      track-latest — must follow upstream head.
+  pin_reason:
+    type: string
+    description: Required when freshness_policy is pin-exact.
+  owner:
+    type: string
+    description: GitHub handle accountable for re-vendoring this artifact.
+    example: '@mdheller'
+  disposition:
+    enum: [current, remediation-open, remediation-required, waived, observation-required]
+    description: >-
+      The declared human position on this artifact. The validator recomputes the
+      freshness state from the recorded versions and fails if the declared
+      disposition contradicts it. You may not declare `current` while five releases
+      behind.
+  remediation:
+    type: object
+    description: Required when disposition is remediation-open or remediation-required.
+    properties:
+      pull_request:
+        type: string
+        description: Required when disposition is remediation-open.
+      target_version: {type: string}
+      finding_id:
+        type: string
+        description: Required when disposition is remediation-required.
+      due:
+        type: string
+        format: date
+        description: >-
+          Required when disposition is remediation-required. Past due is a hard
+          failure — this is the ratchet that stops a filed finding becoming the new
+          silence.
+      note: {type: string}
+  waiver:
+    type: object
+    description: Required when disposition is waived.
+    properties:
+      reason: {type: string}
+      expires:
+        type: string
+        format: date
+        description: Required. An expired waiver is a hard failure.
+  guard:
+    type: object
+    description: >-
+      The consumer-side check that would catch a bad re-vendor. `invoked_by_ci: false`
+      is a declared finding in its own right: a guard nobody calls is not a guard.
+    properties:
+      path: {type: string}
+      floor_constant: {type: string}
+      floor_value: {type: string}
+      invoked_by_ci: {type: boolean}
+  version_marker:
+    type: object
+    description: >-
+      The discriminating string that must be present INSIDE the packed artifact to
+      prove the bytes really are the new release. A version field is not evidence.
+    properties:
+      marker: {type: string}
+      present_in: {type: string}
+      absent_in: {type: string}
+      note: {type: string}
+  receipt_fixtures:
+    type: array
+    description: >-
+      Golden sealed-receipt fixtures that must be byte-identical across a version
+      bump of this artifact, or explicitly regenerated with the change.
+    items:
+      required: [path, digest]
+      properties:
+        path: {type: string}
+        digest: {type: string}
+        note: {type: string}
+  findings:
+    type: array
+    description: Free-text observations attached to this artifact.
+  notes:
+    type: string
+
+# ── Computed freshness states (validator output, not declared) ───────────────
+
+computed_states:
+  current: Vendored state satisfies freshness_policy against the recorded upstream.
+  stale: Upstream has moved past the vendored copy under this policy.
+  unknown: >-
+    Upstream state is not recorded (or recorded as unknown), so freshness cannot be
+    computed. This is not benign — it is the state the estate was already in.
+
+disposition_agreement:
+  current: [current]
+  stale: [remediation-open, remediation-required, waived]
+  unknown: [observation-required, waived]

@@ -1,0 +1,33 @@
+name: vendor-freshness
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  vendor-freshness:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml pytest
+
+      # Consumer repos are not materialized here, so on-disk verification reports
+      # SKIPPED rather than passed. The register, workspace binding, disposition
+      # agreement and graph vocabulary checks all run.
+      - name: Vendor freshness register validate
+        run: make vendor-freshness-validate
+
+      - name: Negative vectors
+        run: pytest -q tests/test_vendor_freshness.py

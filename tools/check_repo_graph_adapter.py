@@ -38,7 +38,17 @@ def load_adapter_module():
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load repo graph adapter")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # The adapter defines dataclasses under `from __future__ import annotations`;
+    # dataclasses resolves those string annotations through sys.modules, so the
+    # module must be registered before it is executed.
+    sys.modules[spec.name] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        # Do not leave a half-initialized module behind for a later load in the
+        # same process (this checker is chained into others) to pick up.
+        sys.modules.pop(spec.name, None)
+        raise
     return module
 
 

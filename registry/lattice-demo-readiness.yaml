@@ -82,6 +82,7 @@ mlops_replay_evidence:
     host_mutation: false
 
 required_estate_refs:
+  demo_readiness_report: SocioProphet/prophet-platform#307
   schema: SourceOS-Linux/sourceos-spec#75
   runtime_profiles: SocioProphet/lattice-forge#11
   runtime_promotion_manifest: SocioProphet/lattice-forge#12

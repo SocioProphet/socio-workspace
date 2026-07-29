@@ -86,3 +86,34 @@ jobs:
 
       - name: Registry validate (ontology + cycles)
         run: make registry-validate
+
+  # The `validate` job above runs `make validate-standards`, which is only the FIRST
+  # prerequisite of the `validate` aggregate. Nothing ran the aggregate itself, so four
+  # of its targets stayed broken from the commit that introduced them. This job runs it.
+  validate-aggregate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      # `validate` is a plain prerequisite list, so a bare `make validate` stops at the
+      # first failing target and hides every later one -- that is how the four broken
+      # targets stayed invisible behind each other. `-k` runs every target and still
+      # exits non-zero if any failed, so one red target cannot mask the rest.
+      #
+      # This target is deliberately not asserted to leave a clean tree: the SVF smoke
+      # targets rewrite the timestamped receipts under artifacts/svf/runs/local-smoke
+      # and artifacts/svf/exports/latest on every run. Making those reproducible means
+      # redirecting the smoke run and the export that reads it (tools/svf_export_latest.py
+      # hardcodes that run directory as its source), which is a separate change.
+      - name: Validate aggregate (all targets, keep-going)
+        run: make -k validate

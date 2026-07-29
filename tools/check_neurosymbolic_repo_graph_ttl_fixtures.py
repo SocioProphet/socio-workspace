@@ -49,7 +49,10 @@ def ttl_value(text: str, predicate: str) -> object:
     # A quoted literal is read whole: "." is legal inside one, and every fixture id
     # is dotted ("valid.active-spine-inference"). Only an unquoted token may be
     # terminated by the statement "." or ";".
-    pattern = rf'nrg:{re.escape(predicate)}\s+(?:"((?:[^"\\]|\\.)*)"|([^\s;.]*))\s*[;.](?:\s|$)'
+    # Only the quoted branch may be empty (so `""` still reads as ""); an unquoted
+    # token must have at least one character, so a valueless `nrg:key ;` fails to
+    # match and reports a mismatch instead of silently comparing equal to "".
+    pattern = rf'nrg:{re.escape(predicate)}\s+(?:"((?:[^"\\]|\\.)*)"|([^\s;.]+))\s*[;.](?:\s|$)'
     match = re.search(pattern, text)
     if not match:
         return None

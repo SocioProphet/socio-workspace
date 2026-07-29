@@ -55,7 +55,10 @@ def _literal(body: str, key: str) -> str:
     # A quoted literal is read whole: "." is legal inside one, and both source paths
     # ("catalog/boundaries.yaml") and fixture ids are dotted. Only an unquoted token
     # may be terminated by the statement "." or ";".
-    pattern = rf'nrg:{key}\s+(?:"(?P<quoted>(?:[^"\\]|\\.)*)"|(?P<bare>[^\s;.]*))\s*[;.](?:\s|$)'
+    # Only the quoted branch may be empty (so `""` still reads as ""); an unquoted
+    # token must have at least one character, so a valueless `nrg:key ;` yields no
+    # match rather than a silently empty value.
+    pattern = rf'nrg:{key}\s+(?:"(?P<quoted>(?:[^"\\]|\\.)*)"|(?P<bare>[^\s;.]+))\s*[;.](?:\s|$)'
     match = re.search(pattern, body)
     if not match:
         return ""

@@ -32,7 +32,13 @@ def load_adapter():
     # dataclasses resolves those string annotations through sys.modules, so the
     # module must be registered before it is executed.
     sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        # Do not leave a half-initialized module behind for a later load in the
+        # same process to pick up.
+        sys.modules.pop(spec.name, None)
+        raise
     return module.default_adapter()
 
 

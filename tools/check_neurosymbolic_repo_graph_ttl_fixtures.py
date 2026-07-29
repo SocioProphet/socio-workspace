@@ -46,18 +46,21 @@ def fail(msg: str) -> None:
 
 
 def ttl_value(text: str, predicate: str) -> object:
-    pattern = rf"nrg:{re.escape(predicate)}\s+([^;.]*)"
+    # A quoted literal is read whole: "." is legal inside one, and every fixture id
+    # is dotted ("valid.active-spine-inference"). Only an unquoted token may be
+    # terminated by the statement "." or ";".
+    pattern = rf'nrg:{re.escape(predicate)}\s+(?:"((?:[^"\\]|\\.)*)"|([^\s;.]*))\s*[;.](?:\s|$)'
     match = re.search(pattern, text)
     if not match:
         return None
-    raw = match.group(1).strip()
-    if raw == "true":
+    quoted, bare = match.group(1), match.group(2)
+    if quoted is not None:
+        return quoted
+    if bare == "true":
         return True
-    if raw == "false":
+    if bare == "false":
         return False
-    if raw.startswith('"') and raw.endswith('"'):
-        return raw[1:-1]
-    return raw
+    return bare
 
 
 def compare_value(case: str, field: str, json_value: object, ttl_field: str, text: str) -> bool:

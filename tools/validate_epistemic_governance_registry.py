@@ -21,7 +21,9 @@ makes that failure mode non-recurring by enforcing:
   6. the verification stamp (verified_on / verified_by) is present, so a reader
      knows how old the delivery claim is.
 
-Exit 0 on success, 1 on any violation. Stdlib + pyyaml.
+Exit codes: 0 clean, 1 on any violation, 2 when the registry cannot be read or
+parsed at all (a validator that cannot run must not be mistaken for one that
+passed). Stdlib + pyyaml.
 """
 from __future__ import annotations
 
@@ -52,17 +54,28 @@ def main() -> int:
         print(f"ERR: missing registry: {REGISTRY}", file=sys.stderr)
         return 2
 
-    doc = yaml.safe_load(REGISTRY.read_text())
+    # A validator that dies on malformed input reports a stack trace where it
+    # should report a verdict. Parse failures are exit 2 ("could not run"), kept
+    # distinct from exit 1 ("ran, found violations").
+    try:
+        doc = yaml.safe_load(REGISTRY.read_text())
+    except yaml.YAMLError as exc:
+        print(f"ERR: {REGISTRY} is not valid YAML: {exc}", file=sys.stderr)
+        return 2
+    if not isinstance(doc, dict):
+        print(f"ERR: {REGISTRY} must parse to a mapping, got {type(doc).__name__}", file=sys.stderr)
+        return 2
 
-    declared = set(doc.get("canonical_namespaces", {}) or {})
-    if not declared:
-        fail("canonical_namespaces is empty or missing")
+    namespaces = doc.get("canonical_namespaces")
+    if not isinstance(namespaces, dict) or not namespaces:
+        fail("canonical_namespaces must be a non-empty mapping")
         return 1
+    declared = set(namespaces)
     ok(f"{len(declared)} namespaces declared in canonical_namespaces")
 
     impl = doc.get("implementation_status")
     if not isinstance(impl, dict):
-        fail("implementation_status block is missing — intent without a delivery record "
+        fail("implementation_status must be a mapping — intent without a delivery record "
              "is exactly the failure this validator exists to prevent")
         return 1
 
@@ -72,9 +85,9 @@ def main() -> int:
     if impl.get("verified_on") and impl.get("verified_by"):
         ok(f"verification stamp present ({impl['verified_on']})")
 
-    entries = impl.get("namespaces") or {}
-    if not entries:
-        fail("implementation_status.namespaces is empty")
+    entries = impl.get("namespaces")
+    if not isinstance(entries, dict) or not entries:
+        fail("implementation_status.namespaces must be a non-empty mapping")
         return 1
 
     # 1. coverage: every declared namespace has a status entry

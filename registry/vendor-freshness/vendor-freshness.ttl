@@ -1,0 +1,128 @@
+@prefix vfp: <https://socioprophet.org/ns/vendor-freshness#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Typed vocabulary for the vendor freshness plane.
+#
+# Sibling of nrg: (registry/neurosymbolic-repo-graph-reasoner), which reasons about
+# repositories and their governance surfaces. This vocabulary reasons one level down:
+# about the ARTIFACTS that cross between repositories, and the pins that hold a
+# consumer at one version of one of them. nrg:pinnedCommitStale answers "is this
+# submodule pin behind?"; vfp: answers the same question for everything that moves
+# between repos WITHOUT a submodule — packed tarballs, copied schemas, copied
+# ontologies — which is where the estate actually rotted.
+#
+# Design doc: docs/governance/vendor-freshness-plane.md
+
+# ── Classes ──────────────────────────────────────────────────────────────────
+
+vfp:Repository a rdfs:Class ;
+  rdfs:comment "A repository. Produces artifacts, hosts consumer apps, or both." .
+
+vfp:Artifact a rdfs:Class ;
+  rdfs:comment "One immutable released thing: a packed tarball, a schema file set, an ontology copy. Identified by version or digest, never by path." .
+
+vfp:ConsumerApp a rdfs:Class ;
+  rdfs:comment "An application inside a repository that consumes a vendored artifact. The unit of blast radius: prophet-platform is not the consumer, apps/hellgraph-service is." .
+
+vfp:VendorPin a rdfs:Class ;
+  rdfs:comment "The reified fact that one ConsumerApp holds one Artifact at one version. Reified because a pin carries its own policy, owner, disposition and dates — it is a governed object, not an edge label." .
+
+vfp:Release a rdfs:Class ;
+  rdfs:comment "An upstream release of a source repository, ordered by version. Carries the contract changes that make a version gap risky rather than merely large." .
+
+vfp:Contract a rdfs:Class ;
+  rdfs:comment "A load-bearing interface whose change breaks consumers silently: a sealed receipt shape, a JSON schema, a state machine." .
+
+vfp:Finding a rdfs:Class ;
+  rdfs:comment "A derived, materialized observation about a pin. Emitted by the reasoner, never hand-authored." .
+
+# ── The four spine edges ─────────────────────────────────────────────────────
+
+vfp:vendors a rdfs:Property ;
+  rdfs:domain vfp:ConsumerApp ; rdfs:range vfp:Artifact ;
+  rdfs:comment "This app carries a copy of this artifact." .
+
+vfp:producedBy a rdfs:Property ;
+  rdfs:domain vfp:Artifact ; rdfs:range vfp:Repository ;
+  rdfs:comment "This artifact is built from this repository." .
+
+vfp:supersededBy a rdfs:Property ;
+  rdfs:domain vfp:Artifact ; rdfs:range vfp:Artifact ;
+  rdfs:comment "A newer artifact from the same source exists. Transitive: the length of a supersededBy path is the size of the gap." .
+
+vfp:pinnedAt a rdfs:Property ;
+  rdfs:domain vfp:VendorPin ; rdfs:range vfp:Artifact ;
+  rdfs:comment "The exact artifact this pin holds." .
+
+# ── Supporting edges ─────────────────────────────────────────────────────────
+
+vfp:pinFor a rdfs:Property ;
+  rdfs:domain vfp:VendorPin ; rdfs:range vfp:ConsumerApp .
+
+vfp:hostedIn a rdfs:Property ;
+  rdfs:domain vfp:ConsumerApp ; rdfs:range vfp:Repository .
+
+vfp:releasedAs a rdfs:Property ;
+  rdfs:domain vfp:Artifact ; rdfs:range vfp:Release .
+
+vfp:changesContract a rdfs:Property ;
+  rdfs:domain vfp:Release ; rdfs:range vfp:Contract ;
+  rdfs:comment "This release altered a load-bearing contract. The edge that turns a version gap into a risk assessment." .
+
+vfp:guardedBy a rdfs:Property ;
+  rdfs:domain vfp:VendorPin ; rdfs:range vfp:Contract ;
+  rdfs:comment "A consumer-side check that would catch a bad re-vendor of this pin." .
+
+vfp:findingAbout a rdfs:Property ;
+  rdfs:domain vfp:Finding ; rdfs:range vfp:VendorPin .
+
+# ── Literal-valued properties ────────────────────────────────────────────────
+
+vfp:repoName a rdfs:Property ; rdfs:range xsd:string .
+vfp:repoUrl a rdfs:Property ; rdfs:range xsd:string .
+vfp:workspaceBound a rdfs:Property ; rdfs:range xsd:boolean ;
+  rdfs:comment "Whether the workspace manifest declares this repository at all." .
+
+vfp:artifactId a rdfs:Property ; rdfs:range xsd:string .
+vfp:artifactKind a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "npm-tarball | json-schema | rdf-ontology | source-port | derived-output" .
+vfp:version a rdfs:Property ; rdfs:range xsd:string .
+vfp:digest a rdfs:Property ; rdfs:range xsd:string .
+vfp:versionScheme a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "semver | digest | commit" .
+vfp:sourceCommit a rdfs:Property ; rdfs:range xsd:string .
+
+vfp:appPath a rdfs:Property ; rdfs:range xsd:string .
+vfp:artifactPath a rdfs:Property ; rdfs:range xsd:string .
+
+vfp:freshnessPolicy a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "pin-exact | track-minor | track-latest" .
+vfp:disposition a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "current | remediation-open | remediation-required | waived | observation-required" .
+vfp:freshnessState a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "current | stale | unknown. DERIVED — recomputed by the reasoner, never declared." .
+vfp:owner a rdfs:Property ; rdfs:range xsd:string .
+vfp:observedAt a rdfs:Property ; rdfs:range xsd:date .
+vfp:dueAt a rdfs:Property ; rdfs:range xsd:date .
+
+vfp:guardPath a rdfs:Property ; rdfs:range xsd:string .
+vfp:guardInvokedByCi a rdfs:Property ; rdfs:range xsd:boolean ;
+  rdfs:comment "False is a finding: a guard nobody calls is not a guard." .
+vfp:versionMarker a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "String that must be present INSIDE the packed artifact to prove the bytes are the claimed release." .
+
+vfp:contractKind a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "receipt-shape | schema | fsm" .
+vfp:receiptFixture a rdfs:Property ; rdfs:range xsd:string .
+
+# ── Derived properties (reasoner output) ─────────────────────────────────────
+
+vfp:gapSize a rdfs:Property ; rdfs:range xsd:integer ;
+  rdfs:comment "Number of supersededBy hops from the pinned artifact to the newest one." .
+vfp:blastRadius a rdfs:Property ; rdfs:range xsd:integer ;
+  rdfs:comment "Count of ConsumerApps a given release would touch." .
+vfp:crossesContract a rdfs:Property ; rdfs:range xsd:boolean ;
+  rdfs:comment "Whether any release in the gap changed a load-bearing contract." .
+vfp:findingClass a rdfs:Property ; rdfs:range xsd:string ;
+  rdfs:comment "STALE | DRIFT | UNDECLARED | GUARD-NOT-INVOKED | WORKSPACE-UNBOUND | OBSERVATION-STALE" .

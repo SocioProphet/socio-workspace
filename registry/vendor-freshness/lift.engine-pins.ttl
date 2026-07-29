@@ -1,0 +1,135 @@
+@prefix vfp: <https://socioprophet.org/ns/vendor-freshness#> .
+@prefix ex: <https://socioprophet.org/id/vendor-freshness/> .
+
+# Worked lift of the engine pins as they stand on 2026-07-29, from
+# registry/vendor-freshness.yaml. Hand-authored for this increment; the lift becomes
+# generated once the register feeds the graph.
+#
+# This fixture exists to make the three derived questions concrete enough to
+# implement. Every literal below was read off disk or out of git.
+
+# ── Repositories ─────────────────────────────────────────────────────────────
+
+ex:repo-hellgraph a vfp:Repository ;
+  vfp:repoName "SocioProphet/hellgraph" ;
+  vfp:repoUrl "https://github.com/SocioProphet/hellgraph" ;
+  vfp:workspaceBound true .
+
+ex:repo-prophet-platform a vfp:Repository ;
+  vfp:repoName "SocioProphet/prophet-platform" ;
+  vfp:repoUrl "https://github.com/SocioProphet/prophet-platform" ;
+  vfp:workspaceBound true .
+
+# ── Consumer apps — the unit of blast radius ─────────────────────────────────
+
+ex:app-hellgraph-service a vfp:ConsumerApp ;
+  vfp:appPath "apps/hellgraph-service" ;
+  vfp:hostedIn ex:repo-prophet-platform ;
+  vfp:vendors ex:artifact-engine-0-4-40 .
+
+ex:app-lifecycle-warden a vfp:ConsumerApp ;
+  vfp:appPath "apps/lifecycle-warden" ;
+  vfp:hostedIn ex:repo-prophet-platform ;
+  vfp:vendors ex:artifact-engine-0-4-40 .
+
+# ── Artifacts and the supersession chain ─────────────────────────────────────
+# Five hops from what production runs to what the engine has released.
+
+ex:artifact-engine-0-4-40 a vfp:Artifact ;
+  vfp:artifactId "socioprophet-hellgraph-0.4.40" ;
+  vfp:artifactKind "npm-tarball" ;
+  vfp:versionScheme "semver" ;
+  vfp:version "0.4.40" ;
+  vfp:digest "sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0" ;
+  vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-40 ;
+  vfp:supersededBy ex:artifact-engine-0-4-41 .
+
+ex:artifact-engine-0-4-41 a vfp:Artifact ;
+  vfp:version "0.4.41" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-41 ; vfp:supersededBy ex:artifact-engine-0-4-42 .
+
+ex:artifact-engine-0-4-42 a vfp:Artifact ;
+  vfp:version "0.4.42" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-42 ; vfp:supersededBy ex:artifact-engine-0-4-43 .
+
+ex:artifact-engine-0-4-43 a vfp:Artifact ;
+  vfp:version "0.4.43" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-43 ; vfp:supersededBy ex:artifact-engine-0-4-44 .
+
+ex:artifact-engine-0-4-44 a vfp:Artifact ;
+  vfp:version "0.4.44" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-44 ; vfp:supersededBy ex:artifact-engine-0-4-45 .
+
+ex:artifact-engine-0-4-45 a vfp:Artifact ;
+  vfp:artifactId "socioprophet-hellgraph-0.4.45" ;
+  vfp:artifactKind "npm-tarball" ;
+  vfp:versionScheme "semver" ;
+  vfp:version "0.4.45" ;
+  vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-45 ;
+  vfp:versionMarker "PROP_NS = \"prop:\"" .
+
+# ── Releases and the contracts they moved ────────────────────────────────────
+
+ex:release-0-4-40 a vfp:Release ; vfp:version "0.4.40" ; vfp:observedAt "2026-07-28"^^<http://www.w3.org/2001/XMLSchema#date> .
+ex:release-0-4-41 a vfp:Release ; vfp:version "0.4.41" .
+ex:release-0-4-42 a vfp:Release ; vfp:version "0.4.42" .
+
+ex:release-0-4-43 a vfp:Release ;
+  vfp:version "0.4.43" ;
+  vfp:changesContract ex:contract-enrich-receipt .
+
+ex:release-0-4-44 a vfp:Release ; vfp:version "0.4.44" .
+
+ex:release-0-4-45 a vfp:Release ;
+  vfp:version "0.4.45" ;
+  vfp:changesContract ex:contract-cypher-projection .
+
+ex:contract-enrich-receipt a vfp:Contract ;
+  vfp:contractKind "receipt-shape" ;
+  vfp:receiptFixture "apps/compute-gateway/tests/test_engine_seal.py" ;
+  vfp:digest "sha256:018f2febf0c76f91752ba9726c9a32a4a8d3ca03895a5d877b780c312d34cc71" .
+
+ex:contract-cypher-projection a vfp:Contract ;
+  vfp:contractKind "schema" .
+
+# ── Pins — reified, because each carries its own governance ──────────────────
+
+ex:pin-engine-hellgraph-service a vfp:VendorPin ;
+  vfp:pinFor ex:app-hellgraph-service ;
+  vfp:pinnedAt ex:artifact-engine-0-4-40 ;
+  vfp:artifactPath "apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz" ;
+  vfp:freshnessPolicy "track-minor" ;
+  vfp:disposition "remediation-open" ;
+  vfp:freshnessState "stale" ;
+  vfp:gapSize 5 ;
+  vfp:crossesContract true ;
+  vfp:owner "@mdheller" ;
+  vfp:guardPath "apps/hellgraph-service/scripts/check-engine-version.mjs" ;
+  vfp:guardInvokedByCi false ;
+  vfp:guardedBy ex:contract-enrich-receipt .
+
+ex:pin-engine-lifecycle-warden a vfp:VendorPin ;
+  vfp:pinFor ex:app-lifecycle-warden ;
+  vfp:pinnedAt ex:artifact-engine-0-4-40 ;
+  vfp:artifactPath "apps/lifecycle-warden/vendor/socioprophet-hellgraph-0.4.40.tgz" ;
+  vfp:freshnessPolicy "track-minor" ;
+  vfp:disposition "remediation-required" ;
+  vfp:freshnessState "stale" ;
+  vfp:gapSize 5 ;
+  vfp:crossesContract true ;
+  vfp:owner "@mdheller" ;
+  vfp:guardInvokedByCi false ;
+  vfp:dueAt "2026-09-30"^^<http://www.w3.org/2001/XMLSchema#date> .
+
+# ── Derived findings ─────────────────────────────────────────────────────────
+
+ex:finding-vfp-0001 a vfp:Finding ;
+  vfp:findingClass "STALE" ;
+  vfp:findingAbout ex:pin-engine-lifecycle-warden ;
+  vfp:blastRadius 2 .
+
+ex:finding-vfp-0002 a vfp:Finding ;
+  vfp:findingClass "GUARD-NOT-INVOKED" ;
+  vfp:findingAbout ex:pin-engine-hellgraph-service .

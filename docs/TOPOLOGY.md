@@ -51,6 +51,7 @@ This document records the active repository topology for the SocioProphet worksp
 - `tools/check_spine_canonical_sources_drift.py` validates broader active-spine canonical-source coverage.
 - `tools/check_runner_overlay_discovery.py` documents the current runner overlay consumption state.
 - `tools/check_runner_overlay_merge_order.py` validates intended manifest merge order for `workspace.toml`, committed `*.repos.toml` overlays, and local `overrides.toml`.
+- `tools/validate_vendor_freshness.py` validates the vendored-artifact register (`registry/vendor-freshness.yaml`): every repo it names must already be declared in the workspace manifest, every declared pin must agree with the bytes on disk, and no vendored artifact may go undeclared.
 
 ## Notes / archival
 
@@ -76,4 +77,31 @@ To bump a submodule pin, for example `third_party/tritrpc`:
 6. Open a PR linking to the upstream release/tag and the issue that motivated the bump.
 7. CI topology and active-spine checks verify the pin and governance surfaces.
 
-See also: [Naming and versioning policy](NAMING_VERSIONING.md).
+## Vendored artifacts
+
+A submodule pin is not the only way one repo holds another at a version. The estate
+also **vendors**: it copies a built artifact — a packed tarball, a schema file, an
+ontology — into a consumer repo, where the consumer's own dependency tooling cannot
+see it. A vendored copy only moves when a human re-vendors it. **Merging an upstream
+PR does not ship it.**
+
+This is the same object as a submodule pin, routed around rule 4 above, so it is
+governed here rather than left to each consumer:
+
+1. Every vendored artifact must have an entry in `registry/vendor-freshness.yaml`
+   naming its source repo, source ref, artifact path, consuming app, freshness policy
+   and owner. An artifact with no entry is a finding, not an omission.
+2. Repos named in that register must already be declared in `manifest/workspace.toml`,
+   `manifest/workspace.lock.json`, or a committed `manifest/*.repos.toml` overlay. A
+   repo that genuinely is not declared must record `workspace_binding: unbound` with
+   a reason.
+3. A pin that has fallen behind upstream may not be declared current. The validator
+   recomputes freshness and rejects a disposition that contradicts it.
+4. Re-vendoring follows the discipline in
+   [the vendor freshness plane](governance/vendor-freshness-plane.md) — in particular,
+   `npm pack` does not rebuild under `ignore-scripts=true`, so version markers must be
+   asserted **inside** the packed artifact, and golden sealed-receipt fixtures must be
+   verified byte-identical across the bump.
+
+See also: [Naming and versioning policy](NAMING_VERSIONING.md),
+[Vendor freshness plane](governance/vendor-freshness-plane.md).

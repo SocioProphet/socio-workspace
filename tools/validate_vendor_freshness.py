@@ -59,9 +59,15 @@ VOCAB = GRAPH_DIR / "vendor-freshness.ttl"
 
 REQUIRED_TOP = {"manifest_id", "status", "schema", "purpose", "policy", "coverage", "sources", "artifacts"}
 REQUIRED_SOURCE = {"source_id", "repo", "url", "artifact_kind", "version_scheme", "upstream_ref", "observed_at", "observation_method"}
-REQUIRED_ARTIFACT = {"artifact_id", "source_id", "consumer_repo", "consumer_url", "consumer_app", "freshness_policy", "owner", "disposition"}
+REQUIRED_ARTIFACT = {"artifact_id", "source_id", "consumer_repo", "consumer_url", "consumer_app", "freshness_policy", "owner", "disposition", "tier"}
 
 STATUS = {"seed", "active", "superseded"}
+# Tier grades the severity of UNVERIFIABILITY. It never grades the severity of
+# CONTRADICTION: a declared disposition that contradicts the recomputed state is an
+# error at every tier, always. Softening that would make the tier field a way to
+# opt out of the gate, which is the one thing it must not be.
+TIERS = {"foundation", "reference"}
+STRICTEST_FIRST = ["foundation", "reference"]
 ARTIFACT_KINDS = {"npm-tarball", "json-schema", "rdf-ontology", "source-port", "derived-output"}
 VERSION_SCHEMES = {"semver", "digest", "commit"}
 POLICIES = {"pin-exact", "track-minor", "track-latest"}
@@ -232,6 +238,14 @@ def check_shape(data: Any, errors: list[str]) -> tuple[dict[str, dict], list[dic
         if artifact.get("disposition") not in DISPOSITIONS:
             errors.append(f"{label} disposition must be one of {sorted(DISPOSITIONS)}")
 
+        tier = artifact.get("tier")
+        if tier not in TIERS:
+            errors.append(f"{label} tier must be one of {sorted(TIERS)}, got {tier!r}")
+        elif tier == "foundation" and not str(artifact.get("tier_reason") or "").strip():
+            # Foundation is the strict tier; claiming it without saying why is how a
+            # tier becomes a label rather than a decision.
+            errors.append(f"{label} tier foundation requires tier_reason")
+
         if not artifact.get("artifact_path") and not artifact.get("artifact_paths"):
             errors.append(f"{label} must declare artifact_path or artifact_paths")
         for entry in artifact.get("artifact_paths") or []:
@@ -364,19 +378,143 @@ def compute_state(artifact: dict, source: dict) -> tuple[str, str]:
     return "unknown", f"unsupported version_scheme {scheme!r}"
 
 
-def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict], today: date, errors: list[str], notes: list[str]) -> None:
-    max_age = data.get("policy", {}).get("observation_max_age_days")
-    if isinstance(max_age, int):
-        for source_id, source in sources.items():
-            observed = parse_date(source.get("observed_at"))
-            if observed is None:
+def source_tier(source_id: str, artifacts: list[dict]) -> str:
+    """A source inherits the STRICTEST tier of anything vendored from it.
+
+    An upstream feeding one foundation consumer and four reference ones is a
+    foundation upstream. Taking the loosest tier would let a reference copy set the
+    observation budget for the engine that answers production queries.
+    """
+    tiers = {a.get("tier") for a in artifacts if a.get("source_id") == source_id}
+    for candidate in STRICTEST_FIRST:
+        if candidate in tiers:
+            return candidate
+    return "reference"
+
+
+def check_release_chain(sources: dict[str, dict], artifacts: list[dict], errors: list[str], notes: list[str]) -> None:
+    """The supersession chain must actually be walkable from the register.
+
+    `gapSize` is the length of a vfp:supersededBy path, and blast-radius reasoning is
+    worth little without it. A source that names a latest version it does not list as
+    a release has a chain with a hole in it, and the derived questions silently answer
+    from a shorter chain than reality — which is a smaller number, in the reassuring
+    direction. So a hole is an error, not a note.
+    """
+    for source_id, source in sources.items():
+        if source.get("version_scheme") != "semver":
+            continue
+        releases = source.get("releases") or []
+        if not releases:
+            errors.append(
+                f"source {source_id!r} is semver and declares no releases:; the supersession chain "
+                "cannot be built, so staleness distance and contract-crossing risk cannot be derived "
+                "from this register. `make vendor-freshness-detect` populates it."
+            )
+            continue
+
+        known = {str(r.get("version")) for r in releases if isinstance(r, dict)}
+        latest = source.get("upstream_latest_version")
+        if latest and str(latest) not in known:
+            errors.append(
+                f"source {source_id!r} declares upstream_latest_version {latest} with no matching "
+                f"releases: entry — the chain does not reach its own head"
+            )
+        for artifact in artifacts:
+            if artifact.get("source_id") != source_id:
                 continue
-            age = (today - observed).days
-            if age > max_age:
+            vendored = artifact.get("vendored_version")
+            if vendored and str(vendored) not in known:
                 errors.append(
-                    f"source {source_id!r} observation is {age} days old (limit {max_age}); "
-                    "re-observe upstream — a stale observation makes every artifact from this source unverifiable"
+                    f"artifact {artifact.get('artifact_id')!r} pins {vendored}, which source "
+                    f"{source_id!r} does not list as a release — the chain has no anchor to walk from"
                 )
+
+        catalog = {c.get("contract_id") for c in source.get("contracts") or [] if isinstance(c, dict)}
+        contract_silent = []
+        for release in releases:
+            if not isinstance(release, dict):
+                errors.append(f"source {source_id!r} releases entries must be mappings")
+                continue
+            changes = release.get("changes_contract")
+            if not changes:
+                contract_silent.append(str(release.get("version")))
+                continue
+            for change in changes:
+                if not isinstance(change, dict):
+                    errors.append(f"source {source_id!r} release {release.get('version')} changes_contract entries must be mappings")
+                    continue
+                contract_id = change.get("contract_id")
+                if contract_id is None:
+                    if not change.get("kind"):
+                        errors.append(
+                            f"source {source_id!r} release {release.get('version')} declares a contract change "
+                            "with neither contract_id nor kind"
+                        )
+                    continue
+                if contract_id not in catalog:
+                    errors.append(
+                        f"source {source_id!r} release {release.get('version')} references unknown "
+                        f"contract_id {contract_id!r}; declare it under the source's contracts:"
+                    )
+        # Contract-silence is a legitimate, common state — most releases move nothing
+        # load-bearing — so it is reported, never failed. Failing it would push people
+        # to declare a contract change they had not actually checked for.
+        pending = [str(r.get("version")) for r in releases
+                   if isinstance(r, dict) and r.get("contract_review") == "pending"]
+        if pending:
+            notes.append(
+                f"CONTRACT-REVIEW-PENDING source {source_id!r}: {sorted(pending)} were appended by the "
+                "detector and nobody has said what they moved"
+            )
+        elif contract_silent:
+            notes.append(f"CONTRACT-SILENT source {source_id!r}: {sorted(contract_silent)}")
+
+
+def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict], today: date, errors: list[str], notes: list[str]) -> None:
+    policy = data.get("policy", {}) if isinstance(data.get("policy"), dict) else {}
+    default_max_age = policy.get("observation_max_age_days")
+    by_tier = policy.get("tier_observation_max_age_days") or {}
+
+    for source_id, source in sources.items():
+        tier = source_tier(source_id, artifacts)
+        max_age = by_tier.get(tier, default_max_age)
+        observable = upstream_is_observed(source)
+        gap = source.get("observation_gap") or {}
+
+        if not observable:
+            # Nobody can be late looking at something there is no way to look at. But
+            # you CAN be late building the way to look at it — so a foundation source
+            # the detector cannot observe must name the gap and a date to close it.
+            # Without this, `unknown` is a permanent, silent parking space, which is
+            # the exact state the estate was already in.
+            if tier == "foundation":
+                revisit = parse_date(gap.get("revisit_by"))
+                if not str(gap.get("reason") or "").strip() or revisit is None:
+                    errors.append(
+                        f"source {source_id!r} is tier foundation and its upstream is not observable "
+                        "(tools/detect_vendor_freshness.py cannot read it); declare observation_gap "
+                        "with a reason and a revisit_by date"
+                    )
+                elif revisit < today:
+                    errors.append(
+                        f"source {source_id!r} observation_gap revisit_by has passed ({revisit}, today {today}); "
+                        "either make the upstream observable or re-date the gap deliberately"
+                    )
+            else:
+                notes.append(f"UNOBSERVABLE source {source_id!r} [tier {tier}]: upstream state cannot be computed")
+            continue
+
+        observed = parse_date(source.get("observed_at"))
+        if observed is None or not isinstance(max_age, int):
+            continue
+        age = (today - observed).days
+        if age > max_age:
+            errors.append(
+                f"source {source_id!r} observation is {age} days old (tier {tier} limit {max_age}); "
+                "re-observe upstream — a stale observation makes every artifact from this source "
+                "unverifiable. `make vendor-freshness-detect` refreshes it."
+            )
 
     for artifact in artifacts:
         artifact_id = artifact.get("artifact_id")
@@ -410,15 +548,30 @@ def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict],
 
 # ── layer 4: on-disk reality and undeclared-artifact sweep ───────────────────
 
-def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: dict[str, Path], errors: list[str], notes: list[str]) -> None:
+def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: dict[str, Path],
+                  errors: list[str], notes: list[str], required: set[str] | None = None) -> None:
     repos = sorted({a.get("consumer_repo") for a in artifacts if a.get("consumer_repo")})
     roots: dict[str, Path] = {}
+    required = required or set()
     for repo in repos:
         root = resolve_repo_root(repo, overrides)
         if root is None:
-            notes.append(f"SKIPPED on-disk verification for {repo}: not materialized locally")
+            # SKIPPED is honest when nobody claimed the repo would be there. In CI it
+            # is not honest — the workflow materializes the consumers on purpose, and
+            # a checkout that silently failed would turn the whole on-disk layer into
+            # a no-op that still prints green. --require-disk closes that.
+            if repo in required or repo.split("/")[-1] in required:
+                errors.append(
+                    f"--require-disk names {repo} but it is not materialized; on-disk verification "
+                    "would have been skipped. Refusing to report a pass for bytes nobody read."
+                )
+            else:
+                notes.append(f"SKIPPED on-disk verification for {repo}: not materialized locally")
         else:
             roots[repo] = root
+    for name in sorted(required):
+        if not any(name in (repo, repo.split("/")[-1]) for repo in repos):
+            errors.append(f"--require-disk names {name!r}, which no artifact declares as a consumer_repo")
 
     declared_paths: dict[str, set[str]] = {repo: set() for repo in roots}
 
@@ -541,7 +694,8 @@ def check_vocabulary(errors: list[str], notes: list[str]) -> None:
 
 # ── entrypoint ───────────────────────────────────────────────────────────────
 
-def run(register_path: Path, overrides: dict[str, Path], today: date, skip_disk: bool) -> tuple[list[str], list[str], int]:
+def run(register_path: Path, overrides: dict[str, Path], today: date, skip_disk: bool,
+        required: set[str] | None = None) -> tuple[list[str], list[str], int]:
     errors: list[str] = []
     notes: list[str] = []
     try:
@@ -552,12 +706,17 @@ def run(register_path: Path, overrides: dict[str, Path], today: date, skip_disk:
     sources, artifacts = check_shape(data, errors)
     if not errors:
         check_workspace_binding(sources, artifacts, errors, notes)
+        check_release_chain(sources, artifacts, errors, notes)
         check_freshness(data if isinstance(data, dict) else {}, sources, artifacts, today, errors, notes)
         if register_path == REGISTER:
             # The graph vocabulary governs the committed register, not fixtures.
             check_vocabulary(errors, notes)
-        if not skip_disk:
-            check_on_disk(artifacts, sources, overrides, errors, notes)
+        if skip_disk:
+            if required:
+                errors.append("--skip-disk and --require-disk are contradictory; --require-disk exists to stop exactly this")
+            notes.append("SKIPPED on-disk verification entirely (--skip-disk)")
+        else:
+            check_on_disk(artifacts, sources, overrides, errors, notes, required)
     return errors, notes, len(artifacts)
 
 
@@ -567,6 +726,10 @@ def main() -> int:
     parser.add_argument("--repo-root", action="append", default=[], metavar="NAME=PATH",
                         help="Locate a consumer repo explicitly, e.g. prophet-platform=/path/to/repo")
     parser.add_argument("--skip-disk", action="store_true", help="Register checks only; skip on-disk verification.")
+    parser.add_argument("--require-disk", action="append", default=[], metavar="REPO",
+                        help="Fail if this consumer repo is not materialized, instead of reporting SKIPPED. "
+                             "Repeatable. This is what makes the CI gate fail-closed: a checkout that "
+                             "silently did not happen must not read as a pass.")
     parser.add_argument("--today", type=str, default=None, help="Override today's date (YYYY-MM-DD) for date-based checks.")
     args = parser.parse_args()
 
@@ -583,7 +746,7 @@ def main() -> int:
         print(f"ERROR: --today expects YYYY-MM-DD, got {args.today!r}", file=sys.stderr)
         return 1
 
-    errors, notes, count = run(args.register, overrides, today, args.skip_disk)
+    errors, notes, count = run(args.register, overrides, today, args.skip_disk, set(args.require_disk))
 
     for note in notes:
         print(f"NOTE: {note}")

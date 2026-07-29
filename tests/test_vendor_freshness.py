@@ -49,8 +49,12 @@ def test_committed_register_reports_the_engine_drift() -> None:
     assert "GUARD-NOT-INVOKED hellgraph-engine@lifecycle-warden" in result.stdout
 
 
-def test_positive_control_passes() -> None:
-    result = run(FIXTURES / "good-minimal.yaml", "--skip-disk")
+POSITIVE = ["good-minimal.yaml", "good-reference-observation-tolerated.yaml"]
+
+
+@pytest.mark.parametrize("filename", POSITIVE)
+def test_positive_control_passes(filename: str) -> None:
+    result = run(FIXTURES / filename, "--skip-disk")
     assert result.returncode == 0, result.stderr
 
 
@@ -67,6 +71,12 @@ NEGATIVE = [
     ("bad-unbound-source.yaml", "is not declared in manifest/workspace.toml"),
     ("bad-missing-fields.yaml", "missing required fields"),
     ("bad-enum-values.yaml", "must be one of"),
+    # ── W12.5: tier-based severity ──
+    ("bad-missing-tier.yaml", "missing required fields: ['tier']"),
+    ("bad-foundation-without-tier-reason.yaml", "tier foundation requires tier_reason"),
+    ("bad-foundation-observation-too-old.yaml", "tier foundation limit 30"),
+    ("bad-foundation-unobservable-without-gap.yaml", "declare observation_gap"),
+    ("bad-expired-observation-gap.yaml", "observation_gap revisit_by has passed"),
 ]
 
 
@@ -82,6 +92,85 @@ def test_every_bad_fixture_is_exercised() -> None:
     on_disk = {p.name for p in FIXTURES.glob("bad-*.yaml")}
     covered = {name for name, _ in NEGATIVE}
     assert on_disk == covered, f"unexercised fixtures: {sorted(on_disk - covered)}"
+
+
+def test_every_good_fixture_is_exercised() -> None:
+    """A positive control nobody runs proves nothing either."""
+    on_disk = {p.name for p in FIXTURES.glob("good-*.yaml")}
+    assert on_disk == set(POSITIVE), f"unexercised positive controls: {sorted(on_disk - set(POSITIVE))}"
+
+
+# ── tier changes the VERDICT, not just the wording ───────────────────────────
+
+def test_tier_decides_the_observation_budget() -> None:
+    """The tier pair is the whole claim of W12.5, so assert it as a pair.
+
+    Both fixtures carry the SAME 44-day-old observation. foundation (30) must fail
+    and reference (90) must pass. If they ever agree, tier has become decoration.
+    """
+    strict = run(FIXTURES / "bad-foundation-observation-too-old.yaml", "--skip-disk")
+    lenient = run(FIXTURES / "good-reference-observation-tolerated.yaml", "--skip-disk")
+    assert strict.returncode == 1, strict.stdout
+    assert "tier foundation limit 30" in strict.stderr
+    assert lenient.returncode == 0, lenient.stderr
+
+
+def test_tier_never_softens_a_contradiction() -> None:
+    """A disposition that contradicts the computed state fails at EVERY tier.
+
+    Tier grades unverifiability. If it could also grade contradiction it would be a
+    supported way to opt out of the gate, which is the one thing it must not be.
+    """
+    source = (FIXTURES / "bad-stale-declared-current.yaml").read_text(encoding="utf-8")
+    assert "tier: reference" in source
+    for tier in ("reference", "foundation"):
+        text = source.replace("tier: reference", f"tier: {tier}")
+        if tier == "foundation":
+            text = text.replace(f"tier: {tier}", f"tier: {tier}\n    tier_reason: fixture")
+        path = FIXTURES.parent / f"_tmp-tier-{tier}.yaml"
+        path.write_text(text, encoding="utf-8")
+        try:
+            result = run(path, "--skip-disk")
+            assert result.returncode == 1, f"tier {tier} let a contradiction through"
+            assert "computed freshness is 'stale'" in result.stderr
+        finally:
+            path.unlink()
+
+
+# ── fail-closed: an unverified repo must never read as verified ──────────────
+
+def test_require_disk_turns_skipped_into_failure(tmp_path: Path) -> None:
+    """--skip-disk is honest locally and dishonest in CI.
+
+    The workflow materializes the consumer repos on purpose. A checkout that
+    silently did not happen would make the whole on-disk layer a no-op that still
+    printed green, which is the failure class this plane exists for.
+    """
+    register = register_for("0.4.45", ENGINE_DIGEST, tmp_path)
+    lenient = run(register, "--repo-root=prophet-platform=/nonexistent-path")
+    assert lenient.returncode == 0
+    assert "SKIPPED on-disk verification" in lenient.stdout
+
+    strict = run(register, "--repo-root=prophet-platform=/nonexistent-path",
+                 "--require-disk", "prophet-platform")
+    assert strict.returncode == 1, strict.stdout
+    assert "Refusing to report a pass for bytes nobody read" in strict.stderr
+
+
+def test_require_disk_and_skip_disk_are_contradictory(tmp_path: Path) -> None:
+    register = register_for("0.4.45", ENGINE_DIGEST, tmp_path)
+    result = run(register, "--skip-disk", "--require-disk", "prophet-platform")
+    assert result.returncode == 1
+    assert "contradictory" in result.stderr
+
+
+def test_require_disk_rejects_an_unknown_repo(tmp_path: Path) -> None:
+    """Guarding a repo the register does not know about is a typo, not a guard."""
+    register = register_for("0.4.45", ENGINE_DIGEST, tmp_path)
+    result = run(register, "--repo-root=prophet-platform=/nonexistent",
+                 "--require-disk", "prophet-platfrom")
+    assert result.returncode == 1
+    assert "which no artifact declares as a consumer_repo" in result.stderr
 
 
 # ── on-disk drift, against a synthetic consumer repo ─────────────────────────
@@ -109,6 +198,12 @@ def register_for(root_version: str, digest: str, tmp_path: Path) -> Path:
         f"    vendored_digest: '{digest}'\n    owner: '@mdheller'",
     )
     if root_version != "0.4.45":
+        # The supersession chain must reach whatever this register pins, or the
+        # chain check fires and the test fails for a reason it is not about.
+        text = text.replace(
+            "      - version: '0.4.45'\n        ref: v0.4.45",
+            f"      - version: '0.4.45'\n        ref: v0.4.45\n"
+            f"      - version: '{root_version}'\n        ref: v{root_version}")
         text = text.replace("disposition: current", "disposition: remediation-required")
         text += "    remediation:\n      finding_id: VFP-TEST\n      due: '2026-12-31'\n"
     path = tmp_path / "register.yaml"

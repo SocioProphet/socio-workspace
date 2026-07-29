@@ -1,0 +1,42 @@
+# Fixture for tools/validate_vendor_freshness.py. Not a real register.
+manifest_id: vendor-freshness-fixture
+status: seed
+schema: registry/vendor-freshness.schema.yaml
+purpose: >-
+  A tier-foundation artifact whose upstream the detector cannot observe, with no
+  declared observation_gap. Nobody can be late looking at something there is no way
+  to look at — but you can be late BUILDING the way to look at it, and an
+  undeclared, undated `unknown` is a permanent parking space. That is precisely the
+  state prophet-platform was already in when five engine releases went missing.
+policy:
+  observation_max_age_days: 90
+  default_freshness_policy: track-minor
+  tier_observation_max_age_days:
+    foundation: 30
+    reference: 90
+coverage:
+  mechanically_scanned: [npm-tarball vendored under a consumer vendor/ directory]
+  declared_only: [json-schema copies]
+sources:
+  - source_id: opaque-schemas
+    repo: SocioProphet/prophet-platform
+    url: https://github.com/SocioProphet/prophet-platform
+    artifact_kind: json-schema
+    version_scheme: digest
+    upstream_ref: main
+    upstream_latest_digest: unknown
+    observed_at: '2026-07-29'
+    observation_method: fixture — never observed
+artifacts:
+  - artifact_id: opaque-schemas@compute-gateway
+    source_id: opaque-schemas
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/compute-gateway
+    artifact_path: apps/compute-gateway/src/compute_gateway/schemas/grant.schema.json
+    freshness_policy: track-latest
+    tier: foundation
+    tier_reason: >-
+      Fixture: policy contracts the gateway enforces.
+    owner: '@mdheller'
+    disposition: observation-required

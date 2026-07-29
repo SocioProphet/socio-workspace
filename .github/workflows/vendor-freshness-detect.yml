@@ -1,0 +1,137 @@
+# vendor-freshness-detect — the detector (W12.2).
+#
+# The register that W12.1 seeded records what upstream looked like when a human last
+# looked. This is the machine that looks, so that "a human last looked" stops being
+# the mechanism. It runs daily, and on demand when an upstream cuts a release.
+#
+# It does TWO things, and it is important that they are separate:
+#
+#  1. Refreshes the observation IN THIS REPO and opens a PR here. That PR is the
+#     anti-rot ratchet: policy.tier_observation_max_age_days gives foundation sources
+#     30 days, so if this job stops running, the vendor-freshness gate goes red on
+#     day 31 and says why. The automation cannot fail silently, because its silence
+#     IS the failure signal.
+#
+#  2. Emits one re-vendor PLAN per stale artifact — an EffectRequest carrying the
+#     whole evidence bundle — and publishes it as an artifact. The CONSUMER repo's
+#     executor picks it up and opens the re-vendor PR there.
+#
+# ── Why this workflow does not open the re-vendor PR itself ─────────────────────
+# It cannot, without a credential this estate has decided not to have. sociosphere's
+# GITHUB_TOKEN is scoped to sociosphere; opening a PR in prophet-platform needs a
+# cross-repo PAT or a GitHub App installation token. Both are new long-lived secrets.
+# So the direction is inverted: the consumer PULLS the plan and opens the PR with its
+# OWN token, in its own CI, against its own test suite. See
+# prophet-platform/.github/workflows/revendor-vendored-artifact.yml.
+#
+# That is not a workaround. The re-vendor work — build, pack, assert the marker
+# inside the dist, move the floor, run the suite, verify the sealed receipts — has to
+# happen in the consumer's toolchain anyway. A cross-repo token would have bought the
+# ability to push a branch, not the ability to verify it.
+name: vendor-freshness-detect
+
+on:
+  schedule:
+    # Daily, early UTC. Frequency is a floor on how long a release can be invisible;
+    # 24h against the five-release, multi-week gap this replaces.
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+    inputs:
+      open_pr:
+        description: 'Open the register-refresh PR (off = observe and report only)'
+        type: boolean
+        default: true
+  repository_dispatch:
+    # An upstream that has just cut a release can trigger this directly rather than
+    # waiting for the next cron. Contract: {"event_type": "upstream-release",
+    # "client_payload": {"source_id": "hellgraph-engine", "version": "0.4.46"}}.
+    # The emitter side lives in the upstream repo and is NOT shipped here — hellgraph
+    # is a different lane. Until it exists, the schedule is what closes the gap, and
+    # this trigger is dispatchable by hand today.
+    types: [upstream-release]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vendor-freshness-detect
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # push the register-refresh branch
+      pull-requests: write   # open the PR for it
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install pyyaml
+
+      # git ls-remote against public HTTPS URLs. That is the entire network surface:
+      # no API token, no registry credential, no new secret.
+      - name: Observe upstream and recompute
+        id: detect
+        run: |
+          set -euo pipefail
+          python3 tools/detect_vendor_freshness.py \
+            --write-register \
+            --propose-disposition \
+            --emit-plans plans \
+            --observations-out plans/observations.json \
+            --summary detect-summary.md \
+            ${{ github.event.client_payload.source_id && format('--source {0}', github.event.client_payload.source_id) || '' }} \
+            | tee detect.log
+          echo "plans=$(find plans -name '*.json' ! -name observations.json | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          if git diff --quiet -- registry/vendor-freshness.yaml; then
+            echo "register_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "register_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The refreshed register must pass the gate before it is proposed. Proposing a
+      # change that fails the gate would hand a human a red build to repair by hand,
+      # which is the labour this whole plane exists to delete.
+      - name: The refreshed register must pass its own gate
+        run: python3 tools/validate_vendor_freshness.py --skip-disk
+
+      - name: Publish summary
+        run: cat detect-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      # The plans are the interface to the consumer repos. Retained long enough for a
+      # consumer's scheduled run to pick one up without depending on timing.
+      - name: Upload re-vendor plans
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor-revendor-plans
+          path: plans/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Open the register-refresh PR
+        if: steps.detect.outputs.register_changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.open_pr)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="vendor-freshness/observe-$(date -u +%Y%m%d)"
+          git config user.name "vendor-freshness-detect[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # One branch per day, force-updated: a re-run must converge on the same PR
+          # rather than opening a second one for the same observation.
+          git checkout -B "$BRANCH"
+          git add registry/vendor-freshness.yaml
+          git commit -m "vendor-freshness: refresh upstream observation $(date -u +%Y-%m-%d)"
+          git push --force origin "$BRANCH"
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')" ]; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "vendor-freshness: refresh upstream observation ($(date -u +%Y-%m-%d))" \
+              --body-file detect-summary.md
+          else
+            gh pr edit "$BRANCH" --body-file detect-summary.md
+          fi

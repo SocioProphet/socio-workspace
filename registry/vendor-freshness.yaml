@@ -154,21 +154,24 @@ artifacts:
 
   # ── The engine: two copies, same tarball, different fates ──
   - artifact_id: hellgraph-engine@hellgraph-service
+    tier: foundation  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
+    tier_reason: >-
+      The graph engine THE spine runs on; a stale copy shipped a silent-wrong Cypher projection to production.
     source_id: hellgraph-engine
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
     consumer_app: apps/hellgraph-service
-    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz
-    vendored_version: 0.4.40
-    vendored_digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.45.tgz
+    vendored_version: 0.4.45
+    vendored_digest: 'sha256:be6d645e75b8d00215398c3a46f4cd41c9a5710f6bc95f3b05c4a107b36cbe15'
     freshness_policy: track-minor
     owner: '@mdheller'
-    disposition: remediation-open
+    disposition: current
     declared_in:
       - path: apps/hellgraph-service/package.json
-        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.40.tgz'
+        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.45.tgz'
       - path: apps/hellgraph-service/package-lock.json
-        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.40.tgz (two occurrences)'
+        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.45.tgz (two occurrences)'
       - path: apps/hellgraph-service/scripts/check-engine-version.mjs
         note: "MIN_ENGINE = '0.4.40' — the floor and the tarball must move together"
       - path: apps/compute-gateway/src/compute_gateway/engine_receipts.py
@@ -181,7 +184,7 @@ artifacts:
       path: apps/hellgraph-service/scripts/check-engine-version.mjs
       floor_constant: MIN_ENGINE
       floor_value: 0.4.40
-      invoked_by_ci: false
+      invoked_by_ci: true          # via `make engine-guards` in the validate-target-diagnostics matrix (feeds the required diagnostics-gate)
     version_marker:
       marker: 'PROP_NS = "prop:"'
       present_in: 0.4.45
@@ -198,13 +201,14 @@ artifacts:
       - path: apps/compute-gateway/tests/test_engine_seal.py
         digest: 'sha256:35a9df2dd74a25fcbb966a41d2949cd7646912d743aeec730a36fa1a1d3a00af'
         note: 'EXPLORE_JSON golden, same snapshot'
-    remediation:
-      pull_request: https://github.com/SocioProphet/prophet-platform/pull/1030
-      target_version: 0.4.45
+    resolved:
+      finding_id: VFP-0001
+      resolved_on: '2026-07-29'
       note: >-
-        Open, not merged. Moves the tarball 0.4.40 -> 0.4.45 and MIN_ENGINE with it,
-        deletes the old tarball, and reports 81/81 tests green. Until it merges,
-        production still answers from 0.4.40.
+        Closed. prophet-platform #1032 vendored 0.4.45 here and #1030 did the same for
+        hellgraph-service, so both copies are on one release again. The guard this entry
+        recorded as absent now exists AND runs: `make engine-guards` is in the
+        validate-target-diagnostics matrix that feeds the required diagnostics-gate.
     findings:
       - >-
         Five releases invisible in production. 0.4.45 fixed a silent-wrong Cypher
@@ -219,37 +223,39 @@ artifacts:
         is additionally warn-only by construction.
 
   - artifact_id: hellgraph-engine@lifecycle-warden
+    tier: foundation  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
+    tier_reason: >-
+      Executes L5 retention and legal-hold; if its engine drifts, governance decisions are made on different semantics than the rest of the estate.
     source_id: hellgraph-engine
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
     consumer_app: apps/lifecycle-warden
-    artifact_path: apps/lifecycle-warden/vendor/socioprophet-hellgraph-0.4.40.tgz
-    vendored_version: 0.4.40
-    vendored_digest: 'sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0'
+    artifact_path: apps/lifecycle-warden/vendor/socioprophet-hellgraph-0.4.45.tgz
+    vendored_version: 0.4.45
+    vendored_digest: 'sha256:be6d645e75b8d00215398c3a46f4cd41c9a5710f6bc95f3b05c4a107b36cbe15'
     freshness_policy: track-minor
     owner: '@mdheller'
-    disposition: remediation-required
+    disposition: current
     declared_in:
       - path: apps/lifecycle-warden/package.json
-        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.40.tgz'
+        note: 'dependencies["@socioprophet/hellgraph"] = file:vendor/socioprophet-hellgraph-0.4.45.tgz'
       - path: apps/lifecycle-warden/package-lock.json
-        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.40.tgz (two occurrences)'
+        note: 'resolved = file:vendor/socioprophet-hellgraph-0.4.45.tgz (two occurrences)'
     guard:
-      path: null
-      invoked_by_ci: false
+      path: apps/lifecycle-warden/scripts/check-engine-version.mjs
+      invoked_by_ci: true          # via `make engine-guards` in the validate-target-diagnostics matrix (feeds the required diagnostics-gate)
     version_marker:
       marker: 'PROP_NS = "prop:"'
       present_in: 0.4.45
       absent_in: 0.4.40
-    remediation:
+    resolved:
       finding_id: VFP-0001
-      target_version: 0.4.45
-      due: '2026-09-30'
+      resolved_on: '2026-07-29'
       note: >-
-        No PR. Explicitly out of scope of PR #1030, which says so in its own body.
-        This copy is byte-identical to the hellgraph-service one and equally stale,
-        and it is the reason this register exists: the second copy was never noticed
-        because nothing enumerated the first.
+        Closed. prophet-platform #1032 vendored 0.4.45 here and #1030 did the same for
+        hellgraph-service, so both copies are on one release again. The guard this entry
+        recorded as absent now exists AND runs: `make engine-guards` is in the
+        validate-target-diagnostics matrix that feeds the required diagnostics-gate.
     findings:
       - >-
         Second, separate copy of the same tarball. Same bytes
@@ -259,6 +265,9 @@ artifacts:
 
   # ── sourceos-spec schema copies ──
   - artifact_id: sourceos-spec-schemas@market-replay
+    tier: foundation  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
+    tier_reason: >-
+      The MarketDataEvent contract every emitted event is validated against before it reaches the log.
     source_id: sourceos-spec-schemas
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -289,6 +298,9 @@ artifacts:
         (Python and TypeScript), nothing reconciling them.
 
   - artifact_id: sourceos-spec-schemas@hellgraph-service
+    tier: foundation  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
+    tier_reason: >-
+      The membrane validates EffectRequest/OrderIntent/ExecutionReport against these; drift silently changes what the B-after-A gate admits.
     source_id: sourceos-spec-schemas
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -322,6 +334,7 @@ artifacts:
 
   # ── Ontology copies ──
   - artifact_id: kbpedia-kko@hellgraph
+    tier: reference  # not a deployed ArgoCD service; reference is the honest default
     source_id: kbpedia-kko
     consumer_repo: SocioProphet/hellgraph
     consumer_url: https://github.com/SocioProphet/hellgraph
@@ -348,6 +361,7 @@ artifacts:
         the shape the other entries should be held to.
 
   - artifact_id: kbpedia-kko@owl-reasoner
+    tier: reference  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
     source_id: kbpedia-kko
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -371,6 +385,9 @@ artifacts:
         either one.
 
   - artifact_id: kbpedia-reference-concepts@hellgraph-service
+    tier: foundation  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
+    tier_reason: >-
+      The 55k-concept ABox under KKO; enrich coherence and semantic typing resolve against it, so a drifted copy changes answers rather than failing.
     source_id: kbpedia-reference-concepts
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -395,6 +412,7 @@ artifacts:
 
   # ── Derived output and source ports ──
   - artifact_id: ontogenesis-ontology-index@lattice-studio
+    tier: reference  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
     source_id: ontogenesis-ontology-index
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -420,6 +438,7 @@ artifacts:
         workspace copy rather than an assumed home directory.
 
   - artifact_id: tritrpc-go-bindings@tritrpcbridge
+    tier: reference  # not a deployed ArgoCD service; reference is the honest default
     source_id: tritrpc-go-bindings
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -441,6 +460,7 @@ artifacts:
         mechanism it constrains.
 
   - artifact_id: regis-entity-graph-schemas@regis-acr-api
+    tier: reference  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
     source_id: regis-entity-graph-schemas
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
@@ -469,6 +489,9 @@ artifacts:
         the only record of what these bytes are.
 
   - artifact_id: mcp-a2a-zero-trust-kernel-schemas@compute-gateway
+    tier: foundation  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
+    tier_reason: >-
+      The receipt and attestation shapes the whole proof chain is validated against.
     source_id: mcp-a2a-zero-trust-kernel-schemas
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform

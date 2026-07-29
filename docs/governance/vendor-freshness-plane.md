@@ -1,4 +1,4 @@
-# Vendor freshness plane (W12, increment 1)
+# Vendor freshness plane (W12)
 
 ## The failure this exists for
 
@@ -308,12 +308,219 @@ Ten negative vectors in `fixtures/vendor-freshness/`, each executed by
 test asserting that no fixture sits in the directory unrun, because a written-but-never-executed
 fixture is the same failure class as a never-invoked guard.
 
-## Not in this increment
+## Not in increment 1
 
-- No network calls. `upstream_latest_*` is recorded with an `observed_at` and an
-  `observation_method`, and ages out. Automated observation is increment 2.
 - No lift generator. `lift.engine-pins.ttl` is hand-authored from the register.
-- No `EffectRequest` emission. The mapping above is specified, not implemented.
 - No SHACL shapes for `vfp:` (the `nrg:` sibling has them).
 - The `lifecycle-warden` bump itself — filed as `VFP-0001`, due 2026-09-30, which the
   validator will begin failing on.
+
+---
+
+# Increment 2 — the detector (W12.2)
+
+Increment 1 recorded what upstream looked like **when a human last looked**. This is
+the machine that looks, so that "a human last looked" stops being the mechanism.
+
+`tools/detect_vendor_freshness.py`, `make vendor-freshness-detect`,
+`.github/workflows/vendor-freshness-detect.yml` (daily, plus `repository_dispatch:
+upstream-release`, plus manual).
+
+## Observe → recompute → emit
+
+**Observe.** `git ls-remote` against a public HTTPS URL. That is the entire network
+surface: no API token, no registry credential, no new secret.
+
+> **Argument order is load-bearing.** Flags precede the URL; ref patterns follow it.
+> `git ls-remote main <url>` treats `main` as the repository and fails with
+> *"'main' does not appear to be a git repository"* — a message that reads like a
+> permissions problem and is not one. It silently made three sources look unreachable
+> on the first run.
+
+> **Do not pass `--refs`.** An annotated tag's own sha is the sha of the tag OBJECT,
+> and `--refs` suppresses exactly the `^{}` peeled lines that reveal the commit.
+> hellgraph mixes annotated and lightweight tags, so both forms must be handled.
+
+**Recompute.** By importing `compute_state` from the validator — not by computing the
+same answer, but by calling the same function object, which
+`test_detector_uses_the_gates_definition_of_stale` asserts. A detector with its own
+opinion of staleness is a second register, and two registers disagreeing is how the
+first stops being believed.
+
+**Emit.** One `EffectRequest` per stale artifact, in the shape § *Emitting an
+EffectRequest* specifies, whose `parameters` carry the evidence rather than a diff
+summary: gap size and the releases in it, blast radius over consumer APPS, contract
+crossings with the Contract node each one moved, the discriminating version marker,
+the golden receipt fixtures that must survive, the guard floor that moves with the
+tarball, and every file that names the pin.
+
+## What the first real run found
+
+Three things nobody knew, produced by the detector on its first execution:
+
+1. **`sourceos-spec` had moved.** Both consumers were behind
+   (`487e4b61` and `7d74db81` vs head `f656559c`). The register said
+   `observation-required` because nobody had ever looked.
+2. **`ontogenesis` was actually current.** `e791402` IS upstream head — good news that
+   was previously unverifiable.
+3. **`v0.4.42` is a duplicate tag, not a release.** `v0.4.41` and `v0.4.42` point at
+   the same commit, whose `package.json` says `0.4.41`. Anyone pinning `v0.4.42` gets
+   `0.4.41` bytes. The 0.4.40 → 0.4.45 gap is **five tags but four distinct
+   releases**, and the peer-index rewrite ships in `0.4.43`, which
+   `git tag --contains 92401f6` settles and the commit subjects (which say "0.4.42")
+   do not.
+
+The detector now computes `tag_aliases` from the ls-remote output it already has, and
+drops alias duplicates from every gap count.
+
+## The detector maintains the register
+
+- **Observation fields** are rewritten in place, line-surgically. Never through a YAML
+  dumper: the register's comments carry its findings and a round-trip would delete
+  every one. `observation_method` becomes machine-owned once the detector runs; the
+  human prose it replaces was findings, and findings belong on artifacts — all three
+  displaced notes were already duplicated there, which was checked before replacing
+  them.
+- **`releases:`** gains newly observed tags, so the supersession chain stays current
+  as a side effect of polling rather than as a chore. Appended entries carry
+  `contract_review: pending` and **no `changes_contract`**: what a release moved is a
+  judgement about behaviour, and a detector that guessed it from the version number
+  would manufacture exactly the false assurance this plane removes. 0.4.45 was a
+  *patch* bump and it changed what a Cypher query answers.
+- **`disposition`** — with `--propose-disposition`, when an observation makes a
+  declared position false the detector files the weakest defensible disposition for
+  the computed state, with a `finding_id` and a tier-derived `due` date. It never
+  overwrites a disposition that already agrees: a human's `remediation-open` naming a
+  real PR stands. Without this, every refresh would hand a human a red build to repair
+  by hand — the labour this exists to delete.
+
+## Why the detector does not open the re-vendor PR
+
+It cannot, without a credential this estate has decided not to have. sociosphere's
+`GITHUB_TOKEN` is scoped to sociosphere; opening a PR in `prophet-platform` needs a
+cross-repo PAT or a GitHub App installation token, both new long-lived secrets.
+
+So the direction is inverted. The **consumer pulls**:
+`prophet-platform/.github/workflows/revendor-vendored-artifact.yml` clones this repo
+(public — anonymous, no token), runs the detector filtered to its own artifacts, and
+opens the PR with its own `GITHUB_TOKEN`.
+
+That is not a workaround for a missing credential. The re-vendor work is a build, a
+pack, a lockfile and a test suite, all of which are the consumer's toolchain. A
+cross-repo token would have bought the ability to push a branch, not the ability to
+verify it — and an unverified re-vendor is the thing being replaced.
+
+The `detect` job there runs another repo's code, so it holds **no write permissions**
+and hands the writing job nothing but JSON. The job that can push a branch never
+executes foreign code.
+
+## What the executor proves, beyond the merged discipline
+
+`tools/revendor/revendor.mjs` in the consumer repo performs every step of
+§ *Re-vendor discipline* and fails the job on any of them. Two additions:
+
+**The marker must DISCRIMINATE.** Asserting the marker is present in the new tarball
+is half a check. The executor also asserts it is **absent from the outgoing one**, and
+fails if it is in both — naming `graph:labels` as the reason. Verified against the
+real bytes: `PROP_NS = "prop:"` absent in 0.4.40, present in 0.4.45; `graph:labels`
+present in both. Read with `fs.readFileSync`; `file(1)` reports that bundle as `data`,
+which is precisely why grep must not be used on it.
+
+**The golden receipts, stated exactly.** `test_engine_seal.py`'s fixtures are **frozen
+string constants** — that test never spawns node, never reads `vendor/*.tgz`, and
+never invokes the engine. Running it green across a bump therefore says *nothing* about
+the new engine, and reporting it as "golden receipts verified" would be a false
+assurance of the exact kind this plane deletes. What the executor checks is that the
+committed digests are byte-identical before and after, so a re-vendor cannot quietly
+regenerate them. What remains uncovered — whether the NEW engine still emits those
+bytes — is stated in the PR body rather than left implied. The coupling is real:
+`engine_receipts.py` pins the key order to "the vendored 0.4.40 dist" and refuses
+unknown keys, so a release that adds a field becomes a 422 in production while that
+test stays green.
+
+---
+
+# Increment 5 — the fail-closed gate (W12.5)
+
+## Before and after
+
+**Before.** `.github/workflows/vendor-freshness.yml` ran the validator with the
+consumer repos absent, so layer 4 reported `SKIPPED` for all eleven artifacts and the
+job went green **having read no vendored bytes at all**. The register was checked
+against itself. A drifted digest, a deleted tarball, or an UNDECLARED second copy
+appearing — the `lifecycle-warden` case exactly — were all invisible.
+
+**After.** Both consumer repos are cloned (public, anonymous, no token) and
+`--require-disk` names them, so a checkout that silently did not happen is an ERROR
+rather than a `SKIPPED` that still prints green. `--skip-disk` together with
+`--require-disk` is rejected as contradictory. The job additionally **proves the gate
+still fails**, by running it against a known-bad fixture and against a missing repo
+and failing if either is accepted — a gate nobody has watched fail is a gate nobody
+knows is wired up, which is the same class of finding as `check:engine`.
+
+## Tier
+
+`tier: foundation | reference` on every artifact, required.
+
+**Tier grades the severity of UNVERIFIABILITY. It never grades CONTRADICTION.** A
+declared disposition that contradicts the recomputed state fails at every tier,
+always; `test_tier_never_softens_a_contradiction` asserts it for both. If tier could
+soften that, it would be a supported way to opt out of the gate.
+
+| | foundation | reference |
+|---|---|---|
+| observation budget | 30 days | 90 days |
+| upstream the detector cannot observe | ERROR unless `observation_gap {reason, revisit_by}` | NOTE |
+| expired `observation_gap.revisit_by` | ERROR | — |
+| contradiction | ERROR | ERROR |
+
+A source inherits the **strictest** tier of anything vendored from it. The clock runs
+only against sources that ARE observable: you cannot be late looking at something
+there is no way to look at, but you can be late building the way to look at it, and
+`revisit_by` is that ratchet.
+
+The pair `bad-foundation-observation-too-old.yaml` /
+`good-reference-observation-tolerated.yaml` carry the same 44-day-old observation and
+differ only in tier — one must fail, one must pass. If they ever agree, the tier has
+stopped meaning anything.
+
+**The 30-day foundation budget is what makes the detector non-optional.** Stop running
+it and this repo goes red on day 31 and says why. The automation cannot fail silently,
+because its silence *is* the failure signal.
+
+## The release chain must be walkable
+
+`gapSize` is the length of a `vfp:supersededBy` path. A semver source that declares no
+`releases:`, or declares a latest version it does not list, or is pinned at a version
+it does not list, has a chain with a hole — and a hole makes the derived questions
+answer from a *shorter* path, which is a smaller number in the reassuring direction.
+So it is an error, not a note. Contract-silence is the opposite: common, legitimate,
+and reported only.
+
+## Making the gate block
+
+The workflow fails the run. Making it a **required status check** on `main` is a
+repository-ruleset change, not a workflow change, and a required context that does not
+yet exist on `main` blocks every open PR in the repo the moment it is added. It must
+therefore be added AFTER this workflow is on `main`:
+
+```
+gh api -X POST repos/SocioProphet/sociosphere/rulesets ... \
+  required_status_checks: [{ context: "vendor-freshness" }]
+```
+
+sociosphere currently has exactly one ruleset (Copilot review) and no required status
+checks at all, so this is a deliberate, separate decision — not something to smuggle
+in with a feature PR.
+
+---
+
+# Increment 3 — the sovereign path (W12.3)
+
+See `docs/governance/vendor-freshness-sovereign-path.md`. In short: the OCI publish
+path is **REAL** (exercised end to end against zot v2.1.2 — push, pull by digest,
+byte-identical round trip, 404 on an unknown digest, idempotent re-push, with a
+pure-curl reimplementation producing the identical manifest digest), and publishing to
+`registry.socioprophet.ai` is **SPEC ONLY** because it needs the `ci` credential and
+this work adds no secrets. The gitea webhook contract and the consumer-side digest
+consumption are specified and explicitly undecided, and said so.

@@ -22,6 +22,11 @@ sources:
     upstream_latest_ref: v0.4.45
     observed_at: '2026-07-01'
     observation_method: fixture
+    releases:
+      - version: '0.4.40'
+        ref: v0.4.40
+      - version: '0.4.45'
+        ref: v0.4.45
 artifacts:
   - artifact_id: hellgraph-engine@hellgraph-service
     source_id: hellgraph-engine
@@ -31,5 +36,6 @@ artifacts:
     artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz
     vendored_version: 0.4.40
     freshness_policy: pin-exact
+    tier: reference
     owner: '@mdheller'
     disposition: current

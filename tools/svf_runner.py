@@ -65,7 +65,13 @@ def utc_now() -> str:
     # wall-clock time, so production receipts still record when they actually ran.
     epoch = os.environ.get("SVF_SOURCE_DATE_EPOCH")
     if epoch:
-        moment = dt.datetime.fromtimestamp(int(epoch), dt.timezone.utc)
+        try:
+            seconds = int(epoch)
+        except ValueError:
+            raise ValueError(
+                f"SVF_SOURCE_DATE_EPOCH must be an integer Unix epoch in seconds; got {epoch!r}"
+            ) from None
+        moment = dt.datetime.fromtimestamp(seconds, dt.timezone.utc)
     else:
         moment = dt.datetime.now(dt.timezone.utc)
     return moment.replace(microsecond=0).isoformat().replace("+00:00", "Z")

@@ -8,6 +8,114 @@ purpose: >-
   standard, protocol, migration ledger, and cross-repo orchestration map. Downstream
   repositories own their implementation surfaces.
 
+# READ THIS BEFORE USING THIS FILE TO REASON ABOUT ESTATE COVERAGE.
+#
+# `canonical_namespaces` records INTENT — who is assigned a surface. It is NOT a
+# delivery record. Every namespace additionally carries `implementation_status`,
+# which records VERIFIED delivery: what a filesystem walk of the named repo
+# actually found on `verified_on`.
+#
+# The distinction is load-bearing. A 2026-07-29 audit walked all nine named owner
+# repos: eight contained ZERO trace of this standard (no LOGFALL, COGBIAS, CTEST,
+# or epistemic-governance path), and the one repo that does implement the
+# detectors and reasoner — Noetica — was not named here at all. Read as a
+# delivery record, this file was actively misleading about estate coverage.
+#
+# `unimplemented` is the honest default. Do not promote a namespace to
+# `implemented` or `partial` without listing concrete evidence paths;
+# tools/validate_epistemic_governance_registry.py enforces that, and enforces
+# that `unimplemented` claims no evidence.
+
+implementation_status:
+  verified_on: "2026-07-29"
+  verified_by: filesystem walk of each named repo for LOGFALL / COGBIAS / CTEST /
+    epistemic-governance markers across code, schema, and doc extensions
+  namespaces:
+    standards/epistemic-governance:
+      status: implemented
+      evidence:
+        - standards/epistemic-governance/detector-countertest-map.yaml
+        - standards/epistemic-governance/README.md
+      note: ruleset_semver 1.3.0, status draft. Standard text exists; it is the
+        implementations that diverge from it.
+
+    protocol/epistemic-governance/v1:
+      status: partial
+      evidence:
+        - protocol/epistemic-governance/v1/topic-catalog.v1.yaml
+      note: 21 topics declared. The catalog states CloudEvents schemas are
+        deferred to the schema pack, and no producer or consumer exists for any
+        topic — the bus itself is unbuilt.
+
+    policy/epistemic-intervention:
+      status: unimplemented
+      evidence: []
+      note: policy-fabric contains no epistemic-governance marker of any kind.
+
+    execution/epistemic-detectors:
+      status: partial
+      evidence:
+        - "agentplane: schemas/hygiene-run-artifact.schema.json"
+        - "agentplane: schemas/countertest-run-artifact.schema.json"
+        - "agentplane: tools/validate_epigov_artifacts.py"
+        - "agentplane: bundles/epigov-hygiene-detector-smoke/"
+        - "agentplane: bundles/epigov-countertest-smoke/"
+      note: schema validation of hand-written example artifacts, wired into
+        agentplane's aggregate validate target. No producer emits these
+        artifacts; no counter-test runner exists.
+
+    sourceos/discourse-events:
+      status: unimplemented
+      evidence: []
+      note: sourceos-syncd contains no epistemic-governance marker. Its "repair"
+        code is SourceOS lifecycle repair, unrelated to this standard.
+
+    identity/reasoning-calibration:
+      status: unimplemented
+      evidence: []
+      note: neither HolographMe nor human-digital-twin contains any marker.
+        "Reasoning Calibration Passport" has no referent in code estate-wide.
+
+    delivery/epistemic-metrics:
+      status: unimplemented
+      evidence: []
+      note: delivery-excellence contains no marker.
+
+    ontology/epistemic-governance:
+      status: unimplemented
+      evidence: []
+      note: ontogenesis contains no marker. Its glossary work is a SKOS physics
+        glossary, unrelated to detector or counter-test vocabulary.
+
+    ui/epistemic-governance:
+      status: unimplemented
+      evidence: []
+      note: socioprophet contains no marker. No hygiene-flag or repair-suggestion
+        surface exists.
+
+    trust/epistemic-authority:
+      status: unimplemented
+      evidence: []
+      note: mcp-a2a-zero-trust contains no marker.
+
+    reasoning/epistemic-detectors:
+      status: partial
+      evidence:
+        - "Noetica: agent-machine/lib/debate-detectors.ts"
+        - "Noetica: agent-machine/lib/reasoner.ts"
+        - "Noetica: agent-machine/lib/mln.ts"
+        - "Noetica: agent-machine/lib/debate-calibrate.ts"
+      note: >-
+        The actual detector and reasoner implementation, previously absent from
+        this registry. 16 deterministic detectors, MLN severity composition, and
+        detector calibration — all tested and in CI. It is PARTIAL because it
+        implements a DIFFERENT id namespace from the standard above
+        (RULESET_SEMVER 0.1.0 with LOGFALL.ADHOMINEM.V1, versus the ruleset's
+        1.3.0 with LOGFALL.ADHOM.V2), and because the counter-tests the ruleset
+        makes mandatory for warn/block have no runners. Noetica PR #570 added the
+        gate that refuses to assert warn/block without a confirmed counter-test,
+        so the divergence now produces visible downgrades instead of silent ones.
+
 canonical_namespaces:
   standards/epistemic-governance:
     canonical_repo: sociosphere
@@ -120,6 +228,9 @@ mvs1:
     - one AgentPlane replay bundle
     - one SourceOS event-store write
 
+# These gates concern the CONTROL-PLANE artifacts this repo owns. They are
+# document-existence gates and say nothing about downstream implementation —
+# see implementation_status for that.
 release_gates:
   - standard anchor exists
   - topic catalog exists
@@ -128,3 +239,12 @@ release_gates:
   - migration ledger exists
   - estate ownership map exists
   - follow-up issues created for downstream repos
+
+# Gates that would indicate the standard is actually ENFORCED anywhere. None of
+# these is met today; they are listed so the gap is explicit rather than implied
+# by the satisfied document gates above.
+enforcement_gates_not_met:
+  - a counter-test runner exists for any CTEST in the detector map
+  - a producer emits hygiene-run or countertest-run artifacts
+  - any declared topic has a producer and a consumer
+  - the ruleset id namespace and the implemented detector id namespace agree

@@ -1,0 +1,31 @@
+name: Epistemic Governance Registry
+
+on:
+  pull_request:
+    paths:
+      - "registry/epistemic-governance.yaml"
+      - "tools/validate_epistemic_governance_registry.py"
+      - ".github/workflows/epistemic-governance-registry.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "registry/epistemic-governance.yaml"
+      - "tools/validate_epistemic_governance_registry.py"
+      - ".github/workflows/epistemic-governance-registry.yml"
+
+jobs:
+  validate-epistemic-governance-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validator dependency
+        run: python -m pip install pyyaml
+      - name: Validate epistemic-governance registry
+        run: python tools/validate_epistemic_governance_registry.py

@@ -52,8 +52,19 @@ def main() -> int:
     if not RULESET.exists():
         print(f"ERR: missing ruleset: {RULESET}", file=sys.stderr)
         return 2
+    # A validator that cannot even open the file must not read as one that
+    # passed — exit 2 covers every "could not run" cause: permissions, missing
+    # bytes, undecodable text, or malformed YAML.
     try:
-        doc = yaml.safe_load(RULESET.read_text())
+        raw = RULESET.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"ERR: cannot read {RULESET}: {exc}", file=sys.stderr)
+        return 2
+    except UnicodeDecodeError as exc:
+        print(f"ERR: {RULESET} is not valid UTF-8: {exc}", file=sys.stderr)
+        return 2
+    try:
+        doc = yaml.safe_load(raw)
     except yaml.YAMLError as exc:
         print(f"ERR: {RULESET} is not valid YAML: {exc}", file=sys.stderr)
         return 2

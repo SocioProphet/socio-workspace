@@ -1,0 +1,28 @@
+@prefix nrg: <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Vendored-artifact extension to the neurosymbolic repo-graph vocabulary.
+# Lifts registry/vendor-freshness.yaml into nrg: so THE GRAPH can reason about
+# vendored-dependency staleness and its blast radius. Freshness itself is never
+# recomputed here — it is imported from validate_vendor_freshness.compute_state.
+# nrg:chronosReasoning is reused from neurosymbolic-repo-graph.ttl (not redeclared).
+
+nrg:VendoredArtifact a rdfs:Class .
+nrg:VendoredSource a rdfs:Class .
+
+nrg:artifactId a rdfs:Property ; rdfs:range xsd:string .
+nrg:sourceId a rdfs:Property ; rdfs:range xsd:string .
+nrg:vendoredFrom a rdfs:Property ; rdfs:range nrg:VendoredSource .
+nrg:consumerRepo a rdfs:Property ; rdfs:range xsd:string .
+nrg:consumerApp a rdfs:Property ; rdfs:range xsd:string .
+nrg:freshnessPolicy a rdfs:Property ; rdfs:range xsd:string .
+nrg:freshnessState a rdfs:Property ; rdfs:range xsd:string .
+nrg:freshnessReason a rdfs:Property ; rdfs:range xsd:string .
+nrg:disposition a rdfs:Property ; rdfs:range xsd:string .
+nrg:vendoredVersion a rdfs:Property ; rdfs:range xsd:string .
+nrg:vendoredDigest a rdfs:Property ; rdfs:range xsd:string .
+nrg:upstreamLatestVersion a rdfs:Property ; rdfs:range xsd:string .
+nrg:consumerCount a rdfs:Property ; rdfs:range xsd:integer .
+nrg:staleConsumerCount a rdfs:Property ; rdfs:range xsd:integer .
+nrg:blastRadius a rdfs:Property ; rdfs:range xsd:string .

@@ -50,8 +50,15 @@ def _load_validator():
 
 
 def _lit(value: object) -> str:
-    """A Turtle string literal with the handful of characters that must be escaped."""
-    text = str(value).replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    """A Turtle string literal with the control characters that must be escaped."""
+    text = (
+        str(value)
+        .replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")
+    )
     return f'"{text}"'
 
 
@@ -106,7 +113,9 @@ def build() -> str:
             f"  nrg:freshnessPolicy {_lit(art['freshness_policy'])} ;",
             f"  nrg:freshnessState {_lit(state)} ;",
             f"  nrg:freshnessReason {_lit(reason)} ;",
-            f"  nrg:disposition {_lit(art.get('disposition', ''))} ",
+            # disposition is a required artifact field (check_shape enforces it), so it is
+            # always a concrete value here, never a defaulted empty string.
+            f"  nrg:disposition {_lit(art['disposition'])} ",
         ]
         for key, prop in (
             ("vendored_version", "nrg:vendoredVersion"),
@@ -122,27 +131,35 @@ def build() -> str:
         out.extend(triples)
         out.append("")
 
-    # Source nodes carry the blast-radius rollup — the reasoning the flat register cannot state.
+    # Source nodes carry the blast-radius rollup — the reasoning the flat register cannot
+    # state. The radius is emitted as queryable nrg:staleConsumer edges (one per stale
+    # consumer), not a joined string, so a SPARQL/graph query can traverse it directly.
     for sid in sorted(consumers):
         fed = consumers[sid]
-        stale = stale_consumers.get(sid, [])
+        stale = sorted(stale_consumers.get(sid, []))
         node = _iri(SOURCE_BASE, sid)
-        radius = ", ".join(sorted(stale)) if stale else "none"
-        out.extend([
+        block = [
             f"{node}",
             "  a nrg:VendoredSource ;",
             f"  nrg:sourceId {_lit(sid)} ;",
             f"  nrg:consumerCount {len(fed)} ;",
-            f"  nrg:staleConsumerCount {len(stale)} ;",
-            f"  nrg:blastRadius {_lit(radius)} ;",
+            f"  nrg:staleConsumerCount {len(stale)}",
+        ]
+        for aid in stale:
+            block[-1] = block[-1].rstrip() + " ;"
+            block.append(f"  nrg:staleConsumer {_iri(ARTIFACT_BASE, aid)}")
+        radius = ", ".join(stale) if stale else "none"
+        block[-1] = block[-1].rstrip() + " ;"
+        block.append(
             "  nrg:chronosReasoning "
             + _lit(
                 f"a stale source propagates to every consumer that vendors it; "
-                f"{sid} staleness has blast radius {{{radius}}}"
+                f"{sid} staleness reaches {{{radius}}}"
             )
-            + " .",
-            "",
-        ])
+            + " ."
+        )
+        out.extend(block)
+        out.append("")
 
     return "\n".join(out).rstrip() + "\n"
 

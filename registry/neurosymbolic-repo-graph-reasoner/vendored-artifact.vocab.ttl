@@ -25,4 +25,5 @@ nrg:vendoredDigest a rdfs:Property ; rdfs:range xsd:string .
 nrg:upstreamLatestVersion a rdfs:Property ; rdfs:range xsd:string .
 nrg:consumerCount a rdfs:Property ; rdfs:range xsd:integer .
 nrg:staleConsumerCount a rdfs:Property ; rdfs:range xsd:integer .
-nrg:blastRadius a rdfs:Property ; rdfs:range xsd:string .
+# Blast radius as a traversable edge (one per stale consumer), not a joined string.
+nrg:staleConsumer a rdfs:Property ; rdfs:range nrg:VendoredArtifact .

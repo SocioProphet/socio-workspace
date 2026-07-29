@@ -152,61 +152,55 @@
   nrg:sourceId "hellgraph-engine" ;
   nrg:consumerCount 2 ;
   nrg:staleConsumerCount 2 ;
-  nrg:blastRadius "hellgraph-engine@hellgraph-service, hellgraph-engine@lifecycle-warden" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; hellgraph-engine staleness has blast radius {hellgraph-engine@hellgraph-service, hellgraph-engine@lifecycle-warden}" .
+  nrg:staleConsumer <https://socioprophet.org/ns/nrg/vendored-artifact/hellgraph-engine@hellgraph-service> ;
+  nrg:staleConsumer <https://socioprophet.org/ns/nrg/vendored-artifact/hellgraph-engine@lifecycle-warden> ;
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; hellgraph-engine staleness reaches {hellgraph-engine@hellgraph-service, hellgraph-engine@lifecycle-warden}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/kbpedia-kko>
   a nrg:VendoredSource ;
   nrg:sourceId "kbpedia-kko" ;
   nrg:consumerCount 2 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; kbpedia-kko staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; kbpedia-kko staleness reaches {none}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/kbpedia-reference-concepts>
   a nrg:VendoredSource ;
   nrg:sourceId "kbpedia-reference-concepts" ;
   nrg:consumerCount 1 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; kbpedia-reference-concepts staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; kbpedia-reference-concepts staleness reaches {none}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/mcp-a2a-zero-trust-kernel-schemas>
   a nrg:VendoredSource ;
   nrg:sourceId "mcp-a2a-zero-trust-kernel-schemas" ;
   nrg:consumerCount 1 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; mcp-a2a-zero-trust-kernel-schemas staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; mcp-a2a-zero-trust-kernel-schemas staleness reaches {none}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/ontogenesis-ontology-index>
   a nrg:VendoredSource ;
   nrg:sourceId "ontogenesis-ontology-index" ;
   nrg:consumerCount 1 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; ontogenesis-ontology-index staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; ontogenesis-ontology-index staleness reaches {none}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/regis-entity-graph-schemas>
   a nrg:VendoredSource ;
   nrg:sourceId "regis-entity-graph-schemas" ;
   nrg:consumerCount 1 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; regis-entity-graph-schemas staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; regis-entity-graph-schemas staleness reaches {none}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/sourceos-spec-schemas>
   a nrg:VendoredSource ;
   nrg:sourceId "sourceos-spec-schemas" ;
   nrg:consumerCount 2 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; sourceos-spec-schemas staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; sourceos-spec-schemas staleness reaches {none}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/tritrpc-go-bindings>
   a nrg:VendoredSource ;
   nrg:sourceId "tritrpc-go-bindings" ;
   nrg:consumerCount 1 ;
   nrg:staleConsumerCount 0 ;
-  nrg:blastRadius "none" ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; tritrpc-go-bindings staleness has blast radius {none}" .
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; tritrpc-go-bindings staleness reaches {none}" .

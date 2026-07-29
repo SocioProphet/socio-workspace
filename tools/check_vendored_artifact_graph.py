@@ -87,14 +87,18 @@ def main() -> int:
         fail("register fails shape checks: " + "; ".join(shape_errors))
         return 1
 
-    # 2. no second register — graph freshnessState agrees with compute_state
-    state_in_graph = dict(
-        re.findall(
-            r"nrg:artifactId \"([^\"]+)\" ;.*?nrg:freshnessState \"([^\"]+)\"",
-            committed,
-            re.DOTALL,
-        )
+    # 2. no second register — graph freshnessState agrees with compute_state for EVERY
+    #    artifact. Coverage is asserted so a regex miss cannot silently drop one.
+    state_pairs = re.findall(
+        r'nrg:artifactId "([^"]+)" ;.*?nrg:freshnessState "([^"]+)"',
+        committed,
+        re.DOTALL,
     )
+    if len(state_pairs) != len(artifacts):
+        fail(f"parsed {len(state_pairs)} freshnessState pairs but the register declares "
+             f"{len(artifacts)} artifacts — the graph parse dropped coverage")
+        failed = True
+    state_in_graph = dict(state_pairs)
     expected_stale: dict[str, list[str]] = {}
     for art in artifacts:
         aid = art["artifact_id"]
@@ -114,14 +118,30 @@ def main() -> int:
         fail(f"graph uses undeclared nrg: terms: {sorted(undeclared)}")
         failed = True
 
-    # 4. reasoning-sound — blast radius matches the stale consumer set
-    for block in re.findall(r"nrg:sourceId \"([^\"]+)\" ;\n  nrg:consumerCount.*?nrg:blastRadius \"([^\"]+)\"", committed, re.DOTALL):
-        sid, radius = block
-        graph_radius = set() if radius == "none" else {r.strip() for r in radius.split(",")}
+    # 4. reasoning-sound — each source's staleConsumerCount and its nrg:staleConsumer
+    #    edges match exactly the set compute_state flags stale.
+    artifact_base = lift.ARTIFACT_BASE
+    seen_sources: set[str] = set()
+    for m in re.finditer(
+        r'a nrg:VendoredSource ;\s*\n\s*nrg:sourceId "([^"]+)" ;\s*\n\s*'
+        r'nrg:consumerCount \d+ ;\s*\n\s*nrg:staleConsumerCount (\d+)'
+        r'((?:\s*;\s*nrg:staleConsumer <[^>]+>)*)',
+        committed,
+    ):
+        sid, count_str, edges_blob = m.group(1), m.group(2), m.group(3)
+        seen_sources.add(sid)
+        edge_ids = set(re.findall(re.escape("nrg:staleConsumer <" + artifact_base) + r"([^>]+)>", edges_blob))
         want = set(expected_stale.get(sid, []))
-        if graph_radius != want:
-            fail(f"blast radius for source {sid} is {sorted(graph_radius)}, expected {sorted(want)}")
+        if edge_ids != want:
+            fail(f"staleConsumer edges for {sid} are {sorted(edge_ids)}, expected {sorted(want)}")
             failed = True
+        if int(count_str) != len(want):
+            fail(f"staleConsumerCount for {sid} is {count_str}, expected {len(want)}")
+            failed = True
+    missing = set(expected_stale) - seen_sources
+    if missing:
+        fail(f"sources with stale consumers absent from the graph: {sorted(missing)}")
+        failed = True
 
     if failed:
         return 1

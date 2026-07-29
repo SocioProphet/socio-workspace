@@ -109,11 +109,20 @@ jobs:
       # first failing target and hides every later one -- that is how the four broken
       # targets stayed invisible behind each other. `-k` runs every target and still
       # exits non-zero if any failed, so one red target cannot mask the rest.
-      #
-      # This target is deliberately not asserted to leave a clean tree: the SVF smoke
-      # targets rewrite the timestamped receipts under artifacts/svf/runs/local-smoke
-      # and artifacts/svf/exports/latest on every run. Making those reproducible means
-      # redirecting the smoke run and the export that reads it (tools/svf_export_latest.py
-      # hardcodes that run directory as its source), which is a separate change.
       - name: Validate aggregate (all targets, keep-going)
         run: make -k validate
+
+      # The SVF smoke targets regenerate the committed artifacts/svf fixtures. They pin
+      # svf_runner's clock (SVF_SOURCE_DATE_EPOCH in the Makefile), so a correct run
+      # reproduces those files byte-for-byte and the tree stays clean. A non-empty diff
+      # -- or an untracked artifact -- means the generator output drifted from what is
+      # committed, which is a real regression: fail and show it.
+      - name: Assert SVF fixtures are reproducible (clean tree)
+        run: |
+          if [ -n "$(git status --porcelain -- artifacts/svf)" ]; then
+            echo "::error::make validate changed committed SVF fixtures -- regenerate with 'make svf-workspace-validate' and commit, or investigate the generator drift."
+            git status --porcelain -- artifacts/svf
+            git --no-pager diff -- artifacts/svf
+            exit 1
+          fi
+          echo "OK: SVF fixtures reproduced byte-for-byte"

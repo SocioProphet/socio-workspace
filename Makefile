@@ -200,6 +200,13 @@ corpus-loop-check: corpus-loop-v0-validate neurosymbolic-chronos-validate corpus
 multidomain-geospatial-standards-compliance-validate:
 	python3 tools/check_multidomain_geospatial_standards_compliance.py
 
+# Pinned instant for the SVF smoke fixtures (2026-06-09T11:53:46Z). svf_runner
+# stamps this into run/receipt timestamps (and the ids + digests derived from
+# them) when SVF_SOURCE_DATE_EPOCH is set, so `make validate` regenerates the
+# committed artifacts/svf fixtures byte-for-byte instead of churning them on the
+# wall clock. Real runs leave the variable unset and record actual time.
+SVF_SOURCE_DATE_EPOCH := 1781006026
+
 svf-registry-validate:
 	python3 -m pip install --user pyyaml >/dev/null
 	python3 tools/validate_svf_registry.py
@@ -218,7 +225,7 @@ svf-runner-verify-receipt-smoke:
 svf-runner-run-smoke:
 	python3 -m pip install --user pyyaml >/dev/null
 	rm -rf artifacts/svf/runs/local-smoke
-	python3 tools/svf_runner.py run --repo SocioProphet/sociosphere --changed-path registry/sovereign-validation-fabric.yaml --out artifacts/svf/runs/local-smoke >/dev/null
+	SVF_SOURCE_DATE_EPOCH=$(SVF_SOURCE_DATE_EPOCH) python3 tools/svf_runner.py run --repo SocioProphet/sociosphere --changed-path registry/sovereign-validation-fabric.yaml --out artifacts/svf/runs/local-smoke >/dev/null
 	python3 tools/svf_runner.py verify-receipt artifacts/svf/runs/local-smoke/validation-receipt.json >/dev/null
 
 svf-runner-tampered-receipt-smoke: svf-runner-run-smoke
@@ -229,7 +236,7 @@ svf-runner-unregistered-action-smoke:
 	python3 -m pip install --user pyyaml >/dev/null
 	mkdir -p artifacts/svf/runs/unregistered-action-smoke
 	python3 -c 'from pathlib import Path; import yaml; data=yaml.safe_load(Path("registry/sovereign-validation-fabric.yaml").read_text(encoding="utf-8")); data["plans"][0]["actions"]=["svf:action:sociosphere.missing-action"]; Path("artifacts/svf/runs/unregistered-action-smoke/registry.yaml").write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")'
-	! python3 tools/svf_runner.py --registry artifacts/svf/runs/unregistered-action-smoke/registry.yaml run --repo SocioProphet/sociosphere --plan svf:plan:sociosphere.registry-dogfood --out artifacts/svf/runs/unregistered-action-smoke >/dev/null
+	! SVF_SOURCE_DATE_EPOCH=$(SVF_SOURCE_DATE_EPOCH) python3 tools/svf_runner.py --registry artifacts/svf/runs/unregistered-action-smoke/registry.yaml run --repo SocioProphet/sociosphere --plan svf:plan:sociosphere.registry-dogfood --out artifacts/svf/runs/unregistered-action-smoke >/dev/null
 
 svf-export-latest:
 	python3 tools/svf_export_latest.py

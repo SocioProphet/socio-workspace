@@ -57,7 +57,24 @@ CLAIM_SCOPES = {
 
 
 def utc_now() -> str:
-    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    # Reproducible-fixture support. When SVF_SOURCE_DATE_EPOCH is set (the
+    # `make validate` smoke targets set it), every timestamp is pinned to that
+    # instant so the generated run/receipt/export artifacts are byte-identical
+    # across machines and CI can gate on a clean tree. An invalid value raises
+    # rather than silently poisoning artifacts. Unset (real runs) keeps
+    # wall-clock time, so production receipts still record when they actually ran.
+    epoch = os.environ.get("SVF_SOURCE_DATE_EPOCH")
+    if epoch:
+        try:
+            seconds = int(epoch)
+        except ValueError:
+            raise ValueError(
+                f"SVF_SOURCE_DATE_EPOCH must be an integer Unix epoch in seconds; got {epoch!r}"
+            ) from None
+        moment = dt.datetime.fromtimestamp(seconds, dt.timezone.utc)
+    else:
+        moment = dt.datetime.now(dt.timezone.utc)
+    return moment.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def canonical_json(data: Any) -> str:

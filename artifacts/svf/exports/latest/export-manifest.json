@@ -11,7 +11,7 @@
     "SocioProphet/prophet-platform#588"
   ],
   "export_id": "svf:export:sociosphere.registry-dogfood.latest",
-  "exported_at": "2026-06-09T11:53:47Z",
+  "exported_at": "2026-06-09T11:53:46Z",
   "non_certified_claims": [
     "production_readiness",
     "live_infrastructure_safety",
@@ -32,14 +32,14 @@
   "receipt_artifact": "artifacts/svf/exports/latest/validation-receipt.json",
   "receipt_digest": {
     "algorithm": "sha256",
-    "digest": "cf6a273478391d908cc1668812d5038dd18feea386860a84d6a52ed8049cd5ac"
+    "digest": "03f5517f04547d40a409a18a6c59858a027ee6469963294936ab6ee9cea73743"
   },
   "receipt_ref": "svf:receipt:cda7b48ccd1b03b1",
   "repo": "SocioProphet/sociosphere",
   "run_artifact": "artifacts/svf/exports/latest/validation-run.json",
   "run_digest": {
     "algorithm": "sha256",
-    "digest": "4806e0098632d8539159657529ab0d5b8c6274162e3089c0b66ab374d2186b18"
+    "digest": "f584348e1646cab025f6ea04e7fc5d4e8307aa13df8c8a065fc3c6febc84cb47"
   },
   "run_ref": "svf:run:cda7b48ccd1b03b1",
   "schema_version": "1.0",

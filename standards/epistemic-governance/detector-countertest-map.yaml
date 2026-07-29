@@ -1,8 +1,37 @@
-schema_version: 0.1.0
+schema_version: 0.2.0
 standard: epistemic-governance
-ruleset_semver: 1.3.0
+ruleset_semver: 1.4.0
 status: draft
 owner: sociosphere
+
+# Ruleset shape (introduced in 1.4.0). This ruleset now describes what SHIPS
+# alongside what is DESIGNED — nothing is lost, nothing pretended. Every
+# detector carries an explicit `maturity` field and every counter-test carries
+# an `availability` field:
+#
+#   maturity:
+#     shipped   — the detector exists in code today (currently Noetica
+#                 agent-machine/lib/debate-detectors.ts, RULESET_SEMVER 0.1.0).
+#                 Deterministic surface heuristics: honest first-pass signals
+#                 that feed the MLN reasoner rather than firing severity alone.
+#     proposed  — the detector is specified but not yet implemented. Reserving
+#                 the id so a future NLI/structural implementation lands in a
+#                 known place, not so the ruleset can claim it as evidence.
+#
+#   availability:
+#     runnable  — a real counter-test runner exists (currently: the 6 CTESTs
+#                 routed to the reasoner engine in Noetica reasoner.ts).
+#     proposed  — the counter-test is specified but no runner exists yet.
+#
+# The maturity ladder is explicit via `succeeded_by`: a shipped V1 detector
+# names the proposed V2 detector that will eventually replace it, so the
+# migration path is a fact in the file rather than folklore. Nothing is
+# aliased away — both ids exist in this document until the V2 detector ships.
+#
+# The CTEST gate enforces `counter_tests_required_for_warn_or_block` against
+# whichever detector actually fires. A shipped detector whose only mapped
+# counter-test is `proposed` will correctly downgrade warn/block to info until
+# the runner exists, per the honesty rules of the epistemic-kernel contract.
 
 principles:
   detector_findings_are_hypotheses: true
@@ -19,6 +48,15 @@ severity_tiers:
   block:
     meaning: halt generation, promotion, publication, or action until resolved or waived under policy
 
+maturity_vocabulary:
+  detector:
+    shipped: implemented in code today; the id here matches the running detector
+    proposed: id reserved for a specified but not-yet-implemented detector
+  counter_test:
+    runnable: a real runner exists (reasoner engine or standalone classifier)
+    proposed: specified but no runner exists yet — cannot certify warn/block
+              until it becomes runnable
+
 namespaces:
   logical_fallacies: LOGFALL
   cognitive_biases: COGBIAS
@@ -28,6 +66,7 @@ namespaces:
 
 detectors:
   - rule_id: LOGFALL.STRAWMAN.V2
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - nli_contradiction_or_neutrality
@@ -42,6 +81,7 @@ detectors:
     promotion_effect: cannot_use_rebuttal_as_grounded_until_counter_test_clears_or_repair_applied
 
   - rule_id: LOGFALL.ADHOM.V2
+    maturity: proposed
     default_severity: block
     primary_signals:
       - person_targeting_predicate
@@ -55,6 +95,7 @@ detectors:
     promotion_effect: publication_block_until_repaired_or_moderator_override
 
   - rule_id: LOGFALL.EMOTION.V2
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - high_arousal_sentiment
@@ -67,6 +108,7 @@ detectors:
     promotion_effect: requires_evidence_or_qualifier_before_claim_promotion
 
   - rule_id: LOGFALL.FALSECAUSE.V2
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - causal_verbs
@@ -81,6 +123,7 @@ detectors:
     promotion_effect: causal_claim_cannot_be_verified_without_causal_gate
 
   - rule_id: LOGFALL.GISH.V1
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - claims_per_100w_above_domain_threshold
@@ -95,6 +138,7 @@ detectors:
     promotion_effect: batch_claims_must_be_split_before_individual_promotion
 
   - rule_id: LOGFALL.SHARPSHOOT.V2
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - post_hoc_cluster_selection
@@ -108,6 +152,7 @@ detectors:
     promotion_effect: statistical_claim_requires_mtp_or_exploratory_label
 
   - rule_id: LOGFALL.LOADED.V1
+    maturity: proposed
     default_severity: block
     primary_signals:
       - wh_question_with_unproven_presupposition
@@ -119,6 +164,7 @@ detectors:
     promotion_effect: loaded_question_cannot_be_used_as_evidence_or_challenge_until_rewritten
 
   - rule_id: LOGFALL.BURDEN.V1
+    maturity: proposed
     default_severity: block
     primary_signals:
       - prove_me_wrong_pattern
@@ -131,6 +177,7 @@ detectors:
     promotion_effect: claimant_must_supply_minimum_backing
 
   - rule_id: LOGFALL.EQUIV.V1
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - lexical_sense_switch
@@ -143,6 +190,7 @@ detectors:
     promotion_effect: ambiguous_term_must_be_locked_for_formal_decision_use
 
   - rule_id: LOGFALL.MOTTEBAILEY.V1
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - pressure_dependent_claim_switching
@@ -155,6 +203,7 @@ detectors:
     promotion_effect: defended_claim_must_be_frozen_before_rebuttal_or_promotion
 
   - rule_id: COGBIAS.ANCHORING.V2
+    maturity: proposed
     default_severity: info
     primary_signals:
       - low_estimate_elasticity_to_counter_anchor
@@ -166,6 +215,8 @@ detectors:
     projection_policy: self_private_by_default
 
   - rule_id: COGBIAS.CONFIRM.V1
+    maturity: shipped
+    detection_method: regex_heuristic
     default_severity: warn
     primary_signals:
       - support_to_disconfirm_ratio_above_threshold
@@ -178,6 +229,7 @@ detectors:
     projection_policy: self_private_by_default
 
   - rule_id: COGBIAS.OVERCONF.V1
+    maturity: proposed
     default_severity: info
     primary_signals:
       - narrow_ci
@@ -191,6 +243,7 @@ detectors:
     projection_policy: self_private_by_default
 
   - rule_id: COGBIAS.REACTDEV.V1
+    maturity: proposed
     default_severity: warn
     primary_signals:
       - source_label_devaluation
@@ -201,6 +254,216 @@ detectors:
       - source_content_separation
       - attribution_blind_review
     projection_policy: self_private_by_default
+
+
+# ─── Shipped V1 detectors (implemented today in Noetica debate-detectors.ts) ──
+# These are honest surface heuristics that feed the MLN reasoner. Their
+# counter-test requirements point at the CTESTs that would justify their
+# warn/block severity; those marked availability: proposed have no runner today
+# and the gate will therefore downgrade any warn/block from the corresponding
+# detection until a runner ships.
+
+shipped_detectors:
+  - rule_id: LOGFALL.STRAWMAN.V1
+    maturity: shipped
+    succeeded_by: LOGFALL.STRAWMAN.V2
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - restatement_cue_lexicon
+      - absolutizing_quantifier
+    required_counter_tests:
+      - CTEST.STEELMAN.CONFIRM.V2
+    default_repairs:
+      - steelman_rewrite
+      - scope_narrowing
+
+  - rule_id: LOGFALL.ADHOMINEM.V1
+    maturity: shipped
+    succeeded_by: LOGFALL.ADHOM.V2
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - person_targeting_lexicon
+    required_counter_tests:
+      - CTEST.REFOCUS.PROPOSITION.V1
+    default_repairs:
+      - refocus_on_claim
+      - remove_person_attack
+
+  - rule_id: LOGFALL.APPEALAUTHORITY.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - authority_appeal_lexicon_without_backing
+    required_counter_tests:
+      - CTEST.EVIDENCE-LR.V1
+    default_repairs:
+      - request_primary_evidence
+
+  - rule_id: LOGFALL.APPEALEMOTION.V1
+    maturity: shipped
+    succeeded_by: LOGFALL.EMOTION.V2
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - high_arousal_lexicon
+    required_counter_tests:
+      - CTEST.BASELINE.DATA.V1
+    default_repairs:
+      - evidence_request
+      - baseline_request
+
+  - rule_id: LOGFALL.BANDWAGON.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - popularity_appeal_lexicon
+    required_counter_tests:
+      - CTEST.EVIDENCE-LR.V1
+    default_repairs:
+      - request_primary_evidence
+
+  - rule_id: LOGFALL.CIRCULAR.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - premise_conclusion_restatement
+    required_counter_tests:
+      - CTEST.ACYCLIC.PROOF.V1
+    default_repairs:
+      - independent_grounding_request
+
+  - rule_id: LOGFALL.FALSECAUSE.V1
+    maturity: shipped
+    succeeded_by: LOGFALL.FALSECAUSE.V2
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - post_hoc_temporal_cue
+    required_counter_tests:
+      - CTEST.CAUSAL.DO/COUNTERFACTUAL.V1
+    default_repairs:
+      - causal_dag_request
+      - confidence_widening
+
+  - rule_id: LOGFALL.FALSEDICHOTOMY.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - either_or_exhaustiveness_cue
+    required_counter_tests:
+      - CTEST.PRESUP.EXPOSE.V1
+    default_repairs:
+      - option_enumeration_request
+
+  - rule_id: LOGFALL.HASTYGEN.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - single_or_few_examples_universal_claim
+    required_counter_tests:
+      - CTEST.CHAIN.PROB.V1
+    default_repairs:
+      - sample_size_request
+      - qualification_request
+
+  - rule_id: LOGFALL.SLIPPERYSLOPE.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - inevitability_chain_cue
+    required_counter_tests:
+      - CTEST.CHAIN.PROB.V1
+    default_repairs:
+      - probability_decomposition_request
+
+  - rule_id: LOGFALL.SUNKCOST.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - past_investment_forward_justification
+    required_counter_tests:
+      - CTEST.EVIDENCE-LR.V1
+    default_repairs:
+      - forward_only_evaluation_request
+
+  - rule_id: LOGFALL.TUQUOQUE.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: warn
+    primary_signals:
+      - counter_accusation_deflection
+    required_counter_tests:
+      - CTEST.REFOCUS.PROPOSITION.V1
+    default_repairs:
+      - refocus_on_claim
+
+  - rule_id: COGBIAS.ABSOLUTECERTAINTY.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: info
+    primary_signals:
+      - absolute_certainty_lexicon
+    required_counter_tests:
+      - CTEST.EVIDENCE-LR.V1
+    default_repairs:
+      - confidence_widening
+
+  - rule_id: COGBIAS.ANCHOR.V1
+    maturity: shipped
+    succeeded_by: COGBIAS.ANCHORING.V2
+    detection_method: regex_heuristic
+    default_severity: info
+    primary_signals:
+      - salient_number_early_in_context
+    required_counter_tests:
+      - CTEST.COUNTER-ANCHOR.V1
+    default_repairs:
+      - counter_anchor_prompt
+      - confidence_widening
+
+  - rule_id: COGBIAS.AVAILABILITY.V1
+    maturity: shipped
+    detection_method: regex_heuristic
+    default_severity: info
+    primary_signals:
+      - vivid_recent_example_generalized
+    required_counter_tests:
+      - CTEST.EVIDENCE-LR.V1
+    default_repairs:
+      - base_rate_request
+
+# ─── Counter-test runners: what a runner exists for TODAY ────────────────────
+# Six CTESTs have real reasoner-engine implementations (Noetica reasoner.ts
+# CTEST_ROUTING). Every other CTEST id referenced above is `proposed` — the
+# gate cannot certify warn/block against them until a runner ships.
+counter_test_availability:
+  runnable:
+    - CTEST.TERMS.LOCK.V1
+    - CTEST.ACYCLIC.PROOF.V1
+    - CTEST.CHAIN.PROB.V1
+    - CTEST.EVIDENCE-LR.V1
+    - CTEST.CAUSAL.DO/COUNTERFACTUAL.V1
+    - CTEST.PRESUP.EXPOSE.V1
+  proposed:
+    - CTEST.STEELMAN.CONFIRM.V2
+    - CTEST.REFOCUS.PROPOSITION.V1
+    - CTEST.BASELINE.DATA.V1
+    - CTEST.PREREG/MTP.V2
+    - CTEST.BURDEN.REASSIGN.V1
+    - CTEST.CRITERIA.PRE-REGISTER.V1
+    - CTEST.COUNTER-ANCHOR.V1
+    - CTEST.DEVIL-S.LIST.V1
+    - CTEST.CALIBRATION-20Q.V1
+    - CTEST.ATTRIBUTION-BLIND.A/B.V1
 
 technical_claim_detectors:
   - rule_id: TECHCLAIM.UNREPRODUCIBLE.V1

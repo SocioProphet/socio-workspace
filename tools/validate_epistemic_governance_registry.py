@@ -57,8 +57,22 @@ def main() -> int:
     # A validator that dies on malformed input reports a stack trace where it
     # should report a verdict. Parse failures are exit 2 ("could not run"), kept
     # distinct from exit 1 ("ran, found violations").
+    # read_text() sat inside a try that caught only YAMLError, so a registry that
+    # could not be READ — permissions, a mid-write truncation, non-UTF-8 bytes —
+    # escaped as a traceback and exit 1. Exit 1 means "ran, found violations"; the
+    # docstring above promises 2 for "could not run". A validator that never ran
+    # reporting as one that ran and found problems is the failure this exit-code
+    # split exists to prevent. Same shape as validate_detector_countertest_map.py.
     try:
-        doc = yaml.safe_load(REGISTRY.read_text())
+        raw = REGISTRY.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"ERR: cannot read {REGISTRY}: {exc}", file=sys.stderr)
+        return 2
+    except UnicodeDecodeError as exc:
+        print(f"ERR: {REGISTRY} is not valid UTF-8: {exc}", file=sys.stderr)
+        return 2
+    try:
+        doc = yaml.safe_load(raw)
     except yaml.YAMLError as exc:
         print(f"ERR: {REGISTRY} is not valid YAML: {exc}", file=sys.stderr)
         return 2

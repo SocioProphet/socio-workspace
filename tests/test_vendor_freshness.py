@@ -294,6 +294,46 @@ def test_undeclared_file_dependency_is_detected(tmp_path: Path) -> None:
     assert "UNDECLARED file: dependency" in result.stderr
 
 
+def test_file_dependency_escaping_the_repo_root_is_reported(tmp_path: Path) -> None:
+    """The escape hatch: `file:../../outside` used to be silently skipped.
+
+    A file: specifier that resolves OUTSIDE the consumer repo is the one case the
+    sweep can say least about — the bytes are not in the repo, so no digest here
+    can ever cover them. Skipping it quietly (the old `except ValueError: continue`)
+    made "declare every vendored artifact" opt-out: point the specifier one level
+    further up and the artifact stops existing as far as this plane is concerned.
+    Unverifiable must read as a finding, not as a pass.
+    """
+    payload = b"engine tarball bytes"
+    digest = "sha256:" + hashlib.sha256(payload).hexdigest()
+    root = tmp_path / "prophet-platform"
+    build_consumer(root, "0.4.45", payload)
+
+    # The artifact lives outside the repo entirely.
+    outside = tmp_path / "outside"
+    outside.mkdir(parents=True)
+    (outside / "sidecar.tgz").write_bytes(payload)
+
+    escapee = root / "apps" / "escapee"
+    escapee.mkdir(parents=True)
+    (escapee / "package.json").write_text(
+        json.dumps({
+            "name": "escapee",
+            "dependencies": {"@socioprophet/sidecar": "file:../../../outside/sidecar.tgz"},
+        }),
+        encoding="utf-8",
+    )
+
+    register = register_for("0.4.45", digest, tmp_path)
+    result = run(register, f"--repo-root=prophet-platform={root}")
+    assert result.returncode == 1, (
+        "a file: dependency resolving outside the repo root was accepted silently; "
+        f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    )
+    assert "ESCAPES" in result.stderr
+    assert "@socioprophet/sidecar" in result.stderr
+
+
 def test_missing_declared_path_is_detected(tmp_path: Path) -> None:
     payload = b"engine tarball bytes"
     digest = "sha256:" + hashlib.sha256(payload).hexdigest()

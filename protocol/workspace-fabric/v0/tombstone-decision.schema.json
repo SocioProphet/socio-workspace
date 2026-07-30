@@ -24,7 +24,7 @@
     "signed_tombstone": {"type": "boolean"},
     "local_dirty": {"type": "boolean"},
     "decision_status": {"enum": ["applied", "rejected", "manual_reconcile_required"]},
-    "resulting_state": {"enum": ["tombstoned", "active", "reconcile_required"]},
+    "resulting_state": {"enum": ["TOMBSTONED", "ACTIVE", "RECONCILE_REQUIRED"]},
     "policy_bundle_ref": {"type": "string", "minLength": 1},
     "correlation_id": {"type": "string", "minLength": 1}
   }

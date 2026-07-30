@@ -6,7 +6,7 @@
   "signed_tombstone": true,
   "local_dirty": false,
   "decision_status": "applied",
-  "resulting_state": "tombstoned",
+  "resulting_state": "TOMBSTONED",
   "policy_bundle_ref": "policy/default",
   "correlation_id": "reg-topo-main-20260418-004"
 }

@@ -239,9 +239,15 @@ def main() -> int:
     if quorum_dec["decision_status"] == "granted" and quorum_dec["granted_approvers"] < quorum_dec["required_approvers"]:
         raise SystemExit("granted quorum decision must satisfy required approver count")
 
+    # TOMBSTONED, not "tombstoned": `resulting_state` names a state in the mount state
+    # machine, whose states are uppercase (see fixtures/state-machine.example.json), and
+    # the sibling reconcile fixture already writes RECONCILE_REQUIRED into this same
+    # field. This check used to demand the lowercase spelling, which made it enforce the
+    # inconsistency rather than catch it — while line 283 below simultaneously required
+    # an uppercase ("ACTIVE", "TOMBSTONED") edge to exist *because of this same fixture*.
     if tombstone["signed_tombstone"] and not tombstone["local_dirty"]:
-        if tombstone["decision_status"] == "applied" and tombstone["resulting_state"] != "tombstoned":
-            raise SystemExit("applied tombstone must result in tombstoned state in this fixture")
+        if tombstone["decision_status"] == "applied" and tombstone["resulting_state"] != "TOMBSTONED":
+            raise SystemExit("applied tombstone must result in TOMBSTONED state in this fixture")
 
     if reconcile["resulting_state"] != "RECONCILE_REQUIRED":
         raise SystemExit("reconcile fixture must result in RECONCILE_REQUIRED")

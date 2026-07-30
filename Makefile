@@ -76,8 +76,19 @@ neurosymbolic-vendored-artifact-graph-write:
 neurosymbolic-vendored-artifact-graph-validate:
 	python3 tools/check_vendored_artifact_graph.py
 
+# Register-only. --skip-disk is DELIBERATE and load-bearing: this target is a
+# prerequisite of the aggregate `validate`, which `make -k validate` runs in
+# validate.yml on a runner where the consumer repos do not exist. Without the flag the
+# on-disk layer resolved nothing, emitted SKIPPED, and still printed "validated 11
+# declared vendored artifact(s)" with exit 0 — a second copy of this gate, inert, next
+# to the fail-closed one. Declaring the skip makes the difference between "I chose not
+# to read the bytes" and "I tried and silently read none" visible in the log.
+#
+# The FAIL-CLOSED on-disk gate is .github/workflows/vendor-freshness.yml, which
+# materializes the consumer repos and passes --require-disk. It is the enforcing copy;
+# this one checks register self-consistency only.
 vendor-freshness-validate:
-	python3 tools/validate_vendor_freshness.py
+	python3 tools/validate_vendor_freshness.py --skip-disk
 
 # Observe upstream and report. Read-only: no register edit, no plan emission.
 vendor-freshness-detect-check:

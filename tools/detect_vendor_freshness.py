@@ -57,7 +57,6 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from validate_vendor_freshness import (  # noqa: E402  (path set above)
-    ROOT,
     REGISTER,
     compute_state,
     parse_date,

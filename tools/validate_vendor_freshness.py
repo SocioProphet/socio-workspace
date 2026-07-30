@@ -410,7 +410,7 @@ def check_release_chain(sources: dict[str, dict], artifacts: list[dict], errors:
         releases = source.get("releases") or []
         if not releases:
             errors.append(
-                f"source {source_id!r} is semver and declares no releases:; the supersession chain "
+                f"source {source_id!r} is semver and declares no releases; the supersession chain "
                 "cannot be built, so staleness distance and contract-crossing risk cannot be derived "
                 "from this register. `make vendor-freshness-detect` populates it."
             )

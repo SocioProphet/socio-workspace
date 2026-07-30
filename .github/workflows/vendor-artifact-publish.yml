@@ -95,7 +95,18 @@ jobs:
           echo "tarball=$PWD/$TARBALL" >> "$GITHUB_OUTPUT"
           echo "sha256=$(sha256sum "$TARBALL" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
 
-      - name: Assert the version marker inside the packed dist
+      # This step was called "Assert the version marker inside the packed dist" and did
+      # not do that. It checked package.json's version, then read ts/dist/index.js and
+      # printed its BYTE LENGTH — a read that cannot fail for any dist that exists. Nor
+      # is there a version marker to look for: the bundle embeds no version constant
+      # (the only version-shaped string in 0.4.45's dist is `0.4.44`, inside a comment).
+      # A step whose name promises an assertion it cannot make is worse than no step.
+      #
+      # What IS worth asserting — and what the "tgz ships a stale dist" incident actually
+      # needed — is that the bytes npm PACKED are the bytes we just BUILT. The pack step
+      # compares the committed dist against a fresh build; that says nothing about what
+      # `files`/.npmignore then selected into the tarball. This closes that gap.
+      - name: Assert the packed dist is the dist we just built
         run: |
           set -euo pipefail
           cd upstream && mkdir -p x && tar xzf "${{ steps.pack.outputs.tarball }}" \
@@ -103,14 +114,24 @@ jobs:
           # node, never grep: file(1) reports this bundle as `data`, and grep skips or
           # misreports matches in binary content.
           node -e '
-            const fs = require("fs"), yaml = null;
+            const fs = require("fs");
             const pkg = JSON.parse(fs.readFileSync("x/package/package.json", "utf8"));
             if (pkg.version !== process.env.VERSION) {
               console.error(`✗ tarball says ${pkg.version}, expected ${process.env.VERSION}`);
               process.exit(1);
             }
-            const bytes = fs.readFileSync("x/package/ts/dist/index.js", "utf8");
-            console.log(`✓ ${pkg.version}, dist ${bytes.length} bytes read with node`);
+            const packed = fs.readFileSync("x/package/ts/dist/index.js");
+            const built  = fs.readFileSync("ts/dist/index.js");
+            if (packed.length === 0) {
+              console.error("✗ packed ts/dist/index.js is empty"); process.exit(1);
+            }
+            if (!packed.equals(built)) {
+              console.error(
+                `✗ packed dist (${packed.length}B) differs from the freshly built dist ` +
+                `(${built.length}B) — npm pack shipped bytes the build did not produce`);
+              process.exit(1);
+            }
+            console.log(`✓ ${pkg.version}: packed dist is byte-identical to the build (${packed.length}B)`);
           '
         env:
           VERSION: ${{ inputs.version }}

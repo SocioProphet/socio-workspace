@@ -56,6 +56,11 @@ REGISTRY = os.environ.get("OCI_REGISTRY", "localhost:15000")
 SCHEME = os.environ.get("OCI_SCHEME", "http")  # "https" in production
 REPO = os.environ.get("OCI_REPO", "socioprophet/hellgraph")
 TAG = os.environ.get("OCI_TAG", "0.4.40")
+# The version the metadata CLAIMS must be the version being pushed. Hard-coding it
+# meant a publish of 0.4.45 shipped a config blob and an image.version annotation
+# that both said 0.4.40: the digest would pin one release's bytes while the metadata
+# named another, and the digest — being correct — would make the lie permanent.
+VERSION = os.environ.get("OCI_VERSION", TAG).lstrip("v")
 
 # Auth: production zot is htpasswd- or bearer-protected. Local probe has none.
 OCI_USER = os.environ.get("OCI_USERNAME")
@@ -79,6 +84,24 @@ EMPTY_MEDIA_TYPE = "application/vnd.oci.empty.v1+json"
 EMPTY_DIGEST = "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
 
 # ---------------------------------------------------------------- helpers
+
+
+class PublishError(RuntimeError):
+    """A correctness check on the publish path failed."""
+
+
+def require(condition, message: str) -> None:
+    """Assert-equivalent that survives `python -O`.
+
+    These are not debug assertions: they are the checks that stop a digest
+    mismatch, a non-201 PUT, or a non-byte-identical pull from being published
+    anyway. `python -O` strips `assert`, which would have turned every one of
+    them into a no-op and let the tool report a successful publish for bytes the
+    registry never confirmed. A check that a runtime flag can silently delete is
+    not a check.
+    """
+    if not condition:
+        raise PublishError(message)
 
 
 def sha256_hex(data: bytes) -> str:
@@ -273,7 +296,7 @@ def main():
     print("\n--- 2. push JSON config blob ---")
     config_doc = {
         "artifact": "socioprophet-hellgraph",
-        "version": "0.4.40",
+        "version": VERSION,
         "npmName": "@socioprophet/hellgraph",
         "tarballSha256": payload_digest,
     }
@@ -293,15 +316,14 @@ def main():
         config_desc, [layer_desc],
         artifact_type=ARTIFACT_TYPE,
         annotations={
-            "org.opencontainers.image.version": "0.4.40",
+            "org.opencontainers.image.version": VERSION,
             "dev.socioprophet.tarball.sha256": payload_digest,
         },
     )
     st, server_dg, local_dg, _, _ = push_manifest(REPO, TAG, manifest_bytes,
                                                   label="artifactType")
-    assert st == 201, f"manifest PUT expected 201, got {st}"
-    assert server_dg == local_dg, (
-        f"DIGEST MISMATCH server={server_dg} local={local_dg}")
+    require(st == 201, f"manifest PUT expected 201, got {st}")
+    require(server_dg == local_dg, f"DIGEST MISMATCH server={server_dg} local={local_dg}")
     print(f"\n  ==> MANIFEST DIGEST: {local_dg}  (server header agrees)\n")
     manifest_digest = local_dg
 
@@ -311,7 +333,10 @@ def main():
         alias = "sha256-" + manifest_digest.split(":", 1)[1]
         st_a, sdg_a, _, _, _ = push_manifest(REPO, alias, manifest_bytes,
                                              label="immutable alias")
-        assert st_a == 201 and sdg_a == manifest_digest
+        require(
+            st_a == 201 and sdg_a == manifest_digest,
+            f"immutable alias push expected 201 and the same digest; got {st_a}/{sdg_a}",
+        )
         print(f"  immutable alias tag pushed: {alias}")
 
     # ---- 4. digest-pinned round trip ------------------------------------
@@ -319,9 +344,9 @@ def main():
     st_gm, h_gm, got_manifest = get_manifest(REPO, manifest_digest)
     log(f"GET manifests/{manifest_digest[:19]}...", st_gm,
         f"content-digest={content_digest_header(h_gm)}")
-    assert st_gm == 200
-    assert digest_of(got_manifest) == manifest_digest, "manifest bytes not stable"
-    assert got_manifest == manifest_bytes, "manifest bytes differ from what we PUT"
+    require(st_gm == 200, f"GET manifest by digest expected 200, got {st_gm}")
+    require(digest_of(got_manifest) == manifest_digest, "manifest bytes not stable")
+    require(got_manifest == manifest_bytes, "manifest bytes differ from what we PUT")
     print("  manifest bytes byte-identical to what we PUT  [OK]")
 
     parsed = json.loads(got_manifest)
@@ -331,9 +356,9 @@ def main():
     pulled_layer_digest = parsed["layers"][0]["digest"]
     st_gb, h_gb, got_layer = get_blob(REPO, pulled_layer_digest)
     log(f"GET blobs/{pulled_layer_digest[:19]}...", st_gb, f"{len(got_layer)}B")
-    assert st_gb == 200
-    assert digest_of(got_layer) == payload_digest, "pulled layer digest mismatch"
-    assert got_layer == payload, "pulled layer bytes differ from source"
+    require(st_gb == 200, f"GET blob by digest expected 200, got {st_gb}")
+    require(digest_of(got_layer) == payload_digest, "pulled layer digest mismatch")
+    require(got_layer == payload, "pulled layer bytes differ from source")
     print(f"  layer bytes byte-identical to source tarball ({len(got_layer)}B)  [OK]")
 
     # ---- 5a. negative: digest we never pushed ---------------------------
@@ -344,41 +369,56 @@ def main():
         f"code={_errcode(b_nm)}")
     st_nb, _, b_nb = get_blob(REPO, bogus)
     log(f"GET blobs/{bogus[:19]}... (bogus)", st_nb, f"code={_errcode(b_nb)}")
-    assert st_nm == 404 and st_nb == 404
+    require(st_nm == 404 and st_nb == 404,
+            f"a digest never pushed must 404; got manifest={st_nm} blob={st_nb}")
 
     # ---- 5b. idempotency: push identical bytes again ---------------------
     print("\n--- 5b. idempotency: push the SAME bytes again ---")
     layer2 = push_blob(REPO, payload, label="tarball-again")
     config2 = push_blob(REPO, config_bytes, label="config-again")
+    # The re-push result was previously computed and discarded, which made this an
+    # idempotency test that never tested blob idempotency — only that a second push
+    # did not raise. Content-addressing is the claim; check it.
+    require(layer2["digest"] == layer["digest"],
+            f"blob NOT content-addressed: re-push of identical bytes gave "
+            f"{layer2['digest']} but the first gave {layer['digest']}")
+    require(config2["digest"] == config["digest"],
+            f"config blob NOT content-addressed: {config2['digest']} != {config['digest']}")
     manifest_bytes2 = build_manifest(
         descriptor(CONFIG_MEDIA_TYPE, config2["digest"], config2["size"]),
         [layer_desc],
         artifact_type=ARTIFACT_TYPE,
         annotations={
-            "org.opencontainers.image.version": "0.4.40",
+            "org.opencontainers.image.version": VERSION,
             "dev.socioprophet.tarball.sha256": payload_digest,
         },
     )
-    assert manifest_bytes2 == manifest_bytes, "manifest serialisation not deterministic"
+    require(manifest_bytes2 == manifest_bytes, "manifest serialisation not deterministic")
     st2, server_dg2, local_dg2, _, _ = push_manifest(
         REPO, TAG + "-dup", manifest_bytes2, label="idempotency")
-    assert st2 == 201
-    assert server_dg2 == manifest_digest, (
-        f"NOT idempotent: {server_dg2} != {manifest_digest}")
+    require(st2 == 201, f"idempotency re-push expected 201, got {st2}")
+    require(server_dg2 == manifest_digest, f"NOT idempotent: {server_dg2} != {manifest_digest}")
     print(f"  second push under a DIFFERENT tag -> SAME digest {server_dg2}  [OK]")
 
     st_t1, h_t1, _ = get_manifest(REPO, TAG)
     st_t2, h_t2, _ = get_manifest(REPO, TAG + "-dup")
     log(f"GET manifests/{TAG}", st_t1, content_digest_header(h_t1))
     log(f"GET manifests/{TAG}-dup", st_t2, content_digest_header(h_t2))
-    assert content_digest_header(h_t1) == content_digest_header(h_t2) == manifest_digest
+    require(
+        content_digest_header(h_t1) == content_digest_header(h_t2) == manifest_digest,
+        f"both tags must resolve to {manifest_digest}; got "
+        f"{content_digest_header(h_t1)} and {content_digest_header(h_t2)}",
+    )
 
     # ---- 6. the digest must survive the mutable tag being moved -------------
     print("\n--- 6. digest survives the mutable tag being repointed ---")
     moved = build_manifest(config_desc, [layer_desc], artifact_type=ARTIFACT_TYPE,
                            annotations={"build": "SUPERSEDING"})
     st_mv, dg_mv, _, _, _ = push_manifest(REPO, TAG, moved, label="repoint tag")
-    assert st_mv == 201 and dg_mv != manifest_digest
+    require(
+        st_mv == 201 and dg_mv != manifest_digest,
+        f"moving the tag should publish a NEW digest; got status {st_mv} digest {dg_mv}",
+    )
     st_h, h_h, _ = request("HEAD", f"/v2/{REPO}/manifests/{TAG}",
                            headers={"Accept": MANIFEST_MEDIA_TYPE})
     log(f"HEAD manifests/{TAG} after repoint", st_h,
@@ -386,8 +426,10 @@ def main():
     st_old, _, old_bytes = get_manifest(REPO, manifest_digest)
     log(f"GET manifests/{manifest_digest[:19]}... (original pin)", st_old,
         "SURVIVED" if st_old == 200 else "ORPHANED BY TAG MOVE")
-    assert st_old == 200 and old_bytes == manifest_bytes, (
-        "original digest was orphaned -- immutable alias tag is REQUIRED on zot")
+    require(
+        st_old == 200 and old_bytes == manifest_bytes,
+        "original digest was orphaned -- immutable alias tag is REQUIRED on zot",
+    )
     print("  original digest still resolves + bytes identical  [OK]")
     if alias:
         print(f"  (protected by immutable alias tag {alias})")

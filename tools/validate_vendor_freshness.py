@@ -923,10 +923,10 @@ def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: di
                         errors.append(
                             f"ESCAPES repo root: file: dependency {name} -> {spec} "
                             f"(declared in {package_json.relative_to(root).as_posix()}) resolves to "
-                            f"{target}, outside {repo}. Vendored artifacts must live inside the "
-                            "consumer repo so their bytes can be hashed; if this is deliberate, "
-                            "vendor the artifact into the repo and declare it in "
-                            "registry/vendor-freshness.yaml."
+                            f"{target}, outside {repo} at {root.resolve()}. Vendored artifacts must "
+                            "live inside the consumer repo so their bytes can be hashed; if this is "
+                            "deliberate, vendor the artifact into the repo and declare it in the "
+                            "vendor freshness register."
                         )
                         continue
                     if rel not in declared_paths[repo]:

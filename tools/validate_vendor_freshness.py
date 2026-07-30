@@ -161,6 +161,29 @@ def check_shape(data: Any, errors: list[str]) -> tuple[dict[str, dict], list[dic
         policy = {}
     if not isinstance(policy.get("observation_max_age_days"), int):
         errors.append("policy.observation_max_age_days must be an integer")
+    # The per-tier override was read by check_freshness and validated by nobody. A budget
+    # of `null`, `"30"` or `30.0` failed `isinstance(max_age, int)` there, which SKIPPED
+    # the observation-age check for that whole tier and returned exit 0 — one typo in the
+    # register silently switching off staleness enforcement for every source in the tier,
+    # with a green gate on top. Shape it here: the budget is the teeth.
+    by_tier = policy.get("tier_observation_max_age_days")
+    if by_tier is not None:
+        if not isinstance(by_tier, dict):
+            errors.append("policy.tier_observation_max_age_days must be a mapping of tier -> integer days")
+        else:
+            for tier_name, budget in by_tier.items():
+                if tier_name not in TIERS:
+                    errors.append(
+                        f"policy.tier_observation_max_age_days names unknown tier {tier_name!r}; "
+                        f"expected one of {sorted(TIERS)} — a budget under a misspelled tier is "
+                        "never consulted, so the real tier silently keeps the default"
+                    )
+                if isinstance(budget, bool) or not isinstance(budget, int) or budget < 1:
+                    errors.append(
+                        f"policy.tier_observation_max_age_days[{tier_name!r}] must be a positive "
+                        f"integer number of days, got {budget!r} — a non-integer budget disables "
+                        "the observation-age check for this tier instead of failing"
+                    )
     if policy.get("default_freshness_policy") not in POLICIES:
         errors.append(f"policy.default_freshness_policy must be one of {sorted(POLICIES)}")
 

@@ -96,6 +96,9 @@ NEGATIVE = [
     ("bad-foundation-observation-too-old.yaml", "tier foundation limit 30"),
     ("bad-foundation-unobservable-without-gap.yaml", "declare observation_gap"),
     ("bad-expired-observation-gap.yaml", "observation_gap revisit_by has passed"),
+    # A budget that is not a positive integer used to SKIP the observation-age check
+    # for the whole tier and exit 0. The budget is the teeth.
+    ("bad-tier-budget-not-an-integer.yaml", "must be a positive integer number of days"),
 ]
 
 

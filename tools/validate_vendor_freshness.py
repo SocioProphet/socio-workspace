@@ -913,6 +913,21 @@ def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: di
                     try:
                         rel = target.relative_to(root.resolve()).as_posix()
                     except ValueError:
+                        # The specifier resolves outside the consumer repo. This used
+                        # to `continue`, which made the whole sweep opt-out: aim the
+                        # path one level further up and the artifact stopped existing
+                        # as far as this plane was concerned. It is the *worst* case,
+                        # not the safest — the bytes are not in the repo, so no digest
+                        # recorded here can ever cover them, and nothing in CI reads
+                        # them. Unverifiable has to read as a finding, not as a pass.
+                        errors.append(
+                            f"ESCAPES repo root: file: dependency {name} -> {spec} "
+                            f"(declared in {package_json.relative_to(root).as_posix()}) resolves to "
+                            f"{target}, outside {repo}. Vendored artifacts must live inside the "
+                            "consumer repo so their bytes can be hashed; if this is deliberate, "
+                            "vendor the artifact into the repo and declare it in "
+                            "registry/vendor-freshness.yaml."
+                        )
                         continue
                     if rel not in declared_paths[repo]:
                         errors.append(

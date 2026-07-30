@@ -41,7 +41,7 @@ sources:
     upstream_ref: main
     upstream_latest_version: 0.4.45
     upstream_latest_ref: v0.4.45
-    observed_at: '2026-07-29'
+    observed_at: '2026-07-30'
     observation_method: >-
       git ls-remote --tags https://github.com/SocioProphet/hellgraph -> newest semver tag v0.4.45 (dbe854faf5b8)
     # Load-bearing contracts THIS upstream can move, as first-class nodes. A release
@@ -362,10 +362,10 @@ sources:
     version_scheme: commit
     upstream_ref: main
     upstream_latest_digest: unknown
-    observed_at: '2026-07-29'
+    observed_at: '2026-07-30'
     observation_method: >-
-      git ls-remote https://github.com/SourceOS-Linux/sourceos-spec main -> 65925aed8974
-    upstream_latest_commit: 65925aed8974f66757b729a9e0b9500227944583
+      git ls-remote https://github.com/SourceOS-Linux/sourceos-spec main -> 44965d61daef
+    upstream_latest_commit: 44965d61daefbeb47205bf8a991a3cbdb4345fad
 
   - source_id: kbpedia-kko
     repo: SocioProphet/kbpedia
@@ -421,7 +421,7 @@ sources:
     artifact_kind: derived-output
     version_scheme: commit
     upstream_ref: main
-    observed_at: '2026-07-29'
+    observed_at: '2026-07-30'
     observation_method: >-
       git ls-remote https://github.com/SocioProphet/ontogenesis main -> e791402afdfa
     upstream_latest_commit: e791402afdfad5ae8dc29e5f4a142ccaa3fa04c9
@@ -432,7 +432,7 @@ sources:
     artifact_kind: source-port
     version_scheme: commit
     upstream_ref: main
-    observed_at: '2026-07-29'
+    observed_at: '2026-07-30'
     observation_method: >-
       git ls-remote https://github.com/SocioProphet/TriTRPC main -> 08121c183d4a
     upstream_latest_commit: 08121c183d4a2e95d6a0c77e1ad8b91805356a6d

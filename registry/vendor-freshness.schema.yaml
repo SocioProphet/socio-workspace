@@ -54,6 +54,19 @@ top_level:
           not be allowed to rot the same way the artifacts it governs did.
       default_freshness_policy:
         enum: [pin-exact, track-minor, track-latest]
+      default_tier:
+        enum: [foundation, reference]
+      tier_observation_max_age_days:
+        type: object
+        description: >-
+          Per-tier override of observation_max_age_days. A source inherits the
+          STRICTEST tier of anything vendored from it. foundation is deliberately
+          short (30 days) so that the detector RUNNING is not optional: if
+          tools/detect_vendor_freshness.py stops, this register goes red and says so.
+          The automation cannot fail silently, because its silence is the signal.
+        properties:
+          foundation: {type: integer}
+          reference: {type: integer}
   coverage:
     type: object
     required: [mechanically_scanned, declared_only]
@@ -137,6 +150,100 @@ source:
     type: string
     description: How it was looked at, precisely enough to repeat.
     example: git tag --list 'v0.4.*' --sort=-v:refname
+  upstream_latest_commit:
+    type: string
+    description: >-
+      Upstream head commit at observed_at. Required when version_scheme is commit,
+      unless an observation_gap is declared.
+  observation_gap:
+    type: object
+    description: >-
+      Required when a tier-foundation source cannot be observed by the detector.
+      Nobody can be late looking at something there is no way to look at — but you
+      CAN be late building the way to look at it, and an undeclared, undated
+      `unknown` is a permanent parking space. That is the state the estate was in.
+    properties:
+      reason:
+        type: string
+        description: Why it is unobservable, and what would make it observable.
+      revisit_by:
+        type: string
+        format: date
+        description: Hard failure once passed. Same ratchet as remediation.due.
+  contracts:
+    type: array
+    description: >-
+      Load-bearing contracts this upstream can move, as first-class nodes with ids.
+      The graph vocabulary types vfp:changesContract as Release -> Contract and
+      vfp:guardedBy as VendorPin -> Contract, so a bare `kind` string cannot be the
+      object of either edge. Declaring only a kind is why vfp:guardedBy appeared in
+      the exported edge constants and was never once emitted.
+    items:
+      required: [contract_id, contract_kind]
+      properties:
+        contract_id: {type: string}
+        contract_kind:
+          enum: [receipt-shape, schema, fsm]
+        note: {type: string}
+  releases:
+    type: array
+    description: >-
+      The supersession chain, ordered. Required for semver sources, and it must span
+      vendored_version..upstream_latest_version or the chain cannot be walked —
+      gapSize is a path length, and a chain with a hole answers from a SHORTER path,
+      which is a smaller number in the reassuring direction. The detector APPENDS
+      newly observed tags here; it never invents changes_contract for them.
+    items:
+      required: [version]
+      properties:
+        version: {type: string}
+        ref: {type: string}
+        commit: {type: string}
+        note:
+          type: string
+          description: The release commit's own subject, not a paraphrase.
+        also_tagged:
+          type: array
+          description: >-
+            Other tags on this same commit. A version that is not a distinct artifact
+            is not a release, however real its tag looks — hellgraph v0.4.42 points at
+            the v0.4.41 commit, whose package.json says 0.4.41.
+        contract_review:
+          enum: [pending, done]
+          description: >-
+            `pending` means the detector appended this release and nobody has yet said
+            what it moved. Contract-silence means "nobody has said", never "nothing
+            moved".
+        changes_contract:
+          type: array
+          description: >-
+            DECLARED, never inferred. A patch bump is not evidence of safety and a
+            minor bump is not evidence of danger: 0.4.45 was a patch bump and it
+            changed what a Cypher query answers. Inferring risk from a version number
+            is the same guess-instead-of-check this plane exists to stop.
+          items:
+            properties:
+              contract_id:
+                type: string
+                description: Must reference one of this source's contracts[].contract_id.
+              id:
+                type: string
+                description: >-
+                  The SAME value as contract_id, under the spelling the engine's ingest
+                  reads (hellgraph ts/src/vendor-graph.ts derives the Contract node id
+                  from `id`, falling back to `<version>/<kind>`). Both are carried so one
+                  file serves both readers; the validator ERRORS if they disagree, so the
+                  redundancy cannot silently become two different Contract nodes.
+              kind:
+                enum: [receipt-shape, schema, fsm]
+                description: >-
+                  Required by the engine's ingest. Also the pre-contracts form: accepted
+                  alone, but prefer declaring it alongside contract_id.
+              receipt_fixture:
+                type: string
+                description: A golden fixture whose bytes must be re-verified across this release.
+              digest: {type: string}
+              note: {type: string}
   external:
     type: boolean
     description: >-
@@ -215,6 +322,29 @@ artifact:
   pin_reason:
     type: string
     description: Required when freshness_policy is pin-exact.
+  tier:
+    enum: [foundation, reference]
+    description: >-
+      Severity band for UNVERIFIABILITY. It never grades CONTRADICTION: a declared
+      disposition that contradicts the recomputed state fails at every tier, always.
+      Softening that would make tier a supported way to opt out of the gate, which is
+      the one thing it must not be.
+      foundation — a defect here reaches production behaviour or a governed contract.
+                   30-day observation budget; an unobservable upstream must declare an
+                   observation_gap with a revisit_by date.
+      reference  — drift is a correctness problem for a tool, not the product surface.
+                   90 days; an unobservable upstream is a NOTE.
+  tier_reason:
+    type: string
+    description: >-
+      Required when tier is foundation. A tier asserted with no reason is a label
+      rather than a decision.
+  trust_zone:
+    type: string
+    description: >-
+      The consuming app's exposure, emitted as a policyLabel on the EffectRequest the
+      detector produces. Without it the membrane gate would have to invent the label.
+    example: external-facing
   owner:
     type: string
     description: GitHub handle accountable for re-vendoring this artifact.
@@ -261,9 +391,36 @@ artifact:
       is a declared finding in its own right: a guard nobody calls is not a guard.
     properties:
       path: {type: string}
-      floor_constant: {type: string}
-      floor_value: {type: string}
-      invoked_by_ci: {type: boolean}
+      floor_constant:
+        type: string
+        description: >-
+          Name of the constant holding the floor. VERIFIED when the consumer repo is
+          materialized: the guard file must actually define it.
+      floor_value:
+        type: string
+        description: >-
+          The floor the register believes is in force. VERIFIED against the value the
+          guard file holds. It read 0.4.40 for both engine pins while the file said
+          0.4.45 — a floor nobody re-reads drifts the way the tarball did.
+      invoked_by_ci:
+        type: boolean
+        description: >-
+          VERIFIED, never taken on trust. When the consumer repo is materialized the
+          validator follows the invocation chain — a workflow naming the guard path, a
+          CI-reachable make target whose recipe runs it, or a package.json script that
+          something actually runs — and `true` with no such evidence is an ERROR.
+          Declaring is not invoking: check:engine was declared in package.json, called
+          by nothing, and had never once run while being cited as authority. Paths match
+          repo-relative, never by basename — two apps ship a file called
+          check-engine-version.mjs and a basename match would credit one for the other.
+      guards_contract:
+        type: array
+        description: >-
+          contract_ids from the source's contracts[]. The target of vfp:guardedBy: a
+          guard guards a CONTRACT, not a path. The floor exists because these are the
+          contracts that move with the artifact. Every id is checked against the
+          source's catalog, so this cannot become a second unverified assertion inside
+          the field that exists to stop unverified assertions.
   version_marker:
     type: object
     description: >-
@@ -299,6 +456,25 @@ computed_states:
   unknown: >-
     Upstream state is not recorded (or recorded as unknown), so freshness cannot be
     computed. This is not benign — it is the state the estate was already in.
+
+# ── Tier severity (W12.5) ───────────────────────────────────────────────────
+
+tier_severity:
+  principle: >-
+    Tier grades the severity of unverifiability. It never grades the severity of
+    contradiction. Every rule below is about what happens when we CANNOT KNOW; the
+    disposition_agreement table applies unchanged at every tier.
+  foundation:
+    observation_max_age_days: 30
+    unobservable_upstream: ERROR unless observation_gap {reason, revisit_by} is declared
+    expired_observation_gap: ERROR
+  reference:
+    observation_max_age_days: 90
+    unobservable_upstream: NOTE
+  observation_clock: >-
+    Only runs against sources that ARE observable. You cannot be late looking at
+    something there is no way to look at; you can be late building the way to look at
+    it, which is what observation_gap.revisit_by ratchets.
 
 disposition_agreement:
   current: [current]

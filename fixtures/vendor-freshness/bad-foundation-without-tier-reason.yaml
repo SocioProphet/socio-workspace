@@ -3,10 +3,13 @@ manifest_id: vendor-freshness-fixture
 status: seed
 schema: registry/vendor-freshness.schema.yaml
 purpose: >-
-  Waiver that expired and was never revisited.
+  Claims the strict tier without saying why. A tier asserted with no reason is a label, not a decision.
 policy:
   observation_max_age_days: 90
   default_freshness_policy: track-minor
+  tier_observation_max_age_days:
+    foundation: 30
+    reference: 90
 coverage:
   mechanically_scanned: [npm-tarball vendored under a consumer vendor/ directory]
   declared_only: [json-schema copies]
@@ -23,8 +26,6 @@ sources:
     observed_at: '2026-07-01'
     observation_method: fixture
     releases:
-      - version: '0.4.40'
-        ref: v0.4.40
       - version: '0.4.45'
         ref: v0.4.45
 artifacts:
@@ -33,12 +34,9 @@ artifacts:
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
     consumer_app: apps/hellgraph-service
-    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz
-    vendored_version: 0.4.40
+    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.45.tgz
+    vendored_version: 0.4.45
     freshness_policy: track-minor
-    tier: reference
+    tier: foundation
     owner: '@mdheller'
-    disposition: waived
-    waiver:
-      reason: fixture
-      expires: '2026-01-01'
+    disposition: current

@@ -1,3 +1,40 @@
+# vendor-freshness — the fail-closed gate (W12.5).
+#
+# What this gate is NOT: "stale fails the build". That would have failed on day one,
+# with eleven artifacts and two of them five releases behind, and it would have been
+# switched off within a week. Stale is a legitimate state to be in.
+#
+# What it IS: the DECLARED disposition must agree with the RECOMPUTED state. You may
+# not declare `current` while five releases behind. A remediation `due` date and a
+# waiver `expires` date fail once passed, so a filed finding cannot quietly become
+# the new silence. Tier grades how long an artifact may go unobserved; it never
+# grades contradiction, which fails at every tier.
+#
+# ── What changed in W12.5, and why ──────────────────────────────────────────────
+# Before: this job ran the validator with the consumer repos absent, so layer 4
+# (on-disk reality) reported SKIPPED for every artifact and the job went green having
+# read no vendored bytes at all. The register was checked against itself. A digest
+# that had drifted, a tarball that had been deleted, or an UNDECLARED second copy
+# appearing — the lifecycle-warden case, exactly — were all invisible here.
+#
+# After: the consumer repos are materialized and `--require-disk` names them, so a
+# checkout that silently did not happen is an ERROR rather than a SKIPPED that still
+# prints green. Both repos are public, so this needs no token and no new secret.
+# `--skip-disk` and `--require-disk` together are rejected as contradictory, so the
+# escape hatch cannot be reintroduced quietly.
+#
+# ── What the materialized checkout buys, beyond digests (W12.6) ─────────────────
+# The on-disk layer also VERIFIES `guard.invoked_by_ci` — it follows workflow -> make
+# target -> guard path inside the consumer repo and fails a `true` it cannot evidence.
+# That check is worth nothing without the checkout, which is the second reason
+# --require-disk matters: without the bytes, the claim goes back to being a boolean
+# anyone can type, which is the hole the whole plane exists to close.
+#
+# NOT DONE HERE, deliberately: making this a REQUIRED status check on `main` is a
+# repository-ruleset change, not a workflow change, and a required context that does
+# not yet exist on main blocks every open PR in the repo the moment it is added. It
+# has to be added AFTER this workflow is on main. See
+# docs/governance/vendor-freshness-plane.md § Making the gate block.
 name: vendor-freshness
 
 on:
@@ -6,6 +43,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: vendor-freshness-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   vendor-freshness:
@@ -23,11 +64,48 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml pytest
 
-      # Consumer repos are not materialized here, so on-disk verification reports
-      # SKIPPED rather than passed. The register, workspace binding, disposition
-      # agreement and graph vocabulary checks all run.
-      - name: Vendor freshness register validate
-        run: make vendor-freshness-validate
+      # Anonymous shallow clones of PUBLIC repos. No token, no new secret. Full blobs
+      # (not --filter=blob:none): the point of the exercise is to hash the vendored
+      # bytes, and a filtered clone would hand the validator promised objects it
+      # cannot read, which would surface as drift rather than as a bad checkout.
+      - name: Materialize consumer repos
+        run: |
+          set -euo pipefail
+          mkdir -p consumers
+          for repo in prophet-platform hellgraph; do
+            git clone --depth 1 --no-tags \
+              "https://github.com/SocioProphet/${repo}.git" "consumers/${repo}"
+            echo "materialized ${repo} at $(git -C "consumers/${repo}" rev-parse --short HEAD)"
+          done
+
+      # A clone can fail for reasons that have nothing to do with vendoring — a rename,
+      # an outage, a repo going private. --require-disk makes that loud instead of
+      # letting the on-disk layer degrade into a no-op that still reports success.
+      - name: Vendor freshness register validate (fail-closed)
+        run: |
+          python3 tools/validate_vendor_freshness.py \
+            --repo-root "prophet-platform=$PWD/consumers/prophet-platform" \
+            --repo-root "hellgraph=$PWD/consumers/hellgraph" \
+            --require-disk prophet-platform \
+            --require-disk hellgraph
 
       - name: Negative vectors
-        run: pytest -q tests/test_vendor_freshness.py
+        run: pytest -q tests/test_vendor_freshness.py tests/test_vendor_freshness_detector.py
+
+      # The gate proves it can still fail. A gate nobody has watched fail is a gate
+      # nobody knows is wired up — the same class of finding as `check:engine`, which
+      # was declared as an npm script with no caller and never once ran.
+      - name: Prove the gate still fails closed
+        run: |
+          set -euo pipefail
+          if python3 tools/validate_vendor_freshness.py \
+               --register fixtures/vendor-freshness/bad-stale-declared-current.yaml \
+               --skip-disk 2>/dev/null; then
+            echo "::error::the gate ACCEPTED a register declaring current while stale"; exit 1
+          fi
+          if python3 tools/validate_vendor_freshness.py \
+               --repo-root "prophet-platform=/nonexistent" \
+               --require-disk prophet-platform 2>/dev/null; then
+            echo "::error::the gate reported a pass for bytes it never read"; exit 1
+          fi
+          echo "gate refuses both a contradiction and an unverified consumer repo"

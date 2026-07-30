@@ -25,7 +25,10 @@ registry/vendor-freshness.schema.yaml, in four layers:
 4. On-disk reality — when a consumer repo is materialized locally, every
    declared path must exist and every recorded version and digest must match the
    bytes actually vendored. The same sweep looks for vendored artifacts that are
-   NOT declared here; an undeclared artifact is itself a finding.
+   NOT declared here; an undeclared artifact is itself a finding. It also VERIFIES
+   `guard.invoked_by_ci` by following the invocation chain in the consumer repo
+   rather than believing the field, and checks that a declared guard floor is the
+   value the guard file actually holds.
 
 Layers 1-3 are pure register checks and always run. Layer 4 needs the consumer
 repos on disk; where they are absent it is reported as SKIPPED, never as passed.
@@ -59,9 +62,15 @@ VOCAB = GRAPH_DIR / "vendor-freshness.ttl"
 
 REQUIRED_TOP = {"manifest_id", "status", "schema", "purpose", "policy", "coverage", "sources", "artifacts"}
 REQUIRED_SOURCE = {"source_id", "repo", "url", "artifact_kind", "version_scheme", "upstream_ref", "observed_at", "observation_method"}
-REQUIRED_ARTIFACT = {"artifact_id", "source_id", "consumer_repo", "consumer_url", "consumer_app", "freshness_policy", "owner", "disposition"}
+REQUIRED_ARTIFACT = {"artifact_id", "source_id", "consumer_repo", "consumer_url", "consumer_app", "freshness_policy", "owner", "disposition", "tier"}
 
 STATUS = {"seed", "active", "superseded"}
+# Tier grades the severity of UNVERIFIABILITY. It never grades the severity of
+# CONTRADICTION: a declared disposition that contradicts the recomputed state is an
+# error at every tier, always. Softening that would make the tier field a way to
+# opt out of the gate, which is the one thing it must not be.
+TIERS = {"foundation", "reference"}
+STRICTEST_FIRST = ["foundation", "reference"]
 ARTIFACT_KINDS = {"npm-tarball", "json-schema", "rdf-ontology", "source-port", "derived-output"}
 VERSION_SCHEMES = {"semver", "digest", "commit"}
 POLICIES = {"pin-exact", "track-minor", "track-latest"}
@@ -152,6 +161,29 @@ def check_shape(data: Any, errors: list[str]) -> tuple[dict[str, dict], list[dic
         policy = {}
     if not isinstance(policy.get("observation_max_age_days"), int):
         errors.append("policy.observation_max_age_days must be an integer")
+    # The per-tier override was read by check_freshness and validated by nobody. A budget
+    # of `null`, `"30"` or `30.0` failed `isinstance(max_age, int)` there, which SKIPPED
+    # the observation-age check for that whole tier and returned exit 0 — one typo in the
+    # register silently switching off staleness enforcement for every source in the tier,
+    # with a green gate on top. Shape it here: the budget is the teeth.
+    by_tier = policy.get("tier_observation_max_age_days")
+    if by_tier is not None:
+        if not isinstance(by_tier, dict):
+            errors.append("policy.tier_observation_max_age_days must be a mapping of tier -> integer days")
+        else:
+            for tier_name, budget in by_tier.items():
+                if tier_name not in TIERS:
+                    errors.append(
+                        f"policy.tier_observation_max_age_days names unknown tier {tier_name!r}; "
+                        f"expected one of {sorted(TIERS)} — a budget under a misspelled tier is "
+                        "never consulted, so the real tier silently keeps the default"
+                    )
+                if isinstance(budget, bool) or not isinstance(budget, int) or budget < 1:
+                    errors.append(
+                        f"policy.tier_observation_max_age_days[{tier_name!r}] must be a positive "
+                        f"integer number of days, got {budget!r} — a non-integer budget disables "
+                        "the observation-age check for this tier instead of failing"
+                    )
     if policy.get("default_freshness_policy") not in POLICIES:
         errors.append(f"policy.default_freshness_policy must be one of {sorted(POLICIES)}")
 
@@ -231,6 +263,14 @@ def check_shape(data: Any, errors: list[str]) -> tuple[dict[str, dict], list[dic
 
         if artifact.get("disposition") not in DISPOSITIONS:
             errors.append(f"{label} disposition must be one of {sorted(DISPOSITIONS)}")
+
+        tier = artifact.get("tier")
+        if tier not in TIERS:
+            errors.append(f"{label} tier must be one of {sorted(TIERS)}, got {tier!r}")
+        elif tier == "foundation" and not str(artifact.get("tier_reason") or "").strip():
+            # Foundation is the strict tier; claiming it without saying why is how a
+            # tier becomes a label rather than a decision.
+            errors.append(f"{label} tier foundation requires tier_reason")
 
         if not artifact.get("artifact_path") and not artifact.get("artifact_paths"):
             errors.append(f"{label} must declare artifact_path or artifact_paths")
@@ -364,19 +404,172 @@ def compute_state(artifact: dict, source: dict) -> tuple[str, str]:
     return "unknown", f"unsupported version_scheme {scheme!r}"
 
 
-def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict], today: date, errors: list[str], notes: list[str]) -> None:
-    max_age = data.get("policy", {}).get("observation_max_age_days")
-    if isinstance(max_age, int):
-        for source_id, source in sources.items():
-            observed = parse_date(source.get("observed_at"))
-            if observed is None:
+def source_tier(source_id: str, artifacts: list[dict]) -> str:
+    """A source inherits the STRICTEST tier of anything vendored from it.
+
+    An upstream feeding one foundation consumer and four reference ones is a
+    foundation upstream. Taking the loosest tier would let a reference copy set the
+    observation budget for the engine that answers production queries.
+    """
+    tiers = {a.get("tier") for a in artifacts if a.get("source_id") == source_id}
+    for candidate in STRICTEST_FIRST:
+        if candidate in tiers:
+            return candidate
+    return "reference"
+
+
+def check_release_chain(sources: dict[str, dict], artifacts: list[dict], errors: list[str], notes: list[str]) -> None:
+    """The supersession chain must actually be walkable from the register.
+
+    `gapSize` is the length of a vfp:supersededBy path, and blast-radius reasoning is
+    worth little without it. A source that names a latest version it does not list as
+    a release has a chain with a hole in it, and the derived questions silently answer
+    from a shorter chain than reality — which is a smaller number, in the reassuring
+    direction. So a hole is an error, not a note.
+    """
+    for source_id, source in sources.items():
+        if source.get("version_scheme") != "semver":
+            continue
+        releases = source.get("releases") or []
+        if not releases:
+            errors.append(
+                f"source {source_id!r} is semver and declares no releases; the supersession chain "
+                "cannot be built, so staleness distance and contract-crossing risk cannot be derived "
+                "from this register. `make vendor-freshness-detect` populates it."
+            )
+            continue
+
+        known = {str(r.get("version")) for r in releases if isinstance(r, dict)}
+        latest = source.get("upstream_latest_version")
+        if latest and str(latest) not in known:
+            errors.append(
+                f"source {source_id!r} declares upstream_latest_version {latest} with no matching "
+                f"releases: entry — the chain does not reach its own head"
+            )
+        for artifact in artifacts:
+            if artifact.get("source_id") != source_id:
                 continue
-            age = (today - observed).days
-            if age > max_age:
+            vendored = artifact.get("vendored_version")
+            if vendored and str(vendored) not in known:
                 errors.append(
-                    f"source {source_id!r} observation is {age} days old (limit {max_age}); "
-                    "re-observe upstream — a stale observation makes every artifact from this source unverifiable"
+                    f"artifact {artifact.get('artifact_id')!r} pins {vendored}, which source "
+                    f"{source_id!r} does not list as a release — the chain has no anchor to walk from"
                 )
+
+        catalog = {c.get("contract_id") for c in source.get("contracts") or [] if isinstance(c, dict)}
+        contract_silent = []
+        for release in releases:
+            if not isinstance(release, dict):
+                errors.append(f"source {source_id!r} releases entries must be mappings")
+                continue
+            changes = release.get("changes_contract")
+            if not changes:
+                contract_silent.append(str(release.get("version")))
+                continue
+            for change in changes:
+                if not isinstance(change, dict):
+                    errors.append(f"source {source_id!r} release {release.get('version')} changes_contract entries must be mappings")
+                    continue
+                # `contract_id` is this register's spelling; `id` is the one the engine's
+                # ingest reads (hellgraph ts/src/vendor-graph.ts derives the Contract node
+                # id from it, falling back to `<version>/<kind>`). Both are carried so the
+                # same bytes serve both readers — which is only safe if they cannot drift,
+                # so disagreement is an error rather than a preference.
+                contract_id, alias = change.get("contract_id"), change.get("id")
+                if contract_id is not None and alias is not None and contract_id != alias:
+                    errors.append(
+                        f"source {source_id!r} release {release.get('version')} declares contract_id "
+                        f"{contract_id!r} and id {alias!r}; they name the same Contract node and must agree"
+                    )
+                contract_id = contract_id if contract_id is not None else alias
+                if contract_id is None:
+                    if not change.get("kind"):
+                        errors.append(
+                            f"source {source_id!r} release {release.get('version')} declares a contract change "
+                            "with neither contract_id nor kind"
+                        )
+                    continue
+                if contract_id not in catalog:
+                    errors.append(
+                        f"source {source_id!r} release {release.get('version')} references unknown "
+                        f"contract_id {contract_id!r}; declare it under the source's contracts:"
+                    )
+        # vfp:guardedBy is VendorPin -> Contract. It existed in the engine's exported edge
+        # constants and was never once written, because the register only ever declared a
+        # guard PATH — a string, which cannot be the object of that edge. `guards_contract`
+        # supplies the missing endpoint, and is checked here so it does not become a second
+        # unverified assertion in the field that exists to stop unverified assertions.
+        for artifact in artifacts:
+            if artifact.get("source_id") != source_id:
+                continue
+            guard = artifact.get("guard") or {}
+            for contract_id in guard.get("guards_contract") or []:
+                if contract_id not in catalog:
+                    errors.append(
+                        f"artifact {artifact.get('artifact_id')!r} guard guards_contract names "
+                        f"{contract_id!r}, which source {source_id!r} does not declare under contracts:"
+                    )
+
+        # Contract-silence is a legitimate, common state — most releases move nothing
+        # load-bearing — so it is reported, never failed. Failing it would push people
+        # to declare a contract change they had not actually checked for.
+        order = sorted(releases, key=lambda r: semver(str(r.get("version"))) or (0, 0, 0))
+        pending = [str(r.get("version")) for r in order
+                   if isinstance(r, dict) and r.get("contract_review") == "pending"]
+        if pending:
+            notes.append(
+                f"CONTRACT-REVIEW-PENDING source {source_id!r}: {len(pending)} release(s) "
+                f"{pending[0]}..{pending[-1]} were appended by the detector and nobody has said "
+                "what they moved"
+            )
+        elif contract_silent:
+            notes.append(f"CONTRACT-SILENT source {source_id!r}: {sorted(contract_silent)}")
+
+
+def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict], today: date, errors: list[str], notes: list[str]) -> None:
+    policy = data.get("policy", {}) if isinstance(data.get("policy"), dict) else {}
+    default_max_age = policy.get("observation_max_age_days")
+    by_tier = policy.get("tier_observation_max_age_days") or {}
+
+    for source_id, source in sources.items():
+        tier = source_tier(source_id, artifacts)
+        max_age = by_tier.get(tier, default_max_age)
+        observable = upstream_is_observed(source)
+        gap = source.get("observation_gap") or {}
+
+        if not observable:
+            # Nobody can be late looking at something there is no way to look at. But
+            # you CAN be late building the way to look at it — so a foundation source
+            # the detector cannot observe must name the gap and a date to close it.
+            # Without this, `unknown` is a permanent, silent parking space, which is
+            # the exact state the estate was already in.
+            if tier == "foundation":
+                revisit = parse_date(gap.get("revisit_by"))
+                if not str(gap.get("reason") or "").strip() or revisit is None:
+                    errors.append(
+                        f"source {source_id!r} is tier foundation and its upstream is not observable "
+                        "(tools/detect_vendor_freshness.py cannot read it); declare observation_gap "
+                        "with a reason and a revisit_by date"
+                    )
+                elif revisit < today:
+                    errors.append(
+                        f"source {source_id!r} observation_gap revisit_by has passed ({revisit}, today {today}); "
+                        "either make the upstream observable or re-date the gap deliberately"
+                    )
+            else:
+                notes.append(f"UNOBSERVABLE source {source_id!r} [tier {tier}]: upstream state cannot be computed")
+            continue
+
+        observed = parse_date(source.get("observed_at"))
+        if observed is None or not isinstance(max_age, int):
+            continue
+        age = (today - observed).days
+        if age > max_age:
+            errors.append(
+                f"source {source_id!r} observation is {age} days old (tier {tier} limit {max_age}); "
+                "re-observe upstream — a stale observation makes every artifact from this source "
+                "unverifiable. `make vendor-freshness-detect` refreshes it."
+            )
 
     for artifact in artifacts:
         artifact_id = artifact.get("artifact_id")
@@ -408,19 +601,245 @@ def check_freshness(data: dict, sources: dict[str, dict], artifacts: list[dict],
             notes.append(f"GUARD-NOT-INVOKED {artifact_id}: {guard.get('path') or 'no guard declared'}")
 
 
+# ── layer 4a: is the guard actually invoked? (verified, never asserted) ──────
+#
+# `invoked_by_ci` used to be a field anyone could set to true. That reproduces the
+# exact hole this plane exists to close: hellgraph-service's check:engine was declared
+# in package.json, invoked by no workflow, no Makefile and no Dockerfile, and had
+# never once run — while being cited as the authority that stale engines get caught.
+# A claim that cannot be checked is decoration. So the claim is now CHECKED, by
+# following the invocation chain in the consumer repo itself.
+#
+# Deliberately bounded. Three shapes are recognised, all of them ones the estate
+# actually uses, and anything else reads as unverified rather than being guessed at:
+#
+#   direct    — the guard path appears in a workflow file.
+#   via make  — the guard path appears in the recipe of a make target that is
+#               reachable (through prerequisites) from a target a workflow names.
+#   via npm   — the guard path appears in a package.json script that a workflow, or a
+#               CI-reachable make target, actually runs.
+#
+# Paths are matched REPO-RELATIVE in make/workflow context and PACKAGE-RELATIVE in
+# npm-script context. Never by basename: apps/hellgraph-service and
+# apps/lifecycle-warden both contain a file called check-engine-version.mjs, and a
+# basename match would report one app's guard as evidence for the other — which is
+# the precise confusion that let the second stale copy hide.
+
+MAKE_TARGET_RE = re.compile(r"^([A-Za-z0-9_][A-Za-z0-9_.\-/]*)\s*:(?!=)([^=].*)?$")
+MAKEFILE_NAMES = ("Makefile", "GNUmakefile", "makefile")
+
+
+def _read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return ""
+
+
+def _word(token: str) -> re.Pattern[str]:
+    """Token match that will not fire on a longer name containing it."""
+    return re.compile(rf"(?<![\w./-]){re.escape(token)}(?![\w./-])")
+
+
+def _workflow_texts(root: Path) -> dict[str, str]:
+    directory = root / ".github" / "workflows"
+    if not directory.is_dir():
+        return {}
+    return {
+        p.relative_to(root).as_posix(): _read(p)
+        for p in sorted(directory.iterdir())
+        if p.suffix in (".yml", ".yaml") and p.is_file()
+    }
+
+
+def _make_graph(root: Path) -> dict[str, dict[str, Any]]:
+    """{target: {recipe, prereqs, file}} across the repo's makefiles."""
+    files = [root / name for name in MAKEFILE_NAMES] + sorted(root.glob("*.mk"))
+    graph: dict[str, dict[str, Any]] = {}
+    for path in files:
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root).as_posix()
+        current: list[str] = []
+        for line in _read(path).splitlines():
+            if line.startswith("\t"):
+                for name in current:
+                    graph[name]["recipe"] += line + "\n"
+                continue
+            match = MAKE_TARGET_RE.match(line)
+            if not match:
+                if line.strip():
+                    current = []
+                continue
+            names = [n for n in match.group(1).split() if not n.startswith(".")]
+            prereqs = (match.group(2) or "").split()
+            current = []
+            for name in names:
+                entry = graph.setdefault(name, {"recipe": "", "prereqs": [], "file": rel})
+                entry["prereqs"].extend(prereqs)
+                current.append(name)
+    return graph
+
+
+def _ci_reachable_targets(graph: dict[str, dict[str, Any]], workflows: dict[str, str]) -> dict[str, str]:
+    """Make targets a workflow runs, plus everything they pull in. {target: why}."""
+    reachable: dict[str, str] = {}
+    frontier: list[str] = []
+    for target in graph:
+        for wf, text in workflows.items():
+            if _word(target).search(text):
+                reachable[target] = f"`make {target}` in {wf}"
+                frontier.append(target)
+                break
+    while frontier:
+        target = frontier.pop()
+        for prereq in graph.get(target, {}).get("prereqs", []):
+            if prereq in graph and prereq not in reachable:
+                reachable[prereq] = f"{reachable[target]} -> prerequisite `{prereq}`"
+                frontier.append(prereq)
+    return reachable
+
+
+def _npm_scripts(root: Path) -> list[tuple[Path, str, str]]:
+    """(package_dir, script_name, script_body) for every package.json outside node_modules."""
+    found: list[tuple[Path, str, str]] = []
+    for package_json in sorted(root.rglob("package.json")):
+        if "node_modules" in package_json.parts:
+            continue
+        try:
+            manifest = json.loads(package_json.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            continue
+        for name, body in (manifest.get("scripts") or {}).items():
+            if isinstance(body, str):
+                found.append((package_json.parent, name, body))
+    return found
+
+
+def guard_invocation_evidence(root: Path, guard_path: str, cache: dict[str, Any]) -> list[str]:
+    """Every way CI is shown to reach this guard. Empty means unverified."""
+    workflows = cache.setdefault("workflows", _workflow_texts(root))
+    graph = cache.setdefault("make", _make_graph(root))
+    reachable = cache.setdefault("reachable", _ci_reachable_targets(graph, workflows))
+    scripts = cache.setdefault("npm", _npm_scripts(root))
+
+    rel = guard_path.strip().lstrip("./")
+    pattern = _word(rel)
+    evidence: list[str] = []
+
+    for wf, text in workflows.items():
+        if pattern.search(text):
+            evidence.append(f"named directly in {wf}")
+
+    for target, why in sorted(reachable.items()):
+        if pattern.search(graph[target]["recipe"]):
+            evidence.append(f"{why} ({graph[target]['file']}) runs {rel}")
+
+    for package_dir, name, body in scripts:
+        try:
+            inner = Path(rel).relative_to(package_dir.relative_to(root)).as_posix()
+        except ValueError:
+            continue
+        if not _word(inner).search(body):
+            continue
+        # The script exists. Now: does anything RUN it? This is the check:engine case
+        # exactly — a script that names the guard and that nobody ever calls.
+        invoker = _word(f"run {name}")
+        where = [wf for wf, text in workflows.items() if invoker.search(text)]
+        where += [
+            f"`make {target}` ({graph[target]['file']})"
+            for target in sorted(reachable) if invoker.search(graph[target]["recipe"])
+        ]
+        if where:
+            pkg = (package_dir / "package.json").relative_to(root).as_posix()
+            evidence.append(f"npm script `{name}` in {pkg}, run by {', '.join(where)}")
+    return evidence
+
+
+def check_guard(artifact: dict, root: Path, repo: str, cache: dict[str, Any],
+                errors: list[str], notes: list[str]) -> None:
+    guard = artifact.get("guard") or {}
+    guard_path = guard.get("path")
+    artifact_id = artifact.get("artifact_id")
+    if not guard_path:
+        return
+    path = root / guard_path
+    if not path.exists():
+        errors.append(f"artifact {artifact_id!r} guard path does not exist: {repo}/{guard_path}")
+        return
+
+    evidence = guard_invocation_evidence(root, guard_path, cache)
+    claimed = guard.get("invoked_by_ci")
+    if claimed is True and not evidence:
+        errors.append(
+            f"artifact {artifact_id!r} declares guard.invoked_by_ci: true, but nothing in "
+            f"{repo} invokes {guard_path}: no workflow names it, no CI-reachable make target "
+            "runs it, and no package.json script that runs it is itself run. An unverified "
+            "invoked_by_ci is the check:engine hole with a tick next to it — either wire the "
+            "guard or declare invoked_by_ci: false and carry it as the finding it is."
+        )
+    elif claimed is True:
+        notes.append(f"GUARD-INVOKED {artifact_id}: {guard_path} <- {evidence[0]}")
+    elif evidence:
+        notes.append(
+            f"GUARD-UNDERSTATED {artifact_id}: invoked_by_ci is {claimed!r} but {evidence[0]} "
+            "— the register is behind the repo"
+        )
+
+    # A floor is only a floor if the file holds the value the register says it holds.
+    # The register recorded MIN_ENGINE 0.4.40 for weeks after the re-vendor moved it to
+    # 0.4.45; a floor nobody re-reads drifts the same way the tarball did.
+    constant, expected = guard.get("floor_constant"), guard.get("floor_value")
+    if not constant or expected is None:
+        return
+    found = re.search(
+        rf"^[^\S\n]*(?:export\s+)?(?:const|let|var|final|static)?[^\S\n]*"
+        rf"{re.escape(str(constant))}[^\S\n]*(?::[^=\n]+)?=[^\S\n]*(['\"]?)([^'\"\s,;)]+)\1",
+        _read(path), re.MULTILINE,
+    )
+    if found is None:
+        errors.append(
+            f"artifact {artifact_id!r} declares guard.floor_constant {constant!r}, "
+            f"which {repo}/{guard_path} does not define"
+        )
+    elif found.group(2) != str(expected):
+        errors.append(
+            f"DRIFT artifact {artifact_id!r} guard floor: register records {constant}="
+            f"{expected} but {repo}/{guard_path} holds {found.group(2)}"
+        )
+
+
 # ── layer 4: on-disk reality and undeclared-artifact sweep ───────────────────
 
-def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: dict[str, Path], errors: list[str], notes: list[str]) -> None:
+def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: dict[str, Path],
+                  errors: list[str], notes: list[str], required: set[str] | None = None) -> None:
     repos = sorted({a.get("consumer_repo") for a in artifacts if a.get("consumer_repo")})
     roots: dict[str, Path] = {}
+    required = required or set()
     for repo in repos:
         root = resolve_repo_root(repo, overrides)
         if root is None:
-            notes.append(f"SKIPPED on-disk verification for {repo}: not materialized locally")
+            # SKIPPED is honest when nobody claimed the repo would be there. In CI it
+            # is not honest — the workflow materializes the consumers on purpose, and
+            # a checkout that silently failed would turn the whole on-disk layer into
+            # a no-op that still prints green. --require-disk closes that.
+            if repo in required or repo.split("/")[-1] in required:
+                errors.append(
+                    f"--require-disk names {repo} but it is not materialized; on-disk verification "
+                    "would have been skipped. Refusing to report a pass for bytes nobody read."
+                )
+            else:
+                notes.append(f"SKIPPED on-disk verification for {repo}: not materialized locally")
         else:
             roots[repo] = root
+    for name in sorted(required):
+        if not any(name in (repo, repo.split("/")[-1]) for repo in repos):
+            errors.append(f"--require-disk names {name!r}, which no artifact declares as a consumer_repo")
 
     declared_paths: dict[str, set[str]] = {repo: set() for repo in roots}
+    # One parse of each consumer repo's workflows/makefiles/package scripts, reused by
+    # every guard declared against it.
+    guard_cache: dict[str, dict[str, Any]] = {}
 
     for artifact in artifacts:
         repo = artifact.get("consumer_repo")
@@ -466,10 +885,7 @@ def check_on_disk(artifacts: list[dict], sources: dict[str, dict], overrides: di
             if rel and not (root / rel).exists():
                 errors.append(f"artifact {artifact_id!r} declared_in path does not exist: {repo}/{rel}")
 
-        guard = artifact.get("guard") or {}
-        guard_path = guard.get("path")
-        if guard_path and not (root / guard_path).exists():
-            errors.append(f"artifact {artifact_id!r} guard path does not exist: {repo}/{guard_path}")
+        check_guard(artifact, root, repo, guard_cache.setdefault(repo, {}), errors, notes)
 
     # undeclared-artifact sweep over the mechanically scannable classes
     for repo, root in roots.items():
@@ -541,7 +957,8 @@ def check_vocabulary(errors: list[str], notes: list[str]) -> None:
 
 # ── entrypoint ───────────────────────────────────────────────────────────────
 
-def run(register_path: Path, overrides: dict[str, Path], today: date, skip_disk: bool) -> tuple[list[str], list[str], int]:
+def run(register_path: Path, overrides: dict[str, Path], today: date, skip_disk: bool,
+        required: set[str] | None = None) -> tuple[list[str], list[str], int]:
     errors: list[str] = []
     notes: list[str] = []
     try:
@@ -552,12 +969,17 @@ def run(register_path: Path, overrides: dict[str, Path], today: date, skip_disk:
     sources, artifacts = check_shape(data, errors)
     if not errors:
         check_workspace_binding(sources, artifacts, errors, notes)
+        check_release_chain(sources, artifacts, errors, notes)
         check_freshness(data if isinstance(data, dict) else {}, sources, artifacts, today, errors, notes)
         if register_path == REGISTER:
             # The graph vocabulary governs the committed register, not fixtures.
             check_vocabulary(errors, notes)
-        if not skip_disk:
-            check_on_disk(artifacts, sources, overrides, errors, notes)
+        if skip_disk:
+            if required:
+                errors.append("--skip-disk and --require-disk are contradictory; --require-disk exists to stop exactly this")
+            notes.append("SKIPPED on-disk verification entirely (--skip-disk)")
+        else:
+            check_on_disk(artifacts, sources, overrides, errors, notes, required)
     return errors, notes, len(artifacts)
 
 
@@ -567,6 +989,10 @@ def main() -> int:
     parser.add_argument("--repo-root", action="append", default=[], metavar="NAME=PATH",
                         help="Locate a consumer repo explicitly, e.g. prophet-platform=/path/to/repo")
     parser.add_argument("--skip-disk", action="store_true", help="Register checks only; skip on-disk verification.")
+    parser.add_argument("--require-disk", action="append", default=[], metavar="REPO",
+                        help="Fail if this consumer repo is not materialized, instead of reporting SKIPPED. "
+                             "Repeatable. This is what makes the CI gate fail-closed: a checkout that "
+                             "silently did not happen must not read as a pass.")
     parser.add_argument("--today", type=str, default=None, help="Override today's date (YYYY-MM-DD) for date-based checks.")
     args = parser.parse_args()
 
@@ -583,7 +1009,7 @@ def main() -> int:
         print(f"ERROR: --today expects YYYY-MM-DD, got {args.today!r}", file=sys.stderr)
         return 1
 
-    errors, notes, count = run(args.register, overrides, today, args.skip_disk)
+    errors, notes, count = run(args.register, overrides, today, args.skip_disk, set(args.require_disk))
 
     for note in notes:
         print(f"NOTE: {note}")

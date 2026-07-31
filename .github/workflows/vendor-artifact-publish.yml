@@ -1,0 +1,175 @@
+# vendor-artifact-publish — the sovereign publish path (W12.3).
+#
+# ⚠️  SPEC + CODE, NOT YET EXERCISED AGAINST PRODUCTION. The publisher it calls has
+#     been run end-to-end against a real zot v2.1.2 in a container (push, pull by
+#     digest, byte-identical round trip, 404 on an unknown digest, idempotent
+#     re-push). Publishing to registry.socioprophet.ai has NOT been run: it needs the
+#     `ci` htpasswd credential, and this work adds no new secrets. Do not read a green
+#     run of this file as proof the production path works until it has published once.
+#     See docs/governance/vendor-freshness-sovereign-path.md.
+#
+# Why it exists: today the vendored engine tarball is produced BY HAND on a laptop and
+# committed as a binary blob — hellgraph has no workflow that runs `npm pack` at all.
+# The pin is a FILENAME, so a bump means editing a filename in N places and nothing
+# asserts the bytes are the release they claim to be. A digest is the bytes.
+#
+# Trigger: manual today. The intended trigger is a gitea tag-push webhook; that
+# contract is specified in the doc above and the emitter is not ours to add here.
+name: vendor-artifact-publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_id:
+        description: 'source_id from registry/vendor-freshness.yaml'
+        required: true
+        default: hellgraph-engine
+      version:
+        description: 'Release version to publish (e.g. 0.4.45)'
+        required: true
+      dry_run:
+        description: 'Build, pack and verify, but do not publish'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vendor-artifact-publish-${{ inputs.source_id }}-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Resolve the source from the register
+        id: source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import os, yaml
+          reg = yaml.safe_load(open("registry/vendor-freshness.yaml"))
+          src = next(s for s in reg["sources"] if s["source_id"] == os.environ["SOURCE_ID"])
+          print(f"url={src['url']}")
+          print(f"package={src.get('package_name','')}")
+          # The OCI repository path mirrors the upstream repo path, so a human reading
+          # a digest pin can tell what it is without consulting the register.
+          print(f"oci_repo={src['repo'].lower()}")
+          PY
+        env:
+          SOURCE_ID: ${{ inputs.source_id }}
+
+      # The SAME discipline the consumer-side executor performs, for the same reasons.
+      # A publisher that skipped it would put a stale dist behind a digest, which is
+      # strictly worse than a stale filename: the digest would be correct forever.
+      - name: Build and pack the release
+        id: pack
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "v${{ inputs.version }}" \
+            "${{ steps.source.outputs.url }}.git" upstream
+          cd upstream
+          npm install --no-audit --no-fund
+          # Explicit and unconditional: `npm pack` runs `prepare` only when scripts are
+          # enabled, and whether they are is environment-dependent. Never let pack be
+          # the thing that decides whether the dist was rebuilt.
+          npm run build
+          if ! git diff --quiet -- ts/dist; then
+            echo "::error::the tag's committed ts/dist is stale versus a fresh build"; exit 1
+          fi
+          TARBALL=$(npm pack --silent | tail -1)
+          echo "tarball=$PWD/$TARBALL" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum "$TARBALL" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      # This step was called "Assert the version marker inside the packed dist" and did
+      # not do that. It checked package.json's version, then read ts/dist/index.js and
+      # printed its BYTE LENGTH — a read that cannot fail for any dist that exists. Nor
+      # is there a version marker to look for: the bundle embeds no version constant
+      # (the only version-shaped string in 0.4.45's dist is `0.4.44`, inside a comment).
+      # A step whose name promises an assertion it cannot make is worse than no step.
+      #
+      # What IS worth asserting — and what the "tgz ships a stale dist" incident actually
+      # needed — is that the bytes npm PACKED are the bytes we just BUILT. The pack step
+      # compares the committed dist against a fresh build; that says nothing about what
+      # `files`/.npmignore then selected into the tarball. This closes that gap.
+      - name: Assert the packed dist is the dist we just built
+        run: |
+          set -euo pipefail
+          cd upstream && mkdir -p x && tar xzf "${{ steps.pack.outputs.tarball }}" \
+            -C x package/ts/dist/index.js package/package.json
+          # node, never grep: file(1) reports this bundle as `data`, and grep skips or
+          # misreports matches in binary content.
+          node -e '
+            const fs = require("fs");
+            const pkg = JSON.parse(fs.readFileSync("x/package/package.json", "utf8"));
+            if (pkg.version !== process.env.VERSION) {
+              console.error(`✗ tarball says ${pkg.version}, expected ${process.env.VERSION}`);
+              process.exit(1);
+            }
+            const packed = fs.readFileSync("x/package/ts/dist/index.js");
+            const built  = fs.readFileSync("ts/dist/index.js");
+            if (packed.length === 0) {
+              console.error("✗ packed ts/dist/index.js is empty"); process.exit(1);
+            }
+            if (!packed.equals(built)) {
+              console.error(
+                `✗ packed dist (${packed.length}B) differs from the freshly built dist ` +
+                `(${built.length}B) — npm pack shipped bytes the build did not produce`);
+              process.exit(1);
+            }
+            console.log(`✓ ${pkg.version}: packed dist is byte-identical to the build (${packed.length}B)`);
+          '
+        env:
+          VERSION: ${{ inputs.version }}
+
+      - name: Publish to sovereign zot
+        if: ${{ !inputs.dry_run }}
+        env:
+          OCI_REGISTRY: registry.socioprophet.ai
+          OCI_SCHEME: https
+          OCI_REPO: ${{ steps.source.outputs.oci_repo }}
+          OCI_TAG: ${{ inputs.version }}
+          # Already exist for the image pipeline. This workflow mints NOTHING.
+          OCI_USERNAME: ${{ secrets.ZOT_CI_USERNAME }}
+          OCI_PASSWORD: ${{ secrets.ZOT_CI_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${OCI_USERNAME:-}" ]; then
+            echo "::error::ZOT_CI_USERNAME/PASSWORD are not set in this repository."
+            echo "They exist in prophet-platform for the image pipeline. This workflow"
+            echo "does not create secrets — grant the existing ci user access instead,"
+            echo "and remember htpasswd is authn while accessControl is authz: a user"
+            echo "that authenticates can still 403 on push until it is listed under"
+            echo "accessControl.repositories[**].policies[].users, and zot needs a"
+            echo "rollout restart after that config change because it does not hot-reload."
+            exit 1
+          fi
+          python3 tools/publish_vendor_artifact_oci.py "${{ steps.pack.outputs.tarball }}"
+
+      - name: Report
+        run: |
+          {
+            echo "## vendor-artifact-publish"
+            echo ""
+            echo "- source: \`${{ inputs.source_id }}\` @ \`${{ inputs.version }}\`"
+            echo "- tarball sha256: \`${{ steps.pack.outputs.sha256 }}\`"
+            echo "- published: ${{ inputs.dry_run && 'NO (dry run)' || 'yes' }}"
+            echo ""
+            echo "Record the resulting manifest digest as \`oci_digest\` on the artifact"
+            echo "in \`registry/vendor-freshness.yaml\`. Two independent digests over the"
+            echo "same bytes, which must agree."
+          } >> "$GITHUB_STEP_SUMMARY"

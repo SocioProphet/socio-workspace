@@ -1,0 +1,45 @@
+{
+  "artifact_kind": "PrivacyBoundaryProjectionArtifact",
+  "authority_doc_ref": "SocioProphet/ontogenesis/docs/specs/privacy-nonlinkability-doctrine-v0.md",
+  "authority_repo": "SocioProphet/ontogenesis",
+  "default_disposition": "require_review",
+  "evidence_refs": [
+    "docs/privacy-nonlinkability-workspace-binding.md"
+  ],
+  "generated_at": "2026-06-02T00:00:00Z",
+  "lock_ref": "manifest/workspace.lock.json",
+  "manifest_ref": "manifest/workspace.toml",
+  "non_learning_constraints": [
+    {
+      "constraint": "DoNotLearn",
+      "default_allowed": false,
+      "surfaces": [
+        "memory-mesh-writeback",
+        "vector-index-insertion",
+        "topic-pack-promotion",
+        "policy-learning-feedback",
+        "delivery-metrics-training"
+      ]
+    }
+  ],
+  "non_linkability_constraints": [
+    {
+      "constraint": "DoNotLink",
+      "default_allowed": false,
+      "surfaces": [
+        "cross-workroom-graph-edge",
+        "entity-resolution-bridge",
+        "latent-neighbor-exposure",
+        "source-context-join",
+        "topic-membership-bridge"
+      ]
+    }
+  ],
+  "protected_scope_refs": [
+    "workspace:legal-evidence",
+    "workspace:operator-local-diagnostics",
+    "workroom:incident-review",
+    "workroom:product-planning"
+  ],
+  "workspace_ref": "SocioProphet/sociosphere"
+}

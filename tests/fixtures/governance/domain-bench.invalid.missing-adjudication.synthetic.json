@@ -1,0 +1,31 @@
+{
+  "benchId": "bench:domain:invalid",
+  "domain": "regulated-ai-governance",
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "DomainBench",
+  "rubricLineage": {
+    "expertRoleRefs": [
+      "role:sociosphere-governance-owner"
+    ],
+    "rubricId": "rubric:domain:invalid",
+    "sourceRefs": [
+      "registry/competitive-capability-map-v0.yaml"
+    ]
+  },
+  "schemaVersion": "governance.domain-bench.v0.1",
+  "tasks": [
+    {
+      "expectedEvidenceClass": "canonical",
+      "fixtureRef": "tests/fixtures/governance/evidence-bundle.valid.synthetic.json",
+      "taskId": "task:invalid",
+      "taskKind": "evidence_grounding"
+    }
+  ],
+  "title": "Invalid domain benchmark"
+}

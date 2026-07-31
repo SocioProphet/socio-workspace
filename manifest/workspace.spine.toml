@@ -1,0 +1,45 @@
+# Spine manifest fragment (v0.1)
+
+# This is intended to be merged into sociosphere's manifest/workspace.toml.
+# URLs and revisions are intentionally blank until we pin them in workspace.lock.json.
+
+[[repos]]
+name = "sourceos"
+role = "component"
+local_path = "components/sourceos"
+
+[[repos]]
+name = "tritrpc"
+role = "component"
+local_path = "components/tritrpc"
+
+[[repos]]
+name = "socioprophet-standards-storage"
+role = "component"
+local_path = "components/standards/storage"
+
+[[repos]]
+name = "socioprophet-standards-knowledge"
+role = "component"
+local_path = "components/standards/knowledge"
+
+[[repos]]
+name = "agentplane"
+role = "component"
+local_path = "components/agentplane"
+
+[[repos]]
+name = "tritfabric"
+role = "component"
+local_path = "components/tritfabric"
+
+[[repos]]
+name = "global-devsecops-intelligence"
+role = "component"
+local_path = "components/global-devsecops-intelligence"
+
+# Optional / needs license resolution before distribution
+[[repos]]
+name = "socios"
+role = "third_party"
+local_path = "third_party/socios"

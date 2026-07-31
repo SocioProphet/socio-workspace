@@ -1,0 +1,173 @@
+{
+  "apiVersion": "socioprophet.org/proof-ledger/v0",
+  "kind": "CrossRepoProofLedger",
+  "metadata": {
+    "name": "sourceos-socioprophet-proof-ledger-v0",
+    "ownerRepo": "SocioProphet/sociosphere",
+    "status": "seeded",
+    "claimBoundary": "local, CI-backed, non-mutating, evidence-based MVP proof coordination only; not production readiness"
+  },
+  "canonicalCommandRefs": [
+    {
+      "id": "fogstack-parity-readiness",
+      "repo": "SocioProphet/prophet-platform",
+      "command": "make fogstack-parity-readiness",
+      "mutationPosture": "non-mutating",
+      "expectedArtifact": "build/fogstack-local-demo/fogstack-parity-readiness.record.json",
+      "status": "validated"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "sourceos-contract-canon",
+      "repo": "SourceOS-Linux/sourceos-spec",
+      "role": "contract-canon",
+      "status": "validated",
+      "evidenceRefs": ["schemas/", "examples/", "docs/contract-additions/"]
+    },
+    {
+      "id": "storage-standards",
+      "repo": "SocioProphet/socioprophet-standards-storage",
+      "role": "storage-and-interface-standards",
+      "status": "validated",
+      "evidenceRefs": ["schemas/", "docs/standards/", "benchmarks/"]
+    },
+    {
+      "id": "knowledge-standards",
+      "repo": "SocioProphet/socioprophet-standards-knowledge",
+      "role": "knowledge-context-standards",
+      "status": "validated",
+      "evidenceRefs": ["docs/standards/", "schemas/", "fixtures/"]
+    },
+    {
+      "id": "sourceos-local-substrate",
+      "repo": "SociOS-Linux/source-os",
+      "role": "local-linux-realization",
+      "status": "validated",
+      "evidenceRefs": ["profiles/linux-dev/workstation-v0/", "build/office-suite/scripts/"]
+    },
+    {
+      "id": "agentplane-execution-evidence",
+      "repo": "SocioProphet/agentplane",
+      "role": "execution-and-evidence-admission",
+      "status": "validated",
+      "evidenceRefs": ["schemas/", "examples/", "bundles/", "tools/"]
+    },
+    {
+      "id": "policy-fabric-gates",
+      "repo": "SocioProphet/policy-fabric",
+      "role": "policy-decision-and-diff-hygiene",
+      "status": "seeded",
+      "evidenceRefs": ["contracts/", "examples/", "tools/validate_diff_hygiene_gate.py"]
+    },
+    {
+      "id": "prophet-platform-parity",
+      "repo": "SocioProphet/prophet-platform",
+      "role": "runtime-parity-and-readiness-evidence",
+      "status": "validated",
+      "evidenceRefs": ["tools/run_fogstack_parity_readiness.py", "tools/check_fogstack_parity_readiness.py", "schemas/runtime/", "build/fogstack-local-demo/fogstack-parity-readiness.record.json"]
+    },
+    {
+      "id": "sociosphere-ledger",
+      "repo": "SocioProphet/sociosphere",
+      "role": "workspace-proof-ledger-and-registry",
+      "status": "seeded",
+      "evidenceRefs": ["manifest/workspace.toml", "manifest/workspace.lock.json", "registry/cross-repo-proof-ledger.v0.json"]
+    },
+    {
+      "id": "socioprophet-proof-ui",
+      "repo": "SocioProphet/socioprophet",
+      "role": "product-proof-rendering",
+      "status": "consumed",
+      "evidenceRefs": ["socioprophet-web/client-vue/", "socioprophet-web/client/src/views/procyberneticaDashboard/"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "contract-to-substrate",
+      "from": "sourceos-contract-canon",
+      "to": "sourceos-local-substrate",
+      "sourceRepo": "SourceOS-Linux/sourceos-spec",
+      "targetRepo": "SociOS-Linux/source-os",
+      "status": "consumed",
+      "mutationPosture": "non-mutating validation and local profile realization only",
+      "evidenceRefs": ["DesktopProfile", "workstation-v0 doctor output"]
+    },
+    {
+      "id": "substrate-to-agentplane",
+      "from": "sourceos-local-substrate",
+      "to": "agentplane-execution-evidence",
+      "sourceRepo": "SociOS-Linux/source-os",
+      "targetRepo": "SocioProphet/agentplane",
+      "status": "validated",
+      "mutationPosture": "bounded local execution evidence; no whole-home mount authority",
+      "evidenceRefs": ["Agent Machine mount evidence", "Office Artifact evidence"]
+    },
+    {
+      "id": "agentplane-to-policy",
+      "from": "agentplane-execution-evidence",
+      "to": "policy-fabric-gates",
+      "sourceRepo": "SocioProphet/agentplane",
+      "targetRepo": "SocioProphet/policy-fabric",
+      "status": "seeded",
+      "mutationPosture": "policy gate only; no merge without verdict",
+      "evidenceRefs": ["AgenticPRWorkOrder", "DiffHygieneGateReport"]
+    },
+    {
+      "id": "policy-to-platform",
+      "from": "policy-fabric-gates",
+      "to": "prophet-platform-parity",
+      "sourceRepo": "SocioProphet/policy-fabric",
+      "targetRepo": "SocioProphet/prophet-platform",
+      "status": "validated",
+      "mutationPosture": "non-mutating readiness and parity records",
+      "evidenceRefs": ["PolicyPlane decision linkage", "FogStackRuntimeDryRunRecord"]
+    },
+    {
+      "id": "platform-to-ledger",
+      "from": "prophet-platform-parity",
+      "to": "sociosphere-ledger",
+      "sourceRepo": "SocioProphet/prophet-platform",
+      "targetRepo": "SocioProphet/sociosphere",
+      "status": "seeded",
+      "mutationPosture": "read-only proof ingestion; no runtime mutation",
+      "evidenceRefs": ["fogstack-parity-readiness.record.json", "workspace.lock.json"]
+    },
+    {
+      "id": "ledger-to-ui",
+      "from": "sociosphere-ledger",
+      "to": "socioprophet-proof-ui",
+      "sourceRepo": "SocioProphet/sociosphere",
+      "targetRepo": "SocioProphet/socioprophet",
+      "status": "planned",
+      "mutationPosture": "read-only proof rendering",
+      "evidenceRefs": ["future /proofs or /ops proof panel", "existing /map proof-source pattern"]
+    }
+  ],
+  "deferredGaps": [
+    {
+      "id": "proof-ledger-generated-snapshot",
+      "repo": "SocioProphet/sociosphere",
+      "status": "planned",
+      "description": "Generate proof-ledger snapshots from Prophet Platform parity-readiness output instead of maintaining only a static seed record."
+    },
+    {
+      "id": "socioprophet-proof-panel",
+      "repo": "SocioProphet/socioprophet",
+      "status": "planned",
+      "description": "Render FogStack parity readiness, AgentPlane run linkage, and PolicyPlane decision linkage in a read-only product proof panel."
+    },
+    {
+      "id": "sourceos-agentic-graph-schema-backed-tranche",
+      "repo": "SourceOS-Linux/sourceos-spec",
+      "status": "planned",
+      "description": "Split the local-first agentic graph foundation into schema-backed tranches before broad adoption."
+    },
+    {
+      "id": "policy-fabric-runtime-verdict-consumption",
+      "repo": "SocioProphet/agentplane",
+      "status": "planned",
+      "description": "Consume Policy Fabric diff-hygiene verdict output directly in AgentPlane agentic PR validation."
+    }
+  ]
+}

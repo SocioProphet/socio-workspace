@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/containment-proof-artifact.schema.json",
+  "title": "GBRG Containment Proof Artifact",
+  "description": "Governance-native result of a sever/residual-reachability read. Answers: from a foothold, what was reachable, what remains after isolation (residual), and what the sever contained. Topology-agnostic — the same artifact covers code-boundary severing and network host isolation.",
+  "$comment": "EXTENDS SCOPE-D ProofArtifact (sibling of blast-radius-proof-artifact.schema.json). The `epistemicLevel` enum is inherited VERBATIM from /Users/michaelheller/dev/SCOPE-D/config/schemas/proof-artifact.schema.json. This is the proof-CONFIDENCE axis and is distinct from any autonomy/authority band.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "proofId",
+    "claimType",
+    "statement",
+    "epistemicLevel",
+    "status",
+    "source",
+    "severedScope",
+    "baselineReachableCount",
+    "residualReachableCount",
+    "containedCount",
+    "residualReachable",
+    "derivation",
+    "declaredBy"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "proofId": { "type": "string", "pattern": "^proof-[a-z0-9][a-z0-9._:-]*$" },
+    "claimType": { "type": "string" },
+    "statement": { "type": "string", "minLength": 1 },
+    "epistemicLevel": {
+      "type": "string",
+      "enum": ["proved", "bounded", "empirical", "synthetic", "speculative", "rejected"],
+      "$comment": "Inherited VERBATIM from SCOPE-D proof-artifact.schema.json. A real containment traversal over the frozen index is 'empirical'; a sever that contained nothing is downgraded to 'speculative' so a no-op isolation is never presented as a settled result."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PROVED", "BOUNDED", "FAILED", "BLOCKED", "INCONCLUSIVE", "SYNTHETIC_ONLY"]
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The foothold node the reachability was computed from (hex node id)."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["full", "selective"],
+      "description": "Sever scope applied. Mirror of severedScope; retained for symmetry with the reading."
+    },
+    "severedScope": {
+      "type": "string",
+      "enum": ["full", "selective"],
+      "description": "full = cut all edges from the isolated node(s) but allow-listed control channels; selective = keep only the excluded (kept-label) edges traversable."
+    },
+    "baselineReachableCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Nodes reachable from source BEFORE the sever."
+    },
+    "residualReachableCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Nodes reachable from source AFTER the sever (the residual)."
+    },
+    "containedCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "baselineReachableCount - residualReachableCount: what the sever contained."
+    },
+    "residualReachable": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "The residual reachable node ids (hex). For a full isolation these are the allow-listed control channels (EDR/EPP + exclusions)."
+    },
+    "derivation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable explanation of WHY this containment holds."
+    },
+    "declaredBy": {
+      "type": "string",
+      "pattern": "^agent-registry://",
+      "description": "Producing agent identity, resolvable in the agent-registry."
+    }
+  }
+}

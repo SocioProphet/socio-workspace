@@ -1,0 +1,38 @@
+{
+  "benchId": "bench:workflow:synthetic",
+  "metrics": [
+    {
+      "description": "Synthetic quality score for governed workflow output.",
+      "kind": "quality",
+      "metricId": "metric:quality-score",
+      "unit": "ratio"
+    }
+  ],
+  "ownerRepo": "SocioProphet/sociosphere",
+  "provenance": {
+    "createdAt": "2026-06-06T04:30:00Z",
+    "createdBy": "sociosphere-validator",
+    "nonSecret": true,
+    "sourceCommit": "synthetic",
+    "sourceRepo": "SocioProphet/sociosphere"
+  },
+  "recordType": "WorkflowBench",
+  "schemaVersion": "governance.workflow-bench.v0.1",
+  "testCases": [
+    {
+      "caseId": "case:governed-doc-update",
+      "evidenceBundleRef": "evb:sociosphere:governance-action:example",
+      "expectedReceiptRef": "receipt:governance-action:example",
+      "procedureTemplateRef": "procedure:governed-doc-update"
+    }
+  ],
+  "thresholds": {
+    "maxOverrideRate": 0.2,
+    "minQualityScore": 0.9,
+    "replayRequired": true
+  },
+  "title": "Synthetic governed workflow benchmark",
+  "workflowRefs": [
+    "procedure:governed-doc-update"
+  ]
+}

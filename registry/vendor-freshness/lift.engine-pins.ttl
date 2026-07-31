@@ -1,0 +1,176 @@
+@prefix vfp: <https://socioprophet.org/ns/vendor-freshness#> .
+@prefix ex: <https://socioprophet.org/id/vendor-freshness/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked lift of the engine pins from registry/vendor-freshness.yaml, as they stand
+# after VFP-0001 closed on 2026-07-29. Hand-authored for this increment; the lift
+# becomes generated once the register feeds the graph.
+#
+# ── What changed, and why the previous version was a liability ────────────────
+#
+# This file used to show both apps pinned at 0.4.40, five hops behind, with
+# `guardInvokedByCi false` — which was true when it was written that morning and false
+# by that afternoon, once prophet-platform #1030 and #1032 vendored 0.4.45 into both
+# consumers and `make engine-guards` went into the validate-target-diagnostics matrix.
+# A worked example that has quietly stopped describing reality is the same defect as a
+# stale vendored tarball, in the artifact whose whole subject is stale vendored
+# tarballs. So it is re-derived here from the register as it now stands.
+#
+# Two substantive corrections beyond the version bump:
+#
+#   • 0.4.42 is GONE as a distinct artifact and release. Its tag points at the v0.4.41
+#     commit, whose package.json says 0.4.41 — it is a second tag, not a second
+#     release, and modelling it inflated the supersession chain by one hop. It survives
+#     as vfp:alsoTagged on 0.4.41 so the absence is recorded rather than mysterious.
+#
+#   • vfp:guardedBy is now WRITTEN. It was declared in the vocabulary and exported in
+#     the engine's edge constants (hellgraph ts/src/vendor-graph.ts VFP_EDGE.guardedBy)
+#     and never once emitted, because the register described a guard as a PATH — a
+#     string, which cannot be the object of a VendorPin -> Contract edge. The register
+#     now carries `guard.guards_contract`, so the edge has an endpoint to point at.
+
+# ── Repositories ─────────────────────────────────────────────────────────────
+
+ex:repo-hellgraph a vfp:Repository ;
+  vfp:repoName "SocioProphet/hellgraph" ;
+  vfp:repoUrl "https://github.com/SocioProphet/hellgraph" ;
+  vfp:workspaceBound true .
+
+ex:repo-prophet-platform a vfp:Repository ;
+  vfp:repoName "SocioProphet/prophet-platform" ;
+  vfp:repoUrl "https://github.com/SocioProphet/prophet-platform" ;
+  vfp:workspaceBound true .
+
+# ── Consumer apps — the unit of blast radius ─────────────────────────────────
+# Both live in prophet-platform. Counting REPOS would answer 1 and hide
+# lifecycle-warden, which is exactly how it stayed hidden through five releases.
+
+ex:app-hellgraph-service a vfp:ConsumerApp ;
+  vfp:appPath "apps/hellgraph-service" ;
+  vfp:hostedIn ex:repo-prophet-platform ;
+  vfp:vendors ex:artifact-engine-0-4-45 .
+
+ex:app-lifecycle-warden a vfp:ConsumerApp ;
+  vfp:appPath "apps/lifecycle-warden" ;
+  vfp:hostedIn ex:repo-prophet-platform ;
+  vfp:vendors ex:artifact-engine-0-4-45 .
+
+# ── Artifacts and the supersession chain ─────────────────────────────────────
+# Zero hops now: what production runs IS what the engine has released. The chain is
+# still modelled in full, because gapSize is a path length and the path has to exist
+# for the answer to be zero rather than unknown.
+
+ex:artifact-engine-0-4-40 a vfp:Artifact ;
+  vfp:artifactId "socioprophet-hellgraph-0.4.40" ;
+  vfp:artifactKind "npm-tarball" ;
+  vfp:versionScheme "semver" ;
+  vfp:version "0.4.40" ;
+  vfp:digest "sha256:a1f477969c8f335f95d806baeee349c8d1bbfc9e288665f20caa8a2a016aa6e0" ;
+  vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-40 ;
+  vfp:supersededBy ex:artifact-engine-0-4-41 .
+
+ex:artifact-engine-0-4-41 a vfp:Artifact ;
+  vfp:version "0.4.41" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-41 ; vfp:supersededBy ex:artifact-engine-0-4-43 .
+
+ex:artifact-engine-0-4-43 a vfp:Artifact ;
+  vfp:version "0.4.43" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-43 ; vfp:supersededBy ex:artifact-engine-0-4-44 .
+
+ex:artifact-engine-0-4-44 a vfp:Artifact ;
+  vfp:version "0.4.44" ; vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-44 ; vfp:supersededBy ex:artifact-engine-0-4-45 .
+
+ex:artifact-engine-0-4-45 a vfp:Artifact ;
+  vfp:artifactId "socioprophet-hellgraph-0.4.45" ;
+  vfp:artifactKind "npm-tarball" ;
+  vfp:versionScheme "semver" ;
+  vfp:version "0.4.45" ;
+  vfp:digest "sha256:be6d645e75b8d00215398c3a46f4cd41c9a5710f6bc95f3b05c4a107b36cbe15" ;
+  vfp:producedBy ex:repo-hellgraph ;
+  vfp:releasedAs ex:release-0-4-45 ;
+  vfp:versionMarker "PROP_NS = \"prop:\"" .
+
+# ── Releases and the contracts they moved ────────────────────────────────────
+
+ex:release-0-4-40 a vfp:Release ; vfp:version "0.4.40" ;
+  vfp:observedAt "2026-07-29"^^xsd:date .
+
+# v0.4.42 is a second tag on this same commit (5f72cf3), whose package.json says
+# 0.4.41. Recorded, not modelled as a release: a version that is not a distinct
+# artifact is not a release, however real its tag looks.
+ex:release-0-4-41 a vfp:Release ; vfp:version "0.4.41" ; vfp:alsoTagged "v0.4.42" .
+
+ex:release-0-4-43 a vfp:Release ;
+  vfp:version "0.4.43" ;
+  vfp:changesContract ex:contract-enrich-receipt .
+
+ex:release-0-4-44 a vfp:Release ; vfp:version "0.4.44" .
+
+ex:release-0-4-45 a vfp:Release ;
+  vfp:version "0.4.45" ;
+  vfp:changesContract ex:contract-cypher-projection .
+
+ex:contract-enrich-receipt a vfp:Contract ;
+  vfp:contractKind "receipt-shape" ;
+  vfp:receiptFixture "apps/compute-gateway/tests/test_engine_seal.py" ;
+  vfp:digest "sha256:018f2febf0c76f91752ba9726c9a32a4a8d3ca03895a5d877b780c312d34cc71" .
+
+ex:contract-cypher-projection a vfp:Contract ;
+  vfp:contractKind "schema" .
+
+# ── Pins — reified, because each carries its own governance ──────────────────
+
+ex:pin-engine-hellgraph-service a vfp:VendorPin ;
+  vfp:pinFor ex:app-hellgraph-service ;
+  vfp:pinnedAt ex:artifact-engine-0-4-45 ;
+  vfp:artifactPath "apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.45.tgz" ;
+  vfp:freshnessPolicy "track-minor" ;
+  vfp:disposition "current" ;
+  vfp:freshnessState "current" ;
+  vfp:gapSize 0 ;
+  vfp:crossesContract false ;
+  vfp:owner "@mdheller" ;
+  vfp:guardPath "apps/hellgraph-service/scripts/check-engine-version.mjs" ;
+  # True on EVIDENCE now, not on assertion: tools/validate_vendor_freshness.py follows
+  # validate-target-diagnostics.yml -> `make engine-guards` -> the guard path, in the
+  # consumer repo, and fails the gate if it cannot find such a chain.
+  vfp:guardInvokedByCi true ;
+  vfp:guardedBy ex:contract-enrich-receipt , ex:contract-cypher-projection .
+
+ex:pin-engine-lifecycle-warden a vfp:VendorPin ;
+  vfp:pinFor ex:app-lifecycle-warden ;
+  vfp:pinnedAt ex:artifact-engine-0-4-45 ;
+  vfp:artifactPath "apps/lifecycle-warden/vendor/socioprophet-hellgraph-0.4.45.tgz" ;
+  vfp:freshnessPolicy "track-minor" ;
+  vfp:disposition "current" ;
+  vfp:freshnessState "current" ;
+  vfp:gapSize 0 ;
+  vfp:crossesContract false ;
+  vfp:owner "@mdheller" ;
+  # This pin had NO guard at all when the finding was filed. It has one now, and the
+  # same verified chain runs it — the second recipe line of `make engine-guards`.
+  vfp:guardPath "apps/lifecycle-warden/scripts/check-engine-version.mjs" ;
+  vfp:guardInvokedByCi true ;
+  vfp:guardedBy ex:contract-enrich-receipt , ex:contract-cypher-projection .
+
+# ── Derived findings ─────────────────────────────────────────────────────────
+# Findings are "emitted by the reasoner, never hand-authored" (vendor-freshness.ttl).
+# These two are retained as the WORKED OUTPUT of the reasoner over the 0.4.40 state —
+# the state now frozen in fixtures/vendor-freshness/scenario-engine-behind.yaml — and
+# both are marked resolved rather than deleted. A finding that vanishes when it is
+# fixed leaves no evidence the plane ever caught anything.
+
+ex:finding-vfp-0001 a vfp:Finding ;
+  vfp:findingClass "STALE" ;
+  vfp:findingAbout ex:pin-engine-lifecycle-warden ;
+  vfp:blastRadius 2 ;
+  vfp:disposition "resolved" ;
+  vfp:observedAt "2026-07-29"^^xsd:date .
+
+ex:finding-vfp-0002 a vfp:Finding ;
+  vfp:findingClass "GUARD-NOT-INVOKED" ;
+  vfp:findingAbout ex:pin-engine-hellgraph-service ;
+  vfp:disposition "resolved" ;
+  vfp:observedAt "2026-07-29"^^xsd:date .

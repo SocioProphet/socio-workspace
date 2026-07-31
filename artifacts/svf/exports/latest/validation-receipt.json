@@ -14,7 +14,7 @@
       "path": "registry/sovereign-validation-fabric.yaml"
     }
   ],
-  "issued_at": "2026-06-09T11:53:47Z",
+  "issued_at": "2026-06-09T11:53:46Z",
   "non_certified_claims": [
     "production_readiness",
     "live_infrastructure_safety",
@@ -27,7 +27,7 @@
   "output_digests": [
     {
       "algorithm": "sha256",
-      "digest": "d15e9ad23abe38f45f1a112fd204b355f50d3802fe76e0e6073eae25cf37ed2d",
+      "digest": "4e0fcc329518dbc347a518404ba6988b2581f86664107d5b93fa1f90ea1e943b",
       "name": "svf:action:sociosphere.validate-registry",
       "path": "artifacts/svf/runs/local-smoke/01-svf_action_sociosphere.validate-registry.result.json"
     }
@@ -48,14 +48,14 @@
   "run_artifact": "artifacts/svf/runs/local-smoke/validation-run.json",
   "run_digest": {
     "algorithm": "sha256",
-    "digest": "4806e0098632d8539159657529ab0d5b8c6274162e3089c0b66ab374d2186b18"
+    "digest": "f584348e1646cab025f6ea04e7fc5d4e8307aa13df8c8a065fc3c6febc84cb47"
   },
   "run_ref": "svf:run:cda7b48ccd1b03b1",
   "schema_version": "1.0",
   "verification": {
     "diagnostics": [],
     "status": "verified",
-    "verified_at": "2026-06-09T11:53:47Z",
+    "verified_at": "2026-06-09T11:53:46Z",
     "verifier": "sociosphere.svf_runner.local"
   }
 }

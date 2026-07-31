@@ -113,7 +113,7 @@ fingerprint_rules:
   policy_decision_ref_required_for_execution_and_release: true
   topology_ref_required_for_release_and_rollback: true
   digest_algorithm: sha256
-  digest_prefix: sha256:
+  digest_prefix: "sha256:"
 
 provenance_bindings:
   release:

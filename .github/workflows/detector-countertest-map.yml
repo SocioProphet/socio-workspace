@@ -1,0 +1,32 @@
+name: Detector / Counter-Test Map
+
+on:
+  pull_request:
+    paths:
+      - "standards/epistemic-governance/detector-countertest-map.yaml"
+      - "tools/validate_detector_countertest_map.py"
+      - ".github/workflows/detector-countertest-map.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "standards/epistemic-governance/detector-countertest-map.yaml"
+      - "tools/validate_detector_countertest_map.py"
+      - ".github/workflows/detector-countertest-map.yml"
+
+jobs:
+  validate-detector-countertest-map:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validator dependency
+        # Pinned — an unpinned parser makes CI non-reproducible.
+        run: python -m pip install 'pyyaml==6.0.2'
+      - name: Validate detector/counter-test map
+        run: python tools/validate_detector_countertest_map.py

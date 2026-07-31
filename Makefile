@@ -23,9 +23,9 @@ ui-dev: ui-preflight
 # --- end ui-workbench targets ---
 
 # --- standards validation targets ---
-.PHONY: validate validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate multidomain-geospatial-standards-compliance-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-v1-resolution-live corpus-loop-demo-packet-validate corpus-loop-demo-assemble-check corpus-loop-demo-assemble-write corpus-loop-check svf-registry-validate svf-runner-list svf-runner-select-smoke svf-runner-verify-receipt-smoke svf-runner-run-smoke svf-runner-tampered-receipt-smoke svf-runner-unregistered-action-smoke svf-export-latest svf-export-manifest-validate svf-workspace-validate registry-admissions-validate effective-canonical-registry-validate
+.PHONY: validate validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate neurosymbolic-vendored-artifact-graph-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate multidomain-geospatial-standards-compliance-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-v1-resolution-live corpus-loop-demo-packet-validate corpus-loop-demo-assemble-check corpus-loop-demo-assemble-write corpus-loop-check svf-registry-validate svf-runner-list svf-runner-select-smoke svf-runner-verify-receipt-smoke svf-runner-run-smoke svf-runner-tampered-receipt-smoke svf-runner-unregistered-action-smoke svf-export-latest svf-export-manifest-validate svf-workspace-validate registry-admissions-validate effective-canonical-registry-validate vendor-freshness-validate vendor-freshness-detect vendor-freshness-detect-check
 
-validate: validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate svf-workspace-validate
+validate: validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate neurosymbolic-vendored-artifact-graph-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate svf-workspace-validate vendor-freshness-validate
 	@echo "OK: validate"
 
 validate-standards:
@@ -66,6 +66,39 @@ neurosymbolic-repo-graph-vocabulary-validate:
 
 neurosymbolic-repo-graph-shacl-contract-validate:
 	python3 tools/check_neurosymbolic_repo_graph_shacl_contract.py
+
+# Lift the vendor-freshness register into the nrg: graph so THE GRAPH reasons about
+# vendored-dependency staleness + blast radius. -write regenerates the committed graph;
+# -validate gates that it is faithful, single-source, and vocabulary-covered.
+neurosymbolic-vendored-artifact-graph-write:
+	python3 tools/lift_vendor_freshness_to_graph.py --write
+
+neurosymbolic-vendored-artifact-graph-validate:
+	python3 tools/check_vendored_artifact_graph.py
+
+# Register-only. --skip-disk is DELIBERATE and load-bearing: this target is a
+# prerequisite of the aggregate `validate`, which `make -k validate` runs in
+# validate.yml on a runner where the consumer repos do not exist. Without the flag the
+# on-disk layer resolved nothing, emitted SKIPPED, and still printed "validated 11
+# declared vendored artifact(s)" with exit 0 — a second copy of this gate, inert, next
+# to the fail-closed one. Declaring the skip makes the difference between "I chose not
+# to read the bytes" and "I tried and silently read none" visible in the log.
+#
+# The FAIL-CLOSED on-disk gate is .github/workflows/vendor-freshness.yml, which
+# materializes the consumer repos and passes --require-disk. It is the enforcing copy;
+# this one checks register self-consistency only.
+vendor-freshness-validate:
+	python3 tools/validate_vendor_freshness.py --skip-disk
+
+# Observe upstream and report. Read-only: no register edit, no plan emission.
+vendor-freshness-detect-check:
+	python3 tools/detect_vendor_freshness.py
+
+# Refresh the observation in place and emit re-vendor plans. This is what CI runs;
+# run it locally when the gate complains that an observation has aged out.
+vendor-freshness-detect:
+	python3 tools/detect_vendor_freshness.py --write-register --propose-disposition \
+		--emit-plans build/vendor-revendor-plans --summary build/vendor-freshness-detect.md
 
 runner-overlay-discovery-validate:
 	python3 tools/check_runner_overlay_discovery.py
@@ -197,6 +230,13 @@ corpus-loop-check: corpus-loop-v0-validate neurosymbolic-chronos-validate corpus
 multidomain-geospatial-standards-compliance-validate:
 	python3 tools/check_multidomain_geospatial_standards_compliance.py
 
+# Pinned instant for the SVF smoke fixtures (2026-06-09T11:53:46Z). svf_runner
+# stamps this into run/receipt timestamps (and the ids + digests derived from
+# them) when SVF_SOURCE_DATE_EPOCH is set, so `make validate` regenerates the
+# committed artifacts/svf fixtures byte-for-byte instead of churning them on the
+# wall clock. Real runs leave the variable unset and record actual time.
+SVF_SOURCE_DATE_EPOCH := 1781006026
+
 svf-registry-validate:
 	python3 -m pip install --user pyyaml >/dev/null
 	python3 tools/validate_svf_registry.py
@@ -215,7 +255,7 @@ svf-runner-verify-receipt-smoke:
 svf-runner-run-smoke:
 	python3 -m pip install --user pyyaml >/dev/null
 	rm -rf artifacts/svf/runs/local-smoke
-	python3 tools/svf_runner.py run --repo SocioProphet/sociosphere --changed-path registry/sovereign-validation-fabric.yaml --out artifacts/svf/runs/local-smoke >/dev/null
+	SVF_SOURCE_DATE_EPOCH=$(SVF_SOURCE_DATE_EPOCH) python3 tools/svf_runner.py run --repo SocioProphet/sociosphere --changed-path registry/sovereign-validation-fabric.yaml --out artifacts/svf/runs/local-smoke >/dev/null
 	python3 tools/svf_runner.py verify-receipt artifacts/svf/runs/local-smoke/validation-receipt.json >/dev/null
 
 svf-runner-tampered-receipt-smoke: svf-runner-run-smoke
@@ -226,7 +266,7 @@ svf-runner-unregistered-action-smoke:
 	python3 -m pip install --user pyyaml >/dev/null
 	mkdir -p artifacts/svf/runs/unregistered-action-smoke
 	python3 -c 'from pathlib import Path; import yaml; data=yaml.safe_load(Path("registry/sovereign-validation-fabric.yaml").read_text(encoding="utf-8")); data["plans"][0]["actions"]=["svf:action:sociosphere.missing-action"]; Path("artifacts/svf/runs/unregistered-action-smoke/registry.yaml").write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")'
-	! python3 tools/svf_runner.py --registry artifacts/svf/runs/unregistered-action-smoke/registry.yaml run --repo SocioProphet/sociosphere --plan svf:plan:sociosphere.registry-dogfood --out artifacts/svf/runs/unregistered-action-smoke >/dev/null
+	! SVF_SOURCE_DATE_EPOCH=$(SVF_SOURCE_DATE_EPOCH) python3 tools/svf_runner.py --registry artifacts/svf/runs/unregistered-action-smoke/registry.yaml run --repo SocioProphet/sociosphere --plan svf:plan:sociosphere.registry-dogfood --out artifacts/svf/runs/unregistered-action-smoke >/dev/null
 
 svf-export-latest:
 	python3 tools/svf_export_latest.py

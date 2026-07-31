@@ -1,0 +1,188 @@
+version: "0.1.0"
+kind: EstateControlGraph
+owner_repo: SocioProphet/sociosphere
+status: active
+purpose: >-
+  Machine-readable cross-repo control graph for the active SocioProphet estate.
+  Sociosphere records coordination, topology, validation, and hardening posture;
+  component implementation remains in the owning repositories.
+
+lanes:
+  - id: agentic-pr-control
+    owner_repo: SocioProphet/agentplane
+    required: true
+    anchors:
+      - docs/agentic-pr-control-plane-v0.md
+      - schemas/agentic-pr-work-order.schema.v0.1.json
+      - examples/agentic-pr-work-order.example.json
+    governs:
+      - diff-hygiene-gate
+      - implementation-prs
+      - review-and-merge
+    required_invariants:
+      - implementation_agent_does_not_merge
+      - review_agent_is_distinct_from_patch_producer
+      - work_order_is_evidence_producing
+
+  - id: diff-hygiene-gate
+    owner_repo: SocioProphet/policy-fabric
+    required: true
+    anchors:
+      - docs/specs/DIFF_HYGIENE_GATE_V0.md
+      - contracts/policy_fabric_diff_hygiene_gate_report_v0.schema.json
+      - examples/policy_fabric_diff_hygiene_gate_report_example.json
+      - examples/policy_fabric_diff_hygiene_gate_blocked_env_example.json
+      - tools/validate_diff_hygiene_gate.py
+    governs:
+      - agent-authored-prs
+      - pre-review
+      - pre-merge
+    required_invariants:
+      - denied_generated_paths_block_merge
+      - stale_expected_head_sha_blocks_merge
+      - required_pr_evidence_sections_present
+      - oversized_or_unscoped_diffs_block_or_warn
+
+  - id: fogstack-deployment-parity
+    owner_repo: SocioProphet/prophet-platform
+    required: true
+    anchors:
+      - tools/check_fogstack_parity_readiness.py
+      - tools/run_fogstack_parity_readiness.py
+      - schemas/runtime/fogstack-live-cluster-preflight-record-v0.1.schema.json
+    governs:
+      - fogstack-runtime-deploy
+      - local-demo-evidence
+      - live-preflight
+    required_invariants:
+      - live_preflight_is_read_only
+      - live_apply_allowed_false_by_default
+      - mutated_cluster_false_for_preflight
+      - human_approval_required_before_apply
+
+  - id: identity-proof-ingress
+    owner_repo: SocioProphet/prophet-platform
+    upstream_standard_repo: SocioProphet/socioprophet-agent-standards
+    required: true
+    anchors:
+      - standards.lock.yaml
+      - contracts/identity/IdentitySubjectContext.v0.1.json
+      - contracts/identity/IdentitySessionContext.v0.1.json
+      - contracts/identity/IdentityProofIngressRecord.v0.1.json
+      - tools/validate_identity_contract_examples.py
+    governs:
+      - apps/identity-prime
+      - apps/gateway
+      - identity-sensitive-runtime-authority
+    required_invariants:
+      - proof_ingress_record_required_before_runtime_authority
+      - contract_examples_validate_against_schema
+      - standards_import_is_pinned
+
+  - id: shir-semantic-hyperknowledge
+    owner_repo: SocioProphet/ontogenesis
+    execution_repo: SocioProphet/prophet-platform-fabric-mlops-ts-suite
+    serde_repo: SocioProphet/semantic-serdes
+    required: true
+    anchors:
+      - docs/specs/shir-v0.1.md
+      - packs/rdf-to-shir/task-contract.yaml
+      - packs/rdf-to-shir/tools/rdf_to_shir.py
+    governs:
+      - rdf-to-shir
+      - semantic-projection
+      - future-graph-ml-lowering
+    required_invariants:
+      - projection_loss_accounting_before_graph_ml_lowering
+      - invalid_rdf_fails_closed
+      - shir_outputs_validate_against_semantic_serdes
+
+  - id: michael-machine-science
+    standards_repo: SocioProphet/socioprophet-agent-standards
+    semantic_repo: SocioProphet/ontogenesis
+    instance_repo: SocioProphet/gaia-world-model
+    governance_repo: SocioProphet/prophet-platform
+    execution_repo: SocioProphet/prophet-platform-fabric-mlops-ts-suite
+    required: true
+    anchors:
+      - profiles/michael.profile.json
+      - Platform/Epistemics/michael-core.ttl
+      - docs/MICHAEL_MACHINE_SCIENCE.md
+      - schemas/michael/causal_attribution_delta.schema.json
+      - schemas/michael_workflow_execution_record.v0.1.schema.json
+    governs:
+      - belief-state-updates
+      - candidate-law-discovery
+      - human-digital-twin-boundaries
+      - machine-science-execution-records
+    required_invariants:
+      - candidate_laws_do_not_become_asserted_truth_without_promotion
+      - human_twin_is_bounded_consent_projection
+      - execution_records_are_schema_bound
+      - policy_identity_and_shir_controls_are_not_bypassed
+
+  - id: lattice-gaia-runtime-governance
+    platform_repo: SocioProphet/prophet-platform
+    execution_repo: SocioProphet/prophet-platform-fabric-mlops-ts-suite
+    policy_repo: SocioProphet/policy-fabric
+    spec_repo: SourceOS-Linux/sourceos-spec
+    world_model_repo: SocioProphet/gaia-world-model
+    required: true
+    anchors:
+      - apps/lattice-studio/src/lattice_studio/runtime_profiles.py
+      - examples/lattice_data_governai_execution_0001.json
+      - examples/lattice-runtime-promotion-policy.example.json
+      - examples/osm-bounded-ingest/osm-layer-manifest-candidate.v1.json
+    governs:
+      - ray-runtime-profile
+      - beam-runtime-profile
+      - lattice-data-governai-fixtures
+      - gaia-bounded-ingest
+    required_invariants:
+      - runtime_promotion_requires_evidence_gates
+      - fixture_demo_lanes_do_not_claim_production_serving
+      - gaia_layer_catalog_preserves_odbl_attribution
+
+  - id: open-office-runtime
+    owner_repo: SocioProphet/prophet-platform
+    sourceos_shell_repo: SourceOS-Linux/sourceos-shell
+    turtleterm_repo: SourceOS-Linux/TurtleTerm
+    bearbrowser_repo: SourceOS-Linux/BearBrowser
+    required: true
+    anchors:
+      - schemas/office/office_version_record.schema.json
+      - schemas/office/office_writeback_record.schema.json
+      - schemas/office/office_policy_decision_record.schema.json
+      - schemas/office/office_adapter_profile.schema.json
+      - tools/validate_office_runtime_contracts.py
+    governs:
+      - open-wopi-saveback
+      - office-adapter-profiles
+      - closed-provider-compatibility-boundary
+    required_invariants:
+      - closed_providers_disabled_by_default
+      - closed_providers_not_runtime_dependencies
+      - closed_providers_not_canonical_authority
+
+required_edges:
+  - from: agentic-pr-control
+    to: diff-hygiene-gate
+    relation: invokes_before_review_and_merge
+  - from: diff-hygiene-gate
+    to: all-agent-authored-prs
+    relation: blocks_polluted_or_unscoped_changes
+  - from: michael-machine-science
+    to: identity-proof-ingress
+    relation: consumes_before_identity_sensitive_authority
+  - from: michael-machine-science
+    to: shir-semantic-hyperknowledge
+    relation: respects_projection_and_promotion_boundaries
+  - from: michael-machine-science
+    to: lattice-gaia-runtime-governance
+    relation: reuses_runtime_profile_and_evidence_style
+  - from: fogstack-deployment-parity
+    to: identity-proof-ingress
+    relation: requires_identity_for_future_live_apply
+  - from: open-office-runtime
+    to: diff-hygiene-gate
+    relation: must_preserve_closed_provider_quarantine

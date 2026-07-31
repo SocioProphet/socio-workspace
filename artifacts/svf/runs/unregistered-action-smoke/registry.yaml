@@ -1,0 +1,255 @@
+schema_version: '1.0'
+registry_id: svf:registry:sociosphere.workspace
+upstream_authority:
+  repo: SocioProphet/ProCybernetica
+  issue: SocioProphet/ProCybernetica#100
+  schema_refs:
+    action: schemas/cybernetic-governance/svf_validation_action.v1.json
+    plan: schemas/cybernetic-governance/svf_validation_plan.v1.json
+    capability_policy: schemas/cybernetic-governance/svf_validation_capability_policy.v1.json
+    run: schemas/cybernetic-governance/svf_validation_run.v1.json
+    receipt: schemas/cybernetic-governance/svf_validation_receipt.v1.json
+receipt_root: artifacts/svf/receipts
+actions:
+- action_id: svf:action:sociosphere.validate-registry
+  version: 1.0.0
+  owner_repo: SocioProphet/sociosphere
+  backend: local
+  shell: false
+  argv:
+  - python3
+  - tools/validate_svf_registry.py
+  - --json
+  timeout_seconds: 60
+  side_effect_class: artifact_write
+  filesystem_scope:
+    read:
+    - registry/sovereign-validation-fabric.yaml
+    - tools/validate_svf_registry.py
+    write:
+    - artifacts/svf/runs/**
+  network_mode: not_required
+  credential_policy: none
+  output_artifacts:
+  - action_result_json
+  supported_claims:
+  - schema_conformant
+  - policy_boundary_preserved
+  - non_production_only
+plans:
+- plan_id: svf:plan:sociosphere.registry-dogfood
+  version: 1.0.0
+  owner_repo: SocioProphet/sociosphere
+  applicable_repos:
+  - SocioProphet/sociosphere
+  mode: blocking
+  backend: local
+  actions:
+  - svf:action:sociosphere.missing-action
+  required_evidence:
+  - action_result_json
+  - validation_run
+  - validation_receipt
+  success_criteria:
+  - all_actions_pass
+  - receipt_verifies
+  failure_taxonomy:
+  - action_exit_nonzero
+  - timeout
+  - unregistered_action
+  - receipt_digest_mismatch
+  declared_claims:
+  - schema_conformant
+  - policy_boundary_preserved
+  - non_production_only
+  - artifact_integrity_verified
+  - receipt_integrity_verified
+  non_claims:
+  - Does not certify production readiness.
+  - Does not certify Signadot vendor parity.
+  - Does not certify container, browser, QEMU, or cluster runtime parity.
+profiles:
+- profile_id: svf:profile:sociosphere.dogfood
+  repo: SocioProphet/sociosphere
+  local_path_hint: ~/dev/sociosphere
+  owning_plane: workspace-controller
+  mode: blocking
+  policy_ref: svf:policy:sociosphere.local-readonly
+  execution_backend: local
+  required_receipt_classes:
+  - receipt_integrity_verified
+  - schema_conformant
+  default_plans:
+  - svf:plan:sociosphere.registry-dogfood
+  changed_path_selectors:
+  - selector_id: registry
+    paths:
+    - registry/sovereign-validation-fabric.yaml
+    - tools/validate_svf_registry.py
+    - tools/svf_runner.py
+    plans:
+    - svf:plan:sociosphere.registry-dogfood
+  - selector_id: docs
+    paths:
+    - docs/architecture/sovereign-validation-fabric-workspace.md
+    plans:
+    - svf:plan:sociosphere.registry-dogfood
+  non_claims:
+  - Does not certify downstream repository validation behavior.
+  - Does not execute non-registered Actions.
+- profile_id: svf:profile:procybernetica.svf-policy
+  repo: SocioProphet/ProCybernetica
+  local_path_hint: ~/dev/ProCybernetica
+  owning_plane: policy-fabric
+  mode: blocking
+  policy_ref: svf:policy:procybernetica.local-readonly
+  execution_backend: local
+  required_receipt_classes:
+  - schema_conformant
+  - fixtures_validated
+  - receipt_integrity_verified
+  default_plans:
+  - svf:plan:procybernetica.svf-schema-fixtures
+  changed_path_selectors:
+  - selector_id: svf-policy-primitive
+    paths:
+    - docs/architecture/sovereign-validation-fabric.md
+    - schemas/cybernetic-governance/svf_*.json
+    - tests/fixtures/svf/*.json
+    - tools/cybernetic_governance/validate_svf.py
+    plans:
+    - svf:plan:procybernetica.svf-schema-fixtures
+  non_claims:
+  - Delegates policy primitive validation to ProCybernetica's svf-ci lane.
+- profile_id: svf:profile:scope-d.defensive-assurance
+  repo: SocioProphet/SCOPE-D
+  local_path_hint: ~/dev/SCOPE-D
+  owning_plane: defensive-assurance
+  mode: advisory
+  policy_ref: svf:policy:scope-d.synthetic-readonly
+  execution_backend: local
+  required_receipt_classes:
+  - policy_boundary_preserved
+  - non_production_only
+  default_plans:
+  - svf:plan:scope-d.defensive-assurance-basic
+  contract_refs:
+  - svf/scope-d-defensive-assurance-basic.json
+  validation_command: npm run validate:svf
+  changed_path_selectors:
+  - selector_id: svf-contract
+    paths:
+    - docs/SVF-DEFENSIVE-ASSURANCE.md
+    - svf/**
+    - scripts/validate-svf-contracts.js
+    - package.json
+    plans:
+    - svf:plan:scope-d.defensive-assurance-basic
+  - selector_id: policy-fixtures
+    paths:
+    - config/schemas/**
+    - examples/**
+    - fixtures/**
+    - runs/**
+    - scripts/test-engagement-policy.js
+    - scripts/test-collector-policy.js
+    - scripts/test-ai-infra-slice.js
+    - scripts/test-graph-robustness-slice.js
+    - scripts/test-reporting-exports.js
+    - scripts/smoke-tamper-detection.js
+    plans:
+    - svf:plan:scope-d.defensive-assurance-basic
+  non_claims:
+  - Advisory until npm run validate:svf is observed green.
+  - Does not execute Actions through Sociosphere runner.
+  - Does not certify live-target or production-environment behavior.
+- profile_id: svf:profile:ontogenesis.semantic-validation
+  repo: SocioProphet/ontogenesis
+  local_path_hint: ~/dev/ontogenesis
+  owning_plane: ontology
+  mode: advisory
+  policy_ref: svf:policy:ontogenesis.semantic-readonly
+  execution_backend: local
+  required_receipt_classes:
+  - semantic_roundtrip_preserved
+  - schema_conformant
+  - artifact_integrity_verified
+  default_plans:
+  - svf:plan:ontogenesis.semantic-validation-basic
+  contract_refs:
+  - svf/ontogenesis-semantic-validation-basic.json
+  validation_command: make svf
+  changed_path_selectors:
+  - selector_id: svf-contract
+    paths:
+    - docs/SVF-SEMANTIC-VALIDATION.md
+    - svf/**
+    - scripts/validate_svf_contracts.py
+    - Makefile
+    - README.md
+    plans:
+    - svf:plan:ontogenesis.semantic-validation-basic
+  - selector_id: ontology-surfaces
+    paths:
+    - Upper/**
+    - Middle/**
+    - Lower/**
+    - Domains/**
+    - Platform/**
+    - prophet/**
+    - epi/**
+    - shapes/**
+    - examples/**
+    - catalog/**
+    - dist/**
+    plans:
+    - svf:plan:ontogenesis.semantic-validation-basic
+  non_claims:
+  - Advisory until make svf and the full Ontogenesis validation pipeline are observed
+    green.
+  - Does not execute Actions through Sociosphere runner.
+  - Does not certify domain truth or downstream consumer correctness.
+- profile_id: svf:profile:sourceos.contracts
+  repo: SourceOS-Linux/sourceos-spec
+  local_path_hint: ~/dev/sourceos-spec
+  owning_plane: sourceos-contracts
+  mode: advisory
+  policy_ref: svf:policy:sourceos.contract-readonly
+  execution_backend: local
+  required_receipt_classes:
+  - schema_conformant
+  - fixtures_validated
+  - policy_boundary_preserved
+  - non_production_only
+  default_plans:
+  - svf:plan:sourceos.contract-validation-basic
+  contract_refs:
+  - svf/sourceos-contract-validation-basic.json
+  validation_command: make validate-svf-contracts
+  changed_path_selectors:
+  - selector_id: svf-contract
+    paths:
+    - docs/SVF-OS-VALIDATION-PROFILES.md
+    - svf/**
+    - tools/validate_svf_contracts.py
+    - Makefile
+    - README.md
+    plans:
+    - svf:plan:sourceos.contract-validation-basic
+  - selector_id: sourceos-contract-surfaces
+    paths:
+    - schemas/**
+    - examples/**
+    - semantic/**
+    - openapi*.yaml
+    - asyncapi*.yaml
+    - docs/**
+    - tools/validate_*examples.py
+    plans:
+    - svf:plan:sourceos.contract-validation-basic
+  non_claims:
+  - Advisory until make validate-svf-contracts and the SourceOS spec validation pipeline
+    are observed green.
+  - Does not execute Actions through Sociosphere runner.
+  - Does not build an OS image, validate bootability, certify hardware compatibility,
+    sign artifacts, publish releases, deploy updates, or certify production readiness.

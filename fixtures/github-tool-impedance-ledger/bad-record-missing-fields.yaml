@@ -1,0 +1,13 @@
+ledger_id: github-tool-impedance-ledger-v0
+status: fixture
+schema: registry/github-tool-impedance-ledger.schema.yaml
+purpose: sample malformed record for validator coverage
+records:
+  - event_id: gti-sample-0001
+    observed_at: '2026-06-06'
+    source_context:
+      context_type: chat_turn
+    repository:
+      full_name: SocioProphet/sociosphere
+    operation_intended: Sample record with omitted required fields.
+    observed_failure: Sample record used by validator test coverage.

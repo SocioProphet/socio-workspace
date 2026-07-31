@@ -1,0 +1,41 @@
+# Fixture for tools/validate_vendor_freshness.py. Not a real register.
+manifest_id: vendor-freshness-fixture
+status: seed
+schema: registry/vendor-freshness.schema.yaml
+purpose: >-
+  Stale and dispositioned remediation-required, but with no finding_id or due date.
+policy:
+  observation_max_age_days: 90
+  default_freshness_policy: track-minor
+coverage:
+  mechanically_scanned: [npm-tarball vendored under a consumer vendor/ directory]
+  declared_only: [json-schema copies]
+sources:
+  - source_id: hellgraph-engine
+    repo: SocioProphet/hellgraph
+    url: https://github.com/SocioProphet/hellgraph
+    artifact_kind: npm-tarball
+    version_scheme: semver
+    package_name: '@socioprophet/hellgraph'
+    upstream_ref: main
+    upstream_latest_version: 0.4.45
+    upstream_latest_ref: v0.4.45
+    observed_at: '2026-07-01'
+    observation_method: fixture
+    releases:
+      - version: '0.4.40'
+        ref: v0.4.40
+      - version: '0.4.45'
+        ref: v0.4.45
+artifacts:
+  - artifact_id: hellgraph-engine@hellgraph-service
+    source_id: hellgraph-engine
+    consumer_repo: SocioProphet/prophet-platform
+    consumer_url: https://github.com/SocioProphet/prophet-platform
+    consumer_app: apps/hellgraph-service
+    artifact_path: apps/hellgraph-service/vendor/socioprophet-hellgraph-0.4.40.tgz
+    vendored_version: 0.4.40
+    freshness_policy: track-minor
+    tier: reference
+    owner: '@mdheller'
+    disposition: remediation-required

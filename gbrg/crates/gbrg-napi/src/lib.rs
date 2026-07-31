@@ -24,6 +24,20 @@ pub fn blast_radius(cell_id: String) -> String {
     )
 }
 
+/// Containment (sever / residual reachability) for a source node, returned as a
+/// ContainmentProofArtifact JSON string.
+///
+/// `source_id` is a stable node IRI (code cell or `endpoint://<host>`); `scope` is
+/// `"full"` or `"selective"`. When wired for real this builds/reuses a frozen
+/// `gbrg_core::GraphIndex` and calls `gbrg_core::emit_containment_artifact`.
+#[napi]
+pub fn containment_query(source_id: String, scope: String) -> String {
+    // STUB: real impl resolves the IRI and runs sever_residual over the frozen index.
+    format!(
+        r#"{{"schemaVersion":"0.1.0","proofId":"proof-gbrg-containment-stub","claimType":"scope_bound","statement":"containment of {source_id} ({scope} scope)","epistemicLevel":"speculative","status":"INCONCLUSIVE","source":"{source_id}","scope":"{scope}","severedScope":"{scope}","baselineReachableCount":0,"residualReachableCount":0,"containedCount":0,"residualReachable":[],"derivation":"stub: gbrg-napi not yet wired to a frozen index","declaredBy":"agent-registry://gbrg/skeleton"}}"#
+    )
+}
+
 /// Graph health/status as a JSON string (node/edge counts, freeze state, ...).
 #[napi]
 pub fn graph_status() -> String {

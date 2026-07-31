@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/graph-edge.schema.json",
+  "title": "GBRG Graph Edge",
+  "description": "A typed, weighted relationship between two SemanticCells. Orientation: `from` DEPENDS ON `to` (for a call B->A, from=B, to=A).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["from", "to", "kind"],
+  "properties": {
+    "from": {
+      "type": "string",
+      "description": "Source cell IRI (the dependent).",
+      "minLength": 1
+    },
+    "to": {
+      "type": "string",
+      "description": "Target cell IRI (the dependency).",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["calls", "inherits", "imports", "tested_by", "churns_with"],
+      "description": "Mapped to the graphdb edge label (CALLS, INHERITS, IMPORTS, TESTED_BY, CHURNS_WITH)."
+    },
+    "weight": {
+      "type": "number",
+      "default": 1.0,
+      "$comment": "graphdb properties are NODE-scoped, so weight CANNOT be a graphdb edge property. GBRG persists it in an explicit side map keyed by (from, to, label) — see gbrg-core::EdgeWeights and docs/ADR-001. It is carried here in the wire contract only."
+    }
+  }
+}

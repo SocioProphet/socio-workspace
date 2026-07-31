@@ -1,0 +1,15 @@
+# GBRG — Governed Blast-Radius Graph (self-contained Cargo workspace).
+#
+# This workspace is intentionally standalone so `gbrg/` can later be lifted out
+# into its own repository with no edits. It DEPENDS ON hellgraph (hg_analytics)
+# by path but never contains or edits hellgraph code (consume-only rule).
+#
+# gbrg-napi is deliberately EXCLUDED from the default workspace members: its
+# napi/napi-derive build toolchain may be unavailable in a sandbox, and we do
+# not want that to block `cargo test` for gbrg-core (the load-bearing crate).
+# gbrg-napi is a well-formed skeleton that can be built on its own when the
+# napi toolchain is present.
+[workspace]
+members = ["crates/gbrg-core"]
+exclude = ["crates/gbrg-napi"]
+resolver = "2"

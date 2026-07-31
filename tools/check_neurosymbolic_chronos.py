@@ -18,6 +18,7 @@ INVALIDS = [
     FIXTURES / "invalid.equation-as-authority.json",
     FIXTURES / "invalid.telemetry-model-as-policy.json",
     FIXTURES / "invalid.notebook-equation-as-ontology.json",
+    FIXTURES / "invalid.kairos-schema-promoted-as-canonical-ontology.json",
 ]
 
 REQUIRED_METHOD_FAMILIES = {
@@ -64,6 +65,7 @@ FAILURE_MODE_BY_FILE = {
     "invalid.equation-as-authority.json": "equation_as_authority",
     "invalid.telemetry-model-as-policy.json": "telemetry_model_as_policy",
     "invalid.notebook-equation-as-ontology.json": "notebook_equation_as_ontology",
+    "invalid.kairos-schema-promoted-as-canonical-ontology.json": "kairos_schema_as_canonical_ontology",
 }
 
 
@@ -201,6 +203,16 @@ def assert_invalid_rejected(path: Path, data: dict[str, Any]) -> None:
         require(carrier.get("validationState") == "notebook-output-only", "notebook fixture must expose notebook-output-only validation")
         require(carrier.get("webProtegeMutation") == "direct", "notebook fixture must try direct WebProtege mutation")
         require(authority.get("semanticVocabularyDraft") == "bypassed", "notebook fixture must bypass semantic vocabulary authority")
+
+    if path.name == "invalid.kairos-schema-promoted-as-canonical-ontology.json":
+        require(carrier.get("status") == "admitted", "KAIROS schema fixture must try invalid admission")
+        require(carrier.get("claimStatus") == "canonical", "KAIROS schema fixture must try canonical claim")
+        require(
+            carrier.get("validationState") == "schema-match-confidence-only",
+            "KAIROS schema fixture must expose schema-match-confidence-only validation",
+        )
+        require(carrier.get("groundingStatus") == "unknown", "KAIROS schema fixture must expose unknown grounding")
+        require(authority.get("semanticVocabularyDraft") == "bypassed", "KAIROS schema fixture must bypass semantic vocabulary authority")
 
 
 def main() -> int:

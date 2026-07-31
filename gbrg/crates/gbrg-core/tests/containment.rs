@@ -196,6 +196,32 @@ fn artifact_serialization_conforms_to_contract() {
 }
 
 // ---------------------------------------------------------------------------
+// 2c. An allow-listed endpoint is terminal even when a kept label reaches it —
+//     Selective isolation must not pivot THROUGH the EDR channel.
+// ---------------------------------------------------------------------------
+#[test]
+fn selective_does_not_pivot_through_allow_listed_endpoint() {
+    let mut store = Store::memory(0);
+    let f = endpoint(&mut store, "foothold");
+    let edr = endpoint(&mut store, "edr");
+    let secret = endpoint(&mut store, "secret-behind-edr");
+    // Foothold reaches EDR via a KEPT label; EDR in turn reaches a secret node.
+    store.add_edge(f, edr, "EDR").unwrap();
+    store.add_edge(edr, secret, "SMB").unwrap();
+    let index = store.freeze();
+
+    let reading = sever_residual(
+        &index, f, &[f],
+        &SeverScope::Selective { keep_labels: vec!["EDR".into()] },
+        &[edr], Direction::Downstream,
+    );
+    // EDR is reachable (terminal) but the secret behind it must NOT be — no pivot.
+    assert!(reading.residual_reachable.contains(&edr), "EDR stays reachable");
+    assert!(!reading.residual_reachable.contains(&secret), "must not pivot through the allow-listed EDR");
+    assert_eq!(reading.contained, vec![secret], "the secret behind EDR is contained");
+}
+
+// ---------------------------------------------------------------------------
 // 3. Reverse teeth — a no-op sever must NOT be read as a clean containment
 // ---------------------------------------------------------------------------
 #[test]

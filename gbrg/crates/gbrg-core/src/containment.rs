@@ -297,6 +297,10 @@ fn successors(
             }
             out.sort_unstable();
             out.dedup();
+            // Allow-listed endpoints are terminal by policy: reachable but never a
+            // pivot. If a kept label also reaches one, it must NOT be expanded from
+            // (it is already recorded in `terminal`), so drop it from the expand set.
+            out.retain(|v| !allow.contains(v));
             out
         }
     };

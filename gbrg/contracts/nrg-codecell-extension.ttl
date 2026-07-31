@@ -1,0 +1,62 @@
+# GBRG code-cell extension to the neurosymbolic-repo-graph (NRG) vocabulary.
+#
+# ── The repo → symbol granularity bridge ─────────────────────────────────────
+# The base NRG vocabulary
+#   (registry/neurosymbolic-repo-graph-reasoner/neurosymbolic-repo-graph.ttl)
+# models governance at REPOSITORY granularity: an `nrg:ActiveSpineRepository`
+# node carries spine/manifest/boundary/topology presence flags. It has NO term
+# for anything finer than a repo — there is no symbol/cell node, no code-level
+# dependency edge, and no epistemic-confidence property at symbol granularity.
+#
+# GBRG reasons one level DOWN: about individual code cells (functions, methods)
+# inside a repository. This file is an ADDITIVE, SEPARATELY-NAMESPACED
+# (`gbrgnrg:`) extension that introduces exactly the three terms the base
+# vocabulary lacks at symbol granularity. It does NOT redefine, subclass over,
+# or re-range any base `nrg:` term — the base vocabulary is consumed read-only.
+#
+# The bridge from a GBRG CodeCell UP to a base repository node is the
+# `gbrgnrg:withinRepository` property: many CodeCells belong to one
+# `nrg:ActiveSpineRepository`. Evidence records produced by
+# `gbrg/adapters/evidence.py` carry the repo in `subject_repository` and the
+# cell in a GBRG-namespaced field, so a consumer can always roll a cell-level
+# observation back up to the repo node the base graph already knows about.
+#
+# INVARIANT (evidence, never authorization): none of these terms express a
+# policy decision. GBRG emits EVIDENCE about code; policy-fabric decides. There
+# is deliberately no `gbrgnrg:policyDecision` term here.
+
+@prefix gbrgnrg: <https://socioprophet.org/ns/gbrg/neurosymbolic-repo-graph#> .
+@prefix nrg:     <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+# A code cell: a function/method-granularity node that lives INSIDE a repository.
+# It is a finer-grained sibling to (never a redefinition of) the base repository
+# node — a sub-node reached from a repository via gbrgnrg:withinRepository.
+gbrgnrg:CodeCell a rdfs:Class ;
+    rdfs:label "GBRG Code Cell" ;
+    rdfs:comment "A function/method-granularity node inside a repository; the sub-repository unit GBRG reasons about." .
+
+# Bridge UP to the base repository node (the granularity bridge).
+gbrgnrg:withinRepository a rdfs:Property ;
+    rdfs:domain gbrgnrg:CodeCell ;
+    rdfs:range nrg:ActiveSpineRepository ;
+    rdfs:comment "Rolls a CodeCell up to the base repository node it belongs to." .
+
+# A code-level dependency edge: CodeCell depends on CodeCell (in-degree of the
+# target = its dependents_count / blast-radius input). This is the symbol-level
+# topology the base nrg:presentInTopology repo flag has no vocabulary for.
+gbrgnrg:dependsOn a rdfs:Property ;
+    rdfs:domain gbrgnrg:CodeCell ;
+    rdfs:range gbrgnrg:CodeCell ;
+    rdfs:comment "Directed code-level dependency; target in-degree is the dependents_count that drives blast radius." .
+
+# Epistemic level at symbol granularity — the raw 6-value GBRG spectrum
+# (proved|bounded|empirical|synthetic|speculative|rejected). It is a SUPERSET of
+# the evidence-plane 3-value confidence (exact|derived|heuristic); the coarser
+# confidence is carried on the JSON observation record, this raw level is carried
+# here so no information is lost. See gbrg/adapters/evidence.py for the mapping.
+gbrgnrg:epistemicLevel a rdfs:Property ;
+    rdfs:domain gbrgnrg:CodeCell ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Raw GBRG epistemic level for a cell; superset of the evidence-plane confidence enum." .

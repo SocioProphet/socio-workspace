@@ -1,0 +1,111 @@
+{
+  "servers": [
+    {
+      "name": "gbrg-mcp",
+      "side": "either",
+      "tools": [
+        {
+          "capability_digest": "sha256:cc86ce453b1cd58c7791eb52fa20f60a2c1cadf86cfad7c7f251e4d08dbb3b9f",
+          "capability_ref": "capd://gbrg/mcp/impact_query",
+          "danger_class_hint": "LOW",
+          "effect": "read",
+          "name": "impact_query",
+          "schema": {
+            "in": {
+              "properties": {
+                "cellId": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "type": "object"
+            },
+            "out": {
+              "description": "GBRG BlastRadiusProofArtifact (never a bare float).",
+              "required": [
+                "proofId",
+                "claim",
+                "status",
+                "blast_radius",
+                "derivation",
+                "declared_by"
+              ],
+              "type": "object"
+            }
+          },
+          "side_effect_tags": [],
+          "trustHints": {
+            "attestationRequired": true,
+            "grantRequired": true,
+            "ledgerMode": "required"
+          }
+        },
+        {
+          "capability_digest": "sha256:e222624f3d4f814e594704686576269845e5548bda0a4102a8255a254774c985",
+          "capability_ref": "capd://gbrg/mcp/minimal_context_query",
+          "danger_class_hint": "LOW",
+          "effect": "read",
+          "name": "minimal_context_query",
+          "schema": {
+            "in": {
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "type": "object"
+            },
+            "out": {
+              "description": "Only the cells the gate INCLUDES, each a ProofArtifact.",
+              "type": "object"
+            }
+          },
+          "side_effect_tags": [],
+          "trustHints": {
+            "attestationRequired": true,
+            "grantRequired": true,
+            "ledgerMode": "required"
+          }
+        },
+        {
+          "capability_digest": "sha256:2835420a1a720e2de8eeb46af7dc705a339d81bd613d7368db0afd18b226b770",
+          "capability_ref": "capd://gbrg/mcp/graph_status",
+          "danger_class_hint": "LOW",
+          "effect": "read",
+          "name": "graph_status",
+          "schema": {
+            "in": {
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "type": "object"
+            },
+            "out": {
+              "description": "Counts + epistemicLevel spread, wrapped as a ProofArtifact.",
+              "type": "object"
+            }
+          },
+          "side_effect_tags": [],
+          "trustHints": {
+            "attestationRequired": true,
+            "grantRequired": true,
+            "ledgerMode": "required"
+          }
+        }
+      ]
+    }
+  ]
+}

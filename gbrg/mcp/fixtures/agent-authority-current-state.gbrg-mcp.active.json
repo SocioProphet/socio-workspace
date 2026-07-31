@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "agent-registry.agent-authority-current-state.v0.1",
+  "recordType": "AgentAuthorityCurrentState",
+  "stateId": "agent-authority-current-state:gbrg-mcp:active",
+  "agentRef": "agent-registry://gbrg/mcp",
+  "computed_at": "2026-07-31T00:00:00Z",
+  "authority_status": "active",
+  "effective_decision_ref": "trustops-agent-authority-decision:gbrg-mcp-pass-001",
+  "source_decision_refs": [
+    "trustops-agent-authority-decision:gbrg-mcp-pass-001"
+  ],
+  "evidenceRefs": [
+    "trustops-receipt:gbrg-mcp-pass-001",
+    "policy://trustops/agent-authority-v0.1"
+  ],
+  "authorityEffects": {
+    "toolAccess": "unchanged",
+    "memoryAccess": "unchanged",
+    "autonomousExecution": "unchanged",
+    "routeEligibility": "unchanged",
+    "egressMode": "unchanged"
+  },
+  "restoration_required": false,
+  "receipt_hash": "sha256:cccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc0000",
+  "labels": {
+    "fixture": "gbrg-mcp-active",
+    "purpose": "GBRG MCP surface authority — active agent authorized to serve read-only blast-radius tools"
+  }
+}

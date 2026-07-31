@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "agent-registry.agent-authority-current-state.v0.1",
+  "recordType": "AgentAuthorityCurrentState",
+  "stateId": "agent-authority-current-state:gbrg-mcp:suspended",
+  "agentRef": "agent-registry://gbrg/mcp",
+  "computed_at": "2026-07-31T00:05:00Z",
+  "authority_status": "suspended",
+  "effective_decision_ref": "trustops-agent-authority-decision:gbrg-mcp-quarantine-001",
+  "source_decision_refs": [
+    "trustops-agent-authority-decision:gbrg-mcp-quarantine-001"
+  ],
+  "evidenceRefs": [
+    "trustops-receipt:gbrg-mcp-quarantine-001",
+    "guardrail-action:gbrg-mcp-quarantine-001",
+    "policy://trustops/agent-authority-v0.1"
+  ],
+  "authorityEffects": {
+    "toolAccess": "suspended",
+    "memoryAccess": "suspended",
+    "autonomousExecution": "suspended",
+    "routeEligibility": "suspended",
+    "egressMode": "blocked"
+  },
+  "restoration_required": true,
+  "restoration_policy_ref": "policy://trustops/agent-authority-restoration-v0.1",
+  "restoration_conditions": [
+    "fresh passing TrustOps receipt",
+    "explicit restoration decision",
+    "authorization evidence recorded"
+  ],
+  "receipt_hash": "sha256:dddd0000dddd0000dddd0000dddd0000dddd0000dddd0000dddd0000dddd0000",
+  "labels": {
+    "fixture": "gbrg-mcp-suspended",
+    "purpose": "GBRG MCP surface authority — suspended agent, every tool call must FAIL CLOSED (refuse, no result)"
+  }
+}

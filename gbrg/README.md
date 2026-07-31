@@ -24,7 +24,8 @@ gbrg/
 ├── contracts/                       # JSON Schema (draft 2020-12)
 │   ├── semantic-cell.schema.json
 │   ├── graph-edge.schema.json
-│   └── blast-radius-proof-artifact.schema.json   # extends SCOPE-D ProofArtifact
+│   ├── blast-radius-proof-artifact.schema.json   # extends SCOPE-D ProofArtifact
+│   └── containment-proof-artifact.schema.json    # sever/residual reachability
 └── docs/
     └── ADR-001-gbrg-architecture.md
 ```
@@ -46,6 +47,13 @@ Expected: `smoke_blast_radius_in_degree ... ok` — proves the full
   (in-degree), `reverse_dependents` (in-neighbors), `transitive_dependents`
   (`bfs_on_csr` over the in-CSR), `test_coverage_reach`, and the deterministic
   `cell_id → NodeId` mapping.
+- **Real (containment):** `reachable_set` / `sever_residual` /
+  `emit_containment_artifact` (module `containment`). Topology-agnostic
+  sever/residual reachability — the same reads serve code-boundary severing
+  (Upstream/dependents) and network host isolation (Downstream/reaches). Proven
+  on both a code graph and a network-endpoint graph in `tests/containment.rs`,
+  including that a real sever shrinks reachability and a no-op sever is
+  downgraded to `speculative` rather than presented as clean containment.
 - **Stub:** `blast_radius_score` (`todo!()` — normalisation curve pending),
   `gbrg-napi` bodies, and the `gbrg/mcp` tool bodies.
 

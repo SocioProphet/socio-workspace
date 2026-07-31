@@ -45,6 +45,16 @@ pub use scoring::{
 };
 
 // ---------------------------------------------------------------------------
+// Containment: governed sever / residual-reachability. Topology-agnostic — the
+// same reads serve code-impact blast radius AND network-endpoint isolation.
+// ---------------------------------------------------------------------------
+pub mod containment;
+pub use containment::{
+    build_containment_artifact, emit_containment_artifact, reachable_set, sever_residual,
+    ContainmentProofArtifact, ContainmentReading, Direction, SeverScope, CONTAINMENT_DECLARED_BY,
+};
+
+// ---------------------------------------------------------------------------
 // Node property keys (namespaced to avoid clashes with other graphdb users).
 // ---------------------------------------------------------------------------
 /// Property key under which a cell's [`CellKind`] is stored (as `Prop::Text`).

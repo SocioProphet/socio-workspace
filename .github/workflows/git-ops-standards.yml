@@ -5,4 +5,4 @@ on:
 
 jobs:
   gate:
-    uses: SocioProphet/git-ops-standards/.github/workflows/pr-merge-gate.yml@main
+    uses: SocioProphet/git-ops-standards/.github/workflows/pr-merge-gate.yml@8320091da8e7c168523ccab7e6cdb59da7a8a139

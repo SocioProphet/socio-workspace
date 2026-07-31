@@ -1,0 +1,3 @@
+# The durable, append-only context-inclusion decision ledger is written here
+# (decisions.jsonl). This .gitkeep preserves the sink directory in the repo;
+# runtime .jsonl output is gitignored.

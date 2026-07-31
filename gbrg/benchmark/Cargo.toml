@@ -23,7 +23,10 @@ license = "MIT OR Apache-2.0"
 gbrg-core = { path = "../crates/gbrg-core" }
 gbrg-analyze = { path = "../crates/gbrg-analyze" }
 # Frozen index + Store + NodeId come from hellgraph's analytics crate (consume-only).
-hg_analytics = { path = "../../../hellgraph-rust-parallel-analytics.wt/crates/hg_analytics" }
+# PINNED GIT dependency (portable; hellgraph is PUBLIC). graphdb surface lives on
+# the still-open branch feat/rust-parallel-analytics (PR SocioProphet/hellgraph#47),
+# not main, so we pin the exact commit (rev) below. See gbrg-core/Cargo.toml for detail.
+hg_analytics = { git = "https://github.com/SocioProphet/hellgraph.git", rev = "6644a4adcb492a8e4bdeb6af962dd2434dbd4dd1" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

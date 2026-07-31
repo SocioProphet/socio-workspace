@@ -1,23 +1,29 @@
 //! # `gbrg-analyze` — demo CLI
 //!
 //! The demo surface for the END-TO-END GBRG pipeline. Point it at a real source
-//! file and it prints the emitted [`BlastRadiusProofArtifact`]s as pretty JSON.
+//! **file** OR a **directory** and it prints the emitted
+//! [`BlastRadiusProofArtifact`]s as pretty JSON.
 //!
 //! ```text
 //!   gbrg-analyze <file> [--lang rust|python|typescript]
+//!   gbrg-analyze <dir>          # walks every supported source file under <dir>
 //! ```
 //!
-//! If `--lang` is omitted the language is guessed from the file extension
-//! (`.rs` → rust, `.py` → python, `.ts`/`.tsx`/`.mts`/`.cts` → typescript).
+//! For a single file, if `--lang` is omitted the language is guessed from the
+//! extension (`.rs` → rust, `.py` → python, `.ts`/`.tsx`/`.mts`/`.cts` →
+//! typescript). For a directory, each file's language is auto-detected by
+//! extension and `--lang` is ignored; cross-file calls are resolved and test files
+//! wire `TESTED_BY` edges, so the output spans the full `epistemicLevel` spectrum.
 //!
 //! Output is a JSON array of ProofArtifacts on stdout (so it pipes into `jq`);
-//! all diagnostics go to stderr. Exit code is non-zero on any parse/ingest error.
+//! all diagnostics (including the epistemicLevel spread) go to stderr. Exit code is
+//! non-zero on any parse/ingest error.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use gbrg_analyze::analyze_file;
-use gbrg_core::ScoringConfig;
+use gbrg_analyze::{analyze_file, analyze_path_report, AnalyzePathReport, DEFAULT_CHURN_WINDOW_DAYS};
+use gbrg_core::{BlastRadiusProofArtifact, ScoringConfig};
 use gbrg_parser::Language;
 
 fn lang_from_str(s: &str) -> Option<Language> {
@@ -30,7 +36,51 @@ fn lang_from_str(s: &str) -> Option<Language> {
 }
 
 fn usage() -> &'static str {
-    "usage: gbrg-analyze <file> [--lang rust|python|typescript]"
+    "usage: gbrg-analyze <file|dir> [--lang rust|python|typescript]  (--lang ignored for a dir)"
+}
+
+/// Print the JSON array of artifacts to stdout; return an exit code.
+fn emit(artifacts: &[BlastRadiusProofArtifact]) -> ExitCode {
+    match serde_json::to_string_pretty(artifacts) {
+        Ok(json) => {
+            println!("{json}");
+            ExitCode::SUCCESS
+        }
+        Err(e) => {
+            eprintln!("error: serialising artifacts: {e}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+/// Human-readable evidence summary for a directory walk (to stderr).
+fn print_report_summary(root: &std::path::Path, report: &AnalyzePathReport) {
+    eprintln!(
+        "gbrg-analyze: {} → {} file(s) parsed ({} test file(s)), {} cell(s) ingested, \
+         {} scored, {} test cell(s) excluded",
+        root.display(),
+        report.files_parsed,
+        report.test_files,
+        report.cells_total,
+        report.cells_scored,
+        report.test_cells,
+    );
+    eprintln!(
+        "gbrg-analyze: cross-file calls resolved={} ambiguous={} external={}; \
+         inherits resolved={}; TESTED_BY edges={}; churny files={}",
+        report.xfile_calls_resolved,
+        report.xfile_calls_ambiguous,
+        report.xfile_calls_external,
+        report.xfile_inherits_resolved,
+        report.tested_by_edges,
+        report.churn_files_nonzero,
+    );
+    let spread = report.level_spread();
+    let rendered: Vec<String> = spread
+        .iter()
+        .map(|(lvl, n)| format!("{lvl}={n}"))
+        .collect();
+    eprintln!("gbrg-analyze: epistemicLevel spread → {}", rendered.join("  "));
 }
 
 fn main() -> ExitCode {
@@ -57,7 +107,7 @@ fn main() -> ExitCode {
             }
             other => {
                 if file.is_some() {
-                    eprintln!("error: more than one file given\n{}", usage());
+                    eprintln!("error: more than one path given\n{}", usage());
                     return ExitCode::from(2);
                 }
                 file = Some(PathBuf::from(other));
@@ -65,59 +115,68 @@ fn main() -> ExitCode {
         }
     }
 
-    let file = match file {
+    let path = match file {
         Some(f) => f,
         None => {
-            eprintln!("error: no file given\n{}", usage());
+            eprintln!("error: no path given\n{}", usage());
             return ExitCode::from(2);
         }
     };
 
-    // Resolve language: explicit --lang wins, else guess from the extension.
-    let language = match lang_arg {
-        Some(s) => match lang_from_str(&s) {
-            Some(l) => l,
-            None => {
-                eprintln!("error: unsupported --lang `{s}` (rust|python|typescript)");
-                return ExitCode::from(2);
-            }
-        },
-        None => match Language::from_path(&file) {
-            Some(l) => l,
-            None => {
-                eprintln!(
-                    "error: cannot infer language from `{}`; pass --lang",
-                    file.display()
-                );
-                return ExitCode::from(2);
-            }
-        },
-    };
-
     let config = ScoringConfig::default();
-    match analyze_file(&file, language, &config) {
-        Ok(artifacts) => {
-            eprintln!(
-                "gbrg-analyze: {} → {} ProofArtifact(s) [{:?}]",
-                file.display(),
-                artifacts.len(),
-                language
-            );
-            // The money artifact: a JSON array of ProofArtifacts on stdout.
-            match serde_json::to_string_pretty(&artifacts) {
-                Ok(json) => {
-                    println!("{json}");
-                    ExitCode::SUCCESS
-                }
-                Err(e) => {
-                    eprintln!("error: serialising artifacts: {e}");
-                    ExitCode::FAILURE
-                }
+
+    // DIRECTORY: walk it — auto-detect per-file language, resolve cross-file, wire
+    // TESTED_BY + churn, and score every non-test cell.
+    if path.is_dir() {
+        if lang_arg.is_some() {
+            eprintln!("gbrg-analyze: note: --lang is ignored for a directory (auto-detected per file)");
+        }
+        match analyze_path_report(&path, &config, DEFAULT_CHURN_WINDOW_DAYS) {
+            Ok(report) => {
+                print_report_summary(&path, &report);
+                emit(&report.artifacts)
+            }
+            Err(e) => {
+                eprintln!("error: {e}");
+                ExitCode::FAILURE
             }
         }
-        Err(e) => {
-            eprintln!("error: {e}");
-            ExitCode::FAILURE
+    } else {
+        // SINGLE FILE: resolve language (explicit --lang wins, else by extension).
+        let language = match lang_arg {
+            Some(s) => match lang_from_str(&s) {
+                Some(l) => l,
+                None => {
+                    eprintln!("error: unsupported --lang `{s}` (rust|python|typescript)");
+                    return ExitCode::from(2);
+                }
+            },
+            None => match Language::from_path(&path) {
+                Some(l) => l,
+                None => {
+                    eprintln!(
+                        "error: cannot infer language from `{}`; pass --lang",
+                        path.display()
+                    );
+                    return ExitCode::from(2);
+                }
+            },
+        };
+
+        match analyze_file(&path, language, &config) {
+            Ok(artifacts) => {
+                eprintln!(
+                    "gbrg-analyze: {} → {} ProofArtifact(s) [{:?}]",
+                    path.display(),
+                    artifacts.len(),
+                    language
+                );
+                emit(&artifacts)
+            }
+            Err(e) => {
+                eprintln!("error: {e}");
+                ExitCode::FAILURE
+            }
         }
     }
 }

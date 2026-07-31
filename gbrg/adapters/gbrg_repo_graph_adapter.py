@@ -112,12 +112,11 @@ class GbrgRepoGraphAdapter:
         dependency graph). It makes NO claim about spine/manifest/boundary
         presence — those are other producers' surfaces, left False.
         """
-        seen: dict[str, Any] = {}
-        for _artifact in self._artifacts:
-            repo = self._subject_repository
-            if repo in seen:
-                continue
-            seen[repo] = RepositoryNode(
+        if not self._artifacts:
+            return []
+        repo = self._subject_repository
+        return [
+            RepositoryNode(
                 node=repo.split("/")[-1],
                 repository=repo,
                 spine_role="code-evidence-source",
@@ -127,7 +126,7 @@ class GbrgRepoGraphAdapter:
                 present_in_boundaries=False,
                 present_in_topology=True,
             )
-        return list(seen.values())
+        ]
 
     def graph_fixture(self) -> Any:
         """The governance fixture header for this evidence batch.

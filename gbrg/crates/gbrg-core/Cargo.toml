@@ -8,16 +8,15 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 # CONSUME-ONLY path dependency on hellgraph's analytics crate.
 #
-# Relative path resolves from this Cargo.toml:
-#   gbrg-core/ -> crates/ -> gbrg/ -> sociosphere-gbrg-spine.wt/ -> dev/
-#   then hellgraph-rust/crates/hg_analytics
-# i.e. absolute /Users/michaelheller/dev/hellgraph-rust/crates/hg_analytics
+# Points at hellgraph's still-open feat/rust-parallel-analytics branch (hellgraph#47),
+# not main -- this crate's NodeId/GraphIndex/bfs_on_csr surface hasn't landed on main yet.
+# Once that PR merges, repoint this at hellgraph/crates/hg_analytics.
 #
 # MERGE-READY FOLLOW-UP (see docs/ADR-001): for portability this SHOULD become a
 # pinned GIT dependency, e.g.
-#   hg_analytics = { git = "https://.../hellgraph-rust", rev = "<pinned-sha>" }
+#   hg_analytics = { git = "https://.../hellgraph", rev = "<pinned-sha>" }
 # The path dep is the goal for THIS skeleton only (it must compile locally).
-hg_analytics = { path = "../../../../hellgraph-rust/crates/hg_analytics" }
+hg_analytics = { path = "../../../../hellgraph-rust-parallel-analytics.wt/crates/hg_analytics" }
 
 # Serialization of the BlastRadiusProofArtifact to JSON (MIT OR Apache-2.0 —
 # compatible with the estate's MIT/Apache-only build constraint).

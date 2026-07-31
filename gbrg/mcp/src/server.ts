@@ -28,7 +28,7 @@ import {
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
-import { ProofArtifact, ToolRefusedError, isProofArtifact } from "./types.js";
+import { ProofArtifact, ToolRefusedError } from "./types.js";
 import { AnalyzeFn, makeAnalyze } from "./analyze.js";
 import {
   AuthorizeFn,

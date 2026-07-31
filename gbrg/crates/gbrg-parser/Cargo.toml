@@ -1,0 +1,20 @@
+[package]
+name = "gbrg-parser"
+version = "0.1.0"
+edition = "2021"
+description = "Tree-sitter code-structure parser producing GBRG SemanticCells + edges from source."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Reuse the spine's core model (SemanticCell / GraphEdge / CellKind / EdgeKind)
+# and its sha256 helper (ast_hash_of). No separate sha256 crate needed.
+gbrg-core = { path = "../gbrg-core" }
+
+# tree-sitter core — MIT (verified via `cargo metadata`, 2026-07-31).
+tree-sitter = "0.26"
+
+# Grammar crates — all MIT (verified via `cargo metadata`, 2026-07-31).
+# Each passes the estate MIT/Apache-only license gate.
+tree-sitter-rust = "0.24"
+tree-sitter-python = "0.25"
+tree-sitter-typescript = "0.23"

@@ -1,0 +1,22 @@
+[package]
+name = "gbrg-napi"
+version = "0.1.0"
+edition = "2021"
+description = "N-API bridge exposing gbrg-core blast-radius reads to Node/TypeScript."
+license = "MIT OR Apache-2.0"
+
+# EXCLUDED from the gbrg workspace on purpose (see ../../Cargo.toml): the napi
+# build toolchain may be unavailable in a sandbox. This crate is a well-formed
+# skeleton; build it standalone when napi is present:
+#   cd gbrg/crates/gbrg-napi && cargo build
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Path is relative to THIS crate: gbrg-napi/ -> crates/ -> gbrg-core.
+gbrg-core = { path = "../gbrg-core" }
+napi = { version = "2", default-features = false, features = ["napi8"] }
+napi-derive = "2"
+
+[build-dependencies]
+napi-build = "2"

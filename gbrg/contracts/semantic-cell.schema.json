@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/semantic-cell.schema.json",
+  "title": "GBRG Semantic Cell",
+  "description": "One unit of code (function/class/import/module) — a node in the Governed Blast-Radius Graph.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cell_id",
+    "kind",
+    "language",
+    "file_path",
+    "symbol_name",
+    "ast_hash",
+    "loc_start",
+    "loc_end"
+  ],
+  "properties": {
+    "cell_id": {
+      "type": "string",
+      "description": "Stable code IRI, e.g. code://rust/src/lib.rs#foo. Deterministically hashed to a graphdb NodeId (u64) = first 8 bytes of sha256(cell_id), big-endian.",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["function", "class", "import", "module"]
+    },
+    "language": { "type": "string", "minLength": 1 },
+    "file_path": { "type": "string", "minLength": 1 },
+    "symbol_name": { "type": "string" },
+    "ast_hash": {
+      "type": "string",
+      "description": "sha256 hex of the cell's AST/source slice.",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "loc_start": { "type": "integer", "minimum": 0 },
+    "loc_end": { "type": "integer", "minimum": 0 },
+    "generated": {
+      "type": "boolean",
+      "default": false,
+      "$comment": "True if this cell is machine-generated (codegen). This is INDEPENDENT of the ProofArtifact epistemicLevel 'synthetic', which means synthetic DATA, never auto-generated code. See blast-radius-proof-artifact.schema.json and docs/ADR-001."
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "repo": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics",
+  "token_method": "chars / 4 (rough chars-per-token heuristic; offline, no tokenizer)",
+  "token_divisor": 4.0,
+  "files_parsed": 38,
+  "cells_total": 683,
+  "cells_scored": 575,
+  "reviewable_cells": 372,
+  "xfile_calls_resolved": 560,
+  "xfile_calls_ambiguous": 318,
+  "xfile_calls_external": 3663,
+  "tested_by_edges": 344,
+  "full_context_chars": 342108,
+  "full_context_tokens": 85527,
+  "targets_with_blast_radius": 234,
+  "leaf_cells_no_dependents": 138,
+  "token_reduction_over_targets": {
+    "mean": 70.15508768734902,
+    "median": 41.457829567306334,
+    "min": 1.3991918332624416,
+    "max": 846.8019801980198
+  },
+  "recall_transitive_mean": 1.0,
+  "recall_direct_mean": 0.6621764948573859,
+  "top_targets_by_blast_radius": [
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/interner.rs#len",
+      "symbol": "len",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/interner.rs",
+      "blast_radius_size": 144,
+      "direct_dependents": 84,
+      "minimal_chars": 244503,
+      "minimal_tokens": 61126,
+      "token_reduction_ratio": 1.3991918332624416,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.5833333333333334
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/probabilistic.rs#slots",
+      "symbol": "slots",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/probabilistic.rs",
+      "blast_radius_size": 63,
+      "direct_dependents": 2,
+      "minimal_chars": 131140,
+      "minimal_tokens": 32785,
+      "token_reduction_ratio": 2.608723501601342,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.031746031746031744
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/probabilistic.rs#insert",
+      "symbol": "insert",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/probabilistic.rs",
+      "blast_radius_size": 60,
+      "direct_dependents": 23,
+      "minimal_chars": 130375,
+      "minimal_tokens": 32594,
+      "token_reduction_ratio": 2.62401055408971,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.38333333333333336
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/interner.rs#is_empty",
+      "symbol": "is_empty",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/interner.rs",
+      "blast_radius_size": 58,
+      "direct_dependents": 19,
+      "minimal_chars": 154842,
+      "minimal_tokens": 38711,
+      "token_reduction_ratio": 2.209372013122885,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.3275862068965517
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs#next",
+      "symbol": "next",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs",
+      "blast_radius_size": 48,
+      "direct_dependents": 6,
+      "minimal_chars": 136521,
+      "minimal_tokens": 34130,
+      "token_reduction_ratio": 2.5059185467330796,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.125
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs#expect",
+      "symbol": "expect",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs",
+      "blast_radius_size": 45,
+      "direct_dependents": 8,
+      "minimal_chars": 135984,
+      "minimal_tokens": 33996,
+      "token_reduction_ratio": 2.515795975997176,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.17777777777777778
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs#ident",
+      "symbol": "ident",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs",
+      "blast_radius_size": 45,
+      "direct_dependents": 4,
+      "minimal_chars": 135971,
+      "minimal_tokens": 33993,
+      "token_reduction_ratio": 2.5160180037066455,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.08888888888888889
+    },
+    {
+      "cell_id": "code://rust//Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs#num",
+      "symbol": "num",
+      "file": "/Users/michaelheller/dev/hellgraph-rust-parallel-analytics.wt/crates/hg_analytics/src/cypher.rs",
+      "blast_radius_size": 44,
+      "direct_dependents": 3,
+      "minimal_chars": 135732,
+      "minimal_tokens": 33933,
+      "token_reduction_ratio": 2.5204668022279195,
+      "recall_transitive": 1.0,
+      "recall_direct": 0.06818181818181818
+    }
+  ]
+}

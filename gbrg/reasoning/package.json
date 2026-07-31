@@ -1,0 +1,21 @@
+{
+  "name": "@socioprophet/gbrg-reasoning",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GBRG causal TRACK 1 — PLN probabilistic-logic risk-propagation over the code graph. Projects GBRG blast-radius ProofArtifacts into a HellGraphStore and runs the REAL pln.ts forwardChain() to derive transitive-risk edges (risk that flows A->C through A->B->C) with per-hop confidence decay. NOT Pearl causal inference.",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/risk_propagation.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test test/risk_propagation_test.ts"
+  },
+  "dependencies": {
+    "@socioprophet/hellgraph": "file:../../../hellgraph"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}

@@ -8,4 +8,4 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: SocioProphet/git-ops-standards/.github/workflows/minimal-reusable-test.yml@main
+    uses: SocioProphet/git-ops-standards/.github/workflows/pr-merge-gate.yml@main

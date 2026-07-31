@@ -1,0 +1,21 @@
+{
+  "name": "@socioprophet/gbrg-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server exposing GBRG blast-radius tools (impact_query, minimal_context_query, graph_status). Skeleton — build deferred.",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js"
+  },
+  "comment:build-deferred": "Dependencies are intentionally NOT installed in this skeleton (network may be unavailable). Add @modelcontextprotocol/sdk and typescript, then `pnpm install && pnpm build`.",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}

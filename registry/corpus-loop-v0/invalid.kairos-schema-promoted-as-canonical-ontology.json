@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "0.1.0",
+  "kind": "ChronosCarrierRegistration",
+  "id": "chronos-carrier.invalid.kairos-schema-promoted-as-canonical-ontology",
+  "title": "Invalid carrier promoting a KAIROS-style induced event schema to canonical ontology without review",
+  "source": {
+    "sourceType": "event-schema-induction",
+    "evidenceRefs": []
+  },
+  "carrier": {
+    "status": "admitted",
+    "claimStatus": "canonical",
+    "validationState": "schema-match-confidence-only",
+    "methodFamilies": ["KAIROS-EVENT-SCHEMA-INDUCTION"],
+    "schemaMatchConfidence": 0.94,
+    "groundingStatus": "unknown",
+    "nonAuthorityDeclaration": "missing"
+  },
+  "authority": {
+    "integrationPlane": "SocioProphet/sociosphere",
+    "semanticVocabularyDraft": "bypassed",
+    "schemaAuthority": "bypassed"
+  },
+  "expectedValidationFailure": {
+    "reason": "A KAIROS-style induced event schema, or a schema-match instance over it, proposes candidate multi-step event structure only. CHRONOS cannot promote it to canonical ontology, an evidence record, or a policy trigger, and cannot treat schema-match confidence as ground-truth event occurrence or causal proof, without owning-plane review.",
+    "failureMode": "kairos_schema_as_canonical_ontology"
+  }
+}

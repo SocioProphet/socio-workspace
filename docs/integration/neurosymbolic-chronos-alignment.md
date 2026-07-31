@@ -56,6 +56,27 @@ A carrier produced by a neuro-symbolic method is never automatically canonical. 
 | Deep Ontological Networks / RRN | candidate ontology inference | propose inferred relations or ontology-delta candidates | treat embeddings as ontology authority or explanation-complete reasoning |
 | DSR / DSP | symbolic expression or policy proposal | propose compact symbolic policies for routing, control, or remediation scoring | run a symbolic policy as a live controller before governance admission |
 
+## Candidate row — KAIROS event-schema induction (DRAFT, pending doctrine-owner review)
+
+**Status: DRAFT candidate row. Not yet admitted to the table above.**
+
+This document's own rule is that a new method's carrier is a candidate until the owning-plane review admits it. That rule applies to this row itself: it is proposed here for doctrine-owner review, not presented as decided. Do not treat it as an addition to the admitted "Method families and CHRONOS roles" table above until an owning-plane reviewer accepts it (at which point it should be merged into that table and this section removed).
+
+Grounding: `KAIROS` is not defined anywhere else in this estate's doctrine; it surfaces only as an unexplained paired label in an external deck slide ("KAIROS / CHRONOS Lessons"). The most likely real-world referent is DARPA's KAIROS program — "Knowledge-directed Artificial Intelligence Reasoning Over Schemas," run by DARPA's Information Processing Techniques Office, now complete and reference-only. KAIROS defines a *schema* as an organized unit of knowledge representing a pattern of memory used in human cognition, and targets *complex events*: multi-step sequences with participants, temporal sequencing, and causal chains. Its approach is two-stage: (1) schema induction — learn schemas automatically from large corpora rather than hand-crafting them, by detecting, classifying, and clustering sub-events; (2) schema application — apply the learned schemas to new multilingual/multimedia input to detect, link, and extract complex events and their relationships. This grounding is taken from DARPA's own program page, not guessed from the deck.
+
+Proposed row (to be inserted into "Method families and CHRONOS roles" above, upon admission):
+
+| Method family | CHRONOS role | Admissible use | Forbidden use |
+|---|---|---|---|
+| KAIROS-style complex event schema induction (DRAFT — not yet admitted) | candidate multi-step event-schema proposal | propose induced complex-event schemas (participants, subsidiary sub-events, temporal/causal structure) as candidate carriers with source-corpus provenance and induction confidence, for owning-plane review | promote an induced event schema, or any instance matched against it, to canonical ontology, evidence record, or policy trigger without owning-plane review; treat schema-match confidence as ground-truth event occurrence, causal proof, or evidentiary anchoring |
+
+This follows the same discipline as the existing rows (e.g. dILP's "propose learned rules ... / promote learned rules to canonical schema or ontology without owning-plane review"): schema induction proposes structure, it does not settle it. The forbidden-use column has two independent failure modes worth calling out explicitly, both barred:
+
+1. **Unreviewed promotion** — treating an induced schema (or a real-world instance matched against it) as if it were already canonical ontology, an evidence record, or a live policy trigger, without owning-plane review. This mirrors dILP's and Deep Ontological Networks' forbidden-promotion pattern.
+2. **Confidence-as-truth** — treating the induction/match confidence score as ground-truth evidence that the event occurred, or as a causal claim, rather than as an advisory ranking over candidate structure. This mirrors LTN's and LNN's forbidden pattern of not treating a soft/bounded score as truth.
+
+A negative fixture for failure mode (1) is added at `registry/corpus-loop-v0/invalid.kairos-schema-promoted-as-canonical-ontology.json` and wired into `tools/check_neurosymbolic_chronos.py`.
+
 ## Neuro-symbolic carrier boundary
 
 A CHRONOS carrier that references neuro-symbolic reasoning must include at least:

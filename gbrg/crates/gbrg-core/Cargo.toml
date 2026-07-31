@@ -18,3 +18,8 @@ license = "MIT OR Apache-2.0"
 #   hg_analytics = { git = "https://.../hellgraph-rust", rev = "<pinned-sha>" }
 # The path dep is the goal for THIS skeleton only (it must compile locally).
 hg_analytics = { path = "../../../../hellgraph-rust/crates/hg_analytics" }
+
+# Serialization of the BlastRadiusProofArtifact to JSON (MIT OR Apache-2.0 —
+# compatible with the estate's MIT/Apache-only build constraint).
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

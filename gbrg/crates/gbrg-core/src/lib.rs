@@ -33,6 +33,18 @@ use std::io;
 use hg_analytics::{bfs_on_csr, sha256_hex, GraphCore, GraphIndex, NodeId, Prop, Store};
 
 // ---------------------------------------------------------------------------
+// Scoring differentiator: blast-radius normalisation, epistemicLevel derivation,
+// and ProofArtifact emission. This is the governance-native output layer that
+// replaces the former `blast_radius_score` `todo!()`.
+// ---------------------------------------------------------------------------
+pub mod scoring;
+pub use scoring::{
+    blast_radius_score, build_proof_artifact, churn_frequency, code_dependents_count,
+    derive_epistemic_level, emit_proof_artifact, BlastRadiusInputs, BlastRadiusProofArtifact,
+    EpistemicLevel, ProofClaim, ScoringConfig, DECLARED_BY,
+};
+
+// ---------------------------------------------------------------------------
 // Node property keys (namespaced to avoid clashes with other graphdb users).
 // ---------------------------------------------------------------------------
 /// Property key under which a cell's [`CellKind`] is stored (as `Prop::Text`).
@@ -277,12 +289,8 @@ pub fn test_coverage_reach(index: &GraphIndex, cell: NodeId) -> bool {
     !reverse_dependents(index, cell, Some(EdgeKind::TestedBy.as_label())).is_empty()
 }
 
-/// Normalised blast-radius score in `0.0..=1.0`, suitable for feeding SCOPE-D's
-/// `computeRiskScore`.
-///
-/// STUB: the exact normalisation (how transitive-dependent count and churn fold
-/// into a single 0..1 float) is not settled yet — see ADR-001. The *inputs*
-/// above are real; only the scoring curve is pending.
-pub fn blast_radius_score(_index: &GraphIndex, _cell: NodeId) -> f64 {
-    todo!("blast_radius scoring curve pending — see docs/ADR-001; MUST return 0.0..=1.0")
-}
+// NOTE: `blast_radius_score` (the normalised 0.0..=1.0 curve) previously lived
+// here as a `todo!()`. It is now REAL and lives in [`mod scoring`]
+// (`scoring::blast_radius_score`), re-exported at the crate root above. See that
+// module for the documented normalisation curve and the SCOPE-D precedents it
+// inherits.

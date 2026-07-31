@@ -1,0 +1,19 @@
+{
+  "blast_radius": 0.2566666666666667,
+  "cell_id": "code://rust/crates/gbrg-core/src/lib.rs#as_label",
+  "churn_frequency": 0.022222222222222223,
+  "claim": {
+    "claimId": "claim.gbrg.blast_radius.88a5f1acd4e68768",
+    "claimType": "scope_bound",
+    "epistemicLevel": "speculative",
+    "statement": "blast radius of code://rust/crates/gbrg-core/src/lib.rs#as_label (as_label): 4 direct dependents, test_coverage_reach=false, churn=0.0222/day \u2192 speculative"
+  },
+  "declared_by": "agent-registry://gbrg-scorer",
+  "dependents_count": 4,
+  "derivation": "no test path reaches this cell; 4 dependents is within the bounded threshold of 15, but absent any test evidence the behaviour can only be speculated \u2192 speculative",
+  "generated": false,
+  "proofId": "proof-gbrg-88a5f1acd4e68768",
+  "schemaVersion": "0.1.0",
+  "status": "INCONCLUSIVE",
+  "test_coverage_reach": false
+}

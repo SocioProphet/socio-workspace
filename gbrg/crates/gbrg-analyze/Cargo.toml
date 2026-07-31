@@ -21,7 +21,7 @@ gbrg-core = { path = "../gbrg-core" }
 # The tree-sitter parser producing SemanticCells + GraphEdges from real source.
 gbrg-parser = { path = "../gbrg-parser" }
 # The frozen index + Store come from hellgraph's analytics crate (consume-only).
-hg_analytics = { path = "../../../../hellgraph-rust/crates/hg_analytics" }
+hg_analytics = { path = "../../../../hellgraph-rust-parallel-analytics.wt/crates/hg_analytics" }
 # Pretty-print the ProofArtifacts as JSON on the CLI (MIT OR Apache-2.0).
 serde_json = "1"
 

@@ -1,0 +1,4 @@
+# Durable ledger runtime output is data, not source — keep the dir, ignore contents.
+ledger/*.jsonl
+__pycache__/
+.pytest_cache/

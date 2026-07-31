@@ -39,3 +39,4 @@ manifest/overrides.toml
 # Runtime metrics / logs (generated at runtime — not committed)
 metrics/*.jsonl
 metrics/registry-metrics.json
+agent-registry/

@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check out agent-registry (gbrg governance gate's authorize.py dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/agent-registry
+          path: agent-registry
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:

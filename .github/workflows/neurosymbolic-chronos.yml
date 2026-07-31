@@ -1,0 +1,68 @@
+name: neurosymbolic-chronos
+
+# Wires tools/check_neurosymbolic_chronos.py into CI. This validator checks the shape and
+# required-field discipline of the CHRONOS carrier fixtures for the neuro-symbolic (NSR) and
+# symbolic-regression (SR) method-family maps documented in
+# docs/integration/neurosymbolic-chronos-alignment.md. It previously had no CI wiring at all
+# (`grep -rl check_neurosymbolic_chronos .github/workflows/` found nothing) despite having real
+# valid/invalid fixtures under registry/corpus-loop-v0/ — the same "declared but never enforced"
+# pattern already found and fixed elsewhere in the estate (e.g. prophet-platform's
+# validate-mesh-deployment Make target, which as of this writing is STILL only declared in the
+# Makefile and invoked by no workflow either).
+#
+# Verified clean against the current tree before this workflow was added, so this is wired as a
+# normal BLOCKING check (no continue-on-error). If it starts surfacing failures unrelated to a
+# given change, that is a real regression in the CHRONOS carrier fixtures or the validator itself,
+# not pre-existing noise.
+#
+# Path filters list the exact files tools/check_neurosymbolic_chronos.py reads (see its FIXTURES/
+# VALID_*/INVALIDS constants) plus the script and this workflow file, so the job only runs when
+# something it actually depends on changes.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/check_neurosymbolic_chronos.py'
+      - 'registry/corpus-loop-v0/valid.asu-nsr-chronos.json'
+      - 'registry/corpus-loop-v0/valid.symbolic-regression-insertion-map.json'
+      - 'registry/corpus-loop-v0/invalid.soft-score-as-authority.json'
+      - 'registry/corpus-loop-v0/invalid.ungrounded-symbol-promotion.json'
+      - 'registry/corpus-loop-v0/invalid.label-leakage-carrier.json'
+      - 'registry/corpus-loop-v0/invalid.visual-embedding-as-evidence.json'
+      - 'registry/corpus-loop-v0/invalid.transduction-certificate-missing.json'
+      - 'registry/corpus-loop-v0/invalid.equation-as-authority.json'
+      - 'registry/corpus-loop-v0/invalid.telemetry-model-as-policy.json'
+      - 'registry/corpus-loop-v0/invalid.notebook-equation-as-ontology.json'
+      - '.github/workflows/neurosymbolic-chronos.yml'
+  pull_request:
+    paths:
+      - 'tools/check_neurosymbolic_chronos.py'
+      - 'registry/corpus-loop-v0/valid.asu-nsr-chronos.json'
+      - 'registry/corpus-loop-v0/valid.symbolic-regression-insertion-map.json'
+      - 'registry/corpus-loop-v0/invalid.soft-score-as-authority.json'
+      - 'registry/corpus-loop-v0/invalid.ungrounded-symbol-promotion.json'
+      - 'registry/corpus-loop-v0/invalid.label-leakage-carrier.json'
+      - 'registry/corpus-loop-v0/invalid.visual-embedding-as-evidence.json'
+      - 'registry/corpus-loop-v0/invalid.transduction-certificate-missing.json'
+      - 'registry/corpus-loop-v0/invalid.equation-as-authority.json'
+      - 'registry/corpus-loop-v0/invalid.telemetry-model-as-policy.json'
+      - 'registry/corpus-loop-v0/invalid.notebook-equation-as-ontology.json'
+      - '.github/workflows/neurosymbolic-chronos.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  neurosymbolic-chronos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check neuro-symbolic / symbolic-regression CHRONOS carrier fixtures
+        run: python3 tools/check_neurosymbolic_chronos.py

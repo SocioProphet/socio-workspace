@@ -22,8 +22,11 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use gbrg_analyze::{analyze_file, analyze_path_report, AnalyzePathReport, DEFAULT_CHURN_WINDOW_DAYS};
-use gbrg_core::{BlastRadiusProofArtifact, ScoringConfig};
+use gbrg_analyze::{
+    analyze_file, analyze_path_report, build_whatif_graph, AnalyzePathReport,
+    DEFAULT_CHURN_WINDOW_DAYS,
+};
+use gbrg_core::{what_if, BlastRadiusProofArtifact, Mutation, ScoringConfig};
 use gbrg_parser::Language;
 
 fn lang_from_str(s: &str) -> Option<Language> {
@@ -83,8 +86,123 @@ fn print_report_summary(root: &std::path::Path, report: &AnalyzePathReport) {
     eprintln!("gbrg-analyze: epistemicLevel spread → {}", rendered.join("  "));
 }
 
+/// `gbrg-analyze whatif <path> --cell <id> --mutation add_tests|remove_dependent`
+///
+/// Deterministic recompute-and-diff: build the graph from `<path>`, recompute the
+/// target cell's ProofArtifact on an in-memory-EDITED copy of that graph, and diff
+/// vs baseline. This is NOT counterfactual causal inference (see whatif.rs / WHATIF.md).
+/// Prints the [`gbrg_core::WhatIfResult`] as JSON on stdout; summary to stderr.
+fn run_whatif(mut args: impl Iterator<Item = String>) -> ExitCode {
+    let mut path: Option<PathBuf> = None;
+    let mut cell: Option<String> = None;
+    let mut mutation: Option<Mutation> = None;
+
+    while let Some(a) = args.next() {
+        match a.as_str() {
+            "--cell" | "-c" => match args.next() {
+                Some(v) => cell = Some(v),
+                None => {
+                    eprintln!("error: --cell requires a value\n{}", whatif_usage());
+                    return ExitCode::from(2);
+                }
+            },
+            "--mutation" | "-m" => match args.next() {
+                Some(v) => match Mutation::parse(&v) {
+                    Some(m) => mutation = Some(m),
+                    None => {
+                        eprintln!(
+                            "error: unknown --mutation `{v}` (add_tests|remove_dependent)\n{}",
+                            whatif_usage()
+                        );
+                        return ExitCode::from(2);
+                    }
+                },
+                None => {
+                    eprintln!("error: --mutation requires a value\n{}", whatif_usage());
+                    return ExitCode::from(2);
+                }
+            },
+            "-h" | "--help" => {
+                println!("{}", whatif_usage());
+                return ExitCode::SUCCESS;
+            }
+            other if other.starts_with('-') => {
+                eprintln!("error: unknown flag `{other}`\n{}", whatif_usage());
+                return ExitCode::from(2);
+            }
+            other => {
+                if path.is_some() {
+                    eprintln!("error: more than one path given\n{}", whatif_usage());
+                    return ExitCode::from(2);
+                }
+                path = Some(PathBuf::from(other));
+            }
+        }
+    }
+
+    let (path, cell, mutation) = match (path, cell, mutation) {
+        (Some(p), Some(c), Some(m)) => (p, c, m),
+        _ => {
+            eprintln!("error: whatif needs <path> --cell <id> --mutation <m>\n{}", whatif_usage());
+            return ExitCode::from(2);
+        }
+    };
+
+    let config = ScoringConfig::default();
+    let (graph, churn_by_file) = match build_whatif_graph(&path, &config, DEFAULT_CHURN_WINDOW_DAYS)
+    {
+        Ok(g) => g,
+        Err(e) => {
+            eprintln!("error: building graph from {}: {e}", path.display());
+            return ExitCode::FAILURE;
+        }
+    };
+
+    // Hold the target cell's REAL per-file churn constant across before/after so the
+    // reported delta is attributable to the hypothetical edit alone (dead=false).
+    let churn = graph
+        .cells()
+        .iter()
+        .find(|c| c.cell_id == cell)
+        .and_then(|c| churn_by_file.get(&c.file_path).copied())
+        .unwrap_or(0.0);
+
+    match what_if(&graph, &cell, mutation, churn, false, &config) {
+        Ok(result) => {
+            eprintln!("gbrg-analyze whatif: {}", result.summary);
+            eprintln!("gbrg-analyze whatif: method = {}", result.method);
+            match result.to_json_pretty() {
+                Ok(json) => {
+                    println!("{json}");
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("error: serialising WhatIfResult: {e}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("error: {e}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn whatif_usage() -> &'static str {
+    "usage: gbrg-analyze whatif <file|dir> --cell <cell_id> --mutation add_tests|remove_dependent"
+}
+
 fn main() -> ExitCode {
-    let mut args = std::env::args().skip(1);
+    // Subcommand dispatch: `whatif` is the recompute-and-diff surface; anything else
+    // is the default parse→score pipeline (single file or directory walk).
+    let mut argv = std::env::args().skip(1).peekable();
+    if argv.peek().map(String::as_str) == Some("whatif") {
+        let _ = argv.next(); // consume "whatif"
+        return run_whatif(argv);
+    }
+
+    let mut args = argv;
     let mut file: Option<PathBuf> = None;
     let mut lang_arg: Option<String> = None;
 

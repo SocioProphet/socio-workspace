@@ -45,6 +45,16 @@ pub use scoring::{
 };
 
 // ---------------------------------------------------------------------------
+// What-if: deterministic recompute-and-diff over a hypothetically-edited graph
+// copy (NOT counterfactual causal inference — see `whatif.rs` honesty note).
+// ---------------------------------------------------------------------------
+pub mod whatif;
+pub use whatif::{
+    what_if, Mutation, WhatIfDelta, WhatIfError, WhatIfGraph, WhatIfResult, WhatIfSnapshot,
+    WHATIF_METHOD,
+};
+
+// ---------------------------------------------------------------------------
 // Containment: governed sever / residual-reachability. Topology-agnostic — the
 // same reads serve code-impact blast radius AND network-endpoint isolation.
 // ---------------------------------------------------------------------------

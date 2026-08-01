@@ -1,0 +1,37 @@
+# gbrg-benchmark — HONEST measurement harness (GBRG Phase 5).
+#
+# Consume-only: it drives the REAL end-to-end pipeline (`gbrg_analyze::
+# analyze_path_report`) to obtain the exact resolved cells + edges, rebuilds a
+# frozen index through gbrg-core's public write path, and measures two things on a
+# real repo:
+#   1. token reduction — FULL review context (every reviewable cell body) vs
+#      MINIMAL context (a changed cell + its blast radius);
+#   2. impact recall — fraction of a changed cell's true graph-dependents that the
+#      minimal context actually includes.
+#
+# It defines NO new graph logic: blast radius comes from gbrg_core's public
+# `transitive_dependents` / `reverse_dependents` reads over the analyzer's own
+# graph. See gbrg/benchmark/RESULTS.md for methodology + the non-claim box.
+[package]
+name = "gbrg-benchmark"
+version = "0.1.0"
+edition = "2021"
+description = "Honest token-reduction + impact-recall benchmark for GBRG (consumes the real analyze pipeline)."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# intra-repo (sociosphere): these siblings track the same branch/commit as this crate —
+# no cross-repo pin needed; they are always built from the same checkout.
+gbrg-core = { path = "../crates/gbrg-core" }
+gbrg-analyze = { path = "../crates/gbrg-analyze" }
+# Frozen index + Store + NodeId come from hellgraph's analytics crate (consume-only).
+# PINNED GIT dependency (portable; hellgraph is PUBLIC). graphdb surface lives on
+# the still-open branch feat/rust-parallel-analytics (PR SocioProphet/hellgraph#47),
+# not main, so we pin the exact commit (rev) below. See gbrg-core/Cargo.toml for detail.
+hg_analytics = { git = "https://github.com/SocioProphet/hellgraph.git", rev = "6644a4adcb492a8e4bdeb6af962dd2434dbd4dd1" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[[bin]]
+name = "gbrg-benchmark"
+path = "src/main.rs"

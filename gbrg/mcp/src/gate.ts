@@ -128,6 +128,47 @@ export function makeEmitResult(cfg: GateConfig): EmitResultFn {
   };
 }
 
+/**
+ * Emit a fail-closed REFUSAL ledger event (a deny MCP_CALL) for a call that was
+ * authorized (the caller may act) but blocked by RESOURCE confinement (the
+ * requested path is outside the allowed root). This is the ledger record that
+ * proves "no analysis performed": it is written BEFORE any analyze() runs.
+ */
+export interface RefusalResult {
+  ledgerWritten: boolean;
+  event?: AuthorizeResult["event"];
+}
+export type EmitRefusalFn = (
+  tool: string,
+  reasonCode: string,
+  args: Record<string, unknown>,
+) => Promise<RefusalResult>;
+
+export function makeEmitRefusal(cfg: GateConfig): EmitRefusalFn {
+  return async (tool, reasonCode, args): Promise<RefusalResult> => {
+    const argv = [
+      "refuse",
+      "--tool",
+      tool,
+      "--reason-code",
+      reasonCode,
+      "--args-json",
+      JSON.stringify(args ?? {}),
+      "--ledger",
+      cfg.ledgerPath,
+      "--registry",
+      cfg.registryPath,
+    ];
+    const { stdout } = await runPy(cfg, argv);
+    try {
+      const parsed = JSON.parse(stdout.trim());
+      return { ledgerWritten: parsed.ledger_written === true, event: parsed.event };
+    } catch {
+      return { ledgerWritten: false };
+    }
+  };
+}
+
 /** CONSUME the gate foundation's inclusion decision to pick minimal context. */
 export interface FilterIncludedResult {
   included: ProofArtifact[];

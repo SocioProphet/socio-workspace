@@ -67,7 +67,16 @@ fn code_graph_sever_boundary_contains_transitive_dependent() {
     let d = write_cell(&mut store, &code_cell("d", b"fn d(){c();}")).unwrap();
 
     for (from, to) in [(b, a), (c, a), (d, c)] {
-        write_edge(&mut store, &GraphEdge { from, to, kind: EdgeKind::Calls, weight: 1.0 }).unwrap();
+        write_edge(
+            &mut store,
+            &GraphEdge {
+                from,
+                to,
+                kind: EdgeKind::Calls,
+                weight: 1.0,
+            },
+        )
+        .unwrap();
     }
     let index = store.freeze();
 
@@ -77,12 +86,19 @@ fn code_graph_sever_boundary_contains_transitive_dependent() {
         sorted(transitive_dependents(&index, a)),
         "reachable_set(Upstream) must agree with transitive_dependents"
     );
-    assert_eq!(sorted(reachable_set(&index, a, Direction::Upstream)), sorted(vec![b, c, d]));
+    assert_eq!(
+        sorted(reachable_set(&index, a, Direction::Upstream)),
+        sorted(vec![b, c, d])
+    );
 
     // Sever the boundary cell C (Full). D reaches A only through C → D is contained.
     let reading = sever_residual(&index, a, &[c], &SeverScope::Full, &[], Direction::Upstream);
     assert_eq!(reading.baseline_reachable, sorted(vec![b, c, d]));
-    assert_eq!(reading.residual_reachable, sorted(vec![b, c]), "B and C stay reachable; C is cut but still one hop from A");
+    assert_eq!(
+        reading.residual_reachable,
+        sorted(vec![b, c]),
+        "B and C stay reachable; C is cut but still one hop from A"
+    );
     assert_eq!(reading.contained, vec![d], "severing C contains D");
 
     // Teeth: a real sever strictly shrinks reachability.
@@ -125,16 +141,33 @@ fn network_graph_full_vs_selective_isolation() {
     assert_eq!(baseline, sorted(vec![wks1, wks2, dc, fileserver, edr]));
 
     // FULL isolation of the foothold, EDR allow-listed: residual is EDR only.
-    let full = sever_residual(&index, f, &[f], &SeverScope::Full, &[edr], Direction::Downstream);
-    assert_eq!(full.residual_reachable, vec![edr], "full isolation leaves only the EDR control channel");
-    assert_eq!(full.contained, sorted(vec![wks1, wks2, dc, fileserver]), "everything else is contained");
+    let full = sever_residual(
+        &index,
+        f,
+        &[f],
+        &SeverScope::Full,
+        &[edr],
+        Direction::Downstream,
+    );
+    assert_eq!(
+        full.residual_reachable,
+        vec![edr],
+        "full isolation leaves only the EDR control channel"
+    );
+    assert_eq!(
+        full.contained,
+        sorted(vec![wks1, wks2, dc, fileserver]),
+        "everything else is contained"
+    );
 
     // SELECTIVE isolation keeping RDP (+EDR): wks2 stays reachable; the SMB chain is cut.
     let selective = sever_residual(
         &index,
         f,
         &[f],
-        &SeverScope::Selective { keep_labels: vec!["RDP".into(), "EDR".into()] },
+        &SeverScope::Selective {
+            keep_labels: vec!["RDP".into(), "EDR".into()],
+        },
         &[edr],
         Direction::Downstream,
     );
@@ -151,7 +184,12 @@ fn network_graph_full_vs_selective_isolation() {
 
     // The emitted artifact for a real containment is empirical (observed traversal).
     let artifact = emit_containment_artifact(
-        &index, f, &[f], &SeverScope::Full, &[edr], Direction::Downstream,
+        &index,
+        f,
+        &[f],
+        &SeverScope::Full,
+        &[edr],
+        Direction::Downstream,
     );
     assert_eq!(artifact.epistemic_level, EpistemicLevel::Empirical);
     assert_eq!(artifact.severed_scope, "full");
@@ -172,25 +210,62 @@ fn artifact_serialization_conforms_to_contract() {
     store.add_edge(f, edr, "EDR").unwrap();
     let index = store.freeze();
 
-    let artifact =
-        emit_containment_artifact(&index, f, &[f], &SeverScope::Full, &[edr], Direction::Downstream);
+    let artifact = emit_containment_artifact(
+        &index,
+        f,
+        &[f],
+        &SeverScope::Full,
+        &[edr],
+        Direction::Downstream,
+    );
     let v: serde_json::Value = serde_json::to_value(&artifact).unwrap();
 
     // Every required key from the contract schema must be present with the right type.
     for key in [
-        "schemaVersion", "proofId", "claimType", "statement", "epistemicLevel", "status",
-        "source", "severedScope", "baselineReachableCount", "residualReachableCount",
-        "containedCount", "residualReachable", "derivation", "declaredBy",
+        "schemaVersion",
+        "proofId",
+        "claimType",
+        "statement",
+        "epistemicLevel",
+        "status",
+        "source",
+        "severedScope",
+        "baselineReachableCount",
+        "residualReachableCount",
+        "containedCount",
+        "residualReachable",
+        "derivation",
+        "declaredBy",
     ] {
-        assert!(v.get(key).is_some(), "artifact missing required contract key: {key}");
+        assert!(
+            v.get(key).is_some(),
+            "artifact missing required contract key: {key}"
+        );
     }
     // Enum + pattern constraints the schema declares.
-    assert!(["proved", "bounded", "empirical", "synthetic", "speculative", "rejected"]
-        .contains(&v["epistemicLevel"].as_str().unwrap()));
-    assert!(["PROVED", "BOUNDED", "FAILED", "BLOCKED", "INCONCLUSIVE", "SYNTHETIC_ONLY"]
-        .contains(&v["status"].as_str().unwrap()));
+    assert!([
+        "proved",
+        "bounded",
+        "empirical",
+        "synthetic",
+        "speculative",
+        "rejected"
+    ]
+    .contains(&v["epistemicLevel"].as_str().unwrap()));
+    assert!([
+        "PROVED",
+        "BOUNDED",
+        "FAILED",
+        "BLOCKED",
+        "INCONCLUSIVE",
+        "SYNTHETIC_ONLY"
+    ]
+    .contains(&v["status"].as_str().unwrap()));
     assert!(v["proofId"].as_str().unwrap().starts_with("proof-"));
-    assert!(v["declaredBy"].as_str().unwrap().starts_with("agent-registry://"));
+    assert!(v["declaredBy"]
+        .as_str()
+        .unwrap()
+        .starts_with("agent-registry://"));
     assert!(["full", "selective"].contains(&v["severedScope"].as_str().unwrap()));
     assert!(v["residualReachable"].is_array());
 }
@@ -211,14 +286,29 @@ fn selective_does_not_pivot_through_allow_listed_endpoint() {
     let index = store.freeze();
 
     let reading = sever_residual(
-        &index, f, &[f],
-        &SeverScope::Selective { keep_labels: vec!["EDR".into()] },
-        &[edr], Direction::Downstream,
+        &index,
+        f,
+        &[f],
+        &SeverScope::Selective {
+            keep_labels: vec!["EDR".into()],
+        },
+        &[edr],
+        Direction::Downstream,
     );
     // EDR is reachable (terminal) but the secret behind it must NOT be — no pivot.
-    assert!(reading.residual_reachable.contains(&edr), "EDR stays reachable");
-    assert!(!reading.residual_reachable.contains(&secret), "must not pivot through the allow-listed EDR");
-    assert_eq!(reading.contained, vec![secret], "the secret behind EDR is contained");
+    assert!(
+        reading.residual_reachable.contains(&edr),
+        "EDR stays reachable"
+    );
+    assert!(
+        !reading.residual_reachable.contains(&secret),
+        "must not pivot through the allow-listed EDR"
+    );
+    assert_eq!(
+        reading.contained,
+        vec![secret],
+        "the secret behind EDR is contained"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -233,7 +323,14 @@ fn noop_sever_is_downgraded_not_a_clean_containment() {
     let index = store.freeze();
 
     // Cutting an unrelated/empty set severs nothing.
-    let reading = sever_residual(&index, f, &[], &SeverScope::Full, &[], Direction::Downstream);
+    let reading = sever_residual(
+        &index,
+        f,
+        &[],
+        &SeverScope::Full,
+        &[],
+        Direction::Downstream,
+    );
     assert_eq!(
         reading.residual_reachable, reading.baseline_reachable,
         "a no-op sever leaves reachability unchanged"

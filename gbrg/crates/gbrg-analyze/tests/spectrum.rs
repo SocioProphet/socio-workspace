@@ -156,7 +156,9 @@ fn analyze_path_spans_empirical_bounded_and_speculative() {
     .collect();
     assert_eq!(
         levels,
-        ["bounded", "empirical", "speculative"].into_iter().collect(),
+        ["bounded", "empirical", "speculative"]
+            .into_iter()
+            .collect(),
         "expected all three levels present across the tree"
     );
 
@@ -168,8 +170,7 @@ fn cross_file_resolution_is_conservative_on_ambiguous_names() {
     let root = write_tree();
     let config = ScoringConfig::default();
 
-    let report =
-        analyze_path_report(&root, &config, DEFAULT_CHURN_WINDOW_DAYS).expect("repo walk");
+    let report = analyze_path_report(&root, &config, DEFAULT_CHURN_WINDOW_DAYS).expect("repo walk");
 
     // The unambiguous cross-file spine resolved: 20 tested_hub + 20 untested_hub
     // callers, plus the 2 test calls (tested_low, tested_hub) = 42 minimum.

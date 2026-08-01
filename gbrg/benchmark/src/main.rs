@@ -62,7 +62,9 @@ struct FileCache {
 }
 impl FileCache {
     fn new() -> Self {
-        Self { map: HashMap::new() }
+        Self {
+            map: HashMap::new(),
+        }
     }
     fn lines(&mut self, path: &str) -> &Vec<String> {
         self.map.entry(path.to_string()).or_insert_with(|| {
@@ -203,7 +205,9 @@ fn main() -> ExitCode {
             "--json" => json_out = args.next().map(PathBuf::from),
             "--top" => top = args.next().and_then(|v| v.parse().ok()).unwrap_or(15),
             "-h" | "--help" => {
-                println!("usage: gbrg-benchmark <repo-dir> [--divisor N] [--json out.json] [--top N]");
+                println!(
+                    "usage: gbrg-benchmark <repo-dir> [--divisor N] [--json out.json] [--top N]"
+                );
                 return ExitCode::SUCCESS;
             }
             other => {
@@ -245,7 +249,11 @@ fn main() -> ExitCode {
     };
 
     // Non-test scored cells are exactly those the analyzer emitted an artifact for.
-    let scored: HashSet<&str> = report.artifacts.iter().map(|a| a.cell_id.as_str()).collect();
+    let scored: HashSet<&str> = report
+        .artifacts
+        .iter()
+        .map(|a| a.cell_id.as_str())
+        .collect();
 
     // Reviewable = scored (non-test) Function|Class cells (the units a reviewer reads;
     // module cells span whole files and imports are trivial, so both are excluded from
@@ -346,7 +354,9 @@ fn main() -> ExitCode {
 
     let out = Report {
         repo: repo.display().to_string(),
-        token_method: format!("chars / {divisor} (rough chars-per-token heuristic; offline, no tokenizer)"),
+        token_method: format!(
+            "chars / {divisor} (rough chars-per-token heuristic; offline, no tokenizer)"
+        ),
         token_divisor: divisor,
         files_parsed: report.files_parsed,
         cells_total: report.cells_total,
@@ -374,7 +384,10 @@ fn main() -> ExitCode {
     );
     println!(
         "graph completeness: xfile calls resolved={} ambiguous={} external={}  tested_by_edges={}",
-        out.xfile_calls_resolved, out.xfile_calls_ambiguous, out.xfile_calls_external, out.tested_by_edges
+        out.xfile_calls_resolved,
+        out.xfile_calls_ambiguous,
+        out.xfile_calls_external,
+        out.tested_by_edges
     );
     println!(
         "token method: {}  |  FULL context = {} chars ≈ {} tokens",

@@ -79,11 +79,11 @@ fn print_report_summary(root: &std::path::Path, report: &AnalyzePathReport) {
         report.churn_files_nonzero,
     );
     let spread = report.level_spread();
-    let rendered: Vec<String> = spread
-        .iter()
-        .map(|(lvl, n)| format!("{lvl}={n}"))
-        .collect();
-    eprintln!("gbrg-analyze: epistemicLevel spread → {}", rendered.join("  "));
+    let rendered: Vec<String> = spread.iter().map(|(lvl, n)| format!("{lvl}={n}")).collect();
+    eprintln!(
+        "gbrg-analyze: epistemicLevel spread → {}",
+        rendered.join("  ")
+    );
 }
 
 /// `gbrg-analyze whatif <path> --cell <id> --mutation add_tests|remove_dependent`
@@ -143,7 +143,10 @@ fn run_whatif(mut args: impl Iterator<Item = String>) -> ExitCode {
     let (path, cell, mutation) = match (path, cell, mutation) {
         (Some(p), Some(c), Some(m)) => (p, c, m),
         _ => {
-            eprintln!("error: whatif needs <path> --cell <id> --mutation <m>\n{}", whatif_usage());
+            eprintln!(
+                "error: whatif needs <path> --cell <id> --mutation <m>\n{}",
+                whatif_usage()
+            );
             return ExitCode::from(2);
         }
     };
@@ -247,7 +250,9 @@ fn main() -> ExitCode {
     // TESTED_BY + churn, and score every non-test cell.
     if path.is_dir() {
         if lang_arg.is_some() {
-            eprintln!("gbrg-analyze: note: --lang is ignored for a directory (auto-detected per file)");
+            eprintln!(
+                "gbrg-analyze: note: --lang is ignored for a directory (auto-detected per file)"
+            );
         }
         match analyze_path_report(&path, &config, DEFAULT_CHURN_WINDOW_DAYS) {
             Ok(report) => {

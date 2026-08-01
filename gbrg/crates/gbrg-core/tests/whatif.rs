@@ -71,8 +71,15 @@ fn add_tests_lifts_level_and_shrinks_blast_radius_without_mutating_baseline() {
     assert_eq!(baseline_before.dependents_count, 3);
 
     // --- The what-if: hypothesise a test reaches the target. ---
-    let result = what_if(&graph, &target.cell_id, Mutation::AddTests, 0.0, false, &config)
-        .expect("what_if runs");
+    let result = what_if(
+        &graph,
+        &target.cell_id,
+        Mutation::AddTests,
+        0.0,
+        false,
+        &config,
+    )
+    .expect("what_if runs");
 
     // The diff's `before` must equal the independent baseline read (same graph).
     assert_eq!(
@@ -173,7 +180,10 @@ fn remove_dependent_drops_one_caller_and_lowers_blast_radius_without_mutating_ba
     )
     .expect("what_if runs");
 
-    assert!(result.applied, "remove_dependent must apply when a CALLS edge exists");
+    assert!(
+        result.applied,
+        "remove_dependent must apply when a CALLS edge exists"
+    );
     assert_eq!(
         result.after.dependents_count, 19,
         "removing one caller must drop dependents_count by exactly one"

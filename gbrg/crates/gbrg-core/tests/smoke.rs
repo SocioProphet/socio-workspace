@@ -44,12 +44,22 @@ fn smoke_blast_radius_in_degree() {
     // B calls A, C calls A  =>  A <-CALLS- B , A <-CALLS- C.
     write_edge(
         &mut store,
-        &GraphEdge { from: b, to: a, kind: EdgeKind::Calls, weight: 1.0 },
+        &GraphEdge {
+            from: b,
+            to: a,
+            kind: EdgeKind::Calls,
+            weight: 1.0,
+        },
     )
     .unwrap();
     write_edge(
         &mut store,
-        &GraphEdge { from: c, to: a, kind: EdgeKind::Calls, weight: 1.0 },
+        &GraphEdge {
+            from: c,
+            to: a,
+            kind: EdgeKind::Calls,
+            weight: 1.0,
+        },
     )
     .unwrap();
 
@@ -68,7 +78,10 @@ fn smoke_blast_radius_in_degree() {
     deps.sort_unstable();
     let mut expected = vec![b, c];
     expected.sort_unstable();
-    assert_eq!(deps, expected, "reverse_dependents(A, CALLS) must be {{B, C}}");
+    assert_eq!(
+        deps, expected,
+        "reverse_dependents(A, CALLS) must be {{B, C}}"
+    );
 
     // (3) Prove the raw GraphCore path directly, not only via our wrappers.
     let ad = index.dense(a).expect("A present in index");

@@ -12,6 +12,8 @@ description = "HTTP service exposing the authoritative gbrg-core containment eng
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+# Sibling crate in THIS gbrg workspace (same repo) — provides containment::run over
+# gbrg-core. Intra-workspace path dep, not a cross-repo pin.
 gbrg-analyze = { path = "../gbrg-analyze" }
 # Minimal, dependency-light blocking HTTP server (MIT).
 tiny_http = "0.12"

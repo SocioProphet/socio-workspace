@@ -34,11 +34,14 @@ provide them and must not be described as if it does.
 - **Inference is REAL.** Transitive edges are produced by the real
   `forwardChain()` in `@socioprophet/hellgraph`. We project onto the store and
   read back what it derived; we never reimplement the chainer.
-- **Call topology is supplied by the caller.** The `gbrg-analyze` CLI emits one
-  `ProofArtifact` per cell on stdout but does **not** surface its internal
-  `CALLS` edges there, so the directed `CallEdge[]` (`from` calls `to`) is passed
-  in explicitly. In the real pipeline these come from the same source tree's
-  call graph; in the test, from the `A→B→C` chain.
+- **Call topology is REAL too.** `gbrg-analyze --emit-edges` surfaces the
+  analyzer's internal `CALLS` topology (stable cell-IRI endpoints) alongside the
+  artifacts. `makeAnalyzeWithEdges(binPath)` reads that `{artifacts, edges}`
+  bundle and `callEdgesFromAnalyze(edges)` distils the `CALLS` edges into
+  `CallEdge[]`, so the end-to-end path (`analyzeAndPropagate`) runs PLN over the
+  analyzer's real call graph — the caller no longer supplies topology. A
+  `CallEdge[]` may still be passed to `projectAndPropagate` for synthetic unit
+  tests, but it is no longer required for real analyze output.
 
 ## `pln.ts` is the shallow in-process fallback
 
@@ -73,11 +76,11 @@ An edge is seeded from its **callee** (`to`) — the cell whose risk flows upwar
 import { analyzeAndPropagate, propagateFromArtifacts, projectAndPropagate }
   from '@socioprophet/gbrg-reasoning'
 
-// End-to-end: REAL gbrg-analyze subprocess → risk graph → forwardChain
-const { artifacts, propagation } = await analyzeAndPropagate(
-  binPath, srcDir, [{ from: aCellId, to: bCellId }, { from: bCellId, to: cCellId }],
-)
+// End-to-end: REAL gbrg-analyze --emit-edges → real call graph → forwardChain.
+// Topology is read from analyze output; no caller-supplied edges needed.
+const { artifacts, calls, propagation } = await analyzeAndPropagate(binPath, srcDir)
 propagation.derived // DerivedRiskEdge[] — transitive-risk edges with per-hop decay
+calls               // CallEdge[] — the REAL CALLS graph analyze surfaced
 ```
 
 ## Test (runs LIVE)
@@ -87,11 +90,13 @@ npm install        # @socioprophet/hellgraph via a local file: dep
 npm test           # tsx + node:test; spawns the REAL gbrg-analyze binary
 ```
 
-The test writes a real `A→B→C` TypeScript fixture, runs the real `gbrg-analyze`
-CLI on it, projects the real speculative/untested artifacts onto the store, runs
-the real `forwardChain()`, and asserts (a) a derived `A→C` edge exists, (b) its
-confidence `< ` the direct edges (decay, exactly `c1·c2·0.9`), and (c) its
-strength is sane (`s1·s2`, in `(0,1]`). Point it at a prebuilt binary with
+The test writes a real `A→B→C` TypeScript fixture, runs the real `gbrg-analyze
+--emit-edges` CLI on it, and asserts (a) the analyzer surfaced the REAL `A→B` and
+`B→C` `CALLS` edges (topology is not hand-supplied), then projects the real
+speculative/untested artifacts onto the store, runs the real `forwardChain()`,
+and asserts (b) a derived `A→C` edge exists, (c) its confidence `< ` the direct
+edges (decay, exactly `c1·c2·0.9`), and (d) its strength is sane (`s1·s2`, in
+`(0,1]`). Point it at a prebuilt binary with
 `GBRG_ANALYZE_BIN`, or build one first:
 `(cd gbrg && cargo build -p gbrg-analyze --release)`.
 

@@ -19,12 +19,14 @@
  *     A→B ⊗ B→C ⇒ A→C, with s = s1·s2 and c = c1·c2·0.9). We NEVER reimplement
  *     forwardChain — we project onto the store and read back what it derived.
  *
- * WHAT THE CALLER SUPPLIES:
- *   - The CALL TOPOLOGY (`CallEdge[]`, "from calls to"). The gbrg-analyze CLI
- *     emits one ProofArtifact per cell on stdout but does NOT surface its
- *     internal `CALLS` edges there, so the directed edges are passed in
- *     explicitly (in the real pipeline, from the same source tree's call
- *     graph; in the test, the A→B→C chain). Cell RISK is still 100% real.
+ * CALL TOPOLOGY IS NOW REAL TOO:
+ *   - `gbrg-analyze --emit-edges` surfaces the analyzer's internal `CALLS`
+ *     topology (with stable cell-IRI endpoints) alongside the artifacts, so the
+ *     end-to-end path (`analyzeAndPropagate`) consumes the REAL call graph from
+ *     analyze output — the caller no longer has to supply it. `CallEdge[]` may
+ *     still be passed explicitly to `projectAndPropagate`/`propagateFromArtifacts`
+ *     for unit tests or synthetic topologies, but it is no longer required to run
+ *     PLN over real analyze output.
  *
  * Edge orientation: a `calls` edge `from → to` (caller → callee) becomes a
  * graph edge `from → to` meaning "from is exposed to the risk of to". PLN
@@ -85,6 +87,35 @@ export interface RiskCell {
 export interface CallEdge {
   from: string
   to: string
+}
+
+/**
+ * A raw edge as emitted by `gbrg-analyze --emit-edges`: stable cell-IRI endpoints
+ * plus the edge kind label (`CALLS` | `INHERITS` | `IMPORTS` | `TESTED_BY` | ...).
+ * We consume these; we do NOT synthesize topology.
+ */
+export interface AnalyzeEdge {
+  from: string
+  to: string
+  kind: string
+}
+
+/** The `--emit-edges` bundle: real artifacts AND the real internal topology. */
+export interface AnalyzeBundle {
+  artifacts: ProofArtifact[]
+  edges: AnalyzeEdge[]
+}
+
+/**
+ * Distil the analyzer's real edges into the risk-propagation `CallEdge[]`: keep
+ * only `CALLS` edges (caller → callee), which is exactly the "from is exposed to
+ * the risk of to" orientation PLN chains. `INHERITS`/`IMPORTS`/`TESTED_BY` are not
+ * call-risk edges and are intentionally excluded.
+ */
+export function callEdgesFromAnalyze(edges: AnalyzeEdge[]): CallEdge[] {
+  return edges
+    .filter((e) => e.kind === 'CALLS')
+    .map((e) => ({ from: e.from, to: e.to }))
 }
 
 /** A transitive-risk edge DERIVED by hellgraph's PLN deduction. */
@@ -365,13 +396,67 @@ export function makeAnalyze(binPath: string): AnalyzeFn {
     })
 }
 
-/** End-to-end: run REAL gbrg-analyze on `targetPath`, then propagate risk. */
+/**
+ * Build an analyze fn that returns BOTH artifacts and the real internal topology,
+ * by invoking `gbrg-analyze --emit-edges` and parsing its `{artifacts, edges}`
+ * object. Same subprocess discipline as [`makeAnalyze`]; we do NOT re-score or
+ * synthesize edges — we read what the Rust analyzer resolved.
+ */
+export function makeAnalyzeWithEdges(
+  binPath: string,
+): (targetPath: string) => Promise<AnalyzeBundle> {
+  return (targetPath: string) =>
+    new Promise<AnalyzeBundle>((resolve, reject) => {
+      const child = spawn(binPath, [targetPath, '--emit-edges'], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+      let out = ''
+      let err = ''
+      child.stdout?.on('data', (d) => (out += d.toString()))
+      child.stderr?.on('data', (d) => (err += d.toString()))
+      child.on('error', (e) =>
+        reject(new Error(`gbrg-analyze spawn failed: ${e.message}`)),
+      )
+      child.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`gbrg-analyze exited ${code}: ${err.trim()}`))
+          return
+        }
+        try {
+          const parsed = JSON.parse(out) as AnalyzeBundle
+          if (!Array.isArray(parsed.artifacts) || !Array.isArray(parsed.edges)) {
+            throw new Error('expected an {artifacts, edges} object from --emit-edges')
+          }
+          resolve(parsed)
+        } catch (e) {
+          reject(
+            new Error(
+              `gbrg-analyze --emit-edges produced unparseable JSON: ${(e as Error).message}`,
+            ),
+          )
+        }
+      })
+    })
+}
+
+/**
+ * End-to-end: run REAL `gbrg-analyze --emit-edges` on `targetPath`, then propagate
+ * risk over the REAL `CALLS` topology it surfaced. The call graph is no longer
+ * caller-supplied — both the cell risk AND the edges come from real analyze output.
+ * Pass `callsOverride` only to force a synthetic topology (tests); when omitted, the
+ * analyzer's real `CALLS` edges are used.
+ */
 export async function analyzeAndPropagate(
   binPath: string,
   targetPath: string,
-  calls: CallEdge[],
   opts: PropagateOptions = {},
-): Promise<{ artifacts: ProofArtifact[]; propagation: PropagationResult }> {
-  const artifacts = await makeAnalyze(binPath)(targetPath)
-  return { artifacts, propagation: propagateFromArtifacts(artifacts, calls, opts) }
+  callsOverride?: CallEdge[],
+): Promise<{
+  artifacts: ProofArtifact[]
+  calls: CallEdge[]
+  propagation: PropagationResult
+}> {
+  const { artifacts, edges } = await makeAnalyzeWithEdges(binPath)(targetPath)
+  const calls = callsOverride ?? callEdgesFromAnalyze(edges)
+  return { artifacts, calls, propagation: propagateFromArtifacts(artifacts, calls, opts) }
 }

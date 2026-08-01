@@ -6,10 +6,13 @@
  * over the projected risk graph. Nothing here is mocked.
  *
  * Scenario: cellA calls cellB calls cellC; cellC is the deepest, untested,
- * speculative (high-risk) cell. We propagate risk UP the call graph and assert:
- *   (a) a DERIVED A→C transitive-risk edge exists (produced by PLN deduction);
- *   (b) its confidence < the confidence of the direct edges (per-hop decay);
- *   (c) its strength is sane (0 < s <= 1 and s <= each direct edge's strength).
+ * speculative (high-risk) cell. The CALL TOPOLOGY is NOT hand-supplied — it comes
+ * from `gbrg-analyze --emit-edges` (the analyzer's REAL internal `CALLS` graph). We
+ * propagate risk UP that real graph and assert:
+ *   (a) the analyzer surfaced the real A→B and B→C `CALLS` edges (topology is real);
+ *   (b) a DERIVED A→C transitive-risk edge exists (produced by PLN deduction);
+ *   (c) its confidence < the confidence of the direct edges (per-hop decay);
+ *   (d) its strength is sane (0 < s <= 1 and s <= each direct edge's strength).
  */
 
 import { test } from 'node:test'
@@ -19,7 +22,8 @@ import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
-  makeAnalyze,
+  makeAnalyzeWithEdges,
+  callEdgesFromAnalyze,
   propagateFromArtifacts,
   cellFromArtifact,
   type CallEdge,
@@ -61,10 +65,15 @@ test('PLN transitive-risk propagation A→B→C: derived A→C edge with confide
   const bin = resolveBin()
   const dir = writeChainFixture()
 
-  // ── (1) REAL subprocess: get REAL ProofArtifacts ────────────────────────
-  const artifacts: ProofArtifact[] = await makeAnalyze(bin)(dir)
+  // ── (1) REAL subprocess: get REAL ProofArtifacts + REAL edge topology ────
+  const bundle = await makeAnalyzeWithEdges(bin)(dir)
+  const artifacts: ProofArtifact[] = bundle.artifacts
   console.log(`\n[live] gbrg-analyze bin: ${bin}`)
   console.log(`[live] real ProofArtifacts returned: ${artifacts.length}`)
+  console.log(`[live] real edges surfaced by --emit-edges: ${bundle.edges.length}`)
+  for (const e of bundle.edges) {
+    console.log(`[live] EDGE  ${e.kind}  ${short(e.from)} -> ${short(e.to)}`)
+  }
 
   const cellId = (fn: string) =>
     artifacts.find((a) => (a.cell_id ?? '').endsWith(`#${fn}`))?.cell_id
@@ -87,11 +96,23 @@ test('PLN transitive-risk propagation A→B→C: derived A→C edge with confide
   assert.equal(cCell.epistemicLevel, 'speculative', 'cellC should be speculative (untested/unproven)')
   assert.equal(cCell.testCoverageReach, false, 'cellC should be untested')
 
-  // ── (2) Call topology: A calls B calls C (caller → callee) ──────────────
-  const calls: CallEdge[] = [
-    { from: A!, to: B! },
-    { from: B!, to: C! },
-  ]
+  // ── (2) Call topology comes from the analyzer's REAL edges, NOT hand-built ─
+  const calls: CallEdge[] = callEdgesFromAnalyze(bundle.edges)
+  // Prove the real topology is present: A→B and B→C were resolved by gbrg-analyze
+  // itself (intra-file CALLS resolution), not supplied by this test.
+  assert.ok(
+    calls.some((e) => e.from === A && e.to === B),
+    `expected a REAL A→B CALLS edge from gbrg-analyze, got: ${JSON.stringify(calls)}`,
+  )
+  assert.ok(
+    calls.some((e) => e.from === B && e.to === C),
+    `expected a REAL B→C CALLS edge from gbrg-analyze, got: ${JSON.stringify(calls)}`,
+  )
+  // And no fabricated shortcut edge (A→C is DERIVED by PLN, never emitted by analyze).
+  assert.ok(
+    !calls.some((e) => e.from === A && e.to === C),
+    'gbrg-analyze must NOT emit a direct A→C edge; A→C is a DERIVED transitive edge only',
+  )
 
   // ── (3) REAL forwardChain over the projected risk graph ─────────────────
   const result = propagateFromArtifacts(artifacts, calls)

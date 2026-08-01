@@ -128,8 +128,13 @@ pub struct UnresolvedCall {
     pub caller_iri: String,
     /// The callee's simple (final-segment) symbol name, e.g. `helper`.
     pub callee_symbol: String,
-    /// True if the caller is a test cell (so a cross-file match becomes a
-    /// `TESTED_BY` edge, not a `CALLS` edge).
+    /// True if the caller is a test **FUNCTION** (a `#[test]` fn, a fn in a
+    /// `#[cfg(test)]`/`tests` module, or any fn in a whole test file). When true a
+    /// cross-file match becomes a `TESTED_BY` edge (a test's call path reaches the
+    /// callee — i.e. test-REACH, not assertion-verified); when false it is an
+    /// ordinary `CALLS` code dependency. A call whose caller is a test *module*
+    /// (module-scope scaffolding, not a function body) is neither: see the repo-level
+    /// resolver, which drops it rather than inflating the callee's code dependents.
     pub caller_is_test: bool,
 }
 
@@ -162,9 +167,17 @@ pub struct ParseResult {
     pub unresolved_inherit_sites: Vec<UnresolvedInherit>,
     /// IRIs of cells detected as **test** code (test functions, functions inside a
     /// `#[cfg(test)]`/`tests` module, and — for whole test files — the file module
-    /// and every function/method in it). A repo-level pass uses this to (a) turn a
-    /// test's calls into `TESTED_BY` edges and (b) EXCLUDE test cells from scoring.
+    /// and every function/method in it). A repo-level pass uses this to EXCLUDE test
+    /// cells from scoring.
     pub test_cells: Vec<String>,
+    /// IRIs of the subset of [`Self::test_cells`] that are **test FUNCTIONS** (cell
+    /// kind `Function`, in test scope). This is the ONLY thing whose *call edges*
+    /// establish `TESTED_BY` (test-reach): a `CALLS` originating in a test function
+    /// body is a genuine "a test's code path reaches this cell" signal. Test MODULE
+    /// cells (a `tests` module, a whole test file's module) are in `test_cells` but
+    /// NOT here — a module-scope mention in a test file is test scaffolding, not a
+    /// test exercising a callee, so it must not manufacture test-reach.
+    pub test_function_cells: Vec<String>,
 }
 
 /// Error type for [`parse_file`].
@@ -234,6 +247,7 @@ pub fn parse_source(
         pending_calls: Vec::new(),
         pending_inherits: Vec::new(),
         test_cells: std::collections::HashSet::new(),
+        test_fn_iris: std::collections::HashSet::new(),
         import_counter: 0,
     };
 
@@ -262,6 +276,10 @@ pub fn parse_source(
     let mut test_cells: Vec<String> = ctx.test_cells.into_iter().collect();
     test_cells.sort();
     ctx.result.test_cells = test_cells;
+    // Publish the test-FUNCTION subset (the only callers that establish TESTED_BY).
+    let mut test_function_cells: Vec<String> = ctx.test_fn_iris.into_iter().collect();
+    test_function_cells.sort();
+    ctx.result.test_function_cells = test_function_cells;
     Ok(ctx.result)
 }
 
@@ -336,6 +354,9 @@ struct Ctx<'a> {
     pending_inherits: Vec<(String, String)>,
     /// IRIs of cells detected as test code (see [`ParseResult::test_cells`]).
     test_cells: std::collections::HashSet<String>,
+    /// IRIs of the subset that are test FUNCTIONS (see
+    /// [`ParseResult::test_function_cells`]). Only these establish `TESTED_BY`.
+    test_fn_iris: std::collections::HashSet<String>,
     import_counter: usize,
 }
 
@@ -394,6 +415,10 @@ impl<'a> Ctx<'a> {
                 || self.name_is_test(&symbol);
             if is_test {
                 self.test_cells.insert(iri.clone());
+                // A test FUNCTION body: its resolved calls are the ONLY thing that
+                // establishes `TESTED_BY` (test-reach). Recorded separately from the
+                // general test-cell set (which also holds test module cells).
+                self.test_fn_iris.insert(iri.clone());
             }
             // Descend with THIS function as the enclosing caller; propagate test
             // scope so nested items are classified consistently.
@@ -600,28 +625,44 @@ impl<'a> Ctx<'a> {
 
     /// Resolve pending calls/inherits against the in-file symbol tables.
     ///
-    /// A call whose caller is a **test cell** resolves to a `TESTED_BY` edge
-    /// (caller test → callee) rather than a `CALLS` edge, so it flips the callee's
-    /// `test_coverage_reach` without inflating its code-dependent count. Everything
-    /// that does not resolve in-file is surfaced on [`ParseResult::unresolved_call_sites`]
-    /// (with the caller's test flag) for cross-file resolution by a repo-level pass.
+    /// A resolved call is classified by WHO calls (soundness of the test-reach
+    /// claim — see [`ParseResult::test_function_cells`]):
+    /// * caller is a **test FUNCTION** → `TESTED_BY` (its code path reaches the
+    ///   callee: test-REACH, not assertion-verified). It flips the callee's
+    ///   `test_coverage_reach` without inflating its code-dependent count.
+    /// * caller is a **test MODULE** (module-scope scaffolding in a test file, not a
+    ///   function body) → DROPPED. Such a bare mention is neither a test exercising
+    ///   the callee (so not `TESTED_BY`) nor a production dependency (so not `CALLS`,
+    ///   which would let test code inflate the callee's blast radius).
+    /// * caller is ordinary code → `CALLS`.
+    ///
+    /// Everything that does not resolve in-file is surfaced on
+    /// [`ParseResult::unresolved_call_sites`] (carrying whether the caller is a test
+    /// *function*) for cross-file resolution by a repo-level pass.
     fn resolve(&mut self) {
         let pending_calls = std::mem::take(&mut self.pending_calls);
         for (caller_iri, callee) in pending_calls {
-            let caller_is_test = self.test_cells.contains(&caller_iri);
+            let caller_is_test_fn = self.test_fn_iris.contains(&caller_iri);
+            let caller_is_test_any = self.test_cells.contains(&caller_iri);
             match self.func_by_name.get(&callee) {
                 Some(callee_iri) if *callee_iri != caller_iri => {
-                    let kind = if caller_is_test {
-                        EdgeKind::TestedBy
+                    if caller_is_test_fn {
+                        self.result.edges.push(GraphEdge {
+                            from: cell_iri_to_node_id(&caller_iri),
+                            to: cell_iri_to_node_id(callee_iri),
+                            kind: EdgeKind::TestedBy,
+                            weight: 1.0,
+                        });
+                    } else if caller_is_test_any {
+                        // Module-scope scaffolding in test code: drop (see doc above).
                     } else {
-                        EdgeKind::Calls
-                    };
-                    self.result.edges.push(GraphEdge {
-                        from: cell_iri_to_node_id(&caller_iri),
-                        to: cell_iri_to_node_id(callee_iri),
-                        kind,
-                        weight: 1.0,
-                    });
+                        self.result.edges.push(GraphEdge {
+                            from: cell_iri_to_node_id(&caller_iri),
+                            to: cell_iri_to_node_id(callee_iri),
+                            kind: EdgeKind::Calls,
+                            weight: 1.0,
+                        });
+                    }
                 }
                 // Self-recursion (callee == caller) is skipped to avoid noise;
                 // everything else that doesn't resolve is a cross-file follow-up.
@@ -631,7 +672,7 @@ impl<'a> Ctx<'a> {
                     self.result.unresolved_call_sites.push(UnresolvedCall {
                         caller_iri,
                         callee_symbol: callee,
-                        caller_is_test,
+                        caller_is_test: caller_is_test_fn,
                     });
                 }
             }

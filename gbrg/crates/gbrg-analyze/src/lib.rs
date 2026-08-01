@@ -22,11 +22,21 @@
 //!
 //! ## Honest edges (what is real vs. deferred)
 //! * **Real:** the parse, the graph ingest, the `freeze()`, and the dependents /
-//!   test-coverage reads that drive `epistemicLevel`.
+//!   test-reach reads that drive `epistemicLevel`.
+//! * **Test-reach is a STATIC reach signal, not assertion-coverage.** A `TESTED_BY`
+//!   edge is created only from an actual `CALLS` edge originating in a **test
+//!   function body** ([`analyze_path_report`] resolves these cross-file too). It
+//!   means "a test's call path reaches this cell" — NOT "a test asserts/verifies its
+//!   behaviour". A module-scope mention in a test file, an `import`, or a bare
+//!   reference does NOT establish test-reach. True behavioural/line coverage needs
+//!   RUNNING the suite; that is out of scope for this static pipeline (see
+//!   `gbrg-core::scoring`).
 //! * **Deferred (documented):** `churn_frequency` is passed as `0.0` by
-//!   [`analyze_file`] — a from-parse-only analysis carries no git history, and the
-//!   parser emits no `TESTED_BY` edges, so a purely-parsed function is `speculative`
-//!   until coverage edges are supplied. `churn` and `dead` are first-class inputs to
+//!   [`analyze_file`] on a single file — a from-parse-only analysis carries no git
+//!   history, and a lone file has no test file reaching in, so a purely-parsed
+//!   function stays `speculative` until coverage/churn are supplied.
+//!   [`analyze_path_report`] recovers both (cross-file `TESTED_BY` + real git churn).
+//!   `churn` and `dead` are first-class inputs to
 //!   [`gbrg_core::emit_proof_artifact`]; a richer caller can supply real values via
 //!   [`analyze_file_with`]. This crate keeps the from-parse defaults explicit rather
 //!   than hiding them.
@@ -123,6 +133,34 @@ pub fn analyze_file_with(
     config: &ScoringConfig,
     opts: AnalyzeOptions,
 ) -> Result<Vec<BlastRadiusProofArtifact>, AnalyzeError> {
+    Ok(analyze_file_report(path, language, config, opts)?.artifacts)
+}
+
+/// A single-file analysis bundle: the scored artifacts PLUS the exact cells and
+/// written edges the score was computed over. Mirrors the (cells, edges) surface of
+/// [`AnalyzePathReport`] for the single-file case so a caller (e.g. the `--emit-edges`
+/// CLI mode) can surface the real intra-file `CALLS`/`INHERITS`/`TESTED_BY` topology.
+/// Edge endpoints are raw `NodeId`s; use [`edges_with_cell_ids`] to render them with
+/// the stable cell IRIs external consumers (PLN) key on.
+#[derive(Clone, Debug)]
+pub struct FileAnalysis {
+    /// One [`BlastRadiusProofArtifact`] per distinct cell.
+    pub artifacts: Vec<BlastRadiusProofArtifact>,
+    /// The distinct cells ingested (deduped by NodeId).
+    pub cells: Vec<SemanticCell>,
+    /// The edges actually written (both endpoints present).
+    pub edges: Vec<GraphEdge>,
+}
+
+/// Parse + ingest + freeze + score a single file, returning the full bundle
+/// (artifacts + cells + written edges). [`analyze_file_with`] is this without the
+/// topology.
+pub fn analyze_file_report(
+    path: impl AsRef<Path>,
+    language: Language,
+    config: &ScoringConfig,
+    opts: AnalyzeOptions,
+) -> Result<FileAnalysis, AnalyzeError> {
     // (1) PARSE — tree-sitter → cells + edges.
     let parsed: ParseResult = parse_file(path, language)?;
 
@@ -143,11 +181,14 @@ pub fn analyze_file_with(
     // write_edge's precondition is that both endpoints already exist. The parser
     // only resolves intra-file edges, so both endpoints are always among the cells
     // we just wrote — but we assert it defensively and skip (never fabricate) any
-    // edge that would dangle, so the graph stays sound.
+    // edge that would dangle, so the graph stays sound. Written edges are RETAINED
+    // so the caller can surface the real topology.
+    let mut written_edges: Vec<GraphEdge> = Vec::with_capacity(parsed.edges.len());
     let mut skipped_edges = 0usize;
     for edge in &parsed.edges {
         if written.contains(&edge.from) && written.contains(&edge.to) {
             write_edge(&mut store, edge)?;
+            written_edges.push(edge.clone());
         } else {
             skipped_edges += 1;
         }
@@ -167,7 +208,33 @@ pub fn analyze_file_with(
         .map(|cell| emit_proof_artifact(cell, &index, opts.churn, opts.dead, config))
         .collect();
 
-    Ok(artifacts)
+    Ok(FileAnalysis {
+        artifacts,
+        cells: unique_cells,
+        edges: written_edges,
+    })
+}
+
+/// Render analyzer edges (whose endpoints are raw `NodeId`s) with the stable cell
+/// IRIs that external consumers (e.g. PLN risk propagation) key on. Each returned
+/// triple is `(from_cell_id, to_cell_id, edge_kind_label)` where the label is one of
+/// `CALLS`/`INHERITS`/`IMPORTS`/`TESTED_BY`/`CHURNS_WITH`. Edges whose endpoints are
+/// not BOTH among `cells` are dropped (never fabricated).
+pub fn edges_with_cell_ids(
+    cells: &[SemanticCell],
+    edges: &[GraphEdge],
+) -> Vec<(String, String, &'static str)> {
+    let by_node: HashMap<NodeId, &str> = cells
+        .iter()
+        .map(|c| (c.node_id(), c.cell_id.as_str()))
+        .collect();
+    let mut out = Vec::with_capacity(edges.len());
+    for e in edges {
+        if let (Some(&from), Some(&to)) = (by_node.get(&e.from), by_node.get(&e.to)) {
+            out.push((from.to_string(), to.to_string(), e.kind.as_label()));
+        }
+    }
+    out
 }
 
 // ===========================================================================
@@ -206,6 +273,12 @@ pub struct AnalyzePathReport {
     /// Cross-file call sites whose symbol was defined nowhere in the tree
     /// (external / stdlib / third-party) — expected to be unresolved.
     pub xfile_calls_external: usize,
+    /// Cross-file call sites that resolved to a unique symbol but whose caller is a
+    /// test **module** (module-scope scaffolding in a test file, NOT a test function
+    /// body). These are DROPPED — not `TESTED_BY` (a bare module-scope mention is not
+    /// a test exercising the callee) and not `CALLS` (test code must not inflate a
+    /// production cell's blast radius). Counted so the honest exclusion is visible.
+    pub xfile_calls_test_scaffold: usize,
     /// Cross-file inheritance bases resolved to a unique symbol.
     pub xfile_inherits_resolved: usize,
     /// `TESTED_BY` edges written into the graph (intra- + cross-file).
@@ -256,8 +329,10 @@ pub fn analyze_path(
 /// After every file is parsed, all cells are known. Each *unresolved* call site the
 /// parser surfaced (a callee not defined in the caller's own file) is resolved by
 /// **simple symbol name** against a global table of every function cell:
-/// * exactly **one** definition of that name in the whole tree → resolve to it
-///   (a `TESTED_BY` edge if the caller is test code, else a `CALLS` edge);
+/// * exactly **one** definition of that name in the whole tree → resolve it, then
+///   classify by caller: a `TESTED_BY` edge if the caller is a **test function
+///   body** (test-reach), DROPPED if the caller is a test *module* (module-scope
+///   scaffolding), else a `CALLS` code-dependency edge;
 /// * **zero** definitions → external/stdlib, left unresolved (counted);
 /// * **two or more** definitions (a name like `as_str`/`new` defined in several
 ///   places) → AMBIGUOUS: we do NOT guess and never fabricate an edge (counted).
@@ -283,6 +358,10 @@ pub fn analyze_path_report(
     let mut all_cells: Vec<SemanticCell> = Vec::new();
     let mut all_edges: Vec<GraphEdge> = Vec::new();
     let mut global_test_cells: HashSet<String> = HashSet::new();
+    // The subset of test cells that are test FUNCTIONS — the only callers whose
+    // resolved calls establish `TESTED_BY` (test-reach). See the parser's
+    // `ParseResult::test_function_cells` for the soundness rationale.
+    let mut global_test_function_cells: HashSet<String> = HashSet::new();
     let mut test_file_paths: HashSet<String> = HashSet::new();
     // symbol_name -> distinct defining NodeIds (for cross-file resolution).
     let mut func_defs: HashMap<String, HashSet<NodeId>> = HashMap::new();
@@ -316,6 +395,9 @@ pub fn analyze_path_report(
 
         for iri in &parsed.test_cells {
             global_test_cells.insert(iri.clone());
+        }
+        for iri in &parsed.test_function_cells {
+            global_test_function_cells.insert(iri.clone());
         }
         for cell in &parsed.cells {
             match cell.kind {
@@ -352,7 +434,11 @@ pub fn analyze_path_report(
     }
 
     // (3) CROSS-FILE RESOLUTION — unique-symbol rule (see doc comment above).
-    for (caller_iri, callee_symbol, caller_is_test) in pending_xfile_calls {
+    // `caller_is_test` (the parser's per-site flag) is intentionally IGNORED here in
+    // favour of the authoritative global sets, so the 3-way test classification is
+    // identical to the intra-file path: test FUNCTION → TESTED_BY, test MODULE →
+    // dropped scaffolding, ordinary code → CALLS.
+    for (caller_iri, callee_symbol, _caller_is_test) in pending_xfile_calls {
         let caller_node = cell_iri_to_node_id(&caller_iri);
         match func_defs.get(&callee_symbol) {
             None => report.xfile_calls_external += 1,
@@ -366,19 +452,29 @@ pub fn analyze_path_report(
                     .collect();
                 match candidates.as_slice() {
                     [only] => {
-                        let is_test = caller_is_test || global_test_cells.contains(&caller_iri);
-                        let kind = if is_test {
-                            EdgeKind::TestedBy
+                        if global_test_function_cells.contains(&caller_iri) {
+                            // A test function's call path reaches the callee: a REAL
+                            // test-reach signal (not assertion-verified).
+                            all_edges.push(GraphEdge {
+                                from: caller_node,
+                                to: *only,
+                                kind: EdgeKind::TestedBy,
+                                weight: 1.0,
+                            });
+                            report.xfile_calls_resolved += 1;
+                        } else if global_test_cells.contains(&caller_iri) {
+                            // Test module scaffolding (not a function body): drop it —
+                            // neither test-reach nor a production dependency.
+                            report.xfile_calls_test_scaffold += 1;
                         } else {
-                            EdgeKind::Calls
-                        };
-                        all_edges.push(GraphEdge {
-                            from: caller_node,
-                            to: *only,
-                            kind,
-                            weight: 1.0,
-                        });
-                        report.xfile_calls_resolved += 1;
+                            all_edges.push(GraphEdge {
+                                from: caller_node,
+                                to: *only,
+                                kind: EdgeKind::Calls,
+                                weight: 1.0,
+                            });
+                            report.xfile_calls_resolved += 1;
+                        }
                     }
                     [] => report.xfile_calls_external += 1,
                     _ => report.xfile_calls_ambiguous += 1,

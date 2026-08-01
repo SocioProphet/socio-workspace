@@ -151,7 +151,13 @@ impl EpistemicLevel {
 pub struct BlastRadiusInputs {
     /// Direct dependents = in-degree of the cell in the frozen index.
     pub dependents_count: u32,
-    /// True if at least one test reaches the cell (incoming `TESTED_BY` edge).
+    /// True if at least one **test function's** call path statically reaches this
+    /// cell (an incoming `TESTED_BY` edge, wired only from a real `CALLS` inside a
+    /// test function body). This is call-graph REACH, NOT assertion-verified
+    /// coverage: it does not prove a test asserts the cell's behaviour, only that a
+    /// test executes a path that can invoke it. True behavioural coverage requires
+    /// running the suite. Despite the field name it is a *reach* boolean; the name is
+    /// kept for schema/back-compat. See [`derive_epistemic_level`].
     pub test_coverage_reach: bool,
     /// Historical change frequency (commits/day over the window). Unnormalised.
     pub churn_frequency: f64,
@@ -169,15 +175,25 @@ pub struct BlastRadiusInputs {
 /// Derive the `epistemicLevel` for a changed cell, plus a human-readable
 /// `derivation` explaining WHY.
 ///
+/// ## What `test-reach` means (soundness of the claim)
+/// The "tests reach?" column is `test_coverage_reach`: TRUE iff a **test function's**
+/// call path statically reaches this cell (an incoming `TESTED_BY` edge, wired only
+/// from a real `CALLS` originating in a test function body — never from an import, a
+/// bare mention, or module-scope test scaffolding). It therefore asserts
+/// **reachability from a test**, NOT that any test **asserts** this cell's behaviour.
+/// `empirical`/`bounded` are the strongest levels this static pipeline emits, and
+/// even they claim only test-reach; assertion/line/branch coverage requires RUNNING
+/// the suite and is deliberately out of scope here.
+///
 /// ## Decision table (work order §2.3, reconciled with the estate)
 ///
-/// | `dead` | tests reach? | dependents vs `dependents_threshold` | level         |
-/// |--------|--------------|--------------------------------------|---------------|
-/// | yes    | (any)        | (any)                                | `rejected`    |
-/// | no     | yes          | `<= threshold`                       | `empirical`   |
-/// | no     | yes          | `> threshold`                        | `bounded`     |
-/// | no     | no           | `> threshold`                        | `speculative` |
-/// | no     | no           | `<= threshold`                       | `speculative` |
+/// | `dead` | test-reach? | dependents vs `dependents_threshold` | level         |
+/// |--------|-------------|--------------------------------------|---------------|
+/// | yes    | (any)       | (any)                                | `rejected`    |
+/// | no     | yes         | `<= threshold`                       | `empirical`   |
+/// | no     | yes         | `> threshold`                        | `bounded`     |
+/// | no     | no          | `> threshold`                        | `speculative` |
+/// | no     | no          | `<= threshold`                       | `speculative` |
 ///
 /// Rationale for the two `no-tests` rows collapsing to `speculative`: the work
 /// order names `speculative` for "no tests AND dependents > threshold" (the
@@ -216,18 +232,22 @@ pub fn derive_epistemic_level(
             (
                 EpistemicLevel::Empirical,
                 format!(
-                    "a test path reaches this cell and {d} dependents is within the \
-                     bounded threshold of {t} → empirical (observed by tests, blast \
-                     radius bounded)"
+                    "a test function's call path statically reaches this cell and {d} \
+                     dependents is within the bounded threshold of {t} → empirical. \
+                     NOTE: `empirical` here means TEST-REACHABLE (a test calls into \
+                     this cell in the static call graph), NOT assertion-verified — the \
+                     signal does not prove any test asserts this cell's behaviour. \
+                     True behavioural/line coverage requires RUNNING the suite (out of \
+                     scope for this static pipeline)"
                 ),
             )
         } else {
             (
                 EpistemicLevel::Bounded,
                 format!(
-                    "a test path reaches this cell but {d} dependents exceeds the \
-                     bounded threshold of {t}, so not every caller is exhaustively \
-                     verified → bounded"
+                    "a test function's call path reaches this cell (test-reachable, \
+                     NOT assertion-verified) but {d} dependents exceeds the bounded \
+                     threshold of {t}, so not every caller is exercised → bounded"
                 ),
             )
         }
@@ -235,17 +255,18 @@ pub fn derive_epistemic_level(
         (
             EpistemicLevel::Speculative,
             format!(
-                "no test path reaches this cell and {d} dependents exceeds the bounded \
-                 threshold of {t} → speculative (the \"many callers, no tests\" case)"
+                "no test function's call path reaches this cell and {d} dependents \
+                 exceeds the bounded threshold of {t} → speculative (the \"many \
+                 callers, no tests\" case)"
             ),
         )
     } else {
         (
             EpistemicLevel::Speculative,
             format!(
-                "no test path reaches this cell; {d} dependents is within the bounded \
-                 threshold of {t}, but absent any test evidence the behaviour can only \
-                 be speculated → speculative"
+                "no test function's call path reaches this cell; {d} dependents is \
+                 within the bounded threshold of {t}, but absent any test-reach the \
+                 behaviour can only be speculated → speculative"
             ),
         )
     }
@@ -269,9 +290,11 @@ pub fn derive_epistemic_level(
 ///    — linear ramp saturating at `churn_saturation` (default 1.0 commit/day). A
 ///    hotter file ⇒ larger blast radius.
 /// 3. **coverage term** `cov = if test_coverage_reach { 0.0 } else { 1.0 }`
-///    — tests SHRINK blast-radius risk: a tested cell contributes 0, an untested
-///    cell contributes the full weight. (Binary today because `TESTED_BY` reach is
-///    binary; a graded coverage fraction can replace it without changing the shape.)
+///    — test-REACH shrinks blast-radius risk: a test-reachable cell contributes 0,
+///    an unreached cell contributes the full weight. (Binary today because
+///    `TESTED_BY` reach is binary; note this is call-graph reach, not assertion
+///    coverage — a graded, suite-run coverage fraction can replace it without
+///    changing the shape.)
 ///
 /// `blast_radius = clamp(w_dependents*d_norm + w_churn*c_norm + w_coverage*cov, 0, 1)`
 ///

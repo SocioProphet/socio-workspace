@@ -203,3 +203,114 @@ fn tree_is_written_to_a_real_directory() {
     assert!(Path::new(&root).join("tests/it.rs").is_file());
     let _ = fs::remove_dir_all(&root);
 }
+
+/// M3 SOUNDNESS: `test_coverage_reach` (→ `empirical`) must be established ONLY by a
+/// real CALL originating in a test **function body** — never by an `import`, a bare
+/// mention, or a module-scope call in a test file. This lays down a Python tree with
+/// all three shapes pointing at three distinct production functions and proves each
+/// gets the HONEST verdict:
+///
+/// * `reached_by_test_fn` — CALLED inside `def test_it()` → test-reach → `empirical`.
+/// * `only_module_mention` — called at MODULE scope in the test file (scaffolding,
+///   not a test function) → dropped → NO test-reach → `speculative`.
+/// * `only_imported` — merely `import`ed by the test file → NO test-reach →
+///   `speculative`.
+#[test]
+fn test_reach_requires_a_real_call_from_a_test_function_not_import_or_mention() {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static SEQ: AtomicU64 = AtomicU64::new(0);
+    let n = SEQ.fetch_add(1, Ordering::Relaxed);
+    let root = std::env::temp_dir().join(format!("gbrg-m3-{}-{}", std::process::id(), n));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir_all(&root).unwrap();
+
+    // Production module — three functions, each with a DIFFERENT relationship to the
+    // test file below. None are called by any production code (dependents = 0).
+    fs::write(
+        root.join("prod.py"),
+        "def reached_by_test_fn():\n    return 1\n\
+         def only_module_mention():\n    return 2\n\
+         def only_imported():\n    return 3\n",
+    )
+    .unwrap();
+
+    // A pytest file (stem `test_`). It (a) IMPORTS only_imported, (b) CALLS
+    // only_module_mention at module scope, and (c) CALLS reached_by_test_fn from
+    // inside a test function. Only (c) is honest test-reach.
+    fs::write(
+        root.join("test_prod.py"),
+        "from prod import only_imported\n\
+         only_module_mention()\n\
+         def test_it():\n    reached_by_test_fn()\n",
+    )
+    .unwrap();
+
+    let config = ScoringConfig::default();
+    let report =
+        analyze_path_report(&root, &config, DEFAULT_CHURN_WINDOW_DAYS).expect("repo walk");
+    let arts = &report.artifacts;
+
+    // (c) CALLED from a test function → test-reach → empirical.
+    let reached = find(arts, "#reached_by_test_fn");
+    assert!(
+        reached.test_coverage_reach,
+        "a call from inside a test function MUST establish test-reach; derivation: {}",
+        reached.derivation
+    );
+    assert_eq!(
+        reached.claim.epistemic_level.as_str(),
+        "empirical",
+        "test-reached + few deps → empirical; derivation: {}",
+        reached.derivation
+    );
+    // The honest empirical wording must NOT overclaim assertion/observation.
+    assert!(
+        reached.derivation.contains("TEST-REACHABLE")
+            && reached.derivation.contains("NOT assertion-verified"),
+        "empirical derivation must state it is test-REACH, not assertion-verified: {}",
+        reached.derivation
+    );
+
+    // (b) MODULE-scope call in a test file → scaffolding → NO test-reach.
+    let mention = find(arts, "#only_module_mention");
+    assert!(
+        !mention.test_coverage_reach,
+        "a module-scope mention in a test file must NOT manufacture test-reach; derivation: {}",
+        mention.derivation
+    );
+    assert_eq!(
+        mention.claim.epistemic_level.as_str(),
+        "speculative",
+        "module-scope-only cell must be speculative; derivation: {}",
+        mention.derivation
+    );
+
+    // (a) IMPORT only → NO test-reach.
+    let imported = find(arts, "#only_imported");
+    assert!(
+        !imported.test_coverage_reach,
+        "a bare import must NOT manufacture test-reach; derivation: {}",
+        imported.derivation
+    );
+    assert_eq!(
+        imported.claim.epistemic_level.as_str(),
+        "speculative",
+        "import-only cell must be speculative; derivation: {}",
+        imported.derivation
+    );
+
+    // The module-scaffolding drop is COUNTED (honest, visible exclusion): exactly the
+    // `only_module_mention()` call was resolved-but-dropped.
+    assert!(
+        report.xfile_calls_test_scaffold >= 1,
+        "expected the module-scope test call to be counted as dropped scaffolding, got {}",
+        report.xfile_calls_test_scaffold
+    );
+    // Exactly ONE TESTED_BY edge (the real call from test_it), not three.
+    assert_eq!(
+        report.tested_by_edges, 1,
+        "exactly one honest TESTED_BY edge expected (only the real test-function call)"
+    );
+
+    let _ = fs::remove_dir_all(&root);
+}

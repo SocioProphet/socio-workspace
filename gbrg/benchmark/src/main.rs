@@ -25,9 +25,15 @@
 //! Honesty: see gbrg/benchmark/RESULTS.md for the non-claim box. The numbers are
 //! repo-size-dependent; a small repo yields a modest ratio and that is reported as
 //! measured, never inflated.
+//!
+//! Cleanliness: every path in the emitted JSON (`repo`, `file`, and the `cell_id`
+//! IRIs) is REPO-RELATIVE — an absolute repo root collapses to its dir name and cell
+//! paths are stripped to `src/...` — so a public repo never leaks local filesystem
+//! layout (`/Users/<name>/dev/...`). The FileCache still reads via the real absolute
+//! path; only the OUTPUT is relativized.
 
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use gbrg_analyze::{analyze_path_report, DEFAULT_CHURN_WINDOW_DAYS};
@@ -37,6 +43,25 @@ use gbrg_core::{
 };
 use hg_analytics::{GraphIndex, NodeId, Store};
 use serde::Serialize;
+
+/// Make an absolute source path REPO-RELATIVE for the committed JSON, so a public
+/// repo never leaks the local filesystem layout (e.g. `/Users/<name>/dev/...`).
+/// `abs` is the cell's `file_path` as walked from `root`, so stripping `root` yields
+/// a path relative to the analyzed repo (`src/interner.rs`). If `abs` is not under
+/// `root` (shouldn't happen), it is returned unchanged rather than fabricated.
+fn relativize(abs: &str, root: &Path) -> String {
+    Path::new(abs)
+        .strip_prefix(root)
+        .map(|rel| rel.to_string_lossy().into_owned())
+        .unwrap_or_else(|_| abs.to_string())
+}
+
+/// Rewrite a cell IRI so its embedded file path is repo-relative. The IRI is
+/// `code://<lang>/<file_path>#<symbol>`; `file_path` appears verbatim, so a single
+/// substring replacement is exact (the path is unique within its own IRI).
+fn relativize_cell_id(cell_id: &str, abs_file: &str, rel_file: &str) -> String {
+    cell_id.replacen(abs_file, rel_file, 1)
+}
 
 /// Rebuild the frozen index from the analyzer's EXACT cells + edges via gbrg-core's
 /// public write path — the same discipline `WhatIfGraph::build_index` uses. No new
@@ -316,10 +341,13 @@ fn main() -> ExitCode {
         recalls_t.push(recall_t);
         recalls_d.push(recall_d);
 
+        // REPO-RELATIVE paths in the committed output (no local-FS-layout leak).
+        let rel_file = relativize(&c.file_path, &repo);
+        let rel_cell_id = relativize_cell_id(&c.cell_id, &c.file_path, &rel_file);
         rows.push(TargetRow {
-            cell_id: c.cell_id.clone(),
+            cell_id: rel_cell_id,
             symbol: c.symbol_name.clone(),
-            file: c.file_path.clone(),
+            file: rel_file,
             blast_radius_size: oracle.len(),
             direct_dependents: direct.len(),
             minimal_chars: min_chars,
@@ -344,8 +372,19 @@ fn main() -> ExitCode {
         Some(recalls_d.iter().sum::<f64>() / recalls_d.len() as f64)
     };
 
+    // Repo identity WITHOUT leaking local FS layout: an absolute root collapses to
+    // its final component (the repo/dir name); a relative root (e.g. `gbrg/crates`)
+    // is already layout-free and kept verbatim.
+    let repo_field = if repo.is_absolute() {
+        repo.file_name()
+            .map(|n| n.to_string_lossy().into_owned())
+            .unwrap_or_else(|| repo.display().to_string())
+    } else {
+        repo.display().to_string()
+    };
+
     let out = Report {
-        repo: repo.display().to_string(),
+        repo: repo_field,
         token_method: format!("chars / {divisor} (rough chars-per-token heuristic; offline, no tokenizer)"),
         token_divisor: divisor,
         files_parsed: report.files_parsed,

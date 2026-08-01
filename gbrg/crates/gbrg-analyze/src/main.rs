@@ -23,8 +23,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use gbrg_analyze::{
-    analyze_file, analyze_path_report, build_whatif_graph, AnalyzePathReport,
-    DEFAULT_CHURN_WINDOW_DAYS,
+    analyze_file, analyze_file_report, analyze_path_report, build_whatif_graph, edges_with_cell_ids,
+    AnalyzeOptions, AnalyzePathReport, DEFAULT_CHURN_WINDOW_DAYS,
 };
 use gbrg_core::{what_if, BlastRadiusProofArtifact, Mutation, ScoringConfig};
 use gbrg_parser::Language;
@@ -39,10 +39,13 @@ fn lang_from_str(s: &str) -> Option<Language> {
 }
 
 fn usage() -> &'static str {
-    "usage: gbrg-analyze <file|dir> [--lang rust|python|typescript]  (--lang ignored for a dir)"
+    "usage: gbrg-analyze <file|dir> [--lang rust|python|typescript] [--emit-edges]\n  \
+     (--lang ignored for a dir; --emit-edges prints {artifacts, edges} instead of a bare array)"
 }
 
-/// Print the JSON array of artifacts to stdout; return an exit code.
+/// Print the JSON array of artifacts to stdout; return an exit code. This is the
+/// DEFAULT output shape (a bare array) — kept stable so existing consumers that
+/// `JSON.parse(...) as ProofArtifact[]` keep working.
 fn emit(artifacts: &[BlastRadiusProofArtifact]) -> ExitCode {
     match serde_json::to_string_pretty(artifacts) {
         Ok(json) => {
@@ -51,6 +54,33 @@ fn emit(artifacts: &[BlastRadiusProofArtifact]) -> ExitCode {
         }
         Err(e) => {
             eprintln!("error: serialising artifacts: {e}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+/// `--emit-edges` output shape: a JSON OBJECT `{ "artifacts": [...], "edges": [...] }`
+/// where each edge is `{ "from": <cell_id>, "to": <cell_id>, "kind": "CALLS" | ... }`
+/// with stable cell IRIs as endpoints. This surfaces the analyzer's REAL internal
+/// `CALLS`/`INHERITS`/`TESTED_BY` topology so downstream consumers (e.g. the PLN risk
+/// propagator) no longer need the caller to supply the call graph. A distinct shape
+/// (object vs. bare array) keeps the default backward-compatible.
+fn emit_bundle(
+    artifacts: &[BlastRadiusProofArtifact],
+    edges: &[(String, String, &'static str)],
+) -> ExitCode {
+    let edges_json: Vec<serde_json::Value> = edges
+        .iter()
+        .map(|(from, to, kind)| serde_json::json!({ "from": from, "to": to, "kind": kind }))
+        .collect();
+    let bundle = serde_json::json!({ "artifacts": artifacts, "edges": edges_json });
+    match serde_json::to_string_pretty(&bundle) {
+        Ok(json) => {
+            println!("{json}");
+            ExitCode::SUCCESS
+        }
+        Err(e) => {
+            eprintln!("error: serialising artifacts+edges: {e}");
             ExitCode::FAILURE
         }
     }
@@ -69,11 +99,12 @@ fn print_report_summary(root: &std::path::Path, report: &AnalyzePathReport) {
         report.test_cells,
     );
     eprintln!(
-        "gbrg-analyze: cross-file calls resolved={} ambiguous={} external={}; \
+        "gbrg-analyze: cross-file calls resolved={} ambiguous={} external={} test-scaffold-dropped={}; \
          inherits resolved={}; TESTED_BY edges={}; churny files={}",
         report.xfile_calls_resolved,
         report.xfile_calls_ambiguous,
         report.xfile_calls_external,
+        report.xfile_calls_test_scaffold,
         report.xfile_inherits_resolved,
         report.tested_by_edges,
         report.churn_files_nonzero,
@@ -205,6 +236,7 @@ fn main() -> ExitCode {
     let mut args = argv;
     let mut file: Option<PathBuf> = None;
     let mut lang_arg: Option<String> = None;
+    let mut emit_edges = false;
 
     while let Some(a) = args.next() {
         match a.as_str() {
@@ -215,6 +247,7 @@ fn main() -> ExitCode {
                     return ExitCode::from(2);
                 }
             }
+            "--emit-edges" => emit_edges = true,
             "-h" | "--help" => {
                 println!("{}", usage());
                 return ExitCode::SUCCESS;
@@ -252,7 +285,13 @@ fn main() -> ExitCode {
         match analyze_path_report(&path, &config, DEFAULT_CHURN_WINDOW_DAYS) {
             Ok(report) => {
                 print_report_summary(&path, &report);
-                emit(&report.artifacts)
+                if emit_edges {
+                    let edges = edges_with_cell_ids(&report.cells, &report.edges);
+                    eprintln!("gbrg-analyze: --emit-edges → {} edge(s) surfaced", edges.len());
+                    emit_bundle(&report.artifacts, &edges)
+                } else {
+                    emit(&report.artifacts)
+                }
             }
             Err(e) => {
                 eprintln!("error: {e}");
@@ -281,19 +320,39 @@ fn main() -> ExitCode {
             },
         };
 
-        match analyze_file(&path, language, &config) {
-            Ok(artifacts) => {
-                eprintln!(
-                    "gbrg-analyze: {} → {} ProofArtifact(s) [{:?}]",
-                    path.display(),
-                    artifacts.len(),
-                    language
-                );
-                emit(&artifacts)
+        if emit_edges {
+            match analyze_file_report(&path, language, &config, AnalyzeOptions::default()) {
+                Ok(fa) => {
+                    let edges = edges_with_cell_ids(&fa.cells, &fa.edges);
+                    eprintln!(
+                        "gbrg-analyze: {} → {} ProofArtifact(s), {} edge(s) [{:?}]",
+                        path.display(),
+                        fa.artifacts.len(),
+                        edges.len(),
+                        language
+                    );
+                    emit_bundle(&fa.artifacts, &edges)
+                }
+                Err(e) => {
+                    eprintln!("error: {e}");
+                    ExitCode::FAILURE
+                }
             }
-            Err(e) => {
-                eprintln!("error: {e}");
-                ExitCode::FAILURE
+        } else {
+            match analyze_file(&path, language, &config) {
+                Ok(artifacts) => {
+                    eprintln!(
+                        "gbrg-analyze: {} → {} ProofArtifact(s) [{:?}]",
+                        path.display(),
+                        artifacts.len(),
+                        language
+                    );
+                    emit(&artifacts)
+                }
+                Err(e) => {
+                    eprintln!("error: {e}");
+                    ExitCode::FAILURE
+                }
             }
         }
     }

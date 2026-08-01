@@ -10,6 +10,6 @@
 # gbrg-napi is a well-formed skeleton that can be built on its own when the
 # napi toolchain is present.
 [workspace]
-members = ["crates/gbrg-core", "crates/gbrg-parser", "crates/gbrg-analyze", "benchmark"]
+members = ["crates/gbrg-core", "crates/gbrg-parser", "crates/gbrg-analyze", "crates/gbrg-engine", "benchmark"]
 exclude = ["crates/gbrg-napi"]
 resolver = "2"

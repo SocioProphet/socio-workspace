@@ -1,0 +1,21 @@
+# gbrg-engine — the authoritative containment engine as an HTTP service.
+#
+# Wraps gbrg-analyze::containment::run (which runs the REAL
+# gbrg_core::emit_containment_artifact) behind a tiny HTTP surface so the
+# prophet-platform Go front-door can call the authoritative algorithm over the
+# wire instead of reimplementing it. No new model — pure glue over gbrg-analyze.
+[package]
+name = "gbrg-engine"
+version = "0.1.0"
+edition = "2021"
+description = "HTTP service exposing the authoritative gbrg-core containment engine."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+gbrg-analyze = { path = "../gbrg-analyze" }
+# Minimal, dependency-light blocking HTTP server (MIT).
+tiny_http = "0.12"
+
+[[bin]]
+name = "gbrg-engine"
+path = "src/main.rs"

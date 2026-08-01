@@ -3,19 +3,25 @@
  * Blast-Radius Graph, conformant to the a2a-mcp-zero-trust spec and built ON the
  * `gbrg/governance` gate foundation.
  *
- * Three READ-ONLY tools over a frozen graph, each returning a ProofArtifact
- * OBJECT (never a bare float):
+ * Three READ-ONLY tools, each re-deriving the blast-radius graph for the
+ * requested path per call (NOT served from a pre-frozen snapshot) and returning
+ * a ProofArtifact OBJECT (never a bare float):
  *   - impact_query(path, cellId?)       -> the blast-radius ProofArtifact(s) for a target
  *   - minimal_context_query(path)       -> only the cells the GATE INCLUDES
  *   - graph_status(path)                -> counts + epistemicLevel spread, as a ProofArtifact
  *
  * ZERO-TRUST, PER CALL (see gate.ts / mcp_gate.py):
- *   1. authorize via the gbrg/governance authorize path (agent-registry
+ *   1. AUTHORIZE (who) via the gbrg/governance authorize path (agent-registry
  *      authorize.py), FAIL-CLOSED, actor = agent-registry://gbrg/mcp,
  *      SPIFFE id spiffe://socioprophet/mcp/gbrg.
- *   2. EVERY call (served or refused) emits a hash-chained LedgerEvent via the
+ *   2. CONFINE (which resource) via confine.ts (M4): the requested path is
+ *      canonicalized (symlinks + `..` resolved) and must fall inside the
+ *      configured allowed root, else the call is REFUSED fail-closed with a
+ *      ledgered deny BEFORE any analysis runs. Authorization gates WHO may call;
+ *      confinement gates WHICH resource — both must pass.
+ *   3. EVERY call (served or refused) emits a hash-chained LedgerEvent via the
  *      gate's durable ledger. No ledger event => the call fails closed.
- *   3. On refusal: NO tool result is produced (a ProofArtifact is never returned).
+ *   4. On refusal: NO tool result is produced (a ProofArtifact is never returned).
  *
  * The tools declare NO write/exec/egress — see registry/capability_registry.json.
  */
@@ -30,14 +36,17 @@ import { dirname, resolve } from "node:path";
 
 import { ProofArtifact, ToolRefusedError } from "./types.js";
 import { AnalyzeFn, makeAnalyze } from "./analyze.js";
+import { confinePath } from "./confine.js";
 import {
   AuthorizeFn,
+  EmitRefusalFn,
   EmitResultFn,
   FilterIncludedFn,
   GateConfig,
   MCP_AGENT_REF,
   SPIFFE_ID,
   makeAuthorize,
+  makeEmitRefusal,
   makeEmitResult,
   makeFilterIncluded,
 } from "./gate.js";
@@ -50,16 +59,23 @@ export interface ServerDeps {
   analyze: AnalyzeFn;
   authorize: AuthorizeFn;
   emitResult: EmitResultFn;
+  emitRefusal: EmitRefusalFn;
   filterIncluded: FilterIncludedFn;
 }
 
-/** The MCP agent's CURRENT authority + where the frozen graph lives. */
+/** The MCP agent's CURRENT authority + the resource boundary it may analyze. */
 export interface RuntimeConfig {
   /** Path to the agent's AgentAuthorityCurrentState file (active/suspended). */
   stateFile?: string;
   status?: string;
   /** Default graph root used by graph_status when no path is supplied. */
   graphRoot: string;
+  /**
+   * M4 resource confinement: the ONLY directory subtree whose source the tools
+   * may analyze. Any requested path resolving (symlinks + `..`) outside this
+   * root is refused fail-closed. Defaults to `graphRoot` when unset.
+   */
+  allowedRoot?: string;
 }
 
 // --------------------------------------------------------------------------- //
@@ -93,7 +109,7 @@ function matchCell(a: ProofArtifact, cellId: string): boolean {
   return id === cellId || id.endsWith(`#${cellId}`) || id.split("#").pop() === cellId;
 }
 
-/** graph_status ProofArtifact — a real (empirical) claim about the frozen graph. */
+/** graph_status ProofArtifact — a real (empirical) claim about the graph re-derived for this call. */
 function graphStatusArtifact(artifacts: ProofArtifact[], spread: Record<string, number>): ProofArtifact {
   const n = artifacts.length;
   const spreadStr = Object.entries(spread)
@@ -105,8 +121,8 @@ function graphStatusArtifact(artifacts: ProofArtifact[], spread: Record<string, 
     claim: {
       claimId: "claim.gbrg.graph_status",
       claimType: "graph_summary",
-      statement: `frozen graph: ${n} scored cell(s); epistemicLevel spread → ${spreadStr || "(none)"}`,
-      // Directly measured over the frozen index -> empirical DATA, not synthetic.
+      statement: `graph (re-derived this call): ${n} scored cell(s); epistemicLevel spread → ${spreadStr || "(none)"}`,
+      // Directly measured over the freshly analyzed cells -> empirical DATA, not synthetic.
       epistemicLevel: "empirical",
     },
     status: n > 0 ? "BOUNDED" : "INCONCLUSIVE",
@@ -114,7 +130,7 @@ function graphStatusArtifact(artifacts: ProofArtifact[], spread: Record<string, 
     test_coverage_reach: false,
     churn_frequency: 0,
     blast_radius: 0.0,
-    derivation: `counted ${n} ProofArtifact(s) emitted by gbrg-analyze over the frozen graph; spread computed by tallying claim.epistemicLevel`,
+    derivation: `counted ${n} ProofArtifact(s) emitted by gbrg-analyze over the confined path (re-derived this call); spread computed by tallying claim.epistemicLevel`,
     declared_by: MCP_AGENT_REF,
     generated: false,
   };
@@ -147,36 +163,56 @@ export async function runTool(
     );
   }
 
-  // 2. Authorized: run the read-only tool over the frozen graph.
+  // 2. CONFINE (which resource): authorization gated WHO may call; this gates
+  //    WHICH resource. The requested path is canonicalized (symlinks + `..`
+  //    resolved) and must fall inside the allowed root, else REFUSE fail-closed
+  //    with a ledgered deny BEFORE any analysis runs. Both gates must pass.
+  const allowedRoot = config.allowedRoot ?? config.graphRoot;
+  const requestedPath =
+    name === "graph_status" ? String(args.path ?? config.graphRoot) : String(args.path ?? "");
+  if (!requestedPath) throw new Error(`${name} requires 'path'`);
+  const confinement = confinePath(requestedPath, allowedRoot);
+  if (!confinement.allowed) {
+    // Ledger the refusal BEFORE any analyze() runs — no source tree is parsed.
+    const refusal = await deps.emitRefusal(name, confinement.reasonCode ?? "path_out_of_root", args);
+    throw new ToolRefusedError(
+      `REFUSED (fail-closed): tool=${name} reason=${confinement.reasonCode} ` +
+        `requested="${requestedPath}" resolved="${confinement.canonical}" is outside allowed root ` +
+        `"${confinement.root}"; no analysis performed, no ProofArtifact produced ` +
+        `(ledger_written=${refusal.ledgerWritten})`,
+      confinement.reasonCode ?? "path_out_of_root",
+      refusal.event?.event_id,
+    );
+  }
+  // Analyze the CANONICAL (symlink-resolved) path so an in-root symlink cannot be
+  // swapped to reach out-of-root content between the check and the read.
+  const safePath = confinement.canonical;
+
+  // 3. Authorized + confined: run the read-only tool, re-deriving the graph.
   let result: ImpactResult | MinimalContextResult | GraphStatusResult;
   if (name === "impact_query") {
-    const path = String(args.path ?? "");
     const cellId = args.cellId ? String(args.cellId) : undefined;
-    if (!path) throw new Error("impact_query requires 'path'");
-    let artifacts = await deps.analyze(path);
+    let artifacts = await deps.analyze(safePath);
     if (cellId) artifacts = artifacts.filter((a) => matchCell(a, cellId));
     result = {
       tool: "impact_query",
-      target: { path, cellId },
+      target: { path: safePath, cellId },
       matched: artifacts.length,
       artifact: artifacts.length === 1 ? artifacts[0] : undefined,
       artifacts,
     };
   } else if (name === "minimal_context_query") {
-    const path = String(args.path ?? "");
-    if (!path) throw new Error("minimal_context_query requires 'path'");
-    const artifacts = await deps.analyze(path);
+    const artifacts = await deps.analyze(safePath);
     const filtered = await deps.filterIncluded(artifacts);
     result = {
       tool: "minimal_context_query",
-      target: { path },
+      target: { path: safePath },
       total: filtered.total,
       included_count: filtered.included_count,
       included: filtered.included,
     };
   } else {
-    const path = String(args.path ?? config.graphRoot);
-    const artifacts = await deps.analyze(path);
+    const artifacts = await deps.analyze(safePath);
     const spread: Record<string, number> = {};
     for (const a of artifacts) {
       const lvl = a.claim?.epistemicLevel ?? "unknown";
@@ -190,7 +226,7 @@ export async function runTool(
     };
   }
 
-  // 3. Emit the served-result ledger event.
+  // 4. Emit the served-result ledger event.
   await deps.emitResult(name, result);
   return result;
 }
@@ -202,7 +238,7 @@ const TOOL_DEFS = [
   {
     name: "impact_query",
     description:
-      "Run GBRG over a source file/dir and return the blast-radius ProofArtifact(s) for the target (optionally filtered to a cellId). Returns a ProofArtifact object, never a bare float.",
+      "Run GBRG over a source file/dir INSIDE THE SERVER'S ALLOWED ROOT (re-derived per call; not a frozen snapshot) and return the blast-radius ProofArtifact(s) for the target (optionally filtered to a cellId). Paths outside the allowed root are refused fail-closed. Returns a ProofArtifact object, never a bare float.",
     inputSchema: {
       type: "object" as const,
       properties: { path: { type: "string" }, cellId: { type: "string" } },
@@ -212,7 +248,7 @@ const TOOL_DEFS = [
   {
     name: "minimal_context_query",
     description:
-      "Return only the cells the governance GATE INCLUDES for a source file/dir (each a ProofArtifact object).",
+      "Return only the cells the governance GATE INCLUDES for a source file/dir inside the server's allowed root (each a ProofArtifact object; re-derived per call). Paths outside the allowed root are refused fail-closed.",
     inputSchema: {
       type: "object" as const,
       properties: { path: { type: "string" } },
@@ -222,7 +258,7 @@ const TOOL_DEFS = [
   {
     name: "graph_status",
     description:
-      "Return frozen-graph counts and the epistemicLevel spread, wrapped as a ProofArtifact object.",
+      "Return graph counts and the epistemicLevel spread for a path inside the server's allowed root (re-derived per call), wrapped as a ProofArtifact object. Paths outside the allowed root are refused fail-closed.",
     inputSchema: {
       type: "object" as const,
       properties: { path: { type: "string" } },
@@ -237,7 +273,7 @@ export function makeServer(deps: ServerDeps, config: RuntimeConfig): Server {
     {
       capabilities: { tools: {} },
       // Declared identity for audit/diagnostics.
-      instructions: `GBRG MCP surface. identity: spiffe_id=${SPIFFE_ID}, actor=${MCP_AGENT_REF}. All tools are read-only; every call is authorized fail-closed and ledgered.`,
+      instructions: `GBRG MCP surface. identity: spiffe_id=${SPIFFE_ID}, actor=${MCP_AGENT_REF}. All tools are read-only and re-derive the graph per call (not a frozen snapshot); every call is authorized (who) AND resource-confined to the allowed root (which), both fail-closed and ledgered.`,
     },
   );
 
@@ -296,6 +332,7 @@ function defaultConfig(): { deps: ServerDeps; config: RuntimeConfig } {
     analyze: makeAnalyze(binPath),
     authorize: makeAuthorize(gateCfg),
     emitResult: makeEmitResult(gateCfg),
+    emitRefusal: makeEmitRefusal(gateCfg),
     filterIncluded: makeFilterIncluded(gateCfg),
   };
   const config: RuntimeConfig = {
@@ -304,6 +341,10 @@ function defaultConfig(): { deps: ServerDeps; config: RuntimeConfig } {
       resolve(mcpRoot, "fixtures", "agent-authority-current-state.gbrg-mcp.active.json"),
     status: process.env.GBRG_MCP_STATUS,
     graphRoot: process.env.GBRG_GRAPH_ROOT ?? resolve(gbrgRoot, "crates"),
+    // M4 resource confinement: default the allowed root to the gbrg tree (the
+    // repo subtree this server legitimately analyzes). Operators may widen or
+    // narrow it via GBRG_ALLOWED_ROOT; anything outside is refused fail-closed.
+    allowedRoot: process.env.GBRG_ALLOWED_ROOT ?? gbrgRoot,
   };
   return { deps, config };
 }
@@ -315,7 +356,8 @@ export async function main(): Promise<void> {
   await server.connect(transport);
   // eslint-disable-next-line no-console
   console.error(
-    `gbrg-mcp: serving 3 read-only tools over stdio as ${SPIFFE_ID} (${MCP_AGENT_REF}); fail-closed + ledgered.`,
+    `gbrg-mcp: serving 3 read-only tools over stdio as ${SPIFFE_ID} (${MCP_AGENT_REF}); ` +
+      `authorized + resource-confined to ${config.allowedRoot ?? config.graphRoot}; fail-closed + ledgered.`,
   );
 }
 

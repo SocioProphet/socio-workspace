@@ -32,6 +32,7 @@ import { makeAnalyze } from "../src/analyze.js";
 import {
   makeAuthorize,
   makeEmitResult,
+  makeEmitRefusal,
   makeFilterIncluded,
   GateConfig,
 } from "../src/gate.js";
@@ -97,10 +98,13 @@ async function main(): Promise<void> {
     analyze: makeAnalyze(BIN),
     authorize: makeAuthorize(gateCfg),
     emitResult: makeEmitResult(gateCfg),
+    emitRefusal: makeEmitRefusal(gateCfg),
     filterIncluded: makeFilterIncluded(gateCfg),
   };
   // Mutable config: we flip the agent's authority between calls.
-  const config: RuntimeConfig = { stateFile: ACTIVE, graphRoot: TARGET_DIR };
+  // M4: allowedRoot confines analysis to the gbrg tree; the in-root TARGET_FILE
+  // and TARGET_DIR both live under it, while /etc and outside-tmpdirs do not.
+  const config: RuntimeConfig = { stateFile: ACTIVE, graphRoot: TARGET_DIR, allowedRoot: gbrgRoot };
 
   // ---- Real MCP SDK server + client over in-memory transport ----
   const server = makeServer(deps, config);
@@ -162,12 +166,85 @@ async function main(): Promise<void> {
   let threw: unknown = null;
   try {
     await runTool("impact_query", { path: TARGET_FILE, cellId: "as_label" }, deps,
-      { stateFile: SUSPENDED, graphRoot: TARGET_DIR });
+      { stateFile: SUSPENDED, graphRoot: TARGET_DIR, allowedRoot: gbrgRoot });
   } catch (e) {
     threw = e;
   }
   ok("(b) runTool throws ToolRefusedError under suspended authority", threw instanceof ToolRefusedError,
     `got ${threw}`);
+
+  // ===================================================================== //
+  // (c) M4 RESOURCE CONFINEMENT — authority is ACTIVE (who PASSES); only the
+  //     RESOURCE gate blocks. Same authorized caller: an IN-ROOT path is served
+  //     and analyzed; an OUT-OF-ROOT path and a `..` traversal are REFUSED
+  //     fail-closed with NO analysis performed and a DENY ledger event written.
+  //     We wrap analyze with a spy to PROVE no source tree is parsed on refusal.
+  // ===================================================================== //
+  let analyzeCalls: string[] = [];
+  const spyDeps: ServerDeps = {
+    ...deps,
+    analyze: async (p: string) => {
+      analyzeCalls.push(p);
+      return deps.analyze(p);
+    },
+  };
+  const confineCfg: RuntimeConfig = { stateFile: ACTIVE, graphRoot: TARGET_DIR, allowedRoot: gbrgRoot };
+  const ledgerBeforeConfine = readLedger(LEDGER).length;
+
+  // (c.1) IN-ROOT -> SERVED, analyze IS performed.
+  analyzeCalls = [];
+  const inRoot: any = await runTool("impact_query", { path: TARGET_FILE, cellId: "as_label" }, spyDeps, confineCfg);
+  ok("(c.1) in-root path SERVED under confinement (ProofArtifact)", isProofArtifact(inRoot?.artifact),
+    `tool=${inRoot?.tool} matched=${inRoot?.matched}`);
+  ok("(c.1) analyze WAS performed for the in-root path", analyzeCalls.length === 1, `calls=${analyzeCalls.length}`);
+
+  // (c.2) ABSOLUTE OUT-OF-ROOT (/etc) -> REFUSED, analyze NEVER called.
+  analyzeCalls = [];
+  let etcThrew: unknown = null;
+  try {
+    await runTool("impact_query", { path: "/etc" }, spyDeps, confineCfg);
+  } catch (e) {
+    etcThrew = e;
+  }
+  ok("(c.2) out-of-root /etc REFUSED (ToolRefusedError)", etcThrew instanceof ToolRefusedError, `got ${etcThrew}`);
+  ok("(c.2) refusal reasonCode is path_out_of_root",
+    (etcThrew as ToolRefusedError)?.reasonCode === "path_out_of_root",
+    `got ${(etcThrew as ToolRefusedError)?.reasonCode}`);
+  ok("(c.2) NO analysis performed on out-of-root refusal", analyzeCalls.length === 0, `calls=${analyzeCalls.length}`);
+
+  // (c.3) `..` TRAVERSAL escaping the allowed root (resolves to /etc/passwd) -> REFUSED, no analysis.
+  analyzeCalls = [];
+  const traversal = resolve(gbrgRoot, ...Array(12).fill(".."), "etc", "passwd");
+  let travThrew: unknown = null;
+  try {
+    await runTool("minimal_context_query", { path: traversal }, spyDeps, confineCfg);
+  } catch (e) {
+    travThrew = e;
+  }
+  ok("(c.3) `..` traversal escaping root REFUSED", travThrew instanceof ToolRefusedError, `got ${travThrew}`);
+  ok("(c.3) NO analysis performed on traversal refusal", analyzeCalls.length === 0, `calls=${analyzeCalls.length}`);
+
+  // (c.4) OUTSIDE TMPDIR (a real dir outside the allowed root) -> REFUSED.
+  analyzeCalls = [];
+  const outsideDir = mkdtempSync(resolve(tmpdir(), "gbrg-outside-"));
+  let tmpThrew: unknown = null;
+  try {
+    await runTool("impact_query", { path: outsideDir }, spyDeps, confineCfg);
+  } catch (e) {
+    tmpThrew = e;
+  }
+  ok("(c.4) outside-root tmpdir REFUSED", tmpThrew instanceof ToolRefusedError, `got ${tmpThrew}`);
+  ok("(c.4) NO analysis performed for outside tmpdir", analyzeCalls.length === 0, `calls=${analyzeCalls.length}`);
+  rmSync(outsideDir, { recursive: true, force: true });
+
+  // (c.5) EVERY refusal left a durable DENY MCP_CALL ledger event (control that fires).
+  const confineNewEvents = readLedger(LEDGER).slice(ledgerBeforeConfine);
+  const confineDenies = confineNewEvents.filter(
+    (e) => e.type === "MCP_CALL" && e.decision?.allow === false &&
+      String(e.decision?.reason ?? "").includes("resource confinement"),
+  );
+  ok("(c.5) >=3 resource-confinement DENY ledger events written", confineDenies.length >= 3,
+    `got ${confineDenies.length}`);
 
   // ===================================================================== //
   // minimal_context_query (gate inclusion) + graph_status, under ACTIVE.
@@ -225,8 +302,10 @@ async function main(): Promise<void> {
   // ---- summary ----
   console.log("\n--- ONE SERVED ProofArtifact (impact_query as_label) ---");
   console.log(JSON.stringify(artifact, null, 2));
-  console.log("\n--- ONE DENY LEDGER EVENT (refused, fail-closed) ---");
+  console.log("\n--- ONE DENY LEDGER EVENT (authority refused, fail-closed) ---");
   console.log(JSON.stringify(denyCalls[0], null, 2));
+  console.log("\n--- ONE RESOURCE-CONFINEMENT DENY LEDGER EVENT (M4, out-of-root) ---");
+  console.log(JSON.stringify(confineDenies[0], null, 2));
 
   await client.close();
   await server.close();

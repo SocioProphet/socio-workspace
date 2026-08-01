@@ -363,6 +363,44 @@ def cmd_emit_result(args: argparse.Namespace) -> int:
 
 
 # --------------------------------------------------------------------------- #
+# Subcommand: refuse — RESOURCE-confinement refusal (M4).
+#
+# Authority (`authorize`) gates WHO may call; confinement gates WHICH resource.
+# When an authorized call names a path outside the allowed root, the TS surface
+# calls this to write a durable DENY MCP_CALL event BEFORE any analysis runs, so
+# the ledger proves the refusal happened and no source tree was parsed.
+# --------------------------------------------------------------------------- #
+def cmd_refuse(args: argparse.Namespace) -> int:
+    ledger_path = Path(args.ledger)
+    registry_path = Path(args.registry)
+    try:
+        call_args = json.loads(args.args_json) if args.args_json else {}
+    except json.JSONDecodeError:
+        call_args = {"_unparseable": True}
+    reason_code = args.reason_code or "resource_confinement"
+    payload = {"tool": args.tool, "args": call_args, "verdict": "deny", "reason_code": reason_code}
+    try:
+        event = emit_event(
+            event_type="MCP_CALL",
+            tool=args.tool,
+            payload=payload,
+            allow=False,
+            reason=f"resource confinement refusal ({reason_code})",
+            ledger_path=ledger_path,
+            registry_path=registry_path,
+        )
+    except Exception as exc:  # noqa: BLE001  no event => hard failure
+        print(json.dumps({"ledger_written": False, "error": str(exc), "event": None}))
+        return 1
+    print(json.dumps({
+        "ledger_written": True,
+        "reason_code": reason_code,
+        "event": {"event_id": event["event_id"], "hash": event["hash"], "prev_hash": event["prev_hash"], "type": event["type"]},
+    }))
+    return 1
+
+
+# --------------------------------------------------------------------------- #
 # Subcommand: filter-include — CONSUME the gate foundation's inclusion decision.
 # --------------------------------------------------------------------------- #
 def cmd_filter_include(_args: argparse.Namespace) -> int:
@@ -427,6 +465,14 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--ledger", required=True)
     r.add_argument("--registry", required=True)
     r.set_defaults(func=cmd_emit_result)
+
+    x = sub.add_parser("refuse")
+    x.add_argument("--tool", required=True)
+    x.add_argument("--reason-code", default="resource_confinement")
+    x.add_argument("--args-json", default="{}")
+    x.add_argument("--ledger", required=True)
+    x.add_argument("--registry", required=True)
+    x.set_defaults(func=cmd_refuse)
 
     f = sub.add_parser("filter-include")
     f.set_defaults(func=cmd_filter_include)

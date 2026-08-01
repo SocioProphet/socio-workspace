@@ -40,7 +40,10 @@ fn epistemic_levels_empirical_and_speculative() {
     let a = write(&mut store, &cell("target_a", b"fn target_a() {}"));
     let a_caller1 = write(&mut store, &cell("a_caller1", b"fn c1() { target_a(); }"));
     let a_caller2 = write(&mut store, &cell("a_caller2", b"fn c2() { target_a(); }"));
-    let a_test = write(&mut store, &cell("a_test", b"#[test] fn t() { target_a(); }"));
+    let a_test = write(
+        &mut store,
+        &cell("a_test", b"#[test] fn t() { target_a(); }"),
+    );
     edge(&mut store, a_caller1, a, EdgeKind::Calls);
     edge(&mut store, a_caller2, a, EdgeKind::Calls);
     edge(&mut store, a_test, a, EdgeKind::TestedBy); // A is reached by a test
@@ -48,7 +51,10 @@ fn epistemic_levels_empirical_and_speculative() {
     // --- Case (b): TARGET_B, NOT tested, 20 dependents (> threshold 15) ---
     let b = write(&mut store, &cell("target_b", b"fn target_b() {}"));
     for i in 0..20 {
-        let caller = write(&mut store, &cell(&format!("b_caller{i}"), b"fn bc() { target_b(); }"));
+        let caller = write(
+            &mut store,
+            &cell(&format!("b_caller{i}"), b"fn bc() { target_b(); }"),
+        );
         edge(&mut store, caller, b, EdgeKind::Calls);
     }
     // (no TESTED_BY edge into B)
@@ -164,7 +170,11 @@ fn dead_cell_is_rejected_with_reason() {
     let index = store.freeze();
     let art = emit_proof_artifact(&z, &index, 0.0, /*dead=*/ true, &cfg);
     assert_eq!(art.claim.epistemic_level.as_str(), "rejected");
-    assert!(art.derivation.contains("dead"), "must record WHY: {}", art.derivation);
+    assert!(
+        art.derivation.contains("dead"),
+        "must record WHY: {}",
+        art.derivation
+    );
 }
 
 /// `churn_frequency` is REAL: it counts git commits touching a file.
@@ -196,7 +206,10 @@ fn churn_frequency_reads_real_git_history() {
     // 3 commits over a 30-day window → 0.1 commits/day. Use a wide window so all land.
     let rate = churn_frequency(&dir, "hot.rs", 30).unwrap();
     assert!(rate > 0.0, "expected non-zero churn, got {rate}");
-    assert!((rate - 3.0 / 30.0).abs() < 1e-9, "expected 3/30, got {rate}");
+    assert!(
+        (rate - 3.0 / 30.0).abs() < 1e-9,
+        "expected 3/30, got {rate}"
+    );
 
     // A path with no history → 0.0 (graceful).
     let none = churn_frequency(&dir, "does-not-exist.rs", 30).unwrap();
@@ -210,5 +223,14 @@ fn write(store: &mut Store, c: &SemanticCell) -> hg_analytics::NodeId {
     gbrg_core::write_cell(store, c).unwrap()
 }
 fn edge(store: &mut Store, from: hg_analytics::NodeId, to: hg_analytics::NodeId, kind: EdgeKind) {
-    gbrg_core::write_edge(store, &GraphEdge { from, to, kind, weight: 1.0 }).unwrap();
+    gbrg_core::write_edge(
+        store,
+        &GraphEdge {
+            from,
+            to,
+            kind,
+            weight: 1.0,
+        },
+    )
+    .unwrap();
 }

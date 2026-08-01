@@ -85,12 +85,7 @@ impl SeverScope {
 
 /// Dense neighbours of dense index `d` in `dir`, optionally filtered by `label`.
 /// Wraps the substrate's label-aware `in_neighbors` / `out_neighbors`.
-fn neighbors<'a>(
-    index: &'a GraphIndex,
-    d: u32,
-    label: Option<&str>,
-    dir: Direction,
-) -> &'a [u32] {
+fn neighbors<'a>(index: &'a GraphIndex, d: u32, label: Option<&str>, dir: Direction) -> &'a [u32] {
     match dir {
         Direction::Downstream => index.out_neighbors(d, label),
         Direction::Upstream => index.in_neighbors(d, label),
@@ -398,7 +393,10 @@ pub fn build_containment_artifact(reading: &ContainmentReading) -> ContainmentPr
         }
     );
 
-    let derivation = format!("{statement}; epistemicLevel={} — {level_note}", level.as_str());
+    let derivation = format!(
+        "{statement}; epistemicLevel={} — {level_note}",
+        level.as_str()
+    );
 
     ContainmentProofArtifact {
         schema_version: "0.1.0".to_string(),

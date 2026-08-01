@@ -214,8 +214,10 @@ impl EdgeWeights {
 
     /// Record (or overwrite) the weight for `edge`'s `(from, to, label)` key.
     pub fn set(&mut self, edge: &GraphEdge) {
-        self.map
-            .insert((edge.from, edge.to, edge.kind.as_label().to_string()), edge.weight);
+        self.map.insert(
+            (edge.from, edge.to, edge.kind.as_label().to_string()),
+            edge.weight,
+        );
     }
 
     /// Look up the weight for a `(from, to, label)` triple.

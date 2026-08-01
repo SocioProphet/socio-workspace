@@ -246,12 +246,7 @@ pub fn parse_source(
         .unwrap_or(file_path)
         .to_string();
     let root = tree.root_node();
-    ctx.push_cell(
-        module_iri.clone(),
-        CellKind::Module,
-        module_stem,
-        &root,
-    );
+    ctx.push_cell(module_iri.clone(), CellKind::Module, module_stem, &root);
     // A whole test file's module is itself test code.
     if file_is_test {
         ctx.test_cells.insert(module_iri.clone());
@@ -292,7 +287,10 @@ pub fn is_test_file(path: &Path, language: Language) -> bool {
         .file_name()
         .and_then(|n| n.to_str())
         .unwrap_or_default();
-    let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or_default();
+    let stem = path
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or_default();
     match language {
         Language::Rust => path
             .parent()
@@ -384,7 +382,9 @@ impl<'a> Ctx<'a> {
             let symbol = self.name_of(&node).unwrap_or_else(|| "<anon>".to_string());
             let iri = def_iri(self.language, self.file_path, &symbol);
             self.push_cell(iri.clone(), CellKind::Function, symbol.clone(), &node);
-            self.func_by_name.entry(symbol.clone()).or_insert_with(|| iri.clone());
+            self.func_by_name
+                .entry(symbol.clone())
+                .or_insert_with(|| iri.clone());
             // A function is test code if we are already in test scope, the whole
             // file is a test, its own attributes mark it (`#[test]`), or (Python)
             // its name follows the pytest/unittest convention.
@@ -405,7 +405,9 @@ impl<'a> Ctx<'a> {
             let symbol = self.name_of(&node).unwrap_or_else(|| "<anon>".to_string());
             let iri = def_iri(self.language, self.file_path, &symbol);
             self.push_cell(iri.clone(), CellKind::Class, symbol.clone(), &node);
-            self.class_by_name.entry(symbol).or_insert_with(|| iri.clone());
+            self.class_by_name
+                .entry(symbol)
+                .or_insert_with(|| iri.clone());
             self.collect_inherits(&node, &iri);
             // Methods inside become their own function cells with their own scope.
             self.walk_children(node, enclosing_fn, in_test);
@@ -421,7 +423,9 @@ impl<'a> Ctx<'a> {
         }
 
         if self.spec.is_module(kind) {
-            let symbol = self.name_of(&node).unwrap_or_else(|| "<anon-mod>".to_string());
+            let symbol = self
+                .name_of(&node)
+                .unwrap_or_else(|| "<anon-mod>".to_string());
             let iri = def_iri(self.language, self.file_path, &symbol);
             self.push_cell(iri.clone(), CellKind::Module, symbol.clone(), &node);
             // A `#[cfg(test)]` module (or one literally named `tests`) puts every
@@ -530,8 +534,7 @@ impl<'a> Ctx<'a> {
                         if k.kind() == "identifier" || k.kind() == "attribute" {
                             let name = self.node_text(&k);
                             let name = name.rsplit('.').next().unwrap_or(&name).to_string();
-                            self.pending_inherits
-                                .push((subclass_iri.to_string(), name));
+                            self.pending_inherits.push((subclass_iri.to_string(), name));
                         }
                     }
                 }
@@ -558,8 +561,7 @@ impl<'a> Ctx<'a> {
             match k.kind() {
                 "type_identifier" | "identifier" => {
                     let name = self.node_text(&k);
-                    self.pending_inherits
-                        .push((subclass_iri.to_string(), name));
+                    self.pending_inherits.push((subclass_iri.to_string(), name));
                 }
                 _ => self.collect_ts_type_identifiers(&k, subclass_iri),
             }
@@ -648,10 +650,12 @@ impl<'a> Ctx<'a> {
                 }
                 None => {
                     self.result.unresolved_inherits += 1;
-                    self.result.unresolved_inherit_sites.push(UnresolvedInherit {
-                        subclass_iri: sub_iri,
-                        base_symbol: base,
-                    });
+                    self.result
+                        .unresolved_inherit_sites
+                        .push(UnresolvedInherit {
+                            subclass_iri: sub_iri,
+                            base_symbol: base,
+                        });
                 }
             }
         }

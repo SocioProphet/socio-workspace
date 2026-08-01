@@ -31,6 +31,9 @@
 //!   [`analyze_file_with`]. This crate keeps the from-parse defaults explicit rather
 //!   than hiding them.
 
+/// The authoritative containment CLI logic (`gbrg-containment` binary).
+pub mod containment;
+
 use std::collections::{HashMap, HashSet};
 use std::io;
 use std::path::{Path, PathBuf};
@@ -92,7 +95,10 @@ pub struct AnalyzeOptions {
 
 impl Default for AnalyzeOptions {
     fn default() -> Self {
-        Self { churn: 0.0, dead: false }
+        Self {
+            churn: 0.0,
+            dead: false,
+        }
     }
 }
 
@@ -353,12 +359,14 @@ pub fn analyze_path_report(
             Some(nodes) => {
                 // Exclude the caller itself so a name that only matches self is not
                 // a spurious edge.
-                let candidates: Vec<NodeId> =
-                    nodes.iter().copied().filter(|&n| n != caller_node).collect();
+                let candidates: Vec<NodeId> = nodes
+                    .iter()
+                    .copied()
+                    .filter(|&n| n != caller_node)
+                    .collect();
                 match candidates.as_slice() {
                     [only] => {
-                        let is_test =
-                            caller_is_test || global_test_cells.contains(&caller_iri);
+                        let is_test = caller_is_test || global_test_cells.contains(&caller_iri);
                         let kind = if is_test {
                             EdgeKind::TestedBy
                         } else {
@@ -423,8 +431,8 @@ pub fn analyze_path_report(
 
     // (6) SCORE every NON-test cell, with its file's REAL churn.
     for cell in &unique_cells {
-        let is_test_cell = global_test_cells.contains(&cell.cell_id)
-            || test_file_paths.contains(&cell.file_path);
+        let is_test_cell =
+            global_test_cells.contains(&cell.cell_id) || test_file_paths.contains(&cell.file_path);
         if is_test_cell {
             report.test_cells += 1;
             continue;
@@ -492,10 +500,7 @@ fn collect_source_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
         let name = entry.file_name();
         let name = name.to_string_lossy();
         if path.is_dir() {
-            if name == "target"
-                || name == "node_modules"
-                || name.starts_with('.')
-            {
+            if name == "target" || name == "node_modules" || name.starts_with('.') {
                 continue;
             }
             collect_source_files(&path, out)?;

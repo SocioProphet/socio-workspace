@@ -38,6 +38,7 @@ use std::path::{Path, PathBuf};
 use gbrg_core::{
     cell_iri_to_node_id, churn_frequency, emit_proof_artifact, write_cell, write_edge,
     BlastRadiusProofArtifact, CellKind, EdgeKind, GraphEdge, ScoringConfig, SemanticCell,
+    WhatIfGraph,
 };
 use gbrg_parser::{is_test_file, parse_file, Language, ParseError, ParseResult};
 // `NodeId` (a `u64`) is hg_analytics' own type; gbrg-core does not re-export it.
@@ -205,6 +206,17 @@ pub struct AnalyzePathReport {
     pub tested_by_edges: usize,
     /// Files with a non-zero git churn reading (proves churn wiring is real).
     pub churn_files_nonzero: usize,
+    /// The distinct cells ingested (deduped by NodeId) — the exact node set of the
+    /// scored graph. Exposed so `what-if` can rebuild an editable copy of the SAME
+    /// graph the analyzer scored, rather than re-deriving it.
+    pub cells: Vec<SemanticCell>,
+    /// The edges actually written into the graph (both endpoints present; includes
+    /// cross-file `CALLS`/`INHERITS`/`TESTED_BY`). Pairs with [`Self::cells`] to
+    /// reconstruct the graph for `what-if`.
+    pub edges: Vec<GraphEdge>,
+    /// Per-file real git churn (commits/day), keyed by `file_path`. Lets `what-if`
+    /// hold a target cell's REAL churn constant across before/after.
+    pub churn_by_file: HashMap<String, f64>,
 }
 
 impl AnalyzePathReport {
@@ -395,9 +407,11 @@ pub fn analyze_path_report(
         }
     }
     report.cells_total = unique_cells.len();
+    let mut written_edges: Vec<GraphEdge> = Vec::with_capacity(all_edges.len());
     for edge in &all_edges {
         if written.contains(&edge.from) && written.contains(&edge.to) {
             write_edge(&mut store, edge)?;
+            written_edges.push(edge.clone());
             if edge.kind == EdgeKind::TestedBy {
                 report.tested_by_edges += 1;
             }
@@ -422,7 +436,31 @@ pub fn analyze_path_report(
     }
     report.cells_scored = report.artifacts.len();
 
+    // Expose the exact graph (nodes + written edges) and real per-file churn so
+    // `what-if` can rebuild an editable copy of the SAME graph and hold churn fixed.
+    report.cells = unique_cells;
+    report.edges = written_edges;
+    report.churn_by_file = churn_by_file;
+
     Ok(report)
+}
+
+/// Build an editable [`WhatIfGraph`] from a real source path by reusing the full
+/// analyzer pipeline ([`analyze_path_report`]): parse, cross-file resolution, and
+/// ingest. Returns the graph plus the per-file real churn map (so a caller can hold
+/// a target cell's churn constant across a what-if before/after).
+///
+/// This deliberately does NOT re-implement any graph construction — it consumes the
+/// analyzer's own resolved cells + edges, so a what-if is diffed against exactly the
+/// graph the analyzer would score.
+pub fn build_whatif_graph(
+    root: impl AsRef<Path>,
+    config: &ScoringConfig,
+    churn_window_days: u32,
+) -> Result<(WhatIfGraph, HashMap<String, f64>), AnalyzeError> {
+    let report = analyze_path_report(root, config, churn_window_days)?;
+    let churn = report.churn_by_file.clone();
+    Ok((WhatIfGraph::new(report.cells, report.edges), churn))
 }
 
 /// Per-file churn from real git history, rooted at `root`. `churn_frequency`

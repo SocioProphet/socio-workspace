@@ -1,0 +1,21 @@
+{
+  "name": "@socioprophet/gbrg-reasoning",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GBRG causal TRACK 1 — PLN probabilistic-logic risk propagation. Projects REAL gbrg-analyze ProofArtifacts + call topology onto a HellGraphStore, runs the REAL @socioprophet/hellgraph forwardChain(), and reads DERIVED transitive-risk edges with per-hop confidence decay. NOT Pearl causal inference.",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/risk_propagation.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test test/risk_propagation_test.ts"
+  },
+  "dependencies": {
+    "@socioprophet/hellgraph": "file:/Users/michaelheller/dev/hellgraph"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsx": "^4.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

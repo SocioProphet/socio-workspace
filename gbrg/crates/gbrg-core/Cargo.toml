@@ -6,17 +6,20 @@ description = "Governed Blast-Radius Graph core model over hellgraph's hg_analyt
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-# CONSUME-ONLY path dependency on hellgraph's analytics crate.
+# CONSUME-ONLY dependency on hellgraph's analytics crate (hg_analytics::graphdb).
 #
-# Points at hellgraph's still-open feat/rust-parallel-analytics branch (hellgraph#47),
-# not main -- this crate's NodeId/GraphIndex/bfs_on_csr surface hasn't landed on main yet.
-# Once that PR merges, repoint this at hellgraph/crates/hg_analytics.
+# PINNED GIT dependency -- portable: hellgraph is a PUBLIC repo, so a fresh clone
+# of GBRG builds with NO local hellgraph checkout (the previous machine-local
+# worktree path did not clone-build and failed the estate
+# `cross-repo-path-dependency-pinned` gate).
 #
-# MERGE-READY FOLLOW-UP (see docs/ADR-001): for portability this SHOULD become a
-# pinned GIT dependency, e.g.
-#   hg_analytics = { git = "https://.../hellgraph", rev = "<pinned-sha>" }
-# The path dep is the goal for THIS skeleton only (it must compile locally).
-hg_analytics = { path = "../../../../hellgraph-rust-parallel-analytics.wt/crates/hg_analytics" }
+# The graphdb module GBRG consumes (NodeId/Store/View/ShardedGraph) lives ONLY on
+# hellgraph's still-open feat/rust-parallel-analytics branch -- it has NOT landed
+# on main -- so we pin the exact branch commit, not a tag/main.
+#   branch: feat/rust-parallel-analytics   PR: SocioProphet/hellgraph#47 (OPEN)
+#   commit (rev): 6644a4adcb492a8e4bdeb6af962dd2434dbd4dd1
+# When #47 merges, repoint rev to the resulting commit on main.
+hg_analytics = { git = "https://github.com/SocioProphet/hellgraph.git", rev = "6644a4adcb492a8e4bdeb6af962dd2434dbd4dd1" }
 
 # Serialization of the BlastRadiusProofArtifact to JSON (MIT OR Apache-2.0 —
 # compatible with the estate's MIT/Apache-only build constraint).

@@ -63,6 +63,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import subprocess
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
@@ -184,6 +185,71 @@ class Decision:
         return asdict(self)
 
 
+def recompute_receipt(record: dict[str, Any]) -> str:
+    """Independently recompute a persisted decision's sha256 receipt from its core.
+
+    Rebuilds a :class:`Decision` from the raw ledger record and re-seals it with
+    the SAME canonicalization the writer used (sorted keys, ``(",", ":")``
+    separators over :meth:`Decision.core`). Used by :func:`ledger.verify_ledger`
+    to prove a governance-decision record has not been altered since it was
+    sealed — recompute != stored receipt means the record was tampered.
+    """
+    d = Decision(
+        recordType=record["recordType"],
+        schemaVersion=record["schemaVersion"],
+        agentRef=record["agentRef"],
+        action=record["action"],
+        cell_id=record["cell_id"],
+        epistemicLevel=record["epistemicLevel"],
+        proof_id=record["proof_id"],
+        verdict=record["verdict"],
+        included=record["included"],
+        reason=record["reason"],
+        priority=record["priority"],
+        content_verdict=record["content_verdict"],
+        authority_verdict=record["authority_verdict"],
+        authority_reason_code=record["authority_reason_code"],
+        decided_at=record["decided_at"],
+        authority=record.get("authority", {}),
+    )
+    canonical = json.dumps(d.core(), sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+# --------------------------------------------------------------------------- #
+# M2 — numeric artifact-field validation (never silently drop the unscorable).
+# --------------------------------------------------------------------------- #
+def _validate_blast_radius(value: Any) -> str | None:
+    """Return None if ``value`` is a finite float in [0,1]; else a reason string.
+
+    Rejects NaN, +/-inf, out-of-range, and non-numeric (bool is NOT a valid
+    blast_radius). The reason string is used to mark the decision unverifiable.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return f"blast_radius is non-numeric ({value!r})"
+    v = float(value)
+    if not math.isfinite(v):
+        return f"blast_radius is not finite ({value!r})"
+    if v < 0.0 or v > 1.0:
+        return f"blast_radius out of range [0,1] ({v!r})"
+    return None
+
+
+def _validate_dependents_count(value: Any) -> str | None:
+    """Return None if absent OR a non-negative int; else a reason string.
+
+    ``dependents_count`` is optional in a ProofArtifact, so absence is fine; a
+    present-but-malformed value (negative, non-integer, non-numeric) is not.
+    """
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int):
+        return f"dependents_count is not a non-negative int ({value!r})"
+    if value < 0:
+        return f"dependents_count is negative ({value!r})"
+    return None
+
+
 # --------------------------------------------------------------------------- #
 # 1. CONTENT proposal.
 # --------------------------------------------------------------------------- #
@@ -196,17 +262,36 @@ def decide_inclusion(proof_artifact: dict) -> Proposal:
     claim = proof_artifact.get("claim", {}) or {}
     level = claim.get("epistemicLevel", "")
     status = proof_artifact.get("status", "")
-    blast = float(proof_artifact.get("blast_radius", 0.0) or 0.0)
     tested = bool(proof_artifact.get("test_coverage_reach", False))
     generated = bool(proof_artifact.get("generated", False))
 
-    # (c) rejected / dead -> EXCLUDE regardless.
+    # (c) rejected / dead -> EXCLUDE regardless. This is a POSITIVE warrant to drop
+    # (an explicit rejected level / dead status), so it fires before the numeric
+    # validation below — a rejected cell is excluded even if its blast_radius is junk.
     if level == "rejected" or status in {"FAILED", "BLOCKED"}:
         return Proposal(
             verdict=EXCLUDE,
             priority="n/a",
             reason=f"rejected/dead cell (epistemicLevel={level!r}, status={status!r}) — no warrant to review",
         )
+
+    # M2 — validate the numeric artifact fields BEFORE they can be used to score.
+    # A review gate must never SILENTLY DROP a cell it cannot score: a NaN/inf/
+    # negative/out-of-range/non-numeric blast_radius (or a malformed dependents_count)
+    # is unverifiable evidence, not evidence of low risk. Fail TOWARD INCLUSION so the
+    # unscorable cell reaches a human reviewer instead of vanishing. (M2 deeper, a
+    # follow-on: full artifact-receipt verification before we trust ANY field.)
+    blast_raw = proof_artifact.get("blast_radius", 0.0)
+    unverifiable = _validate_blast_radius(blast_raw) or _validate_dependents_count(
+        proof_artifact.get("dependents_count")
+    )
+    if unverifiable is not None:
+        return Proposal(
+            verdict=INCLUDE,
+            priority="high",
+            reason=f"unverifiable artifact → included for review ({unverifiable})",
+        )
+    blast = float(blast_raw or 0.0)
 
     weak_evidence = (not tested) or level in {"speculative", "synthetic", "empirical"}
 

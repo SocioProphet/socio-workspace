@@ -15,6 +15,15 @@ Conformance targets (spec: /Users/michaelheller/dev/mcp-a2a-zero-trust):
   * LEDGER     — every call (allow AND refuse) emits a hash-chained ``LedgerEvent``
                  (mcp/ledger schema) via the gate's DURABLE append-only ledger
                  (``gbrg.governance.ledger.append``). No ledger event => failure.
+                 Tamper-evidence is ENFORCED, not cosmetic: the chain is anchored
+                 at ``ledger.GENESIS`` and every read path
+                 (``ledger.read_all``/``read_verified``) recomputes each event
+                 ``hash`` and walks the ``prev_hash`` chain via
+                 ``ledger.verify_ledger``, raising on the first bad hash, broken
+                 link, reorder, insertion, or deletion. RESIDUAL: a writer that
+                 rebuilds the WHOLE file as a fresh consistent chain from GENESIS
+                 verifies as internally ok — detecting that needs an out-of-band
+                 head anchor (``ledger.verify_head``).
   * REGISTRY   — the 3 tools are declared in a capability_registry.json conforming
                  to mcp/registry/capability_registry.schema.json; ``policy_hash`` on
                  every ledger event is the sha256 of that governing registry doc.
@@ -48,6 +57,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from gbrg.governance import gate, ledger  # noqa: E402  (path set above)
+from gbrg.governance.ledger import GENESIS  # noqa: E402  single source of the anchor
 
 # --------------------------------------------------------------------------- #
 # Identity (spec: TrustBoundary.spiffe_id / LedgerEvent.actor.spiffe_id).
@@ -60,7 +70,8 @@ SERVER_NAME = "gbrg-mcp"
 # (toolAccess). A suspended agent is denied on every dimension (global gate).
 TOOL_ACTION = "tool"
 
-GENESIS = "sha256:" + hashlib.sha256(b"gbrg-mcp-ledger-genesis").hexdigest()
+# GENESIS is imported from gbrg.governance.ledger (single source of truth) so the
+# writer here and the verifier there anchor the SAME chain.
 
 
 def _sha(obj: Any) -> str:
@@ -196,10 +207,19 @@ def _tool_target(name: str, registry_path: Path) -> dict[str, Any]:
 # Durable, hash-chained ledger emission (reuses gbrg.governance.ledger.append).
 # --------------------------------------------------------------------------- #
 def _prev_hash(ledger_path: Path) -> str:
+    """Next event's ``prev_hash`` = the current chain head (GENESIS if empty).
+
+    Reads through the VERIFIED path so we refuse to extend a tampered chain
+    (:class:`ledger.LedgerTamperError` propagates). L7: tolerate a mixed file by
+    reading the last record's chained ``hash`` OR (single-writer invariant aside)
+    its ``receipt``, instead of the old ``records[-1]["hash"]`` that KeyErrored on
+    a governance-decision record.
+    """
     records = ledger.read_all(ledger_path)
     if not records:
         return GENESIS
-    return records[-1]["hash"]
+    last = records[-1]
+    return last.get("hash") or last["receipt"]
 
 
 def emit_event(
@@ -351,7 +371,19 @@ def cmd_filter_include(_args: argparse.Namespace) -> int:
         data = [data]
     included: list[dict[str, Any]] = []
     for art in data:
-        proposal = gate.decide_inclusion(art)  # gate foundation's content decision
+        # M2: one malformed artifact must not abort the batch. If decide_inclusion
+        # somehow raises on a pathological cell, FAIL TOWARD INCLUSION (surface it
+        # for review) rather than silently dropping it or crashing filter-include.
+        try:
+            proposal = gate.decide_inclusion(art)  # gate foundation's content decision
+        except Exception as exc:  # noqa: BLE001  defensive: never drop-on-crash
+            enriched = dict(art) if isinstance(art, dict) else {"_raw": art}
+            enriched["_inclusion"] = {
+                "priority": "high",
+                "reason": f"unverifiable artifact → included for review (decide_inclusion error: {exc})",
+            }
+            included.append(enriched)
+            continue
         if proposal.verdict == gate.INCLUDE:
             enriched = dict(art)
             enriched["_inclusion"] = {"priority": proposal.priority, "reason": proposal.reason}

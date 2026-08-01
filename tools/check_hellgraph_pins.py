@@ -9,9 +9,13 @@ build rather than a note in a comment. Scans the repo for hellgraph consumption:
     hg_napi) MUST be a git dep pinned by `rev = "<sha>"`. A `path = …` dep (points at
     a local checkout that drifts/forks) or a git dep without `rev` (branch/tag moves)
     is a violation.
-  * JS (package.json): a `@socioprophet/hellgraph` (or "hellgraph") dep MUST be pinned
-    to a tag (`#v1.2.3`) or a commit SHA (`#<40-hex>`). A missing ref or a moving
-    branch (main/master/HEAD/develop) is a violation.
+  * JS (package.json): a `@socioprophet/hellgraph` (or "hellgraph") dep MUST be EITHER
+    a vendored tarball (`file:vendor/socioprophet-hellgraph-X.Y.Z.tgz` — the pattern
+    already used by prophet-platform's hellgraph-service/lifecycle-warden, see
+    docs/architecture/hellgraph-consumption-policy.md) OR pinned to a tag (`#v1.2.3`)
+    or a commit SHA (`#<40-hex>`) for a git-sourced dep. A bare local `file:` path
+    outside `vendor/` (drifts/forks with whatever's on that one machine), a missing
+    ref, or a moving branch (main/master/HEAD/develop) is a violation.
 
 stdlib-only. Exit 0 if clean; 1 (with the offenders) otherwise.
 """
@@ -30,6 +34,7 @@ _SHA_RE = re.compile(r'rev\s*=\s*"[0-9a-fA-F]{7,40}"')
 _JS_SHA = re.compile(r"^[0-9a-fA-F]{7,40}$")
 _JS_TAG = re.compile(r"^v?\d+\.\d+")
 _MOVING = {"main", "master", "head", "develop", "dev", ""}
+_VENDORED_TGZ = re.compile(r"^file:vendor/socioprophet-hellgraph-\d+\.\d+\.\d+\.tgz$")
 
 violations: list[str] = []
 
@@ -67,8 +72,13 @@ def check_package_json(path: Path) -> None:
         for name, val in (data.get(section) or {}).items():
             if "hellgraph" not in name.lower():
                 continue
-            if not isinstance(val, str) or "#" not in val:
-                violations.append(f"{rel}: `{name}` = {val!r} is not pinned (needs `#<tag-or-sha>`)")
+            if not isinstance(val, str):
+                violations.append(f"{rel}: `{name}` = {val!r} is not pinned (needs a vendored tarball or `#<tag-or-sha>`)")
+                continue
+            if _VENDORED_TGZ.match(val):
+                continue
+            if "#" not in val:
+                violations.append(f"{rel}: `{name}` = {val!r} is not pinned (needs `file:vendor/socioprophet-hellgraph-X.Y.Z.tgz` or `#<tag-or-sha>`)")
                 continue
             ref = val.rsplit("#", 1)[1]
             if ref.lower() in _MOVING or not (_JS_SHA.match(ref) or _JS_TAG.match(ref)):

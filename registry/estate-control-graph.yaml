@@ -184,6 +184,21 @@ lanes:
       - ops_workflows_run_from_default_branch
       - ci_secrets_minted_never_static_pat
 
+  - id: board-spec-parity
+    owner_repo: SocioProphet/sociosphere
+    required: true
+    anchors:
+      - registry/board-spec.yaml
+      - tools/check_board_spec.py
+    governs:
+      - program-board-source-of-truth
+      - github-projects-render-target
+      - sovereign-board-render-target
+    required_invariants:
+      - board_spec_is_the_source_of_truth
+      - board_spec_is_schema_validated_in_ci
+      - github_and_sovereign_are_render_targets
+
 required_edges:
   - from: agentic-pr-control
     to: diff-hygiene-gate

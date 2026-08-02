@@ -244,7 +244,10 @@ class RegistryScheduler:
         self._metrics["jobs_run"] += 1
         try:
             from automation import responder  # lazy: keeps kernel import off the hot path
-            receipts = responder.run_once()
+            # execute=True: a verified-safe auto_fix (e.g. mirror-drift re-sync) is carried
+            # out by its registered executor, which verifies the artifact and rolls back on
+            # failure. Decisions are still recorded for every beacon regardless.
+            receipts = responder.run_once(execute=True)
             if receipts:
                 logger.info("Responder decided on %d beacon(s)", len(receipts))
         except Exception as exc:

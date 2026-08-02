@@ -51,16 +51,32 @@ that pattern node: every `{repo, file, line}` element is one
 mechanical — no derivation, no join. The dataset's own `gbrg-blast-radius.jsonl`
 pre-expands `sources[]` into explicit `GraphEdge` records (one per site).
 
-### 4. Field-shape note (why this is convention, not a schema rewrite)
+### 4. `kind`-selected field set (pattern cells VALIDATE, not just parse)
 The corpus's `SemanticCell` projection is deliberately **lighter** than a code
 cell — it carries governance/curation fields (`intent`, `category`,
 `risk_class`, `redos_suspect`, `use_count`, `provider_reference`) instead of the
-code-cell fields (`language`, `file_path`, `ast_hash`, `loc_start/loc_end`). This
-ADR keeps the change **surgical**: it adds only the enum value (schema +
-`CellKind`), leaving the four code kinds and their required fields untouched.
-Reconciling the pattern projection's distinct required/optional field set into
-`semantic-cell.schema.json` (e.g. a `kind`-conditional branch) is a documented
-follow-up; it is not required for the corpus to be recognised as pattern cells.
+code-cell fields (`language`, `file_path`, `ast_hash`, `loc_start/loc_end`).
+
+`semantic-cell.schema.json` therefore makes **`kind` the discriminator**: a cell
+validates against exactly one of two closed branches under a top-level `oneOf`
+(`$defs/codeCell`, `$defs/patternCell`). Their required sets and their
+`additionalProperties:false` property sets are disjoint, so resolution is
+unambiguous:
+
+- **code branch** — `kind ∈ {function,class,import,module}`; the original
+  required set (`language`, `file_path`, `symbol_name`, `ast_hash`,
+  `loc_start`, `loc_end`) and optional `generated` — **unchanged, no
+  regression**.
+- **pattern branch** — `kind = "pattern"`; required `cell_id` (matching
+  `^rx://rx-[0-9a-f]{10}$`), `intent`, `category` (corpus enum), `risk_class`
+  (`catastrophic|sensitive|benign`), `use_count`, `provider_reference`,
+  `redos_suspect`. The dataset line discriminator `record_type: "SemanticCell"`
+  is permitted (optional) so raw `gbrg-blast-radius.jsonl` records validate
+  as-is. Code-cell fields are **rejected** on this branch.
+
+All 2308 real `SemanticCell` records in `gbrg-blast-radius.jsonl` validate
+against this schema, as does the fixture below; representative code cells still
+validate against the code branch (no regression).
 
 ## Consequences
 

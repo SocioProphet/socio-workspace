@@ -160,6 +160,17 @@ class RegistryScheduler:
             misfire_grace_time=600,
         )
 
+        # Drain the beacon inbox every minute: the reasoned responder decides
+        # fix/alert/escalate for each beacon. This is what closes the loop —
+        # observe_and_beacon fills the inbox; the responder acts on it.
+        self._scheduler.add_job(
+            self._run_responder,
+            "interval",
+            minutes=1,
+            id="responder",
+            misfire_grace_time=30,
+        )
+
     # ------------------------------------------------------------------
     # Job implementations
     # ------------------------------------------------------------------
@@ -221,6 +232,24 @@ class RegistryScheduler:
         except Exception as exc:
             self._metrics["jobs_failed"] += 1
             logger.exception("Registry rebuild failed: %s", exc)
+
+    def _run_responder(self) -> None:
+        """Drain beacons and let the reasoned responder decide on each.
+
+        The responder consumes the vendored semantic kernel (boundary -> IRI ->
+        meet(Law, Evidence) -> action) and emits decision receipts to state/decisions/.
+        Imported lazily so the scheduler still constructs when the kernel/vendor tree
+        is unavailable (the responder job simply records the failure).
+        """
+        self._metrics["jobs_run"] += 1
+        try:
+            from automation import responder  # lazy: keeps kernel import off the hot path
+            receipts = responder.run_once()
+            if receipts:
+                logger.info("Responder decided on %d beacon(s)", len(receipts))
+        except Exception as exc:
+            self._metrics["jobs_failed"] += 1
+            logger.exception("Responder run failed: %s", exc)
 
     def _run_deep_scan(self) -> None:
         if self.rate_limiter.usage_fraction() >= BACKOFF_USAGE_THRESHOLD:

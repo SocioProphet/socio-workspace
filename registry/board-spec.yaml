@@ -2,7 +2,11 @@
 # GitHub Projects + any sovereign board surface are RENDER TARGETS of this file, not the truth.
 # Reconcilers apply this spec; cutover = repoint reconciler, spec unchanged.
 version: 1
-generated: 2026-08-02
+generated: "2026-08-02"   # quoted: keep it a string across YAML parsers, not a date scalar
+# std_program_fields is the schema for PROGRAM boards only. The portfolio board
+# (see portfolio_board) is a different kind and carries Program/Lane/Risk/Warrant/Target
+# instead — its `fields` list is authoritative, not this line.
+portfolio_board: "Portfolio Roadmap"
 std_program_fields: [Status, Plane, Lane, Risk, Gate, Warrant, Tranche]  # Plane=Base-OS|Managed (base<=>managed seam)
 boards:
   - title: "Portfolio Roadmap"

@@ -164,6 +164,26 @@ lanes:
       - closed_providers_not_runtime_dependencies
       - closed_providers_not_canonical_authority
 
+  - id: git-ops-standards
+    owner_repo: SocioProphet/git-ops-standards
+    required: true
+    anchors:
+      - core/controls.yaml
+      - scripts/estate_drift_audit.py
+      - .github/workflows/pr-merge-gate.yml
+      - .github/workflows/estate-ci-health.yml
+    governs:
+      - repo-hygiene-and-naming
+      - pr-merge-readiness
+      - default-branch-ci-health
+      - operational-workflow-branch-ref
+      - ci-credential-minting
+    required_invariants:
+      - controls_cite_a_real_incident
+      - default_branch_ci_is_green
+      - ops_workflows_run_from_default_branch
+      - ci_secrets_minted_not_static_pat
+
 required_edges:
   - from: agentic-pr-control
     to: diff-hygiene-gate
@@ -186,3 +206,9 @@ required_edges:
   - from: open-office-runtime
     to: diff-hygiene-gate
     relation: must_preserve_closed_provider_quarantine
+  - from: git-ops-standards
+    to: diff-hygiene-gate
+    relation: co_gates_pre_merge_with
+  - from: git-ops-standards
+    to: fogstack-deployment-parity
+    relation: default_branch_ci_health_covers_operational_runs

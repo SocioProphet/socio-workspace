@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.ai/proof-artifact/v1.json",
+  "title": "ProofArtifact",
+  "version": "1.0.0",
+  "description": "Canonical, frozen ProofArtifact schema v1 for the SocioProphet estate. This is the SINGLE source of truth for the `epistemicLevel` enum and the proof-artifact vocabulary. Consumers (identity, SCOPE-D, GBRG blast-radius/containment, ...) MUST reference this via $ref (directly or inside an allOf) rather than copy-pasting the enum or redefining the shape. It is intentionally permissive (additionalProperties: true, required = just `status`) so every existing consumer's documents validate against the base; each consumer tightens `required` and adds its own fields in its own allOf extension. See standards-storage#97 (remediation R2). Freezes the seed deck's 'ProofArtifact schema v1 frozen at Day 90' milestone.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "status"
+  ],
+  "$defs": {
+    "epistemicLevel": {
+      "description": "Estate-canonical proof-CONFIDENCE axis, ordered strongest -> weakest. This is the ONE authoritative enum; do not re-list it elsewhere. `synthetic` means synthetic/not-real DATA and MUST NOT be overloaded to mean 'auto-generated code' (use a separate `generated` boolean for codegen). `rejected` = the claim was actively falsified.",
+      "type": "string",
+      "enum": [
+        "proved",
+        "bounded",
+        "empirical",
+        "synthetic",
+        "speculative",
+        "rejected"
+      ]
+    },
+    "status": {
+      "description": "Union of proof-outcome statuses across estate consumers. VIOLATION is the identity-domain term for a falsified invariant; FAILED/BLOCKED/BOUNDED/SYNTHETIC_ONLY are the SCOPE-D/GBRG terms. Consumers MAY narrow this enum in their own extension.",
+      "type": "string",
+      "enum": [
+        "PROVED",
+        "VIOLATION",
+        "BOUNDED",
+        "FAILED",
+        "BLOCKED",
+        "INCONCLUSIVE",
+        "SYNTHETIC_ONLY"
+      ]
+    }
+  },
+  "properties": {
+    "version": {
+      "description": "Schema-version tag a document MAY carry to self-identify against this canonical (frozen at 1.0.0).",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "schemaVersion": {
+      "description": "Legacy/compat per-domain version string (e.g. SCOPE-D '0.1.0'). Retained for backward compatibility; prefer `version`.",
+      "type": "string"
+    },
+    "proofId": {
+      "type": "string",
+      "pattern": "^proof-[a-z0-9][a-z0-9._:-]*$"
+    },
+    "claim": {
+      "description": "The claim under proof. Accepts a bare string (identity domain) or a structured claim object (SCOPE-D / GBRG). Additional claim-graph fields are permitted.",
+      "type": [
+        "string",
+        "object"
+      ],
+      "properties": {
+        "claimId": {
+          "type": "string"
+        },
+        "claimType": {
+          "type": "string"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "epistemicLevel": {
+          "$ref": "#/$defs/epistemicLevel"
+        }
+      }
+    },
+    "claimType": {
+      "description": "Flattened claim type (containment domain uses top-level claimType rather than a nested claim object).",
+      "type": "string"
+    },
+    "statement": {
+      "description": "Flattened claim statement (containment domain).",
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "$ref": "#/$defs/status"
+    },
+    "epistemicLevel": {
+      "$ref": "#/$defs/epistemicLevel"
+    },
+    "evidenceRefs": {
+      "description": "The evidence set backing this proof (references into the evidence plane).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "targetRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "identityRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "eventRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "domains": {
+      "description": "Abstract/analysis domains touched. Permissive at the canonical layer; consumers MAY constrain the item enum in their extension.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "invariants": {
+      "description": "Claim-graph: named invariants and their pass/fail results.",
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "inputs": {
+      "type": "object"
+    },
+    "diagnostics": {
+      "type": "object"
+    },
+    "witness": {
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    },
+    "witnesses": {
+      "type": "object"
+    },
+    "provenance": {
+      "description": "Producer + integrity metadata for the artifact.",
+      "type": "object",
+      "properties": {
+        "producer": {
+          "type": "string"
+        },
+        "toolVersion": {
+          "type": "string"
+        },
+        "sourceRef": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        }
+      }
+    },
+    "signature": {
+      "description": "Optional detached/embedded cryptographic signature over the artifact (forward-compat; not all consumers sign today).",
+      "type": [
+        "object",
+        "string"
+      ]
+    },
+    "replayHandle": {
+      "description": "Optional handle that lets a verifier deterministically re-run the derivation that produced this artifact (forward-compat).",
+      "type": [
+        "object",
+        "string"
+      ]
+    },
+    "derivation": {
+      "description": "Human-readable explanation of WHY this artifact holds.",
+      "type": "string",
+      "minLength": 1
+    },
+    "declaredBy": {
+      "description": "Producing agent identity (camelCase form).",
+      "type": "string"
+    },
+    "declared_by": {
+      "description": "Producing agent identity (snake_case form, GBRG blast-radius).",
+      "type": "string"
+    },
+    "generated": {
+      "description": "True if the underlying subject is machine-generated (codegen). Kept SEPARATE from epistemicLevel 'synthetic' on purpose.",
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

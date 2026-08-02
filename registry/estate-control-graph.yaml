@@ -199,6 +199,27 @@ lanes:
       - board_spec_is_schema_validated_in_ci
       - github_and_sovereign_are_render_targets
 
+  - id: consent-plane
+    owner_repo: SocioProphet/socioprophet-agent-standards
+    required: true
+    anchors:
+      - docs/standards/consent-plane/001-purpose-bound-tool-use-and-agent-roles.md
+      - standards/consent-plane/agent-roles_v1.yaml
+      - standards/consent-plane/surfaces_v1.yaml
+      - standards/consent-plane/spaces_v1.yaml
+      - standards/consent-plane/tool-purpose-bindings_v1.yaml
+    governs:
+      - purpose-bound-tool-use
+      - surface-envelope-containment
+      - isolation-space-taints-tolerations
+      - consent-per-purpose
+    required_invariants:
+      - tool_call_declares_a_purpose_or_is_denied
+      - surface_cap_wins_over_role
+      - space_admission_requires_toleration
+      - consent_is_per_purpose_and_revocable
+      - every_decision_emits_a_receipt
+
 required_edges:
   - from: agentic-pr-control
     to: diff-hygiene-gate

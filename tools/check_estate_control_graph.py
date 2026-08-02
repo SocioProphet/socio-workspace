@@ -23,6 +23,7 @@ REQUIRED_LANES = {
     "open-office-runtime",
     "git-ops-standards",
     "board-spec-parity",
+    "consent-plane",
 }
 
 REQUIRED_EDGES = {

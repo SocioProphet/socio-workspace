@@ -21,6 +21,7 @@ REQUIRED_LANES = {
     "michael-machine-science",
     "lattice-gaia-runtime-governance",
     "open-office-runtime",
+    "git-ops-standards",
 }
 
 REQUIRED_EDGES = {

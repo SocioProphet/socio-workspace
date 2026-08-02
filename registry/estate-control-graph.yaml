@@ -182,7 +182,7 @@ lanes:
       - controls_cite_a_real_incident
       - default_branch_ci_is_green
       - ops_workflows_run_from_default_branch
-      - ci_secrets_minted_not_static_pat
+      - ci_secrets_minted_never_static_pat
 
 required_edges:
   - from: agentic-pr-control

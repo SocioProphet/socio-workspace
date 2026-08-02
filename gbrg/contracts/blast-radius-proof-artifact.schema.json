@@ -3,7 +3,7 @@
   "$id": "https://socioprophet.org/schemas/gbrg/blast-radius-proof-artifact.schema.json",
   "title": "GBRG Blast-Radius Proof Artifact",
   "description": "Extends the canonical ProofArtifact with blast-radius fields. Every GBRG MCP tool returns this object (never a bare float).",
-  "$comment": "Converged onto the estate-canonical ProofArtifact v1 (standards-storage#97, remediation R2): binds via allOf to https://schemas.socioprophet.ai/proof-artifact/v1.json and $refs its epistemicLevel enum from $defs instead of copy-pasting it. The canonical is sovereign-vendored at contracts/vendor/proof-artifact/proof-artifact.schema.v1.json. `synthetic` (proof-confidence over DATA) stays distinct from the separate top-level `generated` boolean (codegen); see the `generated` $comment and docs/ADR-001.",
+  "$comment": "Converged onto the estate-canonical ProofArtifact v1 (standards-storage#97, remediation R2): binds via allOf to https://schemas.socioprophet.ai/proof-artifact/v1.json and $refs its epistemicLevel enum from $defs instead of copy-pasting it. The canonical is sovereign-vendored at contracts/vendor/proof-artifact/proof-artifact.schema.v1.json. `synthetic` (proof-confidence over DATA) stays distinct from the separate top-level `generated` boolean (codegen); see the `generated` $comment and docs/ADR-001-gbrg-architecture.md.",
   "allOf": [
     { "$ref": "https://schemas.socioprophet.ai/proof-artifact/v1.json" },
     {
@@ -58,7 +58,7 @@
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "$comment": "Numeric scale is a 0.0-1.0 FLOAT so it can feed SCOPE-D's computeRiskScore directly. See docs/ADR-001."
+          "$comment": "Numeric scale is a 0.0-1.0 FLOAT so it can feed SCOPE-D's computeRiskScore directly. See docs/ADR-001-gbrg-architecture.md."
         },
         "derivation": {
           "type": "string",
@@ -72,7 +72,7 @@
         },
         "generated": {
           "type": "boolean",
-          "$comment": "True if the underlying cell is machine-generated (codegen). Kept SEPARATE from epistemicLevel 'synthetic' on purpose — see the canonical epistemicLevel $defs and docs/ADR-001."
+          "$comment": "True if the underlying cell is machine-generated (codegen). Kept SEPARATE from epistemicLevel 'synthetic' on purpose — see the canonical epistemicLevel $defs and docs/ADR-001-gbrg-architecture.md."
         }
       }
     }

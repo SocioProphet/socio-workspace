@@ -51,6 +51,16 @@ that pattern node: every `{repo, file, line}` element is one
 mechanical — no derivation, no join. The dataset's own `gbrg-blast-radius.jsonl`
 pre-expands `sources[]` into explicit `GraphEdge` records (one per site).
 
+Each such record carries two projection-envelope fields beyond the core edge
+triple: `record_type: "GraphEdge"` (the jsonl line-type discriminator) and
+`line` (the usage site's source line, from `sources[].line`; the same pattern
+used on N lines yields N edges). To let raw dataset edges validate as-is,
+`graph-edge.schema.json` accepts both **additively and optionally** — mirroring
+the optional `record_type` on the pattern SemanticCell branch (§4). The core
+contract is unchanged: `from`/`to`/`kind` stay required, `weight` optional, and a
+native GBRG edge without the envelope fields still validates. All 3852 real
+`GraphEdge` records in `gbrg-blast-radius.jsonl` validate against the schema.
+
 ### 4. `kind`-selected field set (pattern cells VALIDATE, not just parse)
 The corpus's `SemanticCell` projection is deliberately **lighter** than a code
 cell — it carries governance/curation fields (`intent`, `category`,

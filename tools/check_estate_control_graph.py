@@ -22,6 +22,7 @@ REQUIRED_LANES = {
     "lattice-gaia-runtime-governance",
     "open-office-runtime",
     "git-ops-standards",
+    "board-spec-parity",
 }
 
 REQUIRED_EDGES = {

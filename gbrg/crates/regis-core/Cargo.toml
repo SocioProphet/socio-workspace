@@ -1,0 +1,23 @@
+# regis-core — Regis Entity Graph core, on the SAME substrate as gbrg-core.
+#
+# The Regis↔GBRG reconciliation is HYBRID: one engine, two contract families.
+# regis-core reuses hellgraph's graphdb (via hg_analytics) and shares gbrg-core's
+# SCOPE-D `EpistemicLevel` — the "one proof ancestor" — while keeping Regis's own
+# node/edge/decision model for entity resolution (vs GBRG's code blast-radius model).
+#
+# ONE GRAPH: hg_analytics is the SAME pinned git dep as gbrg-core (SocioProphet/
+# hellgraph @ 6644a4ad) — no local path deps, no divergent checkouts.
+[package]
+name = "regis-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Regis Entity Graph core — explainable, policy-vetoed entity resolution over hellgraph's graphdb, sharing GBRG's substrate + SCOPE-D EpistemicLevel."
+
+[dependencies]
+# The ONE canonical hellgraph, pinned to the exact rev gbrg-core uses (consume-only).
+hg_analytics = { git = "https://github.com/SocioProphet/hellgraph.git", rev = "6644a4adcb492a8e4bdeb6af962dd2434dbd4dd1" }
+# share the SCOPE-D EpistemicLevel enum (the one proof ancestor)
+gbrg-core = { path = "../gbrg-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

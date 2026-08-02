@@ -1,0 +1,16 @@
+# One graph, not many divergent branches with discontinuity — enforced.
+# Runs the repo guard that forbids unpinned/path/local hellgraph dependencies
+# (Rust: git dep pinned by rev; JS: vendored tarball or #tag/#sha). See
+# docs/architecture/hellgraph-consumption-policy.md.
+name: hellgraph-pins
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  hellgraph-pins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every hellgraph dependency is pinned to the ONE canonical graph
+        run: python3 tools/check_hellgraph_pins.py

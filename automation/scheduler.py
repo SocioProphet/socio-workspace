@@ -11,6 +11,8 @@ Jobs
 
 import logging
 import os
+import signal
+import threading
 import time
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Optional
@@ -27,6 +29,8 @@ except ImportError:  # pragma: no cover
     BackgroundScheduler = None  # type: ignore[assignment,misc]
 
 from automation.rate_limiter import RateLimiter
+from automation.durable_queue import DurableQueue, state_dir
+from automation import liveness
 
 # API call cost estimates
 COST_REGISTRY_REBUILD = 200
@@ -156,6 +160,17 @@ class RegistryScheduler:
             misfire_grace_time=600,
         )
 
+        # Drain the beacon inbox every minute: the reasoned responder decides
+        # fix/alert/escalate for each beacon. This is what closes the loop —
+        # observe_and_beacon fills the inbox; the responder acts on it.
+        self._scheduler.add_job(
+            self._run_responder,
+            "interval",
+            minutes=1,
+            id="responder",
+            misfire_grace_time=30,
+        )
+
     # ------------------------------------------------------------------
     # Job implementations
     # ------------------------------------------------------------------
@@ -218,6 +233,24 @@ class RegistryScheduler:
             self._metrics["jobs_failed"] += 1
             logger.exception("Registry rebuild failed: %s", exc)
 
+    def _run_responder(self) -> None:
+        """Drain beacons and let the reasoned responder decide on each.
+
+        The responder consumes the vendored semantic kernel (boundary -> IRI ->
+        meet(Law, Evidence) -> action) and emits decision receipts to state/decisions/.
+        Imported lazily so the scheduler still constructs when the kernel/vendor tree
+        is unavailable (the responder job simply records the failure).
+        """
+        self._metrics["jobs_run"] += 1
+        try:
+            from automation import responder  # lazy: keeps kernel import off the hot path
+            receipts = responder.run_once()
+            if receipts:
+                logger.info("Responder decided on %d beacon(s)", len(receipts))
+        except Exception as exc:
+            self._metrics["jobs_failed"] += 1
+            logger.exception("Responder run failed: %s", exc)
+
     def _run_deep_scan(self) -> None:
         if self.rate_limiter.usage_fraction() >= BACKOFF_USAGE_THRESHOLD:
             logger.warning("Skipping deep scan: API usage > 80%%")
@@ -274,3 +307,92 @@ class RegistryScheduler:
     @staticmethod
     def _default_deep_scan() -> None:
         logger.info("[stub] Deep scan job ran")
+
+
+# ----------------------------------------------------------------------------
+# Honest default handler + beacon sink
+# ----------------------------------------------------------------------------
+
+def _beacon_inbox() -> DurableQueue:
+    """The responder inbox: structured beacons a reasoned responder will consume."""
+    return DurableQueue(state_dir() / "beacons")
+
+
+def observe_and_beacon(event: dict) -> None:
+    """Default event handler for the running daemon.
+
+    OBSERVES a drained event and emits a structured beacon to the responder inbox.
+    It deliberately takes NO world-remediating action: choosing fix vs. alert vs.
+    escalate is the job of a reasoned responder (not wired in this change), so the
+    honest default is to record and beacon, never to silently act or to pretend a
+    simulation was a fix.
+    """
+    beacon = {
+        "kind": "event_observed",
+        "event": event,
+        "observed_at": datetime.now(timezone.utc).isoformat(),
+        "decision": "deferred: no reasoned responder wired yet",
+    }
+    _beacon_inbox().put(beacon)
+    logger.info("Observed event; emitted beacon (repo=%s)", event.get("repo", "?"))
+
+
+# ----------------------------------------------------------------------------
+# Daemon entrypoint — what `python -m automation.scheduler` now actually runs
+# ----------------------------------------------------------------------------
+
+def build_scheduler(event_queue=None, propagation_handler: Optional[Callable] = None) -> "RegistryScheduler":
+    """Construct a fully wired RegistryScheduler for the daemon.
+
+    Uses the durable cross-process queue (so events enqueued by the webhook process
+    are actually drained here) and the observe-and-beacon handler by default.
+    """
+    return RegistryScheduler(
+        rate_limiter=RateLimiter(),
+        event_queue=event_queue if event_queue is not None else DurableQueue(),
+        propagation_handler=propagation_handler or observe_and_beacon,
+    )
+
+
+def run(heartbeat_interval: float = 30.0) -> None:
+    """Start the scheduler and block, emitting a heartbeat each tick.
+
+    This function was missing entirely: `python -m automation.scheduler` imported the
+    module and exited, so the scheduler never ran (metrics recorded runs_total: 0).
+    It now starts the background scheduler, writes a fresh heartbeat that
+    `automation.healthz` checks, and shuts down cleanly on SIGTERM/SIGINT.
+    """
+    logging.basicConfig(
+        level=os.environ.get("LOG_LEVEL", "INFO"),
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    )
+    interval = float(os.environ.get("SOCIOSPHERE_HEARTBEAT_INTERVAL", heartbeat_interval))
+
+    scheduler = build_scheduler()
+    scheduler.start()
+    liveness.beat()  # first heartbeat before we start waiting
+    logger.info("Scheduler daemon started (heartbeat every %.0fs)", interval)
+
+    stop = threading.Event()
+
+    def _handle_signal(signum, _frame) -> None:
+        logger.info("Received signal %s; shutting down", signum)
+        stop.set()
+
+    signal.signal(signal.SIGTERM, _handle_signal)
+    signal.signal(signal.SIGINT, _handle_signal)
+
+    try:
+        while not stop.wait(interval):
+            liveness.beat()
+    finally:
+        scheduler.shutdown(wait=True)
+        logger.info("Scheduler daemon stopped")
+
+
+def main() -> None:
+    run()
+
+
+if __name__ == "__main__":
+    main()

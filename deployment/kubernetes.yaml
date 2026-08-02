@@ -175,6 +175,14 @@ spec:
                 secretKeyRef:
                   name: github-secrets
                   key: github-token
+            # Heartbeat + beacons on the scheduler's own PVC so the liveness probe
+            # can read a fresh heartbeat in-pod.
+            - name: SOCIOSPHERE_STATE_DIR
+              value: /app/jobstore/state
+            # NOTE: the event QUEUE must be shared with the webhook pod for events
+            # to actually flow. That requires an RWX PersistentVolume mounted at the
+            # same path in both Deployments, or a Redis-backed queue backend —
+            # neither is wired here. This change fixes the daemon + honest liveness.
           resources:
             requests:
               cpu: "500m"
@@ -182,9 +190,12 @@ spec:
             limits:
               cpu: "2000m"
               memory: "4Gi"
+          # Honest liveness: fails when the daemon stops writing its heartbeat.
+          # Replaces `python -c "import automation.scheduler; print('ok')"`, which
+          # passed whenever the module merely imported (green health, dead daemon).
           livenessProbe:
             exec:
-              command: ["python", "-c", "import automation.scheduler; print('ok')"]
+              command: ["python", "-m", "automation.healthz"]
             initialDelaySeconds: 30
             periodSeconds: 60
           volumeMounts:

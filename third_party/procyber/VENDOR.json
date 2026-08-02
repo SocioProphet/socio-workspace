@@ -1,0 +1,16 @@
+{
+  "source_repo": "SocioProphet/ProCybernetica",
+  "source_path": "procyber/semantic",
+  "source_commit": "3d05a3c",
+  "spec_version": "0.2.0",
+  "files": {
+    "__init__.py": "cf7d03262dbff41da8dd32f1c2a26af245bcf079b7af85977083dae1f9bbcae9",
+    "abstraction_level_gate.py": "6f8b1dfc54cfd977e2e650dbb41cbc4da216c72159aa1ff9ca6b7041467b227e",
+    "agent_coordinate_vector.py": "13656fda9772ce4d798e75308e83b9f000aa651734d03da6b024f6ed816f9718",
+    "boundary_transition_actants.py": "1d98ae84c4efb46c539fc8385ce7832d86a4a98a845565b059fe4ee93af2bc3d",
+    "check_cleanroom.py": "b6009b7a9154954c291592fc211c8dfef2ef627a93e9cd5c4cd34473b4640f57",
+    "intent_address.py": "8d5280942283f20f37cc9ad24ea5cc1ad53aaec3cb9f13308f474a280fa9a53b",
+    "semantic_algebra.py": "c3cdc56dab4cb5edc4a65b5e139a1f022c0c2a40a1efe6886b69a5ff919c0068",
+    "spectral_grounding.py": "f58b7d489e93bb5010b3d341038db3a1b9531f6f6b9e37889e776e84ab338387"
+  }
+}

@@ -37,15 +37,31 @@ def _load(path: Path):
 def is_in_sync(registry_path: Path, status_path: Path) -> bool:
     """True iff the derived artifact equals build_payload(registry) — the drift invariant.
 
-    Raises if the registry (source of truth) cannot be read/derived: an unreadable source
-    is not "in sync", it is un-assessable, and callers must treat that as refuse-to-act.
+    Raises if the registry (source of truth) cannot be read or does not parse to a
+    MAPPING: a registry that decodes to a non-mapping (e.g. YAML ``[]`` or a bare
+    scalar) is un-assessable, not empty — treating it as ``{}`` would let a corrupted
+    source silently overwrite a good artifact, so callers must refuse to act.
+
+    A missing, unreadable, or non-mapping STATUS artifact simply means "out of sync"
+    (return False): the artifact is derived, so it is safe to regenerate it from the
+    readable source of truth rather than abort on a broken derivative.
     """
     status_path = Path(status_path)
     if not status_path.exists():
         return False
-    registry = _load(registry_path) or {}
+    registry = _load(registry_path)
+    if not isinstance(registry, dict):
+        raise ValueError(
+            f"registry {registry_path} did not parse to a mapping "
+            f"(got {type(registry).__name__}) — un-assessable, refusing to act"
+        )
     expected = build_payload(registry)  # raises on malformed registry
-    current = _load(status_path) or {}
+    try:
+        current = _load(status_path)
+    except Exception:
+        return False  # unreadable status ⇒ out of sync; regenerate from the source of truth
+    if not isinstance(current, dict):
+        return False  # non-mapping status ⇒ out of sync
     return current == expected
 
 

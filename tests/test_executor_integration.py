@@ -135,6 +135,36 @@ def test_resync_aborts_on_non_mapping_registry(files):
     assert status.read_text("utf-8") == good
 
 
+def test_resync_aborts_on_falsey_non_mapping_registry(files):
+    # A registry that decodes to a FALSEY non-mapping (YAML `[]`) must be treated as
+    # un-assessable, not as an empty mapping — otherwise a corrupted source could
+    # silently overwrite a good artifact. This is the case the old `_load() or {}` masked.
+    reg, status = files
+    good = _correct_status_text(reg)
+    _write(status, good)
+    _write(reg, "[]\n")
+
+    result = executors.resync_mirror_drift(registry_path=reg, status_path=status)
+
+    assert result["healed"] is False
+    assert result["action_taken"] == "abort"
+    assert status.read_text("utf-8") == good  # good artifact preserved
+
+
+def test_resync_regenerates_when_status_is_unreadable(files):
+    # The registry is readable (source of truth intact) but the DERIVED status
+    # artifact is corrupt YAML — that just means out of sync, so regenerate it.
+    reg, status = files
+    _write(status, "this: : : is not valid yaml\n  - broken")
+
+    assert executors.is_in_sync(reg, status) is False
+    result = executors.resync_mirror_drift(registry_path=reg, status_path=status)
+
+    assert result["healed"] is True
+    assert result["action_taken"] == "regenerated"
+    assert executors.is_in_sync(reg, status)
+
+
 def test_verification_failure_after_write_rolls_back(files, monkeypatch):
     """If regeneration writes but the post-write verification fails, restore the prior file.
 

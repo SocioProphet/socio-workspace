@@ -2,76 +2,79 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://socioprophet.org/schemas/gbrg/blast-radius-proof-artifact.schema.json",
   "title": "GBRG Blast-Radius Proof Artifact",
-  "description": "Extends SCOPE-D's ProofArtifact with blast-radius fields. Every GBRG MCP tool returns this object (never a bare float).",
-  "$comment": "EXTENDS SCOPE-D ProofArtifact. Source: /Users/michaelheller/dev/SCOPE-D/config/schemas/proof-artifact.schema.json ($id https://socioprophet.org/schemas/scope-d-proof-artifact.schema.json). The `epistemicLevel` enum below is inherited VERBATIM from that source.",
-  "type": "object",
-  "required": [
-    "schemaVersion",
-    "proofId",
-    "claim",
-    "status",
-    "dependents_count",
-    "test_coverage_reach",
-    "churn_frequency",
-    "blast_radius",
-    "derivation",
-    "declared_by",
-    "generated"
-  ],
-  "properties": {
-    "schemaVersion": { "type": "string" },
-    "proofId": { "type": "string", "pattern": "^proof-[a-z0-9][a-z0-9._:-]*$" },
-    "claim": {
+  "description": "Extends the canonical ProofArtifact with blast-radius fields. Every GBRG MCP tool returns this object (never a bare float).",
+  "$comment": "Converged onto the estate-canonical ProofArtifact v1 (standards-storage#97, remediation R2): binds via allOf to https://schemas.socioprophet.ai/proof-artifact/v1.json and $refs its epistemicLevel enum from $defs instead of copy-pasting it. The canonical is sovereign-vendored at contracts/vendor/proof-artifact/proof-artifact.schema.v1.json. `synthetic` (proof-confidence over DATA) stays distinct from the separate top-level `generated` boolean (codegen); see the `generated` $comment and docs/ADR-001-gbrg-architecture.md.",
+  "allOf": [
+    { "$ref": "https://schemas.socioprophet.ai/proof-artifact/v1.json" },
+    {
       "type": "object",
-      "required": ["claimId", "claimType", "statement"],
+      "required": [
+        "schemaVersion",
+        "proofId",
+        "claim",
+        "status",
+        "dependents_count",
+        "test_coverage_reach",
+        "churn_frequency",
+        "blast_radius",
+        "derivation",
+        "declared_by",
+        "generated"
+      ],
       "properties": {
-        "claimId": { "type": "string" },
-        "claimType": { "type": "string" },
-        "statement": { "type": "string", "minLength": 1 },
-        "epistemicLevel": {
+        "schemaVersion": { "type": "string" },
+        "proofId": { "type": "string", "pattern": "^proof-[a-z0-9][a-z0-9._:-]*$" },
+        "claim": {
+          "type": "object",
+          "required": ["claimId", "claimType", "statement"],
+          "properties": {
+            "claimId": { "type": "string" },
+            "claimType": { "type": "string" },
+            "statement": { "type": "string", "minLength": 1 },
+            "epistemicLevel": {
+              "$ref": "https://schemas.socioprophet.ai/proof-artifact/v1.json#/$defs/epistemicLevel"
+            }
+          }
+        },
+        "status": {
           "type": "string",
-          "enum": ["proved", "bounded", "empirical", "synthetic", "speculative", "rejected"],
-          "$comment": "Inherited VERBATIM from SCOPE-D proof-artifact.schema.json. CRITICAL: 'synthetic' means synthetic/not-real DATA. It MUST NOT be redefined or overloaded to mean 'auto-generated code' — codegen/auto-generated cells are marked by the separate top-level `generated` boolean, NOT by this level."
+          "enum": ["PROVED", "BOUNDED", "FAILED", "BLOCKED", "INCONCLUSIVE", "SYNTHETIC_ONLY"]
+        },
+        "dependents_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Direct dependents = in-degree of the cell in the frozen index."
+        },
+        "test_coverage_reach": {
+          "type": "boolean",
+          "description": "True if at least one test reaches this cell (incoming TESTED_BY edge)."
+        },
+        "churn_frequency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Historical change frequency of the cell (unnormalised count/rate)."
+        },
+        "blast_radius": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "$comment": "Numeric scale is a 0.0-1.0 FLOAT so it can feed SCOPE-D's computeRiskScore directly. See docs/ADR-001-gbrg-architecture.md."
+        },
+        "derivation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable explanation of WHY this artifact holds (which cells/edges/tests were considered)."
+        },
+        "declared_by": {
+          "type": "string",
+          "pattern": "^agent-registry://",
+          "description": "Producing agent identity, resolvable in the agent-registry."
+        },
+        "generated": {
+          "type": "boolean",
+          "$comment": "True if the underlying cell is machine-generated (codegen). Kept SEPARATE from epistemicLevel 'synthetic' on purpose — see the canonical epistemicLevel $defs and docs/ADR-001-gbrg-architecture.md."
         }
       }
-    },
-    "status": {
-      "type": "string",
-      "enum": ["PROVED", "BOUNDED", "FAILED", "BLOCKED", "INCONCLUSIVE", "SYNTHETIC_ONLY"]
-    },
-    "dependents_count": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Direct dependents = in-degree of the cell in the frozen index."
-    },
-    "test_coverage_reach": {
-      "type": "boolean",
-      "description": "True if at least one test reaches this cell (incoming TESTED_BY edge)."
-    },
-    "churn_frequency": {
-      "type": "number",
-      "minimum": 0,
-      "description": "Historical change frequency of the cell (unnormalised count/rate)."
-    },
-    "blast_radius": {
-      "type": "number",
-      "minimum": 0.0,
-      "maximum": 1.0,
-      "$comment": "Numeric scale is a 0.0-1.0 FLOAT so it can feed SCOPE-D's computeRiskScore directly. See docs/ADR-001."
-    },
-    "derivation": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Human-readable explanation of WHY this artifact holds (which cells/edges/tests were considered)."
-    },
-    "declared_by": {
-      "type": "string",
-      "pattern": "^agent-registry://",
-      "description": "Producing agent identity, resolvable in the agent-registry."
-    },
-    "generated": {
-      "type": "boolean",
-      "$comment": "True if the underlying cell is machine-generated (codegen). Kept SEPARATE from epistemicLevel 'synthetic' on purpose — see the epistemicLevel $comment and docs/ADR-001."
     }
-  }
+  ]
 }

@@ -65,6 +65,12 @@ VERDICT_ACTION: Dict[str, str] = {
 
 IRI_BLOCK = 0.55  # Boundary SPEC block threshold
 
+# (failure class, decided action) -> executor function name in automation.executors.
+# Only wired for verified-safe, idempotent, roll-back-capable remediations.
+EXECUTORS = {
+    ("mirror_drift", "auto_fix"): "resync_mirror_drift",
+}
+
 
 def evidence_verdict(beacon: dict) -> Optional[str]:
     """Map the beacon's warrant strength to a verdict ceiling; None means no evidence."""
@@ -135,9 +141,39 @@ def decide(beacon: dict) -> dict:
                     reason=f"meet(law={law}, evidence={ev})={verdict}; IRI={iri:.2f}")
 
 
+def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> None:
+    """Carry out a decided action via a registered executor, recording the outcome.
+
+    Attaches `receipt["execution"]`. If the executor cannot VERIFY a fix (healed is False),
+    the decision is downgraded to a human escalation — an unverified fix is not a fix.
+    """
+    key = (beacon.get("kind_class"), receipt.get("action"))
+    fn_name = EXECUTORS.get(key)
+    if not fn_name:
+        return
+    from automation import executors  # lazy: keeps yaml/engine import off the decision path
+    fn = getattr(executors, fn_name)
+    try:
+        outcome = fn(**(executor_paths or {}))
+    except Exception as exc:  # pragma: no cover - defensive
+        outcome = {"executor": fn_name, "healed": False, "error": str(exc)}
+    receipt["execution"] = outcome
+    if not outcome.get("healed"):
+        receipt["action"] = "escalate_human"
+        receipt["reason"] = f"{receipt.get('reason', '')} | executor '{fn_name}' did not verify a fix"
+
+
 def run_once(inbox: Optional[DurableQueue] = None,
-             decisions: Optional[DurableQueue] = None) -> List[dict]:
-    """Drain the beacon inbox, decide each, emit decision receipts. Returns the receipts."""
+             decisions: Optional[DurableQueue] = None,
+             *,
+             execute: bool = False,
+             executor_paths: Optional[dict] = None) -> List[dict]:
+    """Drain the beacon inbox, decide each, emit decision receipts. Returns the receipts.
+
+    With ``execute=True`` a decided auto_fix is carried out by its registered executor
+    (verify-and-rollback); the daemon opts in, while pure decision paths stay side-effect
+    free. ``executor_paths`` is forwarded to the executor (used by tests to target tmp dirs).
+    """
     inbox = inbox if inbox is not None else DurableQueue(state_dir() / "beacons")
     decisions = decisions if decisions is not None else DurableQueue(state_dir() / "decisions")
     out: List[dict] = []
@@ -147,6 +183,8 @@ def run_once(inbox: Optional[DurableQueue] = None,
         except Exception:
             break
         receipt = decide(beacon)
+        if execute:
+            _execute(beacon, receipt, executor_paths)
         decisions.put(receipt)
         out.append(receipt)
     return out

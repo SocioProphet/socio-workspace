@@ -29,6 +29,9 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | Verdict = kernel `meet(Law, Evidence)` | ✅ | ✅ delegated, not reimplemented | ✅ equals kernel meet | ✅ | `test_verdict_is_the_vendored_kernel_meet` |
 | End-to-end inbox→responder→kernel→decisions | ✅ | ✅ | ✅ | ✅ | `test_end_to_end_inbox_to_decisions` |
 | Responder canary (guaranteed in → provable verdict) | ✅ | ✅ | ✅ | ✅ | `test_canary_guaranteed_input…` |
+| **Mirror-drift executor** (`executors.resync_mirror_drift`) | ✅ | ✅ scheduler runs `run_once(execute=True)` | ✅ heal **and** abort | ✅ | `tests/test_executor_integration.py` |
+| Verify-the-artifact + rollback (executor) | ✅ | ✅ | ✅ corrupt source → good artifact preserved | ✅ | `test_resync_aborts_and_preserves…`, `test_verification_failure_after_write_rolls_back` |
+| Live break→heal / break→abort | ✅ | ✅ | ✅ | ✅ | `test_resync_heals_drifted…`, `test_run_once_execute_escalates_when_executor_cannot_heal` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 

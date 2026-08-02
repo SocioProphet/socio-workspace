@@ -2,7 +2,7 @@
 @prefix repo: <https://github.com/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-repo:SocioProphet/ontogenesis
+<https://github.com/SocioProphet/ontogenesis>
   a nrg:RepositoryGraphFixture ;
   nrg:fixtureId "diagnostic.stale-pin" ;
   nrg:expectedResult "diagnostic_finding_only" ;

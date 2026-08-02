@@ -179,33 +179,36 @@ def _assert_all(results: dict, ledger_path: Path) -> list[str]:
 # --------------------------------------------------------------------------- #
 # pytest entry point.
 # --------------------------------------------------------------------------- #
-# A deny whose reason is that authority could not be RESOLVED (the external
-# authorize.py subprocess failed / timed out / produced no payload, or
-# agent-registry is not present) is an INFRASTRUCTURE failure, not a
-# governance-logic regression. The gate correctly fail-closes to deny in that
-# case, but this "fires both ways" test cannot exercise the ALLOW path without a
-# working authority resolver, so it must SKIP rather than report a false failure
-# (which is what made it flaky in the full CI suite). A real logic regression
-# (authorize.py runs and returns the wrong verdict) carries a non-infra reason
-# code and still FAILS. See gate.authorize_inclusion fail-closed reason codes.
-_INFRA_REASON_CODES = {"authorize_invocation_failed", "no_decision_payload"}
+# This test verifies the GATE'S logic — that it MEETs content+authority, seals,
+# persists, and fires BOTH ways (allow->INCLUDE, deny->EXCLUDE). That logic must
+# be tested with DETERMINISTIC authority inputs. Driving it through the live
+# external authorize.py subprocess made it flaky: under the full CI suite that
+# subprocess intermittently resolved ACTIVE_STATE to `deny` (external/global
+# state the suite pollutes), so a gate-logic test false-failed on an authority-
+# resolution problem it does not own. The authority RESOLUTION wiring (the real
+# subprocess) is a separate concern, exercised by the __main__ script path below.
+def _deterministic_authority(*, state_file, status=None, agent_ref=None, **_kw):
+    """Hermetic stand-in for gate.authorize_inclusion, keyed on the state file:
+    ACTIVE -> allow; SUSPENDED/ABSENT -> fail-closed deny. No subprocess, no
+    shared state -> no pollution."""
+    sf = str(state_file)
+    if sf == str(ACTIVE_STATE):
+        return "allow", {"verdict": "allow", "reason_code": "authority_active", "receipt_hash": None}
+    reason = "authority_status_suspended" if sf == str(SUSPENDED_STATE) else "state_unavailable"
+    return "deny", {"verdict": "deny", "reason_code": reason, "receipt_hash": None}
 
 
 def test_gate_fires_both_ways() -> None:
-    with tempfile.TemporaryDirectory() as tmp:
-        ledger_path = Path(tmp) / "decisions.jsonl"
-        results = run_scenario(ledger_path)
-        d_allow = results["allow"]
-        if d_allow.authority_verdict != "allow" and d_allow.authority_reason_code in _INFRA_REASON_CODES:
-            import pytest
-            pytest.skip(
-                "authority could not be RESOLVED in this environment "
-                f"(reason_code={d_allow.authority_reason_code}); an infra/invocation "
-                "failure of the external authorize.py is not a governance-logic "
-                "regression. The fail-closed DENY paths are unaffected."
-            )
-        checks = _assert_all(results, ledger_path)
-    assert checks, "no checks ran"
+    orig_authorize = gate.authorize_inclusion
+    gate.authorize_inclusion = _deterministic_authority  # gate_inclusion resolves this at call time
+    try:
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger_path = Path(tmp) / "decisions.jsonl"
+            results = run_scenario(ledger_path)
+            checks = _assert_all(results, ledger_path)
+        assert checks, "no checks ran"
+    finally:
+        gate.authorize_inclusion = orig_authorize
 
 
 # --------------------------------------------------------------------------- #

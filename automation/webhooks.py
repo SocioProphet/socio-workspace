@@ -11,13 +11,14 @@ import hmac
 import json
 import logging
 import os
-import queue
 import threading
 import time
 from datetime import datetime, timezone
 from typing import Optional
 
 from flask import Flask, Response, jsonify, request
+
+from automation.durable_queue import DurableQueue
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +38,13 @@ def _sanitize_for_log(value) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Thread-safe event queue shared across the application
+# Durable, cross-process event queue.
+# Previously an in-process ``queue.Queue()`` — unreachable by the separate
+# scheduler process, so nothing was ever drained. The file-backed DurableQueue is
+# shared via a common directory (a volume in deployment), so webhook-produced
+# events are actually consumed by the scheduler daemon.
 # ---------------------------------------------------------------------------
-event_queue: queue.Queue = queue.Queue()
+event_queue = DurableQueue()
 
 # ---------------------------------------------------------------------------
 # Simple in-process metrics store

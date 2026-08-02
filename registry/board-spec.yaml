@@ -1,0 +1,119 @@
+# board-spec.yaml — DECLARATIVE SOURCE OF TRUTH for the estate program boards.
+# GitHub Projects + any sovereign board surface are RENDER TARGETS of this file, not the truth.
+# Reconcilers apply this spec; cutover = repoint reconciler, spec unchanged.
+version: 1
+generated: 2026-08-02
+std_program_fields: [Status, Plane, Lane, Risk, Gate, Warrant, Tranche]  # Plane=Base-OS|Managed (base<=>managed seam)
+boards:
+  - title: "Portfolio Roadmap"
+    owner_org: SocioProphet
+    github_number: 4
+    github_url: https://github.com/orgs/SocioProphet/projects/4
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Risk', 'Warrant', 'Program', 'Lane', 'Target']
+    items: []  # seed from repo open-issues (auto-add pass, pending)
+  - title: "Spec, Ontology & Contracts"
+    owner_org: SocioProphet
+    github_number: 5
+    github_url: https://github.com/orgs/SocioProphet/projects/5
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 198}
+      - {repo: SocioProphet/socioprophet, issue: 500}
+  - title: "Reasoning & Intelligence"
+    owner_org: SocioProphet
+    github_number: 6
+    github_url: https://github.com/orgs/SocioProphet/projects/6
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 196}
+  - title: "Governance & Control Plane"
+    owner_org: SocioProphet
+    github_number: 7
+    github_url: https://github.com/orgs/SocioProphet/projects/7
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 189}
+      - {repo: SocioProphet/socioprophet, issue: 197}
+      - {repo: SocioProphet/socioprophet, issue: 321}
+      - {repo: SocioProphet/socioprophet, issue: 490}
+      - {repo: SocioProphet/socioprophet, issue: 491}
+      - {repo: SocioProphet/socioprophet, issue: 492}
+      - {repo: SocioProphet/socioprophet, issue: 493}
+      - {repo: SocioProphet/socioprophet, issue: 498}
+  - title: "SourceOS Base OS"
+    owner_org: SourceOS-Linux
+    github_number: 1
+    github_url: https://github.com/orgs/SourceOS-Linux/projects/1
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items: []  # seed from repo open-issues (auto-add pass, pending)
+  - title: "SociOS Managed Plane"
+    owner_org: SociOS-Linux
+    github_number: 2
+    github_url: https://github.com/orgs/SociOS-Linux/projects/2
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items: []  # seed from repo open-issues (auto-add pass, pending)
+  - title: "Model Surfaces (Labs)"
+    owner_org: SociOS-Linux
+    github_number: 3
+    github_url: https://github.com/orgs/SociOS-Linux/projects/3
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items: []  # seed from repo open-issues (auto-add pass, pending)
+  - title: "Agent Runtime & Terminal"
+    owner_org: SourceOS-Linux
+    github_number: 2
+    github_url: https://github.com/orgs/SourceOS-Linux/projects/2
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items: []  # seed from repo open-issues (auto-add pass, pending)
+  - title: "BearBrowser"
+    owner_org: SourceOS-Linux
+    github_number: 3
+    github_url: https://github.com/orgs/SourceOS-Linux/projects/3
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 382}
+  - title: "Platform & GitOps"
+    owner_org: SocioProphet
+    github_number: 8
+    github_url: https://github.com/orgs/SocioProphet/projects/8
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 153}
+      - {repo: SocioProphet/socioprophet, issue: 174}
+      - {repo: SocioProphet/socioprophet, issue: 177}
+      - {repo: SocioProphet/socioprophet, issue: 191}
+  - title: "Product Surfaces"
+    owner_org: SocioProphet
+    github_number: 9
+    github_url: https://github.com/orgs/SocioProphet/projects/9
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 182}
+      - {repo: SocioProphet/socioprophet, issue: 184}
+      - {repo: SocioProphet/socioprophet, issue: 187}
+      - {repo: SocioProphet/socioprophet, issue: 188}
+      - {repo: SocioProphet/socioprophet, issue: 190}
+      - {repo: SocioProphet/socioprophet, issue: 192}
+      - {repo: SocioProphet/socioprophet, issue: 193}
+      - {repo: SocioProphet/socioprophet, issue: 194}
+      - {repo: SocioProphet/socioprophet, issue: 195}
+      - {repo: SocioProphet/socioprophet, issue: 199}
+      - {repo: SocioProphet/socioprophet, issue: 203}
+      - {repo: SocioProphet/socioprophet, issue: 204}
+      - {repo: SocioProphet/socioprophet, issue: 310}
+      - {repo: SocioProphet/socioprophet, issue: 311}
+      - {repo: SocioProphet/socioprophet, issue: 323}
+      - {repo: SocioProphet/socioprophet, issue: 354}
+  - title: "Mesh & Orchestration"
+    owner_org: SocioProphet
+    github_number: 10
+    github_url: https://github.com/orgs/SocioProphet/projects/10
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items:
+      - {repo: SocioProphet/socioprophet, issue: 312}
+      - {repo: SocioProphet/socioprophet, issue: 314}
+  - title: "Delivery Excellence"
+    owner_org: SocioProphet
+    github_number: 11
+    github_url: https://github.com/orgs/SocioProphet/projects/11
+    fields: ['Title', 'Assignees', 'Status', 'Labels', 'Linked pull requests', 'Milestone', 'Repository', 'Reviewers', 'Parent issue', 'Sub-issues progress', 'Created', 'Updated', 'Closed', 'Plane', 'Lane', 'Risk', 'Gate', 'Warrant', 'Tranche']
+    items: []  # seed from repo open-issues (auto-add pass, pending)

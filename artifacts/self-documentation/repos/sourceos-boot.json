@@ -1,0 +1,160 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "boot_trust",
+    "claim_modes": [
+      "formal_construction",
+      "fixture_validated",
+      "experimental_run",
+      "audited_run"
+    ],
+    "current_status": "Boundary record not yet native in repo.",
+    "jurisdiction": "BootReleaseSet, boot attestation, TPM/PCR evidence, rollback, and host trust anchor boundary.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "boot manifests",
+      "attestation evidence",
+      "rollback records",
+      "boot trust reports"
+    ]
+  },
+  "catalog": {
+    "asset_count": 280,
+    "by_kind": {
+      "ci-workflows-tests": 3,
+      "design": 2,
+      "invariant": 1,
+      "json-schema": 5,
+      "readme": 1,
+      "spec": 2,
+      "topic-vocabulary": 266
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "rules-policies",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 157,
+    "sample_assets": [
+      {
+        "asset_id": "doc.sourceos-boot.docs-apple-silicon-evidence-normalization-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "AppleSiliconAdapterEvidence Normalization Design",
+        "path": "docs/APPLE_SILICON_EVIDENCE_NORMALIZATION.md"
+      },
+      {
+        "asset_id": "doc.sourceos-boot.docs-m2-recovery-installer-packaging-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "M2 SourceOS Recovery/Installer Packaging Spec",
+        "path": "docs/M2_RECOVERY_INSTALLER_PACKAGING.md"
+      },
+      {
+        "asset_id": "doc.sourceos-boot.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "SourceOS Boot",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "doc.sourceos-boot.docs-integration-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS Boot Integration Contract",
+        "path": "docs/INTEGRATION.md"
+      },
+      {
+        "asset_id": "doc.sourceos-boot.docs-world-class-targets-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "World-Class Target Architecture: SourceOS Boot",
+        "path": "docs/WORLD_CLASS_TARGETS.md"
+      },
+      {
+        "asset_id": "wf-fe10224740",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "CI",
+        "path": ".github/workflows/ci.yml"
+      },
+      {
+        "asset_id": "wf-24e73aeaab",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Makefile",
+        "path": "Makefile"
+      },
+      {
+        "asset_id": "ts-5c3729a308",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "ts-5c3729a308",
+        "path": "tests"
+      },
+      {
+        "asset_id": "pol-209f6b914e",
+        "dataset": "rules-policies",
+        "kind": "invariant",
+        "name": "fail-closed-gate",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "ct-403809fff0ad",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "UpdateHealthProbe.json",
+        "path": "schemas/ab-update/UpdateHealthProbe.json"
+      },
+      {
+        "asset_id": "ct-d06bcc424857",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "UpdateSlot.json",
+        "path": "schemas/ab-update/UpdateSlot.json"
+      },
+      {
+        "asset_id": "ct-5dec6dfc36f4",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "UpdateTransaction.json",
+        "path": "schemas/ab-update/UpdateTransaction.json"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "actions",
+    "active",
+    "adapter",
+    "additional",
+    "append",
+    "apple",
+    "application",
+    "approval",
+    "artifacts",
+    "asahi",
+    "attempt",
+    "authorization",
+    "blocked",
+    "blocking",
+    "bytes",
+    "candidate",
+    "capability",
+    "chain",
+    "check",
+    "checked"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.sourceos-boot",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/sourceos-boot",
+    "status": "active",
+    "title": "Sourceos Boot (SocioProphet estate repo)"
+  },
+  "repo": "SourceOS-Linux/sourceos-boot",
+  "schema": "self-documentation-record/v0.1",
+  "short": "sourceos-boot"
+}

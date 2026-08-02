@@ -1,0 +1,186 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "estate_registry",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Atlas bootstrap.",
+    "jurisdiction": "Boundary atlas, repo jurisdiction registry, transition reporting, and boundary coverage status.",
+    "maturity": "L2",
+    "owned_artifacts": [
+      "catalog/boundaries.yaml",
+      "catalog/claim-modes.yaml",
+      "catalog/evidence-contracts.yaml",
+      "docs/boundary-atlas-v0.1.md",
+      "docs/boundary-coverage-report.md"
+    ]
+  },
+  "catalog": {
+    "asset_count": 702,
+    "by_kind": {
+      "access": 1,
+      "adrs-docs": 4,
+      "avro": 3,
+      "ci-workflows-tests": 71,
+      "compose-service": 3,
+      "deployment": 3,
+      "design": 25,
+      "embedding": 1,
+      "gate": 7,
+      "governance": 6,
+      "http-api": 2,
+      "identifier": 1,
+      "invariant": 4,
+      "json-schema": 126,
+      "jsonld": 3,
+      "k8s-service": 2,
+      "other": 13,
+      "owl": 2,
+      "path": 6,
+      "policy-as-code": 4,
+      "rdf": 8,
+      "rdfs": 4,
+      "readme": 2,
+      "secret": 2,
+      "shacl": 2,
+      "spec": 6,
+      "topic-vocabulary": 307,
+      "url": 2,
+      "validation": 82
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "models",
+      "ontologies",
+      "regex-operational-dataset",
+      "rules-policies",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 180,
+    "sample_assets": [
+      {
+        "asset_id": "adr.sociosphere.0001",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001: Flywheel hardening, authority precedence, semaphore-gated progression, and void containment",
+        "path": "docs/governance/adr/0001-flywheel-hardening-authority-precedence-semaphore-void.md"
+      },
+      {
+        "asset_id": "adr.sociosphere.0002",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0002 — Strategic Decision Plane Registry, Product-Surface Reconciliation, and Release Gates",
+        "path": "governance/ADR-0002-decision-plane-registry-and-release-gates.md"
+      },
+      {
+        "asset_id": "adr.sociosphere.0003",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0003 — Flow Physics, Congestion Control, and Fair Scheduling",
+        "path": "governance/ADR-0003-flow-physics-congestion-control.md"
+      },
+      {
+        "asset_id": "adr.sociosphere.0001-2",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-001 — GBRG (Governed Blast-Radius Graph) architecture",
+        "path": "gbrg/docs/ADR-001-gbrg-architecture.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-architecture-adr-sociodoc-standards-placement-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "ADR: SocioDoc Standards Placement and Blast Radius",
+        "path": "docs/architecture/adr-sociodoc-standards-placement.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-architecture-overview-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Architecture Overview",
+        "path": "docs/architecture/overview.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-architecture-authority-dependency-graph-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Authority Dependency Graph v0",
+        "path": "docs/architecture/authority-dependency-graph.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-contractforge-repo-registration-tranche-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "ContractForge registration tranche",
+        "path": "docs/CONTRACTFORGE_REPO_REGISTRATION_TRANCHE.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-contractforge-repo-metadata-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "ContractForge repo metadata",
+        "path": "docs/CONTRACTFORGE_REPO_METADATA.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-architecture-control-plane-placement-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Control-plane placement",
+        "path": "docs/architecture/control-plane-placement.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-glossary-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Controlled Glossary",
+        "path": "docs/GLOSSARY.md"
+      },
+      {
+        "asset_id": "doc.sociosphere.docs-architecture-emvi-cross-surface-proof-slice-acceptance-",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Cross-Surface Proof Slice Acceptance Tests",
+        "path": "docs/architecture/emvi/cross-surface-proof-slice-acceptance-tests.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "action",
+    "adapter",
+    "additional",
+    "agent",
+    "append",
+    "apps",
+    "array",
+    "artifact",
+    "audit",
+    "authority",
+    "blast",
+    "branch",
+    "calls",
+    "candidate",
+    "canon",
+    "canonical",
+    "carrier",
+    "cell",
+    "cells",
+    "check"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.sociosphere",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/sociosphere",
+    "status": "active",
+    "title": "Sociosphere (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/sociosphere",
+  "schema": "self-documentation-record/v0.1",
+  "short": "sociosphere"
+}

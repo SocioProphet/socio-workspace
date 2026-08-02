@@ -1,0 +1,156 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "workspace_product",
+    "claim_modes": [
+      "illustrative_schema",
+      "fixture_validated",
+      "experimental_run"
+    ],
+    "current_status": "Active-spine promotion candidate; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "User-facing workspace product boundary, project lifecycle surfaces, UI/workbench contracts, and workspace artifact custody.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "workspace UI contracts",
+      "project lifecycle artifacts",
+      "workspace artifact manifests"
+    ]
+  },
+  "catalog": {
+    "asset_count": 313,
+    "by_kind": {
+      "ci-workflows-tests": 3,
+      "design": 1,
+      "json-schema": 34,
+      "readme": 1,
+      "spec": 1,
+      "topic-vocabulary": 273
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 158,
+    "sample_assets": [
+      {
+        "asset_id": "doc.prophet-workspace.docs-lattice-studio-workspace-integration-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Lattice Studio Workspace Integration Contract",
+        "path": "docs/LATTICE_STUDIO_WORKSPACE_INTEGRATION.md"
+      },
+      {
+        "asset_id": "doc.prophet-workspace.docs-workspace-office-product-architecture-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Workspace Office Product Architecture",
+        "path": "docs/WORKSPACE_OFFICE_PRODUCT_ARCHITECTURE.md"
+      },
+      {
+        "asset_id": "doc.prophet-workspace.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "prophet-workspace",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "wf-ade5d3b4bc",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Professional Workrooms",
+        "path": ".github/workflows/professional-workrooms.yml"
+      },
+      {
+        "asset_id": "wf-7d3269294c",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Workspace Context Fabric",
+        "path": ".github/workflows/context-fabric.yml"
+      },
+      {
+        "asset_id": "wf-36c8414685",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "git-ops-standards",
+        "path": ".github/workflows/git-ops-standards.yml"
+      },
+      {
+        "asset_id": "ct-e0046b9b7298",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "calendar-account-binding.schema.json",
+        "path": "contracts/calendar/calendar-account-binding.schema.json"
+      },
+      {
+        "asset_id": "ct-e8a113078ebd",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "calendar-event.schema.json",
+        "path": "contracts/calendar/calendar-event.schema.json"
+      },
+      {
+        "asset_id": "ct-5da60b061303",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "calendar.schema.json",
+        "path": "contracts/calendar/calendar.schema.json"
+      },
+      {
+        "asset_id": "ct-0d21bd9a45d1",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "channel-substrate.schema.json",
+        "path": "contracts/workspace/channel-substrate.schema.json"
+      },
+      {
+        "asset_id": "ct-21ee008cfaf8",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "contact-group.schema.json",
+        "path": "contracts/contacts/contact-group.schema.json"
+      },
+      {
+        "asset_id": "ct-2abdd63ddde1",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "contact.schema.json",
+        "path": "contracts/contacts/contact.schema.json"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "account",
+    "action",
+    "adapter",
+    "additional",
+    "agent",
+    "allowed",
+    "array",
+    "artifact",
+    "authority",
+    "base",
+    "binding",
+    "boolean",
+    "bridge",
+    "budget",
+    "calendar",
+    "carriers",
+    "channel",
+    "chat",
+    "cloud",
+    "collection"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.prophet-workspace",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/prophet-workspace",
+    "status": "active",
+    "title": "Prophet Workspace (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/prophet-workspace",
+  "schema": "self-documentation-record/v0.1",
+  "short": "prophet-workspace"
+}

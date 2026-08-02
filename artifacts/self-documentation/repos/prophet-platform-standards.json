@@ -1,0 +1,162 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "standards",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema"
+    ],
+    "current_status": "PR open for typed-boundary standard v0.1.",
+    "jurisdiction": "Normative typed-boundary standard, claim modes, sufficiency taxonomy, and evidence artifact schemas.",
+    "maturity": "L2",
+    "owned_artifacts": [
+      "docs/typed-boundary-standard.md",
+      "schemas/boundary.schema.json",
+      "schemas/claim-mode.schema.json",
+      "schemas/evidence-artifact.schema.json",
+      "templates/BOUNDARY.md"
+    ]
+  },
+  "catalog": {
+    "asset_count": 343,
+    "by_kind": {
+      "adrs-docs": 11,
+      "argocd-app": 1,
+      "ci-workflows-tests": 3,
+      "deployment": 1,
+      "governance": 2,
+      "http-api": 1,
+      "json-schema": 9,
+      "readme": 1,
+      "spec": 1,
+      "topic-vocabulary": 313
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 187,
+    "sample_assets": [
+      {
+        "asset_id": "adr.prophet-platform-standards.0040",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-040: Tekton + ArgoCD + GitOps Strategy",
+        "path": "adr/ADR-040-tekton-argocd-gitops.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0050",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-050: DevSecOps, RBAC, and Audit Standards",
+        "path": "adr/ADR-050-devsecops-rbac-audit.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0060",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-060: OTEL Observability and Telemetry Standards",
+        "path": "adr/ADR-060-otel-observability.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0070-5",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-070: Forensic Genesis Edge Ingress on Kafka/Kappa",
+        "path": "adr/ADR-070-forensic-genesis-edge-kafka-kappa.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0070-2",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-070: Immutable Node Host Capability Model",
+        "path": "adr/ADR-070-immutable-node-host-capability-model.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0070-4",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-070: Next Gen Operating Model",
+        "path": "adr/ADR-070-next-gen-operating-model.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0070-3",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-070: OS Build / Cybernetic Boundary",
+        "path": "adr/ADR-070-os-build-cybernetic-boundary.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0070",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-070: SourceOS staged substrate promotion",
+        "path": "adr/ADR-070-sourceos-staged-substrate-promotion.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0080",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-080: Role-Based Storage Fabric",
+        "path": "adr/ADR-080-role-based-storage-fabric.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0081",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-081: Topology Selection and Ranked Recommendations",
+        "path": "adr/ADR-081-topology-selection-and-ranked-recommendations.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform-standards.0082",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-082: History-Aware Threshold Learning",
+        "path": "adr/ADR-082-history-aware-threshold-learning.md"
+      },
+      {
+        "asset_id": "doc.prophet-platform-standards.docs-next-gen-tom-broker-reasoning-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Broker Reasoning Contract v0",
+        "path": "docs/NEXT_GEN_TOM_BROKER_REASONING_CONTRACT.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "action",
+    "actor",
+    "adr",
+    "agent",
+    "api",
+    "app",
+    "argocd",
+    "array",
+    "attestation",
+    "attestations",
+    "audit",
+    "authorization",
+    "aware",
+    "backend",
+    "benchmark",
+    "binding",
+    "broker",
+    "build",
+    "capability",
+    "cloud"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.prophet-platform-standards",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/prophet-platform-standards",
+    "status": "active",
+    "title": "Prophet Platform Standards (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/prophet-platform-standards",
+  "schema": "self-documentation-record/v0.1",
+  "short": "prophet-platform-standards"
+}

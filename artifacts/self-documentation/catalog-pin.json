@@ -1,0 +1,15 @@
+{
+  "catalog_commit": "3d724f2e198df3a0d0322be32eff329081499ce0",
+  "catalog_repo": "SocioProphet/prophet-core-catalog",
+  "composed_by": "tools/compose_self_documentation.py",
+  "inputs": {
+    "assets": "sha256:687f0d875f4c281b9a527bf979002c8fbc3793ac52907b5dedfb19195cbf9b15",
+    "atlas": "sha256:b7500db2f561362933324473eb6167ab663e13d0a4c2fc9172c01a34562bab66",
+    "edges": "sha256:5634d28ce6d97c906016f75d7c62d705a3f9a57834cde46205bee4dcf5680bfd",
+    "estate_edges": "sha256:4035a2330098f72258b074323e6e98c656ffdf1e61413ba030c84a238c67b7b9",
+    "estate_graph": "sha256:32449dd42a7b88804698f9bb3b29f9de12f83b75f1a74e7708a181d1ce419544",
+    "glossary": "sha256:d3eda0310a4ed0382bca8cb65e4b1424dca85a7066a4d2f961211a166d1a72ab",
+    "index": "sha256:6302d1d0c3284423f88e57d2e60de2882b8469113199e32afdb4b9af09e0784e"
+  },
+  "schema": "catalog-pin/v0.1"
+}

@@ -317,3 +317,20 @@ contract-lock-validate:
 	python3 tools/validate_contract_locks.py
 
 ontology-validate: registry-validate
+
+# --- self-documenting-estate targets ---------------------------------------
+# Code is the source of truth; docs are DERIVED from the code-derived catalog.
+# CATALOG points at a prophet-core-catalog checkout (pinned in
+# artifacts/self-documentation/catalog-pin.json).
+CATALOG ?= ../prophet-core-catalog
+.PHONY: estate-enumerate self-doc-compose self-doc-verify
+
+estate-enumerate:
+	python3 tools/enumerate_estate.py --catalog $(CATALOG)
+
+self-doc-compose:
+	python3 tools/compose_self_documentation.py --catalog $(CATALOG)
+
+self-doc-verify:
+	python3 tools/verify_self_documentation.py --catalog $(CATALOG)
+# --- end self-documenting-estate targets -----------------------------------

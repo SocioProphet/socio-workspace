@@ -1,0 +1,161 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "world_model_trace",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated",
+      "experimental_run"
+    ],
+    "current_status": "Boundary record not yet native in repo.",
+    "jurisdiction": "Geospatial/world-model traces, layer provenance, reconstruction-limited access, and uncertainty evidence.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "feature manifests",
+      "tile/layer manifests",
+      "observation evidence",
+      "provenance chains"
+    ]
+  },
+  "catalog": {
+    "asset_count": 460,
+    "by_kind": {
+      "adrs-docs": 1,
+      "ci-workflows-tests": 21,
+      "design": 1,
+      "governance": 5,
+      "json-schema": 62,
+      "other": 5,
+      "readme": 1,
+      "spec": 5,
+      "topic-vocabulary": 359
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 201,
+    "sample_assets": [
+      {
+        "asset_id": "adr.gaia-world-model.0002",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0002: GAIA PAIRS-like Layer Governance",
+        "path": "docs/decisions/ADR-0002-pairs-like-layer-governance.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-architecture-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Architecture",
+        "path": "docs/ARCHITECTURE.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-assessment-scorecards-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Assessment Scorecards (Interop + Repro + Policy)",
+        "path": "docs/assessment/SCORECARDS.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-attribution-policy-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Attribution Policy",
+        "path": "docs/ATTRIBUTION_POLICY.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-cv-storage-policy-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "CV Storage Policy",
+        "path": "docs/CV_STORAGE_POLICY.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-integrations-decision-grade-world-signals-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Decision-Grade World Signals: Foot-Traffic, Weather, Concordance, and Energy Ledgers",
+        "path": "docs/integrations/decision-grade-world-signals.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-contracts-governed-world-claim-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "GAIA Governed World-Claim Contract",
+        "path": "docs/contracts/GOVERNED_WORLD_CLAIM_CONTRACT.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-contracts-identifier-profile-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "GAIA Identifier Profile v1",
+        "path": "docs/contracts/IDENTIFIER_PROFILE.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "GAIA World Model",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-issues-issue-001-select-canonical-ontology-entrypoints-",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "ISSUE-001: Select canonical ontology entrypoints per ingested source",
+        "path": "docs/issues/ISSUE-001_select_canonical_ontology_entrypoints_per_ingested_source.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-contracts-registry-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Minimal Registry Contract (Discovery + Safe Composition)",
+        "path": "docs/contracts/REGISTRY_CONTRACT.md"
+      },
+      {
+        "asset_id": "doc.gaia-world-model.docs-integrations-ofif-bridge-runbook-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "OFIF Bridge Runbook",
+        "path": "docs/integrations/OFIF_BRIDGE_RUNBOOK.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "additional",
+    "address",
+    "ais",
+    "annotation",
+    "append",
+    "arguments",
+    "array",
+    "asset",
+    "attr",
+    "attribution",
+    "awesome",
+    "bco",
+    "bindings",
+    "bit",
+    "bounded",
+    "chebi",
+    "chemical",
+    "chromatograph",
+    "claim",
+    "classed"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.gaia-world-model",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/gaia-world-model",
+    "status": "active",
+    "title": "Gaia World Model (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/gaia-world-model",
+  "schema": "self-documentation-record/v0.1",
+  "short": "gaia-world-model"
+}

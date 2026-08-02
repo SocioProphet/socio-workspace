@@ -1,0 +1,163 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "transport_protocol",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Active-spine transport standard; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "Transport/RPC schema boundary, envelope compatibility, conformance fixtures, and protocol-version transition control.",
+    "maturity": "L1",
+    "owned_artifacts": [
+      "schemas/avro/trirpc",
+      "schemas/schemasalad/trirpc-schema-bundle.v0.yml",
+      "protocol fixtures",
+      "conformance reports"
+    ]
+  },
+  "catalog": {
+    "asset_count": 338,
+    "by_kind": {
+      "avro": 4,
+      "ci-workflows-tests": 10,
+      "design": 2,
+      "governance": 4,
+      "json-schema": 7,
+      "other": 9,
+      "policy-as-code": 1,
+      "protobuf": 1,
+      "readme": 4,
+      "spec": 11,
+      "topic-vocabulary": 285
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "rules-policies",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 176,
+    "sample_assets": [
+      {
+        "asset_id": "doc.tritrpc.docs-schema-visualization-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Avro schema visualization",
+        "path": "docs/schema-visualization.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-vnext-integration-branch-pr-merge-runbook-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Branch + PR Integration Runbook (to land in `main` safely)",
+        "path": "docs/vnext/integration/branch_pr_merge_runbook.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-contracts-descriptor-service-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "DescriptorService contract v0.1",
+        "path": "docs/contracts/descriptor-service-v0.1.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-contracts-execution-bridge-service-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "ExecutionBridgeService contract v0.1",
+        "path": "docs/contracts/execution-bridge-service-v0.1.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-vnext-integration-gtnf-validation-runtime-validation-pr",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "GTNF runtime validation protocol",
+        "path": "docs/vnext/integration/gtnf/validation/runtime_validation_protocol.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-ghost-transport-and-fixtures-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Ghost transport and fixture contract",
+        "path": "docs/ghost-transport-and-fixtures.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-vnext-integration-gtnf-governed-triparty-white-paper-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Governed Triparty Netting Fabric",
+        "path": "docs/vnext/integration/gtnf/governed_triparty_white_paper.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-vnext-integration-gtnf-gtnf-one-page-external-overview-",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Governed Triparty Netting Fabric",
+        "path": "docs/vnext/integration/gtnf/gtnf_one_page_external_overview_math.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-vnext-integration-gtnf-readme-md",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "Governed Triparty Netting Fabric (GTNF) integration pack",
+        "path": "docs/vnext/integration/gtnf/README.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-vnext-experimental-tritrpc-security-pack-notes-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Notes on staged content",
+        "path": "docs/vnext/experimental/tritrpc_security_pack/NOTES.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-research-ontology-alignment-drive-inventory-2026-05-10-",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Ontology Alignment / Knowledge Induction Drive Inventory",
+        "path": "docs/research/ontology_alignment_drive_inventory_2026_05_10.md"
+      },
+      {
+        "asset_id": "doc.tritrpc.docs-research-ontology-alignment-key-lessons-2026-05-10-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Ontology Alignment / Knowledge Induction — Key Lessons Ledger",
+        "path": "docs/research/ontology_alignment_key_lessons_2026_05_10.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "admission",
+    "aead",
+    "agent",
+    "alignment",
+    "append",
+    "approved",
+    "artifact",
+    "attestation",
+    "audit",
+    "avro",
+    "beacon",
+    "blocked",
+    "boundary",
+    "branch",
+    "buf",
+    "bundle",
+    "byte",
+    "bytes",
+    "canonical",
+    "capability"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.tritrpc",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/tritrpc",
+    "status": "active",
+    "title": "Tritrpc (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/TriTRPC",
+  "schema": "self-documentation-record/v0.1",
+  "short": "tritrpc"
+}

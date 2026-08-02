@@ -23,7 +23,8 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["function", "class", "import", "module"]
+      "enum": ["function", "class", "import", "module", "pattern"],
+      "$comment": "'pattern' is a non-code SemanticCell: a distinct regex from the estate REGEX corpus (prophet-core-catalog ds.regex-operational-dataset). Its cell_id is an rx:// IRI of the form rx://rx-<sha1[0:10] of the raw pattern>, and code-file cells depend on it via `imports`-kind edges. See docs/ADR-002-pattern-cells.md. Additive enum value; the four code kinds are unchanged."
     },
     "language": { "type": "string", "minLength": 1 },
     "file_path": { "type": "string", "minLength": 1 },

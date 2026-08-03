@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Callable, List, Optional
 
 from automation.durable_queue import DurableQueue, state_dir
-from automation.executors import is_in_sync
+from automation.executors import is_in_sync, vendored_graph_in_sync
 from engines.mirror_drift_engine import REGISTRY_PATH, STATUS_PATH
 
 
@@ -73,20 +73,51 @@ def detect_mirror_drift(*, registry_path: Path = REGISTRY_PATH,
     }
 
 
+def detect_vendored_graph_drift() -> Optional[dict]:
+    """Return a vendored_graph_drift beacon if the committed graph has drifted, else None.
+
+    Invariant (tools/check_vendored_artifact_graph.py): the committed
+    registry/.../vendored-artifact.graph.ttl equals what the lift regenerates from
+    registry/vendor-freshness.yaml. `vendored_graph_in_sync` is deterministic, so a drift
+    verdict reproduces on re-check — claimed via a double check.
+    """
+    first = vendored_graph_in_sync()
+    second = vendored_graph_in_sync()
+    if first:
+        return None
+    return {
+        "kind_class": "vendored_graph_drift",
+        "system": "vendored-artifact-graph",
+        "evidence": {
+            "detector": "check_vendored_artifact_graph",
+            "reproducible": (first == second),
+            "stale": False,
+        },
+        "evidence_ref": "file://registry/neurosymbolic-repo-graph-reasoner/vendored-artifact.graph.ttl",
+        "detail": {
+            "invariant": "vendored-artifact.graph.ttl == lift(registry/vendor-freshness.yaml)",
+            "in_sync": False,
+        },
+        "observed_at": _now(),
+    }
+
+
 # Registered detectors: each is a zero/keyword-arg callable returning Optional[beacon].
-DETECTORS: List[Callable[..., Optional[dict]]] = [detect_mirror_drift]
+DETECTORS: List[Callable[..., Optional[dict]]] = [detect_mirror_drift, detect_vendored_graph_drift]
 
 
 def run_detectors(inbox: Optional[DurableQueue] = None,
-                  detector_paths: Optional[dict] = None) -> List[dict]:
-    """Run every registered detector; enqueue each emitted beacon. Returns the beacons.
+                  detector_paths: Optional[dict] = None,
+                  detectors: Optional[List[Callable[..., Optional[dict]]]] = None) -> List[dict]:
+    """Run each registered detector; enqueue every emitted beacon. Returns the beacons.
 
-    `detector_paths` is forwarded to the detectors (used by tests to target tmp files);
-    a detector that does not accept the given kwargs is called with no arguments.
+    `detector_paths` is forwarded to detectors that accept them (a detector that does not is
+    called with no arguments). `detectors` overrides the default registry — used by tests to
+    run one detector in isolation so an unrelated real-tree detector is not triggered.
     """
     inbox = inbox if inbox is not None else DurableQueue(state_dir() / "beacons")
     emitted: List[dict] = []
-    for detector in DETECTORS:
+    for detector in (detectors if detectors is not None else DETECTORS):
         try:
             beacon = detector(**(detector_paths or {}))
         except TypeError:

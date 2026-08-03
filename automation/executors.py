@@ -17,8 +17,11 @@ re-sync regenerates the derived artifact from the registry, then verifies the in
 
 from __future__ import annotations
 
+import subprocess
+import sys
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Callable, List, Optional
 
 import yaml
 
@@ -28,6 +31,94 @@ from engines.mirror_drift_engine import (
     STATUS_PATH,
     build_payload,
 )
+
+_ROOT = Path(__file__).resolve().parents[1]
+
+
+# ---------------------------------------------------------------------------
+# Generic reconciler: the reusable shape behind "a derived artifact drifted from
+# its source of truth; regenerate it, then VERIFY, and roll back if that fails".
+# resync_mirror_drift below is the in-process special case; new reconcilable
+# artifacts (e.g. the vendored-artifact graph) register a Reconciler and reuse
+# reconcile() rather than re-implementing verify+rollback.
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Reconciler:
+    """A derived artifact that can be regenerated from a source and verified.
+
+    check       : returns True iff the artifact is in sync. MAY RAISE when the source
+                  of truth is un-assessable — reconcile() treats that as refuse-to-act.
+    regenerate  : rebuild the derived artifact from the source. May raise.
+    artifacts   : files to snapshot so a failed regeneration can be rolled back.
+    """
+
+    name: str
+    check: Callable[[], bool]
+    regenerate: Callable[[], None]
+    artifacts: List[Path] = field(default_factory=list)
+
+
+def _snapshot(paths: List[Path]) -> dict:
+    return {Path(p): (Path(p).read_bytes() if Path(p).exists() else None) for p in paths}
+
+
+def _restore(snapshot: dict) -> None:
+    for path, prior in snapshot.items():
+        if prior is not None:
+            path.write_bytes(prior)
+        elif path.exists():
+            path.unlink()
+
+
+def reconcile(r: Reconciler) -> dict:
+    """Regenerate a drifted artifact and verify the fix, rolling back on failure.
+
+    Returns {executor, action_taken ∈ {noop,regenerated,abort}, healed, rolled_back, [error]}.
+    """
+    result = {"executor": r.name, "action_taken": "none", "healed": False, "rolled_back": False}
+
+    # 1. Idempotence + source readability. In sync -> nothing to do. Un-assessable -> abort.
+    try:
+        if r.check():
+            result["action_taken"] = "noop"
+            result["healed"] = True
+            return result
+    except Exception as exc:
+        result["action_taken"] = "abort"
+        result["error"] = f"cannot assess (source of truth unreadable): {exc}"
+        return result
+
+    # 2. Snapshot for rollback.
+    snapshot = _snapshot(r.artifacts)
+
+    # 3. Regenerate from the source of truth.
+    try:
+        r.regenerate()
+        result["action_taken"] = "regenerated"
+    except Exception as exc:
+        _restore(snapshot)
+        result["action_taken"] = "abort"
+        result["rolled_back"] = True
+        result["error"] = f"regeneration failed: {exc}"
+        return result
+
+    # 4. VERIFY the artifact (not the exit code). Roll back if the invariant does not hold.
+    try:
+        healed = bool(r.check())
+    except Exception as exc:
+        healed = False
+        result["error"] = f"post-regeneration verification error: {exc}"
+
+    if healed:
+        result["healed"] = True
+        return result
+
+    _restore(snapshot)
+    result["rolled_back"] = True
+    result.setdefault("error", "post-regeneration verification failed; rolled back")
+    return result
 
 
 def _load(path: Path):
@@ -137,3 +228,50 @@ def resync_mirror_drift(*, registry_path: Path = REGISTRY_PATH,
     result["healed"] = False
     result.setdefault("error", "post-write verification failed; rolled back")
     return result
+
+
+# ---------------------------------------------------------------------------
+# Second reconcilable artifact: the vendored-artifact graph. Its invariant
+# (tools/check_vendored_artifact_graph.py) is that the committed
+# registry/neurosymbolic-repo-graph-reasoner/vendored-artifact.graph.ttl equals
+# what tools/lift_vendor_freshness_to_graph.py regenerates from
+# registry/vendor-freshness.yaml. The check and the lift are separate CLIs, so
+# this reconciler drives them as subprocesses — and VERIFIES by re-running the
+# check, never by trusting the lift's exit code.
+# ---------------------------------------------------------------------------
+
+_VG_CHECK = _ROOT / "tools" / "check_vendored_artifact_graph.py"
+_VG_LIFT = _ROOT / "tools" / "lift_vendor_freshness_to_graph.py"
+VENDORED_GRAPH_PATH = (
+    _ROOT / "registry" / "neurosymbolic-repo-graph-reasoner" / "vendored-artifact.graph.ttl"
+)
+
+
+def vendored_graph_in_sync() -> bool:
+    """True iff the committed vendored-artifact graph matches the lift output."""
+    proc = subprocess.run(
+        [sys.executable, str(_VG_CHECK)], cwd=str(_ROOT), capture_output=True, text=True
+    )
+    return proc.returncode == 0
+
+
+def _vendored_graph_regenerate() -> None:
+    proc = subprocess.run(
+        [sys.executable, str(_VG_LIFT), "--write"], cwd=str(_ROOT), capture_output=True, text=True
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"lift failed (rc={proc.returncode}): {proc.stderr.strip()[:200]}")
+
+
+def vendored_graph_reconciler() -> Reconciler:
+    return Reconciler(
+        name="reconcile_vendored_graph",
+        check=vendored_graph_in_sync,
+        regenerate=_vendored_graph_regenerate,
+        artifacts=[VENDORED_GRAPH_PATH],
+    )
+
+
+def reconcile_vendored_graph() -> dict:
+    """Executor entry point for a vendored_graph_drift auto_fix decision."""
+    return reconcile(vendored_graph_reconciler())

@@ -1,8 +1,16 @@
 schema_version: 0.2.0
 standard: epistemic-governance
-ruleset_semver: 1.4.0
+ruleset_semver: 1.5.0
 status: draft
 owner: sociosphere
+
+# 1.5.0 (additive, backward-compatible): reserves proposed ids for the set-1
+# cognitive-bias catalog (standards/epistemic-governance/bias-catalog.yaml) —
+# COGBIAS.FAE/HINDSIGHT/FRAMING/BELIEFBIAS.V1 — and LOGFALL.AFFIRMCONSEQ.V1, the
+# governed generalization of the SILENT firewall's affirming-the-consequent tooth
+# (evidence-intake-kernel#3) = Crown invariant D1 (hellgraph#52 ADR-0004). All
+# are `maturity: proposed`: ids reserved so a future runner lands in a known
+# place, not claimed as shipped evidence.
 
 # Ruleset shape (introduced in 1.4.0). This ruleset now describes what SHIPS
 # alongside what is DESIGNED — nothing is lost, nothing pretended. Every
@@ -255,6 +263,75 @@ detectors:
       - attribution_blind_review
     projection_policy: self_private_by_default
 
+  # ─── set-1 cognitive-bias catalog (1.5.0) — see bias-catalog.yaml ───────────
+  - rule_id: COGBIAS.FAE.V1
+    maturity: proposed
+    default_severity: info
+    primary_signals:
+      - dispositional_attribution_over_situational
+      - actor_observer_asymmetry
+    required_counter_tests:
+      - CTEST.ATTRIBUTION-BLIND.A/B.V1
+    default_repairs:
+      - situational_factor_enumeration
+      - attribution_blind_review
+    projection_policy: self_private_by_default
+
+  - rule_id: COGBIAS.HINDSIGHT.V1
+    maturity: proposed
+    default_severity: info
+    primary_signals:
+      - knew_it_all_along_lexicon
+      - outcome_conditioned_evaluation_of_ex_ante_decision
+    required_counter_tests:
+      - CTEST.FORESIGHT-BLIND.V1
+    default_repairs:
+      - ex_ante_information_reconstruction
+      - foreknowledge_blind_review
+    projection_policy: self_private_by_default
+
+  - rule_id: COGBIAS.FRAMING.V1
+    maturity: proposed
+    default_severity: info
+    primary_signals:
+      - gain_loss_frame_sensitivity
+      - denominator_neglect
+    required_counter_tests:
+      - CTEST.REFRAME-INVARIANCE.V1
+    default_repairs:
+      - equivalent_reframe_test
+      - absolute_and_relative_disclosure
+    projection_policy: self_private_by_default
+
+  - rule_id: COGBIAS.BELIEFBIAS.V1
+    maturity: proposed
+    default_severity: warn
+    primary_signals:
+      - validity_judged_by_conclusion_believability
+      - premise_conclusion_link_unassessed
+    required_counter_tests:
+      - CTEST.FORMAL-VALIDITY.V1
+    default_repairs:
+      - formal_validity_check
+      - conclusion_blind_structure_review
+
+  - rule_id: LOGFALL.AFFIRMCONSEQ.V1
+    maturity: proposed
+    default_severity: block
+    primary_signals:
+      - if_p_then_q_observe_q_conclude_p
+      - consequent_taken_as_proof_of_antecedent
+    required_counter_tests:
+      - CTEST.FORMAL-VALIDITY.V1
+    default_repairs:
+      - formal_validity_check
+      - alternative_antecedent_enumeration
+    # The generalized tooth: SAME rule as the SILENT firewall's
+    # affirming-the-consequent guard (evidence-intake-kernel#3) and Crown
+    # invariant D1 (hellgraph#52 ADR-0004). A weight/mechanism result that
+    # manufactures a POS verdict via this form is void.
+    promotion_effect: verdict_manufactured_by_affirming_the_consequent_is_void_crown_d1
+
 
 # ─── Shipped V1 detectors (implemented today in Noetica debate-detectors.ts) ──
 # These are honest surface heuristics that feed the MLN reasoner. Their
@@ -464,6 +541,10 @@ counter_test_availability:
     - CTEST.DEVIL-S.LIST.V1
     - CTEST.CALIBRATION-20Q.V1
     - CTEST.ATTRIBUTION-BLIND.A/B.V1
+    # set-1 bias-catalog counter-tests (1.5.0)
+    - CTEST.FORESIGHT-BLIND.V1
+    - CTEST.REFRAME-INVARIANCE.V1
+    - CTEST.FORMAL-VALIDITY.V1
 
 technical_claim_detectors:
   - rule_id: TECHCLAIM.UNREPRODUCIBLE.V1

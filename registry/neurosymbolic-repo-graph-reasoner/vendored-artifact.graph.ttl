@@ -44,7 +44,7 @@
   nrg:consumerApp "apps/market-replay" ;
   nrg:freshnessPolicy "track-latest" ;
   nrg:freshnessState "stale" ;
-  nrg:freshnessReason "vendored commit 487e4b614b79e556af3aea2c70471eca13281377 != upstream db941c58edb1d771a90a221bbfbe5acccb013651" ;
+  nrg:freshnessReason "vendored commit 487e4b614b79e556af3aea2c70471eca13281377 != upstream 90c1384032cc069738d273df8e9877d46ec2820f" ;
   nrg:disposition "remediation-required" ;
   nrg:vendoredDigest "sha256:7d18865d1a435f8a2e78977ef51f865b842c810f4648faa8755b506fe8b13d55" .
 
@@ -57,7 +57,7 @@
   nrg:consumerApp "apps/hellgraph-service" ;
   nrg:freshnessPolicy "track-latest" ;
   nrg:freshnessState "stale" ;
-  nrg:freshnessReason "vendored commit 7d74db818a943f2070285c2fc16e22f975d1b8d0 != upstream db941c58edb1d771a90a221bbfbe5acccb013651" ;
+  nrg:freshnessReason "vendored commit 7d74db818a943f2070285c2fc16e22f975d1b8d0 != upstream 90c1384032cc069738d273df8e9877d46ec2820f" ;
   nrg:disposition "remediation-required" .
 
 <https://socioprophet.org/ns/nrg/vendored-artifact/kbpedia-kko@hellgraph>
@@ -108,7 +108,7 @@
   nrg:consumerApp "apps/lattice-studio" ;
   nrg:freshnessPolicy "track-latest" ;
   nrg:freshnessState "stale" ;
-  nrg:freshnessReason "vendored commit e791402 != upstream 59615f0738b4b67f379967828b9bf230e6f6c501" ;
+  nrg:freshnessReason "vendored commit e791402 != upstream fbaa72acd07eed808262d53b0764fb0655f1ea50" ;
   nrg:disposition "remediation-required" .
 
 <https://socioprophet.org/ns/nrg/vendored-artifact/tritrpc-go-bindings@tritrpcbridge>

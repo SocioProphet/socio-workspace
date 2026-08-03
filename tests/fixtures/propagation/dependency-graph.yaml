@@ -1,0 +1,37 @@
+# tests/fixtures/propagation/dependency-graph.yaml
+# DETERMINISTIC FIXTURE — not a description of the real estate.
+#
+# PropagationEngine unit tests exercise engine LOGIC (adjacency, reverse
+# adjacency, dependency levels, cascade BFS, cycle detection). Binding those
+# tests to the live registry/dependency-graph.yaml made them brittle: that graph
+# is now regenerated from measured evidence, so it legitimately changes shape
+# (and no longer carries hand-authored `dependency_levels`). Engine behaviour is
+# tested here against a fixed, synthetic graph; the real artifact is guarded by a
+# separate smoke test (loads + acyclic) in test_propagation_engine.py.
+#
+# Edge semantics: `from` depends_on `to` (adjacency from -> to; reverse is the
+# dependents direction the cascade walks).
+
+version: "fixture-1.0.0"
+basis: fixture
+
+edges:
+  - { from: sociosphere,   to: tritrpc,        type: depends_on }
+  - { from: sociosphere,   to: trit-to-trust,  type: depends_on }
+  - { from: new-hope,      to: tritrpc,        type: depends_on }
+  - { from: trit-to-trust, to: tritrpc,        type: depends_on }
+  # An independent chain used to exercise multi-hop BFS cascade ordering.
+  - { from: adapter-x,     to: event-bus,      type: depends_on }
+  - { from: service-y,     to: adapter-x,      type: depends_on }
+
+dependency_levels:
+  "0":
+    - tritrpc
+    - event-bus
+  "1":
+    - trit-to-trust
+    - new-hope
+  "2":
+    - sociosphere
+  archived:
+    - socios

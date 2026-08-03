@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/supply-chain-risk-weights.v0.json",
+  "title": "GBRG Supply-Chain Operational-Risk Scoring Weights (declared)",
+  "schemaVersion": "gbrg.supply-chain-risk.weights.v0",
+  "description": "DECLARED scoring weights, rating thresholds, control-evidence requirements, and KRI/KCI thresholds for the software supply-chain operational-risk framework, consumed (not forked) from software_supply_chain_operational_risk_framework_v0_2_bian_fico.xlsx (sheets: Weights, Controls_Evidence, KRI_KCI). Weights are DATA, never magic numbers in code: gbrg.governance.supply_chain_risk loads THIS file. Numbers are transcribed verbatim from the workbook v0.2. Adjust only after taxonomy is stable and incident data exists for calibration (per the workbook's own guidance).",
+  "provenance": {
+    "consumed_from": "spec-intake/2026-08-03/inbound-ibm-labor-va/software_supply_chain_operational_risk_framework_v0_2_bian_fico.xlsx",
+    "workbook_version": "v0.2 (BIAN/FICO)",
+    "consume_not_fork": true
+  },
+
+  "inherent_risk_factors": {
+    "description": "Node inherent risk = weighted sum of six 0..1 factors. Weights sum to 1.0 (workbook 'Weights' sheet, 'Inherent risk factors').",
+    "weights": {
+      "criticality_K": { "weight": 0.25, "note": "Business impact if this node fails or is compromised" },
+      "privilege_P": { "weight": 0.2, "note": "Ability to publish, sign, administer, or execute sensitive actions" },
+      "execution_E": { "weight": 0.15, "note": "Likelihood this node can run code during install, build, or runtime" },
+      "opacity_O": { "weight": 0.15, "note": "Lack of transparency, attestations, or graph visibility" },
+      "concentration_C": { "weight": 0.15, "note": "Single point of failure or weak alternatives" },
+      "velocity_V": { "weight": 0.1, "note": "Update frequency, churn, or operational instability" }
+    },
+    "weight_sum": 1.0,
+    "source_url": "https://csrc.nist.gov/pubs/sp/800/161/r1/final"
+  },
+
+  "control_efficacy_families": {
+    "description": "Control efficacy = weighted sum of six 0..1 control-family scores (1.0 = strong control). Weights sum to 1.0 (workbook 'Weights' sheet, 'Control efficacy weights'). Each family is bound to a controls-evidence requirement below.",
+    "weights": {
+      "governance": { "weight": 0.1, "interpretation": "Ownership, exceptions, change governance, RACI", "evidence_key": "Governance" },
+      "identity_publish": { "weight": 0.2, "interpretation": "Least privilege, MFA/OIDC trusted publishing, token hygiene", "evidence_key": "Identity & publishing authority" },
+      "build_provenance": { "weight": 0.2, "interpretation": "Isolated builders, attestation, provenance completeness", "evidence_key": "Build provenance" },
+      "artifact_integrity": { "weight": 0.2, "interpretation": "Signing, verification, transparency logs, checksum validation", "evidence_key": "Artifact integrity" },
+      "distribution_guardrails": { "weight": 0.15, "interpretation": "Mirrors, lockfiles, script suppression, index policy", "evidence_key": "Distribution guardrails" },
+      "monitoring_recovery": { "weight": 0.15, "interpretation": "Detection, drills, rollback, exit plans, retention", "evidence_key": "Monitoring & recovery" }
+    },
+    "weight_sum": 1.0,
+    "source_url": "https://www.bis.org/fsi/fsisummaries/psmor.htm"
+  },
+
+  "cluster_common_mode_weights": {
+    "description": "Common-mode / concentration cluster inherent risk = weighted sum of four 0..1 components. Weights sum to 1.0 (workbook 'Weights' sheet, 'Common-mode cluster weights').",
+    "weights": {
+      "hhi_normalized_concentration": { "weight": 0.4, "interpretation": "How concentrated the cluster is across providers" },
+      "blast_radius": { "weight": 0.3, "interpretation": "How many critical services depend on the cluster" },
+      "time_to_recover": { "weight": 0.2, "interpretation": "How long to restore service or integrity if the cluster fails" },
+      "exit_difficulty": { "weight": 0.1, "interpretation": "How hard it is to substitute, mirror, or contractually exit" }
+    },
+    "weight_sum": 1.0,
+    "source_url": "https://www.bis.org/bcbs/publ/d605.pdf"
+  },
+
+  "residual_model": {
+    "description": "Residual = inherent * (1 - control_efficacy). Path risk accumulates node residuals as a noisy-OR (1 - product(1 - residual_i)): any node on the chain failing breaks the service. Cluster residual = common_mode_inherent * (1 - resilience_control).",
+    "node_residual": "inherent * (1 - control_efficacy)",
+    "path_risk": "1 - product(1 - node_residual_i)",
+    "cluster_residual": "common_mode_inherent * (1 - resilience_control)"
+  },
+
+  "rating_thresholds": {
+    "description": "Rating from residual score. Minimum score is inclusive lower bound (workbook 'Weights' sheet, 'Rating thresholds').",
+    "ordered_bands": [
+      { "rating": "Critical", "min_score": 0.75 },
+      { "rating": "High", "min_score": 0.5 },
+      { "rating": "Moderate", "min_score": 0.25 },
+      { "rating": "Low", "min_score": 0.0 }
+    ]
+  },
+
+  "controls_evidence_requirements": {
+    "description": "Minimum evidence checklist per control family for tier-0 services / critical nodes (workbook 'Controls_Evidence' sheet). A control-family efficacy score > 0 asserted with NO evidence reference is UNVERIFIABLE and fails closed.",
+    "families": {
+      "Governance": { "objective": "Assign ownership, exceptions, and change authority for critical services and nodes.", "tier0_minimum": "Owner and exception process documented for every tier-0 node and path.", "mapped_frameworks": "BCBS ORMF / resilience / C-SCRM", "source_url": "https://www.bis.org/fsi/fsisummaries/psmor.htm" },
+      "Identity & publishing authority": { "objective": "Reduce credential risk and uncontrolled publish authority.", "tier0_minimum": "No long-lived publish tokens on tier-0 CI/CD paths; MFA or equivalent for all high-authority identities.", "mapped_frameworks": "BCBS third-party / NIST SSDF / npm trusted publishing", "source_url": "https://docs.npmjs.com/trusted-publishers/" },
+      "Build provenance": { "objective": "Capture where, when, and how artifacts were produced.", "tier0_minimum": "Verified provenance for 100% of tier-0 releases.", "mapped_frameworks": "SLSA / SSDF", "source_url": "https://slsa.dev/spec/v1.0/provenance" },
+      "Artifact integrity": { "objective": "Bind artifacts to identity and make verification auditable.", "tier0_minimum": "All tier-0 artifacts signed and verification enforced before promotion.", "mapped_frameworks": "Sigstore / SSDF", "source_url": "https://docs.sigstore.dev/about/overview/" },
+      "Distribution guardrails": { "objective": "Constrain risky install and update behavior.", "tier0_minimum": "Tier-0 builds and releases install only from approved channels with lock/pin policy.", "mapped_frameworks": "NIST C-SCRM / npm / Go modules", "source_url": "https://go.dev/ref/mod" },
+      "Monitoring & recovery": { "objective": "Detect failures early and recover or roll back fast.", "tier0_minimum": "Recovery playbook tested for every tier-0 service at least quarterly.", "mapped_frameworks": "BCBS resilience / SSDF", "source_url": "https://www.bis.org/bcbs/publ/d516.pdf" }
+    }
+  },
+
+  "kri_kci_thresholds": {
+    "description": "Key risk indicators (KRIs) and key control indicators (KCIs) with green/amber/red bands (workbook 'KRI_KCI' sheet). A metric landing RED is a threshold breach: a path/node whose KRI evaluates RED is FLAGGED and the assessment is not VERIFIED (fail-closed). Bands with a % or numeric direction are encoded as machine-checkable comparators.",
+    "indicators": [
+      { "id": "KRI01", "type": "KRI", "metric": "Tier-0 releases with verified provenance", "direction": "higher_is_better", "unit": "percent", "green": 95, "amber_low": 80, "red_below": 80, "owner": "Release Engineering", "source_url": "https://slsa.dev/spec/v1.0/provenance" },
+      { "id": "KRI02", "type": "KRI", "metric": "Tier-0 artifacts with signature verification enforced", "direction": "higher_is_better", "unit": "percent", "green": 95, "amber_low": 80, "red_below": 80, "owner": "Security Engineering", "source_url": "https://docs.sigstore.dev/about/overview/" },
+      { "id": "KRI03", "type": "KRI", "metric": "Tier-0 paths allowing install-time script execution", "direction": "lower_is_better", "unit": "percent", "green_max": 0, "amber_max": 10, "red_above": 10, "owner": "Developer Platform", "source_url": "https://docs.npmjs.com/cli/v11/using-npm/scripts/" },
+      { "id": "KRI04", "type": "KRI", "metric": "Critical clusters above 70% provider concentration", "direction": "lower_is_better", "unit": "count", "green_max": 0, "amber_max": 1, "red_above": 1, "owner": "Platform Risk", "source_url": "https://www.bis.org/bcbs/publ/d605.pdf" },
+      { "id": "KRI05", "type": "KRI", "metric": "Median emergency rollback time", "direction": "lower_is_better", "unit": "hours", "green_max": 2, "amber_max": 4, "red_above": 4, "owner": "Release Engineering", "source_url": "https://www.bis.org/bcbs/publ/d516.pdf" },
+      { "id": "KRI06", "type": "KRI", "metric": "Critical dependencies without lock/pin coverage", "direction": "lower_is_better", "unit": "percent", "green_max": 5, "amber_max": 15, "red_above": 15, "owner": "Developer Platform", "source_url": "https://packaging.python.org/en/latest/specifications/pylock-toml/" },
+      { "id": "KRI07", "type": "KRI", "metric": "Critical nodes without tested exit plan", "direction": "lower_is_better", "unit": "percent", "green_max": 0, "amber_max": 10, "red_above": 10, "owner": "Platform Risk", "source_url": "https://www.occ.treas.gov/news-issuances/news-releases/2023/nr-ia-2023-53.html" },
+      { "id": "KRI08", "type": "KRI", "metric": "High-authority identities without phishing-resistant MFA", "direction": "lower_is_better", "unit": "count", "green_max": 0, "amber_max": 1, "red_above": 1, "owner": "Identity", "source_url": "https://www.bis.org/bcbs/publ/d605.htm" },
+      { "id": "KCI01", "type": "KCI", "metric": "Tier-0 builds on isolated / ephemeral builders", "direction": "higher_is_better", "unit": "percent", "green": 95, "amber_low": 80, "red_below": 80, "owner": "Platform Engineering", "source_url": "https://slsa.dev/spec/v1.0/requirements" },
+      { "id": "KCI02", "type": "KCI", "metric": "Critical dependencies with SBOM and graph visibility", "direction": "higher_is_better", "unit": "percent", "green": 95, "amber_low": 80, "red_below": 80, "owner": "Security Engineering", "source_url": "https://www.cisa.gov/sbom" },
+      { "id": "KCI03", "type": "KCI", "metric": "Critical services with tested recovery drill", "direction": "higher_is_better", "unit": "percent", "green": 100, "amber_low": 75, "red_below": 75, "owner": "Operations", "source_url": "https://www.bis.org/bcbs/publ/d516.pdf" },
+      { "id": "KCI04", "type": "KCI", "metric": "Critical providers with current due diligence review", "direction": "higher_is_better", "unit": "percent", "green": 100, "amber_low": 80, "red_below": 80, "owner": "Vendor / Platform Risk", "source_url": "https://www.occ.treas.gov/news-issuances/news-releases/2023/nr-ia-2023-53.html" }
+    ]
+  }
+}

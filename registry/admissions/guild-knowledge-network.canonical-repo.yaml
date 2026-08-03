@@ -1,0 +1,20 @@
+# guild-knowledge-network canonical repository admission fragment (auto-registered 2026-08-03)
+id: guild-knowledge-network
+name: guild-knowledge-network
+url: https://github.com/SocioProphet/guild-knowledge-network
+role: standards
+status: active
+description: Guild Knowledge Network (GKN) v0.1 — guild-based epistemic-governance
+  network, spec-as-code
+primary_language: Python
+tags:
+- guild
+- epistemic-governance
+- spec-as-code
+canonical_owner: SocioProphet/guild-knowledge-network
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 24bfca7bdf7e4506979e96a72cecbdd19849d511
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

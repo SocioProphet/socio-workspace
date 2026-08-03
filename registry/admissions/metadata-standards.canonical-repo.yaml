@@ -1,0 +1,24 @@
+# metadata-standards canonical repository admission fragment (auto-registered 2026-08-03)
+id: metadata-standards
+name: metadata-standards
+url: https://github.com/SocioProphet/metadata-standards
+role: standards
+status: active
+description: 'SocioProphet Metadata Standards: the canonical forensic-grade metadata
+  record (identity/integrity/temporal/provenance/classification), WNZL Dirt-to-Diamond
+  zones, and CustodyEvent model. Grounded in FRE 901/902, NIST SP 800-86, ISO/IEC
+  27037, HellGraph IDL, TriTRPC. Schema + validator + examples + CI.'
+primary_language: Python
+tags:
+- metadata
+- forensic
+- provenance
+- custody
+- fre-nist-iso
+canonical_owner: SocioProphet/metadata-standards
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 18881a6ccabb2faa439d96f00a5ae1c803b32666
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

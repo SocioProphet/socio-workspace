@@ -1,0 +1,21 @@
+# noetica-impair canonical repository admission fragment (auto-registered 2026-08-03)
+id: noetica-impair
+name: noetica-impair
+url: https://github.com/SocioProphet/noetica-impair
+role: testing
+status: active
+description: White-box dose-scaled impairment rig for locally-held open-weights LLMs;
+  measures dissociation signatures. Conforms to superconscious interpretability-harness
+  schemas.
+primary_language: Python
+tags:
+- interpretability
+- impairment-rig
+- llm
+canonical_owner: SocioProphet/noetica-impair
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: e3d8e59cfcee6ef9a15e31b5c76925ad9d1d0602
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

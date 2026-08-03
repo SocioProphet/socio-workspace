@@ -1,0 +1,23 @@
+# prophet-sheaf canonical repository admission fragment (auto-registered 2026-08-03)
+id: prophet-sheaf
+name: prophet-sheaf
+url: https://github.com/SocioProphet/prophet-sheaf
+role: component
+status: active
+description: 'A typed germ/section sheaf-gluing algebra: decides whether an assembly
+  of declared agent capabilities is a coherent section over a manifest, and issues
+  a receipt saying precisely why not. MIT.'
+primary_language: Rust
+tags:
+- sheaf
+- gluing-algebra
+- rust
+- mit
+- SP-1
+canonical_owner: SocioProphet/prophet-sheaf
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 219aca1da536b02db97a24afb1f899c577a8d644
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

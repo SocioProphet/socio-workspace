@@ -1,0 +1,20 @@
+# prophet-sheaf-hellgraph canonical repository admission fragment (auto-registered 2026-08-03)
+id: prophet-sheaf-hellgraph
+name: prophet-sheaf-hellgraph
+url: https://github.com/SocioProphet/prophet-sheaf-hellgraph
+role: component
+status: active
+description: 'Internal: HellGraph-backed storage seam for prophet-sheaf. Not published.'
+primary_language: Rust
+tags:
+- sheaf
+- hellgraph
+- storage-seam
+- internal
+canonical_owner: SocioProphet/prophet-sheaf-hellgraph
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 63b7bb4530d2a8179d4f1be5dbdad24842488961
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

@@ -1,0 +1,21 @@
+# cybernetic-genesis canonical repository admission fragment (auto-registered 2026-08-03)
+id: cybernetic-genesis
+name: cybernetic-genesis
+url: https://github.com/SocioProphet/cybernetic-genesis
+role: component
+status: active
+description: 'Cybernetic agentic Genesis & Inception: semantic-hologram base, Genesis
+  seeds, verified twins (Inception + K3 bridge), L0 dual-witness/boundary discipline'
+primary_language: Python
+tags:
+- genesis
+- inception
+- trit
+- provenance-spine
+canonical_owner: SocioProphet/cybernetic-genesis
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 8efe43f161465a17263da5263b5f37d38a9e2af3
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

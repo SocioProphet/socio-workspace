@@ -1,0 +1,23 @@
+# prophet-truth canonical repository admission fragment (auto-registered 2026-08-03)
+id: prophet-truth
+name: prophet-truth
+url: https://github.com/SocioProphet/prophet-truth
+role: component
+status: active
+description: 'A composable, provenance-bearing algebra of epistemic certainty: an
+  absorbing epistemic lattice and an evidential belief calculus where composition
+  degrades but never upgrades. no_std, MIT.'
+primary_language: Rust
+tags:
+- epistemic-lattice
+- belief-calculus
+- rust
+- no_std
+- mit
+canonical_owner: SocioProphet/prophet-truth
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 556b8e7d2f7831197dc9f5f5e5317ace5286173b
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

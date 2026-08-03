@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/supply-chain-risk-proof-artifact.schema.json",
+  "title": "GBRG Supply-Chain Operational-Risk Proof Artifact",
+  "description": "Governance-native result of a supply-chain operational-risk assessment over the governed blast-radius graph, at node | path | cluster granularity. Extends the estate-canonical ProofArtifact v1 (never a bare number): carries the declared weights reference, the inherent/control/residual scores, the rating, the controls-evidence set, and the KRI/KCI evaluations that justify the verdict.",
+  "$comment": "Converged onto the estate-canonical ProofArtifact v1 (standards-storage#97, remediation R2): binds via allOf to https://schemas.socioprophet.ai/proof-artifact/v1.json and $refs its epistemicLevel enum from $defs instead of copy-pasting it. Weights live in supply-chain-risk-weights.v0.json (declared, not magic numbers). epistemicLevel is the proof-CONFIDENCE axis: an assessment whose claimed control efficacy is fully evidenced and whose KRIs are all within threshold is 'empirical'; an assessment with any unevidenced control-family claim, or any KRI in the RED band, is FAILED/BLOCKED and downgraded (fail-closed on missing evidence / threshold breach).",
+  "allOf": [
+    { "$ref": "https://schemas.socioprophet.ai/proof-artifact/v1.json" },
+    {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "proofId",
+        "riskScope",
+        "subjectId",
+        "claim",
+        "status",
+        "residualScore",
+        "rating",
+        "weightsRef",
+        "controlsEvidence",
+        "derivation",
+        "declared_by"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "string" },
+        "proofId": { "type": "string", "pattern": "^proof-[a-z0-9][a-z0-9._:-]*$" },
+        "riskScope": {
+          "type": "string",
+          "enum": ["node", "path", "cluster"],
+          "description": "Granularity of this assessment: a single graph node, a critical-service path (chain of nodes), or a common-mode concentration cluster."
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifier of the assessed node / path / cluster (e.g. an ontology node type instance, path id, or cluster id)."
+        },
+        "claim": {
+          "type": "object",
+          "required": ["claimId", "claimType", "statement"],
+          "properties": {
+            "claimId": { "type": "string" },
+            "claimType": { "type": "string" },
+            "statement": { "type": "string", "minLength": 1 },
+            "epistemicLevel": {
+              "$ref": "https://schemas.socioprophet.ai/proof-artifact/v1.json#/$defs/epistemicLevel"
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PROVED", "BOUNDED", "FAILED", "BLOCKED", "INCONCLUSIVE", "SYNTHETIC_ONLY"]
+        },
+        "inherentScore": {
+          "type": "number", "minimum": 0.0, "maximum": 1.0,
+          "description": "Weighted inherent risk (node) or common-mode inherent (cluster). Absent for a path, whose risk is accumulated from node residuals."
+        },
+        "controlEfficacy": {
+          "type": "number", "minimum": 0.0, "maximum": 1.0,
+          "description": "Weighted control-family efficacy (0..1). Only families whose claim is EVIDENCED count; see controlsEvidence."
+        },
+        "residualScore": {
+          "type": "number", "minimum": 0.0, "maximum": 1.0,
+          "description": "Node: inherent*(1-controlEfficacy). Path: 1 - product(1 - residual_i). Cluster: common_mode_inherent*(1-resilience)."
+        },
+        "rating": {
+          "type": "string",
+          "enum": ["Low", "Moderate", "High", "Critical"],
+          "description": "Rating band from residualScore per the declared rating_thresholds."
+        },
+        "weightsRef": {
+          "type": "string",
+          "description": "URN/id of the declared weights document the scores were computed under (supply-chain-risk-weights.v0)."
+        },
+        "crosswalkRefs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Alignment ids (e.g. B001, F003) binding this assessment's control taxonomy to BIAN/FICO via the governed crosswalk."
+        },
+        "controlsEvidence": {
+          "type": "array",
+          "description": "Per-control-family evidence records. A control family with efficacy > 0 MUST carry a non-empty evidenceRef here, or the assessment fails closed (unverifiable control claim).",
+          "items": {
+            "type": "object",
+            "required": ["controlFamily", "efficacy", "evidenceRef"],
+            "properties": {
+              "controlFamily": { "type": "string" },
+              "efficacy": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "evidenceRef": {
+                "type": ["string", "null"],
+                "description": "Pointer to the evidence backing this control-family claim. null/empty with efficacy>0 = unverifiable => fail-closed."
+              }
+            }
+          }
+        },
+        "kriEvaluations": {
+          "type": "array",
+          "description": "Evaluated KRIs/KCIs relevant to this subject. Any band == 'red' is a threshold breach that FLAGS the assessment.",
+          "items": {
+            "type": "object",
+            "required": ["id", "value", "band"],
+            "properties": {
+              "id": { "type": "string" },
+              "value": { "type": "number" },
+              "band": { "type": "string", "enum": ["green", "amber", "red"] }
+            }
+          }
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["VERIFIES", "FLAGGED", "REJECTED"],
+          "description": "Assay-style projection: VERIFIES (ok) = evidenced controls + all KRIs within threshold; FLAGGED (sad) = a KRI in RED / threshold breach; REJECTED (bad) = missing/unverifiable controls-evidence or an ungoverned crosswalk term."
+        },
+        "derivation": {
+          "type": "string", "minLength": 1,
+          "description": "Human-readable explanation of WHY this rating/verdict holds (which factors, controls, KRIs, and crosswalk terms were considered)."
+        },
+        "declared_by": {
+          "type": "string",
+          "pattern": "^agent-registry://",
+          "description": "Producing agent identity, resolvable in the agent-registry."
+        }
+      }
+    }
+  ]
+}

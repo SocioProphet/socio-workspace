@@ -1,0 +1,162 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "storage_standard",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Active-spine storage standard; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "Storage substrate semantics, replication obligations, durability tiers, capacity policy, and storage proof contracts.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "storage schemas",
+      "replication policy definitions",
+      "durability and capacity contracts"
+    ]
+  },
+  "catalog": {
+    "asset_count": 530,
+    "by_kind": {
+      "adrs-docs": 16,
+      "avro": 26,
+      "ci-workflows-tests": 7,
+      "design": 6,
+      "gate": 2,
+      "governance": 7,
+      "json-schema": 89,
+      "other": 6,
+      "readme": 4,
+      "spec": 18,
+      "topic-vocabulary": 349
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "rules-policies",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 220,
+    "sample_assets": [
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-042-live-telemetry-inspector-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "042 — Live Telemetry Inspector Standard",
+        "path": "docs/standards/042-live-telemetry-inspector.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-082-banking-contracts-and-lineage-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "082 — Banking Contracts and Lineage Standard",
+        "path": "docs/standards/082-banking-contracts-and-lineage.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-096-local-first-desktop-sync-and-governance-m",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "096 — Local-First Desktop, Sync, and Governance Standard",
+        "path": "docs/standards/096-local-first-desktop-sync-and-governance.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-096-multidomain-geospatial-storage-contracts-",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "096 — Multi-Domain Geospatial Storage Contracts",
+        "path": "docs/standards/096-multidomain-geospatial-storage-contracts.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-132-incidence-fabric-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "132 — Incidence Fabric Contract (IFC) v0.2",
+        "path": "docs/standards/132-incidence-fabric-contract.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-135-canonical-evidence-lake-architecture-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "135. Canonical Evidence Lake and Ingest Architecture (v0.1)",
+        "path": "docs/standards/135-canonical-evidence-lake-architecture.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-137-evidence-broker-local-ingest-manifest-v0-",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "137. Evidence Broker Local-File Ingest Manifest Contract (v0.1)",
+        "path": "docs/standards/137-evidence-broker-local-ingest-manifest-v0-1.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-138-action-ontology-bootstrap-temp-landing-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "138. Action Ontology Bootstrap Temporary Landing (v0.1)",
+        "path": "docs/standards/138-action-ontology-bootstrap-temp-landing.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-139-action-ontology-contracts-and-patterns-v0",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "139. Action Ontology Contracts and Pattern Surfaces (v0.1)",
+        "path": "docs/standards/139-action-ontology-contracts-and-patterns-v0-1.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-140-action-ontology-transport-and-consumers-v",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "140. Action Ontology Transport and Consumer Surfaces (v0.1)",
+        "path": "docs/standards/140-action-ontology-transport-and-consumers-v0-1.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-141-action-ontology-validation-profile-v0-1-m",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "141. Action Ontology Validation Profile (v0.1)",
+        "path": "docs/standards/141-action-ontology-validation-profile-v0-1.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-storage.docs-standards-142-action-ontology-edge-and-bridge-cases-v0-",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "142. Action Ontology Edge and Bridge Cases (v0.1)",
+        "path": "docs/standards/142-action-ontology-edge-and-bridge-cases-v0-1.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "access",
+    "acme",
+    "acquisition",
+    "action",
+    "activation",
+    "additional",
+    "addon",
+    "affordances",
+    "agent",
+    "alerts",
+    "alg",
+    "amendment",
+    "append",
+    "array",
+    "artifact",
+    "assessment",
+    "asset",
+    "audit",
+    "award"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.socioprophet-standards-storage",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/socioprophet-standards-storage",
+    "status": "active",
+    "title": "Socioprophet Standards Storage (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/socioprophet-standards-storage",
+  "schema": "self-documentation-record/v0.1",
+  "short": "socioprophet-standards-storage"
+}

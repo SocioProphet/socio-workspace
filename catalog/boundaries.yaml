@@ -9,6 +9,21 @@ atlas:
   owner: SocioProphet/sociosphere
   claim_mode: formal_construction
   sufficiency_type: governance_sufficient
+  code_derived_documentation:
+    mechanism: enumerate -> extract -> compose -> canary -> serve-over-MCP
+    source_of_truth: code
+    catalog_repo: SocioProphet/prophet-core-catalog
+    composed_view: artifacts/self-documentation/
+    composer: tools/compose_self_documentation.py
+    canary: tools/verify_self_documentation.py
+    roster: registry/estate-roster.json
+    doc: docs/SELF-DOCUMENTING-ESTATE.md
+    note: >-
+      The per-repo documentation records under composed_view are DERIVED from the
+      code-derived catalog (schemas / services / ADRs / agents / models / policies /
+      vocab) and the estate-graph — not hand-authored. Every Atlas entry below that
+      the catalog covers has a corresponding code-derived record; the canary fails
+      closed if any record drifts from the code it claims to describe.
 entries:
   - repo: SocioProphet/prophet-platform-standards
     boundary_class: standards

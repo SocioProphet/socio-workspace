@@ -1,0 +1,160 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "evidentiary_retrieval",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "experimental_run"
+    ],
+    "current_status": "Boundary record not yet native in repo.",
+    "jurisdiction": "Search, source attribution, evidence retrieval, query surfaces, and claim-support traces.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "indexed evidence surfaces",
+      "search result traces",
+      "source attribution bundles"
+    ]
+  },
+  "catalog": {
+    "asset_count": 352,
+    "by_kind": {
+      "access": 2,
+      "ci-workflows-tests": 22,
+      "design": 1,
+      "http-api": 2,
+      "json-schema": 39,
+      "readme": 2,
+      "spec": 3,
+      "topic-vocabulary": 281
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "rules-policies",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 153,
+    "sample_assets": [
+      {
+        "asset_id": "doc.sherlock-search.docs-dossiers-agentic-marketing-2026-04-12-dossier-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Full Dossier: Agentic Marketing, Prospecting, Discovery, Surfaces, Bias, Curvature, and Capability-Parity",
+        "path": "docs/dossiers/agentic-marketing-2026-04-12/dossier.md"
+      },
+      {
+        "asset_id": "doc.sherlock-search.docs-semantic-search-readme-md",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "Semantic Search Capability Contract (Contract-Only)",
+        "path": "docs/semantic-search/README.md"
+      },
+      {
+        "asset_id": "doc.sherlock-search.docs-evidence-answer-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Sherlock Evidence-Answer Contract (Anchor -> Normalize -> Propose)",
+        "path": "docs/evidence-answer-contract.md"
+      },
+      {
+        "asset_id": "doc.sherlock-search.docs-architecture-sherlock-query-matrix-chatops-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Sherlock Query Plane and Matrix ChatOps Architecture",
+        "path": "docs/architecture/sherlock-query-matrix-chatops.md"
+      },
+      {
+        "asset_id": "doc.sherlock-search.docs-integrations-socioprophet-dashboard-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Socioprophet dashboard contract",
+        "path": "docs/integrations/socioprophet-dashboard-contract.md"
+      },
+      {
+        "asset_id": "doc.sherlock-search.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "sherlock-search",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "wf-1d8361ed17",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Geospatial Evidence Result Proof",
+        "path": ".github/workflows/geospatial-result.yml"
+      },
+      {
+        "asset_id": "wf-82b4a459d0",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Makefile",
+        "path": "Makefile"
+      },
+      {
+        "asset_id": "wf-b655bb4de7",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "computational-artifact-search-packet",
+        "path": ".github/workflows/computational-artifact-search-packet.yml"
+      },
+      {
+        "asset_id": "wf-c9d15e5185",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "event-capability-record-search",
+        "path": ".github/workflows/event-capability-record-search.yml"
+      },
+      {
+        "asset_id": "wf-0372db98dd",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "evidence-answer-contract-fixtures",
+        "path": ".github/workflows/evidence-answer-contract-fixtures.yml"
+      },
+      {
+        "asset_id": "wf-bb8c5fbe84",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "federated-query-platform-assets",
+        "path": ".github/workflows/federated-query-platform-assets.yml"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "actions",
+    "actor",
+    "additional",
+    "answer",
+    "append",
+    "array",
+    "artifact",
+    "asset",
+    "audit",
+    "backend",
+    "backlink",
+    "base",
+    "candidate",
+    "capability",
+    "capd",
+    "caps",
+    "ceiling",
+    "citance",
+    "claim",
+    "client"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.sherlock-search",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/sherlock-search",
+    "status": "active",
+    "title": "Sherlock Search (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/sherlock-search",
+  "schema": "self-documentation-record/v0.1",
+  "short": "sherlock-search"
+}

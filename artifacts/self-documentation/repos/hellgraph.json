@@ -1,0 +1,164 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "proof_graph_runtime",
+    "claim_modes": [
+      "formal_construction",
+      "fixture_validated",
+      "experimental_run"
+    ],
+    "current_status": "Restricted active-spine promotion candidate; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "Proof graph runtime, field-graph execution, proof-node custody, graph-transition evidence, and restricted promotion controls.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "proof graph schemas",
+      "graph execution traces",
+      "field-graph proof artifacts",
+      "transition evidence reports"
+    ]
+  },
+  "catalog": {
+    "asset_count": 346,
+    "by_kind": {
+      "adrs-docs": 3,
+      "argocd-app": 1,
+      "ci-workflows-tests": 11,
+      "deployment": 1,
+      "json-schema": 2,
+      "k8s-service": 2,
+      "other": 2,
+      "policy-as-code": 1,
+      "readme": 1,
+      "spec": 18,
+      "topic-vocabulary": 304
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "rules-policies",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 174,
+    "sample_assets": [
+      {
+        "asset_id": "adr.hellgraph.0001",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001: HellGraph positioning",
+        "path": "docs/adr/0001-hellgraph-positioning.md"
+      },
+      {
+        "asset_id": "adr.hellgraph.0002",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0002: Managed HellGraph is a sovereign federation, not a central authority",
+        "path": "docs/adr/0002-federated-not-central.md"
+      },
+      {
+        "asset_id": "adr.hellgraph.0003",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0003: The content data-plane composes onto HellGraph; egress is opt-in",
+        "path": "docs/adr/0003-content-plane-composition.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-12-codex-tritrpc-reconciliation-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Codex ↔ TriTRPC Reconciliation v0.1",
+        "path": "docs/specs/12_Codex_TriTRPC_Reconciliation_v0_1.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-02-epistemic-modes-and-assertion-model-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Epistemic Modes and Assertion Model v0.1",
+        "path": "docs/specs/02_Epistemic_Modes_and_Assertion_Model.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-06-fieldproof-pilot-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Field and Proof Pilot v0.1",
+        "path": "docs/specs/06_FieldProof_Pilot_v0_1.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "HellGraph",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-10-content-data-plane-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "HellGraph Content Data-Plane v0.1",
+        "path": "docs/specs/10_Content_Data_Plane_v0_1.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-04-cypher-facade-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "HellGraph Cypher Facade v0.1",
+        "path": "docs/specs/04_Cypher_Facade_v0_1.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-08-federated-sovereign-hellgraph-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "HellGraph Federated Sovereign Model v0.1",
+        "path": "docs/specs/08_Federated_Sovereign_HellGraph_v0_1.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-03-kernel-idl-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "HellGraph Kernel IDL v0.1",
+        "path": "docs/specs/03_Kernel_IDL_v0_1.md"
+      },
+      {
+        "asset_id": "doc.hellgraph.docs-specs-09-proof-under-causal-consistency-v0-1-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "HellGraph Proof Under Causal Consistency v0.1",
+        "path": "docs/specs/09_Proof_Under_Causal_Consistency_v0_1.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "action",
+    "adj",
+    "alice",
+    "artifact",
+    "atom",
+    "auth",
+    "autobase",
+    "backend",
+    "base",
+    "basis",
+    "blazegraph",
+    "boundary",
+    "bytes",
+    "canonical",
+    "cargo",
+    "causal",
+    "claim",
+    "codex",
+    "coherence",
+    "concept"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.hellgraph",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/hellgraph",
+    "status": "active",
+    "title": "Hellgraph (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/hellgraph",
+  "schema": "self-documentation-record/v0.1",
+  "short": "hellgraph"
+}

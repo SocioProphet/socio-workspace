@@ -1,0 +1,169 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "knowledge_standard",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Active-spine knowledge standard; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "Knowledge substrate semantics, provenance, ontology alignment, query contracts, and epistemic-control-plane obligations.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "knowledge schemas",
+      "provenance contracts",
+      "ontology alignment contracts",
+      "query semantics fixtures"
+    ]
+  },
+  "catalog": {
+    "asset_count": 427,
+    "by_kind": {
+      "avro": 7,
+      "ci-workflows-tests": 5,
+      "deployment": 6,
+      "gate": 1,
+      "ingress": 4,
+      "json-schema": 48,
+      "jsonld": 8,
+      "k8s-service": 2,
+      "other": 1,
+      "owl": 3,
+      "rdf": 2,
+      "readme": 1,
+      "shacl": 14,
+      "spec": 2,
+      "topic-vocabulary": 323
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "ontologies",
+      "rules-policies",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 196,
+    "sample_assets": [
+      {
+        "asset_id": "doc.socioprophet-standards-knowledge.docs-whitepapers-abstract-interpretation-as-civic-infrastruc",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Abstract Interpretation as Civic Infrastructure",
+        "path": "docs/whitepapers/abstract-interpretation-as-civic-infrastructure.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-knowledge.docs-standards-034-registri-schema-context-id-registry-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Registri Schema + Context ID Registry (Normative Draft)",
+        "path": "docs/standards/034-registri-schema-context-id-registry.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-knowledge.docs-standards-031-schema-context-id-registry-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Schema + Context ID Registry (Normative)",
+        "path": "docs/standards/031-schema-context-id-registry.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-standards-knowledge.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "SocioProphet Standards — Knowledge Context",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "wf-8945477c46",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Knowledge Context verification",
+        "path": ".github/workflows/knowledge-context-verify.yml"
+      },
+      {
+        "asset_id": "wf-27387b16e8",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Makefile",
+        "path": "Makefile"
+      },
+      {
+        "asset_id": "wf-96dbc40476",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Multi-Domain Geospatial Knowledge Standards",
+        "path": ".github/workflows/multidomain-geospatial-knowledge.yml"
+      },
+      {
+        "asset_id": "ts-bffefd8fa2",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "ts-bffefd8fa2",
+        "path": "tests"
+      },
+      {
+        "asset_id": "wf-3a5b89ffdc",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "validate",
+        "path": ".github/workflows/validate.yml"
+      },
+      {
+        "asset_id": "onto-ef63112173fd",
+        "dataset": "ontologies",
+        "kind": "shacl",
+        "name": "bindings.shacl.ttl",
+        "path": "Lower/shapes/bindings.shacl.ttl"
+      },
+      {
+        "asset_id": "onto-b76e257416e3",
+        "dataset": "ontologies",
+        "kind": "jsonld",
+        "name": "context.jsonld",
+        "path": "schemas/jsonld/contexts/cybernetic-catalog-profile.v1/context.jsonld"
+      },
+      {
+        "asset_id": "onto-bbfcca2faae7",
+        "dataset": "ontologies",
+        "kind": "jsonld",
+        "name": "context.jsonld",
+        "path": "schemas/jsonld/contexts/knowledge.v1/context.jsonld"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "abd",
+    "abstain",
+    "academy",
+    "accept",
+    "ack",
+    "additional",
+    "aead",
+    "agent",
+    "angel",
+    "api",
+    "app",
+    "argument",
+    "array",
+    "artifact",
+    "asset",
+    "avro",
+    "bytes",
+    "capability",
+    "claim",
+    "client"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.socioprophet-standards-knowledge",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/socioprophet-standards-knowledge",
+    "status": "active",
+    "title": "Socioprophet Standards Knowledge (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/socioprophet-standards-knowledge",
+  "schema": "self-documentation-record/v0.1",
+  "short": "socioprophet-standards-knowledge"
+}

@@ -1,0 +1,187 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "runtime_verifier",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated",
+      "experimental_run"
+    ],
+    "current_status": "Implementation issue open for Trust-First proof artifact/checker contract.",
+    "jurisdiction": "Platform runtime verification, Event-IR, proof artifacts, run bundles, and checker contract.",
+    "maturity": "L1",
+    "owned_artifacts": [
+      "schemas/event-ir.schema.json",
+      "schemas/proof-artifact.schema.json",
+      "docs/checker-contract.md",
+      "examples/kms-key-usage-*.json"
+    ]
+  },
+  "catalog": {
+    "asset_count": 1597,
+    "by_kind": {
+      "access": 6,
+      "adrs-docs": 10,
+      "argocd-app": 22,
+      "ci-workflows-tests": 201,
+      "compose-service": 63,
+      "deployment": 67,
+      "design": 6,
+      "fine-tuned": 2,
+      "gate": 33,
+      "governance": 16,
+      "guardrail": 3,
+      "http-api": 56,
+      "identifier": 25,
+      "ingress": 8,
+      "invariant": 4,
+      "json-schema": 314,
+      "jsonld": 2,
+      "k8s-service": 63,
+      "other": 74,
+      "owl": 1,
+      "path": 45,
+      "pii": 2,
+      "policy-as-code": 50,
+      "readme": 1,
+      "secret": 6,
+      "shacl": 4,
+      "spec": 10,
+      "topic-vocabulary": 322,
+      "validation": 180,
+      "version": 1
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "models",
+      "ontologies",
+      "regex-operational-dataset",
+      "rules-policies",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 195,
+    "sample_assets": [
+      {
+        "asset_id": "adr.prophet-platform.0001",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001: Name the medical program SocioProphet Salus and bootstrap it inside prophet-platform",
+        "path": "docs/adr/ADR-0001-salus-naming-and-bootstrap-placement.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0030",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-030: Prophet Platform as the integration target for platform/infrastructure management",
+        "path": "adr/ADR-030-prophet-platform-integration.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0031",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-031: Runtime transport topology for `prophet-platform`",
+        "path": "adr/ADR-031-runtime-transport-topology.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0032",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-032: Service classes and local daemons in prophet-platform",
+        "path": "adr/ADR-032-service-classes-and-local-daemons.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0033",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-033: Canonical receipts and event envelopes",
+        "path": "adr/ADR-033-canonical-receipts-and-event-envelopes.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0034",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-034: Lampstand vertical slice and file-based discovery",
+        "path": "adr/ADR-034-lampstand-vertical-slice-and-discovery.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0035-2",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-035 — Usage Examples and Validation Guide",
+        "path": "docs/adr-035-usage-examples.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0035",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-035: Transparent fault attribution and embedded engine policy",
+        "path": "adr/ADR-035-transparent-fault-attribution-and-embedded-engine-policy.md"
+      },
+      {
+        "asset_id": "adr.prophet-platform.0036",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-036 — Inception Framework: strict-initial-object invariants",
+        "path": "adr/ADR-036-inception-strict-initial-invariants.md"
+      },
+      {
+        "asset_id": "doc.prophet-platform.docs-architecture-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Architecture",
+        "path": "docs/ARCHITECTURE.md"
+      },
+      {
+        "asset_id": "doc.prophet-platform.docs-channel-governed-runtime-gates-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Channel-governed runtime gates v0.1",
+        "path": "docs/CHANNEL_GOVERNED_RUNTIME_GATES.md"
+      },
+      {
+        "asset_id": "doc.prophet-platform.docs-chaos-resilience-fabric-v0-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Chaos & Resilience Fabric — Design V0",
+        "path": "docs/CHAOS_RESILIENCE_FABRIC_V0.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "access",
+    "additional",
+    "api",
+    "app",
+    "append",
+    "array",
+    "artifact",
+    "artifacts",
+    "base",
+    "beta",
+    "body",
+    "bold",
+    "builtins",
+    "bundle",
+    "bygroups",
+    "cache",
+    "cell",
+    "char",
+    "client",
+    "color"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.prophet-platform",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/prophet-platform",
+    "status": "active",
+    "title": "Prophet Platform (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/prophet-platform",
+  "schema": "self-documentation-record/v0.1",
+  "short": "prophet-platform"
+}

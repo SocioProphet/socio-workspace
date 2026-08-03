@@ -1,0 +1,161 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "governance_evidence",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated",
+      "independently_reproduced"
+    ],
+    "current_status": "Implementation issue open for evidence-packet and sufficiency-rubric tooling.",
+    "jurisdiction": "Model and service documentation evidence packets, sufficiency rubrics, adjudication worksheets, and governance scoring.",
+    "maturity": "L1",
+    "owned_artifacts": [
+      "schemas/evidence-packet.schema.json",
+      "schemas/adjudication.schema.json",
+      "examples/frozen-evidence-packets",
+      "tools/sufficiency scoring"
+    ]
+  },
+  "catalog": {
+    "asset_count": 294,
+    "by_kind": {
+      "ci-workflows-tests": 4,
+      "governance": 3,
+      "governed": 3,
+      "invariant": 1,
+      "json-schema": 7,
+      "readme": 1,
+      "topic-vocabulary": 275
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "models",
+      "rules-policies",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 163,
+    "sample_assets": [
+      {
+        "asset_id": "doc.model-governance-ledger.docs-governance-audit-record-v0-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Governance Audit Record v0",
+        "path": "docs/governance-audit-record-v0.md"
+      },
+      {
+        "asset_id": "doc.model-governance-ledger.docs-model-governance-ledger-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Model Governance Ledger",
+        "path": "docs/MODEL_GOVERNANCE_LEDGER.md"
+      },
+      {
+        "asset_id": "doc.model-governance-ledger.docs-professional-intelligence-ledger-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Professional Intelligence Model Governance Ledger",
+        "path": "docs/PROFESSIONAL_INTELLIGENCE_LEDGER.md"
+      },
+      {
+        "asset_id": "doc.model-governance-ledger.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "model-governance-ledger",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "wf-112fd5f009",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Makefile",
+        "path": "Makefile"
+      },
+      {
+        "asset_id": "wf-44863e1fc3",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "release-dry-run",
+        "path": ".github/workflows/release-dry-run.yml"
+      },
+      {
+        "asset_id": "ts-354446c3cf",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "ts-354446c3cf",
+        "path": "tools/tests"
+      },
+      {
+        "asset_id": "wf-f359941830",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "validate",
+        "path": ".github/workflows/validate.yml"
+      },
+      {
+        "asset_id": "mdl-53c1b1fe8a",
+        "dataset": "models",
+        "kind": "governed",
+        "name": "model://fraud/public-synthetic/lgbm-risk-signal-v0",
+        "path": "examples/fraud-decision-ledger-record.example.json"
+      },
+      {
+        "asset_id": "mdl-c155801207",
+        "dataset": "models",
+        "kind": "governed",
+        "name": "model://local/small-language@0.1.0",
+        "path": "examples/route-evidence-record.example.json"
+      },
+      {
+        "asset_id": "mdl-5daf41c5d7",
+        "dataset": "models",
+        "kind": "governed",
+        "name": "model://socioprophet/text-classifier@2.4.0",
+        "path": "examples/trustops-receipt-ledger-record.raw-sensitive.invalid.json"
+      },
+      {
+        "asset_id": "pol-ad74db23dd",
+        "dataset": "rules-policies",
+        "kind": "invariant",
+        "name": "fail-closed-gate",
+        "path": "README.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "additional",
+    "agent",
+    "array",
+    "art",
+    "artifact",
+    "asset",
+    "audit",
+    "benchmark",
+    "bibliographic",
+    "binding",
+    "boolean",
+    "boundary",
+    "branches",
+    "caught",
+    "chain",
+    "checkout",
+    "checksum",
+    "claim",
+    "classifier",
+    "confirmed"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.model-governance-ledger",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/model-governance-ledger",
+    "status": "active",
+    "title": "Model Governance Ledger (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/model-governance-ledger",
+  "schema": "self-documentation-record/v0.1",
+  "short": "model-governance-ledger"
+}

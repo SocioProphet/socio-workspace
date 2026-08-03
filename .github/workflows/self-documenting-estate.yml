@@ -1,0 +1,75 @@
+name: self-documenting-estate
+
+# Fail-closed drift canary for the self-documenting estate.
+# The composed self-documentation under artifacts/self-documentation/ is DERIVED
+# from the code-derived catalog (SocioProphet/prophet-core-catalog) + the Boundary
+# Atlas. This job checks out the catalog at the PINNED commit recorded in
+# artifacts/self-documentation/catalog-pin.json and regenerates + byte-compares.
+# If the committed docs have drifted from the code, this build goes RED.
+
+on:
+  push:
+    paths:
+      - "artifacts/self-documentation/**"
+      - "catalog/boundaries.yaml"
+      - "registry/estate-roster.json"
+      - "tools/compose_self_documentation.py"
+      - "tools/verify_self_documentation.py"
+      - "tools/enumerate_estate.py"
+      - ".github/workflows/self-documenting-estate.yml"
+  pull_request:
+    paths:
+      - "artifacts/self-documentation/**"
+      - "catalog/boundaries.yaml"
+      - "registry/estate-roster.json"
+      - "tools/compose_self_documentation.py"
+      - "tools/verify_self_documentation.py"
+      - "tools/enumerate_estate.py"
+      - ".github/workflows/self-documenting-estate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  self-documentation-drift:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out sociosphere
+        uses: actions/checkout@v4
+        with:
+          # Untrusted PR content is read as data only; drop the token from .git so a
+          # checked-out working tree can never reuse it (CodeQL actions/untrusted-checkout).
+          persist-credentials: false
+
+      - name: Read pinned catalog commit
+        id: pin
+        run: |
+          commit=$(python3 -c "import json;print(json.load(open('artifacts/self-documentation/catalog-pin.json'))['catalog_commit'])")
+          # The pin comes from a PR-controlled file; require a full 40-hex commit SHA so it
+          # cannot be steered to an arbitrary branch/tag/ref (checkout of untrusted code).
+          if ! printf '%s' "$commit" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::catalog_commit is not a 40-hex commit SHA: '$commit'"; exit 1
+          fi
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "Pinned catalog commit: $commit"
+
+      - name: Check out prophet-core-catalog at the pinned commit
+        uses: actions/checkout@v4
+        with:
+          repository: SocioProphet/prophet-core-catalog
+          ref: ${{ steps.pin.outputs.commit }}
+          path: prophet-core-catalog
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: python -m pip install pyyaml
+
+      - name: Self-documentation drift canary (fail-closed)
+        run: python tools/verify_self_documentation.py --catalog prophet-core-catalog

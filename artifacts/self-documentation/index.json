@@ -1,0 +1,182 @@
+{
+  "atlas_entries": 19,
+  "catalog_commit": "3d724f2e198df3a0d0322be32eff329081499ce0",
+  "catalog_repo": "SocioProphet/prophet-core-catalog",
+  "composed_by": "tools/compose_self_documentation.py",
+  "cross_repo_links": 266,
+  "repos": [
+    {
+      "asset_count": 304,
+      "boundary_class": "agent_identity_capability",
+      "datasets": 6,
+      "glossary_terms": 159,
+      "maturity": "L0",
+      "repo": "SocioProphet/agent-registry",
+      "short": "agent-registry"
+    },
+    {
+      "asset_count": 566,
+      "boundary_class": "agent_runtime",
+      "datasets": 6,
+      "glossary_terms": 176,
+      "maturity": "L0",
+      "repo": "SocioProphet/agentplane",
+      "short": "agentplane"
+    },
+    {
+      "asset_count": 460,
+      "boundary_class": "world_model_trace",
+      "datasets": 4,
+      "glossary_terms": 201,
+      "maturity": "L0",
+      "repo": "SocioProphet/gaia-world-model",
+      "short": "gaia-world-model"
+    },
+    {
+      "asset_count": 346,
+      "boundary_class": "proof_graph_runtime",
+      "datasets": 6,
+      "glossary_terms": 174,
+      "maturity": "L0",
+      "repo": "SocioProphet/hellgraph",
+      "short": "hellgraph"
+    },
+    {
+      "asset_count": 294,
+      "boundary_class": "governance_evidence",
+      "datasets": 6,
+      "glossary_terms": 163,
+      "maturity": "L1",
+      "repo": "SocioProphet/model-governance-ledger",
+      "short": "model-governance-ledger"
+    },
+    {
+      "asset_count": 675,
+      "boundary_class": "law_compiler",
+      "datasets": 6,
+      "glossary_terms": 197,
+      "maturity": "L0",
+      "repo": "SocioProphet/ontogenesis",
+      "short": "ontogenesis"
+    },
+    {
+      "asset_count": 411,
+      "boundary_class": "admissibility_policy",
+      "datasets": 6,
+      "glossary_terms": 179,
+      "maturity": "L1",
+      "repo": "SocioProphet/policy-fabric",
+      "short": "policy-fabric"
+    },
+    {
+      "asset_count": 1597,
+      "boundary_class": "runtime_verifier",
+      "datasets": 9,
+      "glossary_terms": 195,
+      "maturity": "L1",
+      "repo": "SocioProphet/prophet-platform",
+      "short": "prophet-platform"
+    },
+    {
+      "asset_count": 343,
+      "boundary_class": "standards",
+      "datasets": 5,
+      "glossary_terms": 187,
+      "maturity": "L2",
+      "repo": "SocioProphet/prophet-platform-standards",
+      "short": "prophet-platform-standards"
+    },
+    {
+      "asset_count": 313,
+      "boundary_class": "workspace_product",
+      "datasets": 4,
+      "glossary_terms": 158,
+      "maturity": "L0",
+      "repo": "SocioProphet/prophet-workspace",
+      "short": "prophet-workspace"
+    },
+    {
+      "asset_count": 352,
+      "boundary_class": "evidentiary_retrieval",
+      "datasets": 6,
+      "glossary_terms": 153,
+      "maturity": "L0",
+      "repo": "SocioProphet/sherlock-search",
+      "short": "sherlock-search"
+    },
+    {
+      "asset_count": 342,
+      "boundary_class": "agent_profile_standard",
+      "datasets": 4,
+      "glossary_terms": 181,
+      "maturity": "L0",
+      "repo": "SocioProphet/socioprophet-agent-standards",
+      "short": "socioprophet-agent-standards"
+    },
+    {
+      "asset_count": 427,
+      "boundary_class": "knowledge_standard",
+      "datasets": 7,
+      "glossary_terms": 196,
+      "maturity": "L0",
+      "repo": "SocioProphet/socioprophet-standards-knowledge",
+      "short": "socioprophet-standards-knowledge"
+    },
+    {
+      "asset_count": 530,
+      "boundary_class": "storage_standard",
+      "datasets": 5,
+      "glossary_terms": 220,
+      "maturity": "L0",
+      "repo": "SocioProphet/socioprophet-standards-storage",
+      "short": "socioprophet-standards-storage"
+    },
+    {
+      "asset_count": 702,
+      "boundary_class": "estate_registry",
+      "datasets": 9,
+      "glossary_terms": 180,
+      "maturity": "L2",
+      "repo": "SocioProphet/sociosphere",
+      "short": "sociosphere"
+    },
+    {
+      "asset_count": 280,
+      "boundary_class": "boot_trust",
+      "datasets": 5,
+      "glossary_terms": 157,
+      "maturity": "L0",
+      "repo": "SourceOS-Linux/sourceos-boot",
+      "short": "sourceos-boot"
+    },
+    {
+      "asset_count": 747,
+      "boundary_class": "sourceos_spec_standard",
+      "datasets": 7,
+      "glossary_terms": 166,
+      "maturity": "L0",
+      "repo": "SourceOS-Linux/sourceos-spec",
+      "short": "sourceos-spec"
+    },
+    {
+      "asset_count": 324,
+      "boundary_class": "local_state_integrity",
+      "datasets": 5,
+      "glossary_terms": 183,
+      "maturity": "L0",
+      "repo": "SourceOS-Linux/sourceos-syncd",
+      "short": "sourceos-syncd"
+    },
+    {
+      "asset_count": 338,
+      "boundary_class": "transport_protocol",
+      "datasets": 5,
+      "glossary_terms": 176,
+      "maturity": "L1",
+      "repo": "SocioProphet/TriTRPC",
+      "short": "tritrpc"
+    }
+  ],
+  "schema": "self-documentation-index/v0.1",
+  "scope_repos": 19
+}

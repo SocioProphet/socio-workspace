@@ -24,7 +24,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import Callable, Dict, List, Optional
 
 _EPS = 1e-12
@@ -69,10 +69,33 @@ class ControlLoop:
         self.safe_state = safe_state
         self._clock = clock
 
+    @staticmethod
+    def _observe(observe: Callable[[], float]) -> float:
+        # A loop that can be crashed by a misbehaving `observe` is not fail-closed — it would
+        # raise instead of returning a LoopResult, losing the fail_closed_state entirely and
+        # potentially leaving the caller's try/except (if any) to decide, unverified. Treat an
+        # unreadable/un-assessable observation as maximal error: it can never look converged,
+        # and the bounded iteration/deadline/patience guards below still apply on top of it.
+        try:
+            return float(observe())
+        except Exception:
+            return float("inf")
+
+    @staticmethod
+    def _act(act: Callable[[], None]) -> None:
+        # Same reasoning as `_observe`: `act` raising must not crash the loop. The next
+        # `observe()` re-checks reality regardless of whether the action "succeeded" — verify
+        # the artifact, not the exit code — so a raising action just looks like a no-op step
+        # and is bounded by the same iteration/deadline/patience guards.
+        try:
+            act()
+        except Exception:
+            pass
+
     def run(self, observe: Callable[[], float], act: Callable[[], None]) -> LoopResult:
         t0 = self._clock()
         trace: List[dict] = []
-        err = float(observe())
+        err = self._observe(observe)
         initial = err
         best = float("inf")
         stall = 0
@@ -102,8 +125,8 @@ class ControlLoop:
                     reason = f"error not decreasing for {self.patience} steps (stuck) — refusing to loop"
                     break
             step["action"] = "act"
-            act()
-            err = float(observe())
+            self._act(act)
+            err = self._observe(observe)
             i += 1
         # re-check terminal condition after the last act
         if err <= self.target + _EPS:

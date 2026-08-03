@@ -7,10 +7,17 @@ on:
   pull_request:
   push:
     branches: [main]
+
+permissions:
+  contents: read
+
 jobs:
   hellgraph-pins:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Every hellgraph dependency is pinned to the ONE canonical graph
         run: python3 tools/check_hellgraph_pins.py

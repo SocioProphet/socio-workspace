@@ -1,4 +1,4 @@
-# ADR-004 — Live supply-chain risk scoring over real HellGraph topology
+# ADR-006 — Live supply-chain risk scoring over real HellGraph topology
 
 Status: Accepted
 Date: 2026-08-03

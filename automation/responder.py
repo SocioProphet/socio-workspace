@@ -73,6 +73,13 @@ EXECUTORS = {
     ("vendored_graph_drift", "auto_fix"): "reconcile_vendored_graph",
 }
 
+# Action-level executors are class-agnostic: any beacon decided to this action routes here
+# (used when no class-specific (kind, action) executor is registered). propose_pr records a
+# reviewable PR proposal for any class the responder caps at propose_pr.
+ACTION_EXECUTORS = {
+    "propose_pr": "propose_pr",
+}
+
 
 def evidence_verdict(beacon: dict) -> Optional[str]:
     """Map the beacon's warrant strength to a verdict ceiling; None means no evidence."""
@@ -146,23 +153,34 @@ def decide(beacon: dict) -> dict:
 def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> None:
     """Carry out a decided action via a registered executor, recording the outcome.
 
-    Attaches `receipt["execution"]`. If the executor cannot VERIFY a fix (healed is False),
-    the decision is downgraded to a human escalation — an unverified fix is not a fix.
+    Dispatch: a class-specific (kind, action) executor first, else an action-level executor.
+    Attaches `receipt["execution"]`. The situation is RESOLVED iff the executor healed the
+    artifact or recorded a proposal; otherwise the decision is downgraded to a human
+    escalation — an unverified fix, or an unfiled proposal, is not a resolution.
     """
-    key = (beacon.get("kind_class"), receipt.get("action"))
-    fn_name = EXECUTORS.get(key)
+    import inspect
+
+    action = receipt.get("action")
+    fn_name = EXECUTORS.get((beacon.get("kind_class"), action)) or ACTION_EXECUTORS.get(action)
     if not fn_name:
         return
     from automation import executors  # lazy: keeps yaml/engine import off the decision path
     fn = getattr(executors, fn_name)
+
+    # Pass the beacon only to executors that accept it (e.g. propose_pr); reconcilers don't.
+    kwargs = dict(executor_paths or {})
+    if "beacon" in inspect.signature(fn).parameters:
+        kwargs["beacon"] = beacon
     try:
-        outcome = fn(**(executor_paths or {}))
+        outcome = fn(**kwargs)
     except Exception as exc:  # pragma: no cover - defensive
-        outcome = {"executor": fn_name, "healed": False, "error": str(exc)}
+        outcome = {"executor": fn_name, "healed": False, "proposed": False, "error": str(exc)}
+
     receipt["execution"] = outcome
-    if not outcome.get("healed"):
+    resolved = bool(outcome.get("healed") or outcome.get("proposed"))
+    if not resolved:
         receipt["action"] = "escalate_human"
-        receipt["reason"] = f"{receipt.get('reason', '')} | executor '{fn_name}' did not verify a fix"
+        receipt["reason"] = f"{receipt.get('reason', '')} | executor '{fn_name}' did not resolve"
 
 
 def run_once(inbox: Optional[DurableQueue] = None,

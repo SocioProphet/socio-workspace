@@ -1,0 +1,19 @@
+# federation-adapters canonical repository admission fragment (auto-registered 2026-08-03)
+id: federation-adapters
+name: federation-adapters
+url: https://github.com/SocioProphet/federation-adapters
+role: component
+status: active
+description: "CloudHaven-shaped federation: the estate is the sovereign user-platform (HolographMe identity + tokenized data + DecisionLedger governance); external backends (Urbit @p/Ames, ATProto, Matrix, Solid, Nostr, MCP, ActivityPub, enterprise) federate to it via a typed FederationAdapter. Apps never touch raw data; identity do-it-once via HolographMe; every call consent-gated + ledgered."
+primary_language: Python
+tags:
+  - federation
+  - urbit
+  - holographme
+  - sovereign-identity
+  - decision-ledger
+canonical_owner: SocioProphet/federation-adapters
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: "SocioSphere records workspace admission only; the repo owns the FederationAdapter contract."
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md
+candidate_pin: 3be221999b1adda9b670cac142033671d8684571

@@ -37,6 +37,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Generic reconciler** (`executors.reconcile`) | ✅ | ✅ both reconcilers use it | ✅ heal/noop/abort/rollback | ✅ | `tests/test_reconcile_generic.py` |
 | **Vendored-graph slice** (detector+executor, real tools) | ✅ | ✅ scheduler jobs | ✅ live break→heal **and** break→escalate | ✅ | `tests/test_vendored_graph_slice.py` |
 | **propose_pr executor** (`executors.propose_pr`) | ✅ | ✅ action-level dispatch | ✅ record/open **and** invalid→escalate | ✅ | `tests/test_propose_pr.py` |
+| **Policy-bound governance** (`policy.ResponsePolicy`) | ✅ | ✅ daemon loads declared policy | ✅ governs decide **and** rejects invalid | ✅ | `tests/test_policy.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -62,6 +63,13 @@ beacon ─▶ boundary fence ─▶ IRI gate ─▶ meet(Law, Evidence) ─▶ a
                                                └─ refuse    → block
    no evidence anywhere on the path ─▶ BOTTOM (→ human, the consent-hole)
 ```
+
+This whole path is **governed by a declared policy** (`registry/self-heal-policy.yaml`, code
+default `policy.DEFAULT_POLICY`): per-class Law ceilings, the verdict→action map, the IRI block
+threshold, and the boundary axes are declared, not hardcoded. It ships an **opinionated
+default** so the loop is governed out of the box; ops tighten or relax a single class by editing
+the YAML (a partial override merges over the default and is validated on load). A test asserts
+the committed file equals the code default, so declared governance and the default cannot drift.
 
 - **Law** = the ceiling a failure *class* may reach (a reversible re-sync may reach `sealed`;
   a cross-repo change caps at `weak`; a policy breach never auto-fixes).

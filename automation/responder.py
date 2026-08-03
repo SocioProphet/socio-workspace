@@ -37,34 +37,16 @@ from procyber.semantic import BOTTOM, SemanticAddress, meet, prim  # vendored ke
 
 from automation.durable_queue import DurableQueue, state_dir
 
-# Ring-1 octonion safety axes; a plan touching any axis norm >= 1 may never auto-act.
-BOUNDARY_AXES = (
-    "legality", "containment", "provenance", "privacy",
-    "performance", "reproducibility", "licensing", "governance",
-)
+# Decision governance is a declared, overridable policy with an opinionated default
+# (automation/policy.py + registry/self-heal-policy.yaml). These module-level names remain as
+# read-only views onto the default policy for back-compat and quick reference; the live
+# decision reads whatever ResponsePolicy is passed to `decide`/`run_once` (default: DEFAULT_POLICY).
+from automation.policy import DEFAULT_POLICY, ResponsePolicy  # noqa: E402
 
-# The LAW: the strongest verdict a failure CLASS is permitted to reach for auto-action.
-# (A reversible re-sync may reach `sealed`; a cross-repo change caps at `weak`; a policy
-# breach is never auto-fixed.)
-LAW_BY_KIND: Dict[str, str] = {
-    "mirror_drift": "sealed",
-    "vendored_graph_drift": "sealed",  # reversible regenerate-from-source, like mirror_drift
-    "build_failure": "probable",
-    "stale_vendor": "weak",       # cross-repo: propose only, never auto-act
-    "policy_violation": "quarantine",
-    "unknown": "refuse",
-}
-
-# Verdict -> action.
-VERDICT_ACTION: Dict[str, str] = {
-    "sealed": "auto_fix",
-    "probable": "canary_fix",
-    "weak": "propose_pr",
-    "quarantine": "quarantine",
-    "refuse": "block",
-}
-
-IRI_BLOCK = 0.55  # Boundary SPEC block threshold
+BOUNDARY_AXES = DEFAULT_POLICY.boundary_axes
+LAW_BY_KIND: Dict[str, str] = DEFAULT_POLICY.law_by_kind
+VERDICT_ACTION: Dict[str, str] = DEFAULT_POLICY.verdict_action
+IRI_BLOCK = DEFAULT_POLICY.iri_block
 
 # (failure class, decided action) -> executor function name in automation.executors.
 # Only wired for verified-safe, idempotent, roll-back-capable remediations.
@@ -101,9 +83,9 @@ def compute_iri(beacon: dict) -> float:
     return max(0.0, 0.45 * e + 0.45 * inj - 0.20 * cc)
 
 
-def boundary_breaches(beacon: dict) -> List[str]:
+def boundary_breaches(beacon: dict, axes: Optional[tuple] = None) -> List[str]:
     plan = beacon.get("plan") or {}
-    return [ax for ax in BOUNDARY_AXES if float(plan.get(ax, 0.0)) >= 1.0]
+    return [ax for ax in (axes or BOUNDARY_AXES) if float(plan.get(ax, 0.0)) >= 1.0]
 
 
 def _receipt(beacon: dict, *, verdict, action: str, reason: str) -> dict:
@@ -125,27 +107,32 @@ def _receipt(beacon: dict, *, verdict, action: str, reason: str) -> dict:
     }
 
 
-def decide(beacon: dict) -> dict:
-    """boundary -> IRI -> meet(Law, Evidence) -> action. Fail-closed at every gate."""
+def decide(beacon: dict, *, policy: Optional[ResponsePolicy] = None) -> dict:
+    """boundary -> IRI -> meet(Law, Evidence) -> action. Fail-closed at every gate.
+
+    Governed by `policy` (default: the opinionated DEFAULT_POLICY). Pass a loaded policy to
+    have the declared governance (registry/self-heal-policy.yaml) drive the decision.
+    """
+    policy = policy or DEFAULT_POLICY
     # 1. boundary fence (first, fail-closed)
-    breached = boundary_breaches(beacon)
+    breached = boundary_breaches(beacon, policy.boundary_axes)
     if breached:
         return _receipt(beacon, verdict=BOTTOM, action="escalate_human",
                         reason=f"octonion boundary breached: {breached}")
     # 2. IRI gate
     iri = compute_iri(beacon)
-    if iri >= IRI_BLOCK:
+    if iri >= policy.iri_block:
         return _receipt(beacon, verdict=BOTTOM, action="escalate_human",
-                        reason=f"IRI {iri:.2f} >= block {IRI_BLOCK}")
+                        reason=f"IRI {iri:.2f} >= block {policy.iri_block}")
     # 3. no evidence -> cannot decide -> human
     ev = evidence_verdict(beacon)
     if ev is None:
         return _receipt(beacon, verdict=BOTTOM, action="escalate_human",
                         reason="no evidence to assess (consent-hole)")
     # 4. the reasoned verdict: kernel meet of Law and Evidence
-    law = LAW_BY_KIND.get(beacon.get("kind_class", "unknown"), "refuse")
+    law = policy.law_for(beacon.get("kind_class", "unknown"))
     verdict = meet(law, ev)
-    action = VERDICT_ACTION.get(verdict, "escalate_human")
+    action = policy.action_for(verdict)
     return _receipt(beacon, verdict=verdict, action=action,
                     reason=f"meet(law={law}, evidence={ev})={verdict}; IRI={iri:.2f}")
 
@@ -187,12 +174,14 @@ def run_once(inbox: Optional[DurableQueue] = None,
              decisions: Optional[DurableQueue] = None,
              *,
              execute: bool = False,
-             executor_paths: Optional[dict] = None) -> List[dict]:
+             executor_paths: Optional[dict] = None,
+             policy: Optional[ResponsePolicy] = None) -> List[dict]:
     """Drain the beacon inbox, decide each, emit decision receipts. Returns the receipts.
 
     With ``execute=True`` a decided auto_fix is carried out by its registered executor
     (verify-and-rollback); the daemon opts in, while pure decision paths stay side-effect
     free. ``executor_paths`` is forwarded to the executor (used by tests to target tmp dirs).
+    ``policy`` governs the decision (default: the opinionated DEFAULT_POLICY).
     """
     inbox = inbox if inbox is not None else DurableQueue(state_dir() / "beacons")
     decisions = decisions if decisions is not None else DurableQueue(state_dir() / "decisions")
@@ -202,7 +191,7 @@ def run_once(inbox: Optional[DurableQueue] = None,
             beacon = inbox.get_nowait()
         except Exception:
             break
-        receipt = decide(beacon)
+        receipt = decide(beacon, policy=policy)
         if execute:
             _execute(beacon, receipt, executor_paths)
         decisions.put(receipt)

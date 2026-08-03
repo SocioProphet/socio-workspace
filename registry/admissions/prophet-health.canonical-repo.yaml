@@ -16,3 +16,5 @@ sociosphere_role: estate-registration-and-propagation
 claim_boundary: SocioSphere records workspace admission and cross-repo propagation
   only; the repo owns implementation and contracts.
 admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 795a23ab16940be0a5eb58186be5f0336fcb4f39
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

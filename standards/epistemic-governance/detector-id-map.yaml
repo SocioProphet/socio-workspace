@@ -1,0 +1,129 @@
+schema_version: 0.1.0
+standard: epistemic-governance
+ruleset_semver: 1.4.0
+status: draft
+owner: sociosphere
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Governed detector-id reconciliation map
+#
+# WHY THIS FILE EXISTS
+# The shipped runtime (Noetica agent-machine/lib/debate-detectors.ts,
+# RULESET_SEMVER 0.1.0) emits detector ids like `LOGFALL.ADHOMINEM.V1`. An
+# earlier reading of the standard (ruleset 1.3.0) declared only the aspirational
+# `detectors:` surface (`LOGFALL.ADHOM.V2`), so the runtime and the standard
+# appeared to speak different id namespaces — an id-namespace DRIFT.
+#
+# Ruleset 1.4.0 closed most of that drift the honest way: it ADOPTED the shipped
+# runtime ids into `shipped_detectors:` alongside the proposed V2 ids, tagged by
+# `maturity`, with a `succeeded_by` ladder (see MIGRATION-v1-to-v2.md). This file
+# is the machine-checkable, teeth-bearing record of that adoption: it binds every
+# id the runtime EMITS to the CANONICAL standard id, and records where each id is
+# HEADED on the maturity ladder — without ever conflating the two.
+#
+# THE DELIBERATE NON-ALIAS (read before "simplifying" this to V1 -> V2)
+# This map maps each emitted id to the standard id AT THE MATURITY ACTUALLY RUN
+# (the shipped-tier id), NOT to its V2 successor. Aliasing `LOGFALL.ADHOMINEM.V1`
+# to `LOGFALL.ADHOM.V2` would let a V1 regex-heuristic firing be recorded as a
+# richer V2 (NLI/structural) detection that never ran — exactly the "declared but
+# never enforced" / silent-wrong failure the epistemic-kernel work removes
+# elsewhere. The V2 target is preserved as `succeeds_into` (a migration fact),
+# and downstream producers (agentplane hygiene runtime) emit `standard_id`, never
+# `succeeds_into`. When a V2 detector actually ships, flip its maturity in the
+# ruleset and repoint the runtime; only then does the emitted id become the V2 id.
+#
+# TEETH (enforced by tools/validate_detector_id_map.py, CI):
+#   - every `standard_id` MUST exist in detector-countertest-map.yaml;
+#   - the set of `emitted_id`s MUST equal the set of shipped-maturity detectors
+#     in the ruleset (round-trip both ways: a shipped detector with no map entry
+#     fails; a map entry for a non-shipped id fails);
+#   - the map is a bijection on (emitted_id <-> standard_id);
+#   - every `succeeds_into`, when present, MUST exist as a proposed detector in
+#     the ruleset;
+#   - an emitted id absent from this map is, by construction, REJECTED by any
+#     consumer (the runtime allow-list is closed).
+# ─────────────────────────────────────────────────────────────────────────────
+
+emitting_runtimes:
+  noetica_debate_detectors:
+    path: agent-machine/lib/debate-detectors.ts
+    ruleset_semver: "0.1.0"
+    repo: SocioProphet/Noetica
+    finding_shape: "DetectorHit { ruleId, score, span, rationale }"
+
+# emitted_id : what the runtime prints today (ruleset 0.1.0).
+# standard_id: the canonical governed id in detector-countertest-map.yaml (1.4.0)
+#              at the maturity actually run. Consumers MUST emit this.
+# succeeds_into: the proposed V2 successor from the ruleset's succeeded_by ladder,
+#              or null. Recorded for migration; NEVER emitted in place of standard_id.
+detector_id_map:
+  - emitted_id: LOGFALL.STRAWMAN.V1
+    standard_id: LOGFALL.STRAWMAN.V1
+    family: LOGFALL
+    succeeds_into: LOGFALL.STRAWMAN.V2
+  - emitted_id: LOGFALL.ADHOMINEM.V1
+    standard_id: LOGFALL.ADHOMINEM.V1
+    family: LOGFALL
+    succeeds_into: LOGFALL.ADHOM.V2
+  - emitted_id: LOGFALL.SLIPPERYSLOPE.V1
+    standard_id: LOGFALL.SLIPPERYSLOPE.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.FALSEDICHOTOMY.V1
+    standard_id: LOGFALL.FALSEDICHOTOMY.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.HASTYGEN.V1
+    standard_id: LOGFALL.HASTYGEN.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.APPEALAUTHORITY.V1
+    standard_id: LOGFALL.APPEALAUTHORITY.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.TUQUOQUE.V1
+    standard_id: LOGFALL.TUQUOQUE.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.BANDWAGON.V1
+    standard_id: LOGFALL.BANDWAGON.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.APPEALEMOTION.V1
+    standard_id: LOGFALL.APPEALEMOTION.V1
+    family: LOGFALL
+    succeeds_into: LOGFALL.EMOTION.V2
+  - emitted_id: LOGFALL.CIRCULAR.V1
+    standard_id: LOGFALL.CIRCULAR.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.SUNKCOST.V1
+    standard_id: LOGFALL.SUNKCOST.V1
+    family: LOGFALL
+    succeeds_into: null
+  - emitted_id: LOGFALL.FALSECAUSE.V1
+    standard_id: LOGFALL.FALSECAUSE.V1
+    family: LOGFALL
+    succeeds_into: LOGFALL.FALSECAUSE.V2
+  - emitted_id: COGBIAS.CONFIRM.V1
+    standard_id: COGBIAS.CONFIRM.V1
+    family: COGBIAS
+    succeeds_into: null
+  - emitted_id: COGBIAS.ANCHOR.V1
+    standard_id: COGBIAS.ANCHOR.V1
+    family: COGBIAS
+    succeeds_into: COGBIAS.ANCHORING.V2
+  - emitted_id: COGBIAS.ABSOLUTECERTAINTY.V1
+    standard_id: COGBIAS.ABSOLUTECERTAINTY.V1
+    family: COGBIAS
+    succeeds_into: null
+  - emitted_id: COGBIAS.AVAILABILITY.V1
+    standard_id: COGBIAS.AVAILABILITY.V1
+    family: COGBIAS
+    succeeds_into: null
+
+# Consumed by:
+#   - agentplane hygiene runtime (tools/hygiene_runtime.py) — vendors a byte-copy
+#     of this file and rejects any detector_id not present as a standard_id here.
+#   - Noetica boundary translation — maps DetectorHit.ruleId (emitted_id) to
+#     standard_id before a hit crosses into a passport.

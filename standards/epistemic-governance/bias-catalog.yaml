@@ -1,0 +1,91 @@
+schema_version: 0.1.0
+standard: epistemic-governance
+ruleset_semver: 1.4.0
+status: draft
+owner: sociosphere
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cognitive-bias catalog — set 1
+#
+# The "set-1" cognitive-bias catalog (montage-alignment backlog item #2:
+# confirmation, fundamental-attribution-error, hindsight, framing, belief-bias)
+# was, until now, an informal backlog row with no governed ids. This file gives
+# each catalogued bias a detector id in the RECONCILED namespace and a required
+# counter-test, so the Bias Passport producer (agentplane hygiene runtime) can
+# name a governed id for every bias detection — and REJECT any detection that
+# lacks one.
+#
+# Doctrine (montage backlog): "each bias -> a governed counter-test; the
+# affirming-the-consequent tooth is ONE, generalize to a bias-audit." That tooth
+# is the SILENT firewall's affirming-the-consequent guard (evidence-intake-kernel
+# #3) — the SAME rule as the Crown constitution's invariant D1
+# (hellgraph#52, ADR-0004: "Da'at cannot assert truth"). It is catalogued here as
+# LOGFALL.AFFIRMCONSEQ.V1 so the generalization is a governed fact, not folklore.
+#
+# TEETH (tools/validate_detector_id_map.py --bias-catalog):
+#   - every `detector_id` here MUST be declared in detector-countertest-map.yaml;
+#   - every `required_counter_test` here MUST be declared under the ruleset's
+#     counter_test_availability;
+#   - `crown_invariant`, when set, is informational cross-reference to ADR-0004.
+# ─────────────────────────────────────────────────────────────────────────────
+
+biases:
+  - key: confirmation
+    label: Confirmation bias
+    detector_id: COGBIAS.CONFIRM.V1
+    maturity: shipped            # the one set-1 bias with a shipped detector today
+    required_counter_test: CTEST.DEVIL-S.LIST.V1
+    definition: >-
+      Preferentially seeking, weighting, or recalling evidence that supports a
+      prior belief while discounting disconfirming evidence.
+
+  - key: fundamental_attribution_error
+    label: Fundamental attribution error (FAE)
+    detector_id: COGBIAS.FAE.V1
+    maturity: proposed
+    required_counter_test: CTEST.ATTRIBUTION-BLIND.A/B.V1
+    definition: >-
+      Over-attributing others' behavior to disposition/character and
+      under-weighting situational causes.
+
+  - key: hindsight
+    label: Hindsight bias
+    detector_id: COGBIAS.HINDSIGHT.V1
+    maturity: proposed
+    required_counter_test: CTEST.FORESIGHT-BLIND.V1
+    definition: >-
+      Judging a past prediction or decision by the now-known outcome
+      ("I knew it all along") rather than by the information available ex ante.
+
+  - key: framing
+    label: Framing effect
+    detector_id: COGBIAS.FRAMING.V1
+    maturity: proposed
+    required_counter_test: CTEST.REFRAME-INVARIANCE.V1
+    definition: >-
+      Reaching different conclusions from logically equivalent presentations of
+      the same information (gain vs loss framing, denominator neglect).
+
+  - key: belief_bias
+    label: Belief bias
+    detector_id: COGBIAS.BELIEFBIAS.V1
+    maturity: proposed
+    required_counter_test: CTEST.FORMAL-VALIDITY.V1
+    definition: >-
+      Judging an argument's logical validity by the believability of its
+      conclusion rather than by whether the conclusion follows from the premises.
+
+# The generalized tooth. Belief bias' formal-validity failure specialized to the
+# canonical invalid form the SILENT firewall rejects, so the bias-audit and the
+# firewall enforce ONE rule.
+formal_validity_tooth:
+  detector_id: LOGFALL.AFFIRMCONSEQ.V1
+  maturity: proposed
+  required_counter_test: CTEST.FORMAL-VALIDITY.V1
+  crown_invariant: D1
+  crown_adr: hellgraph#52 ADR-0004 "Da'at cannot assert truth"
+  firewall_rule: evidence-intake-kernel#3 REJECTED_AFFIRMING_THE_CONSEQUENT
+  definition: >-
+    Inferring the antecedent from the consequent (if P then Q; Q; therefore P).
+    A formally invalid form; a policy/weight or mechanism result that
+    manufactures a POS/true verdict via this form is void (Crown D1).

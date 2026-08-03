@@ -73,6 +73,27 @@ preserved as a namespaced risk CLASS (`gbrgnrg:riskClass`), and
 `policyDecision` key ever reaches the plane. GBRG feeds policy-fabric; it does not
 decide.
 
+### 6. Contract drift is fail-closed
+The signal map DERIVES what the weights contract COMBINES, so the two declared
+files must agree on the factor / cluster-component / KRI-id vocabulary.
+`validate_signal_map()` cross-checks them (the same instinct as
+`supply_chain_risk.validate_crosswalk`), and the CLI REFUSES to score on any
+drift — a renamed factor cannot silently become a 0-weighted derivation.
+
+### 7. Operational + adapter surfaces
+- **CLI**: `python3 -m gbrg.governance.supply_chain_pipeline <bundle> [--evidence
+  f.json] [--emit-evidence] [--ledger p]` scores a real bundle, prints a
+  governance summary, optionally seals to a hash-chained ledger and verifies the
+  whole chain, and (with `--emit-evidence`) emits the evidence-only envelopes as
+  pipeable JSON on stdout.
+- **Adapter**: `GbrgRepoGraphAdapter` gains `from_bundle(...)` and
+  `risk_evidence_records(...)` beside the existing `evidence_records(...)`, so one
+  adapter exposes BOTH the blast-radius and supply-chain-risk evidence surfaces
+  over the same graph.
+- **Receipt spine**: `assess_estate(..., persist=True, ledger_path=...)` seals
+  each assessment as a chained ledger event that `ledger.verify_ledger` walks —
+  the same receipt spine as #547, now exercised over the live pipeline.
+
 ## Consequences
 
 - The scorer (`supply_chain_risk.py`) is **unchanged** — this ADR only supplies

@@ -206,6 +206,79 @@ def test_evidence_only_guard_rejects_smuggled_verdict() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# (6) The signal map cannot DRIFT from the weights contract.
+# --------------------------------------------------------------------------- #
+def test_signal_map_matches_weights_contract() -> None:
+    # The SHIPPED contracts are mutually consistent (no drift).
+    assert pipe.validate_signal_map() == []
+
+    # A renamed factor in the weights contract IS caught (both directions).
+    weights = scr.load_weights()
+    weights["inherent_risk_factors"]["weights"]["criticality_RENAMED"] = (
+        weights["inherent_risk_factors"]["weights"].pop("criticality_K")
+    )
+    violations = pipe.validate_signal_map(weights=weights)
+    assert any("criticality_K" in v for v in violations)
+    assert any("criticality_RENAMED" in v for v in violations)
+
+
+# --------------------------------------------------------------------------- #
+# (7) Receipt spine: sealed assessments verify as a hash-chained ledger.
+# --------------------------------------------------------------------------- #
+def test_estate_seals_and_whole_ledger_verifies() -> None:
+    import tempfile
+
+    from gbrg.governance import ledger
+
+    with tempfile.TemporaryDirectory() as td:
+        lp = Path(td) / "scr-ledger.jsonl"
+        result = pipe.assess_estate(_bundle(), ledger_path=lp, persist=True)
+        n_sealed = len(result["nodes"]) + len(result["paths"]) + 1  # + cluster
+        vr = ledger.verify_ledger(lp)
+        assert vr.ok, f"live-pipeline ledger failed to verify: {vr.reason}"
+        assert len(ledger.read_all(lp)) == n_sealed
+        # every sealed assessment carries its chained receipt hash.
+        assert all(a.receipt for a in result["nodes"])
+
+
+# --------------------------------------------------------------------------- #
+# (8) Estate summary rolls verdicts/ratings up (reporting only, no decision).
+# --------------------------------------------------------------------------- #
+def test_summarize_estate() -> None:
+    result = pipe.assess_estate(_bundle(), persist=False)
+    summary = pipe.summarize_estate(result)
+    assert summary["subjects"] == len(result["nodes"]) + len(result["paths"]) + 1
+    # no evidence -> everything fails closed to REJECTED.
+    assert summary["by_verdict"] == {scr.REJECTED: summary["subjects"]}
+    assert len(summary["worst_residuals"]) <= 5
+    assert summary["worst_residuals"] == sorted(
+        summary["worst_residuals"], key=lambda s: -s["residual"]
+    )
+
+
+# --------------------------------------------------------------------------- #
+# (9) The RepoGraphAdapter exposes BOTH evidence surfaces over one bundle.
+# --------------------------------------------------------------------------- #
+def test_adapter_risk_evidence_surface() -> None:
+    from gbrg.adapters.gbrg_repo_graph_adapter import GbrgRepoGraphAdapter
+
+    adapter = GbrgRepoGraphAdapter.from_bundle(BUNDLE, repo_root=_REPO_ROOT)
+    blast = adapter.evidence_records()
+    risk = adapter.risk_evidence_records()  # no evidence -> fail-closed
+    assert blast and risk
+    schema = json.loads(OBS_SCHEMA.read_text(encoding="utf-8"))
+    validator = jsonschema.Draft202012Validator(schema)
+    for env in risk:
+        validator.validate(env["observation"])
+        gbrg_evidence.assert_evidence_only(env)
+    # the two surfaces are distinct (blast-radius vs supply-chain risk).
+    risk_ids = {e["observation"]["observation_id"] for e in risk}
+    blast_ids = {e["observation"]["observation_id"] for e in blast}
+    assert risk_ids.isdisjoint(blast_ids)
+    assert all(i.startswith("obs:gbrg-scr/") for i in risk_ids)
+
+
+# --------------------------------------------------------------------------- #
 # Plain-script runner (pytest also collects the test_* functions above).
 # --------------------------------------------------------------------------- #
 def _run() -> int:

@@ -89,6 +89,54 @@ def load_bundle(path: Path | str) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- #
+# Contract drift guard — the signal map and the weights contract must agree.
+# --------------------------------------------------------------------------- #
+def validate_signal_map(
+    signal_map: dict[str, Any] | None = None,
+    weights: dict[str, Any] | None = None,
+) -> list[str]:
+    """Verify the signal map cannot DRIFT from the weights contract. Returns violations.
+
+    The signal map DERIVES the factors/components the weights contract COMBINES;
+    if the two disagree on which factors, cluster components, or KRI/KCI ids
+    exist, a derived value would be silently dropped (weighted by 0) or a KRI
+    would be un-evaluatable. An empty list means the two declared files are
+    mutually consistent. This is the same governance instinct as
+    :func:`supply_chain_risk.validate_crosswalk` — a contract cannot smuggle a
+    term its partner contract does not know.
+    """
+    signal_map = signal_map or load_signal_map()
+    weights = weights or scr.load_weights()
+    violations: list[str] = []
+
+    def _cmp(kind: str, derived: set[str], declared: set[str]) -> None:
+        for extra in sorted(derived - declared):
+            violations.append(f"{kind}: signal-map derives {extra!r} absent from weights")
+        for missing in sorted(declared - derived):
+            violations.append(f"{kind}: weights declares {missing!r} with no signal-map derivation")
+
+    _cmp(
+        "inherent_factor",
+        set(signal_map["inherent_factor_derivation"]["factors"]),
+        set(weights["inherent_risk_factors"]["weights"]),
+    )
+    _cmp(
+        "cluster_component",
+        set(signal_map["cluster_common_mode_derivation"]["components"]),
+        set(weights["cluster_common_mode_weights"]["weights"]),
+    )
+
+    # Every auto-derived KRI/KCI id must exist in the weights thresholds.
+    declared_ids = {i["id"] for i in weights["kri_kci_thresholds"]["indicators"]}
+    for kri_id in signal_map.get("derived_kri_kci", {}).get("indicators", {}):
+        if kri_id not in declared_ids:
+            violations.append(
+                f"derived_kri_kci: {kri_id!r} has no threshold in weights kri_kci_thresholds"
+            )
+    return violations
+
+
+# --------------------------------------------------------------------------- #
 # Transforms (over the DECLARED signal map — never magic numbers here).
 # --------------------------------------------------------------------------- #
 def _clamp(x: float) -> float:
@@ -496,28 +544,103 @@ def estate_evidence_envelopes(
 
 
 # --------------------------------------------------------------------------- #
-# Demo surface (mirrors gbrg-analyze): score the committed real bundle.
+# Estate summary — a governance-legible roll-up of a scored assessment.
 # --------------------------------------------------------------------------- #
-def _demo() -> int:
-    fixtures = Path(__file__).resolve().parent / "fixtures"
-    bundle = load_bundle(
-        fixtures / "blast-radius-bundle.real.gbrg-core.containment.json"
+def summarize_estate(result: dict[str, Any]) -> dict[str, Any]:
+    """Roll a scored estate up to verdict/rating tallies + the worst subjects.
+
+    Pure reporting over :func:`assess_estate` output — carries NO decision, only
+    counts and the highest-residual subjects a reviewer should look at first.
+    """
+    subjects: list[scr.Assessment] = list(result.get("nodes", []))
+    subjects += list(result.get("paths", []))
+    cluster = result.get("cluster")
+    if cluster is not None:
+        subjects.append(cluster)
+
+    def _tally(key: str) -> dict[str, int]:
+        out: dict[str, int] = {}
+        for s in subjects:
+            out[getattr(s, key)] = out.get(getattr(s, key), 0) + 1
+        return dict(sorted(out.items()))
+
+    worst = sorted(subjects, key=lambda s: -s.residualScore)[:5]
+    return {
+        "subjects": len(subjects),
+        "by_verdict": _tally("verdict"),
+        "by_rating": _tally("rating"),
+        "worst_residuals": [
+            {"scope": s.riskScope, "subject": s.subjectId,
+             "residual": round(s.residualScore, 4), "rating": s.rating,
+             "verdict": s.verdict}
+            for s in worst
+        ],
+    }
+
+
+# --------------------------------------------------------------------------- #
+# CLI (mirrors gbrg-analyze): score a real bundle, emit a summary / evidence.
+# --------------------------------------------------------------------------- #
+_DEFAULT_BUNDLE = (
+    Path(__file__).resolve().parent / "fixtures"
+    / "blast-radius-bundle.real.gbrg-core.containment.json"
+)
+
+
+def main(argv: list[str] | None = None) -> int:
+    """``supply_chain_pipeline <bundle> [--evidence f.json] [--emit-evidence] [--ledger p]``.
+
+    Scores node/path/cluster off a real gbrg-analyze bundle (defaults to the
+    committed fixture) and prints a governance summary to stdout. ``--evidence``
+    supplies a real controls/KRI ``evidence_index`` (JSON); with none, tier-0
+    subjects fail CLOSED. ``--emit-evidence`` prints the evidence-plane envelopes
+    (evidence-only) as JSON. ``--ledger`` seals each assessment to a hash-chained
+    ledger and verifies the whole chain.
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(prog="supply_chain_pipeline")
+    parser.add_argument("bundle", nargs="?", default=str(_DEFAULT_BUNDLE),
+                        help="gbrg-analyze --emit-edges bundle (or bare artifact array)")
+    parser.add_argument("--evidence", help="JSON evidence_index (controls/KRI by subject)")
+    parser.add_argument("--emit-evidence", action="store_true",
+                        help="print evidence-plane observation envelopes as JSON")
+    parser.add_argument("--ledger", help="seal + verify assessments to this ledger path")
+    args = parser.parse_args(argv)
+
+    drift = validate_signal_map()
+    if drift:  # a drifted contract is fail-closed: refuse to score
+        print("REFUSED: signal-map <-> weights drift:", *drift, sep="\n  ")
+        return 2
+
+    bundle = load_bundle(args.bundle)
+    evidence_index = (
+        json.loads(Path(args.evidence).read_text(encoding="utf-8"))
+        if args.evidence else None
     )
-    result = assess_estate(bundle, persist=False)  # no evidence -> fail-closed
-    print(
-        f"nodes={len(result['nodes'])} "
-        f"paths={len(result['paths'])} cluster=1 "
-        f"(no evidence_index -> tier-0 fail-closed)"
+    result = assess_estate(
+        bundle, evidence_index=evidence_index,
+        ledger_path=args.ledger, persist=bool(args.ledger),
     )
-    cluster = result["cluster"]
-    print(
-        f"cluster residual={cluster.residualScore:.3f} rating={cluster.rating} "
-        f"verdict={cluster.verdict}"
-    )
-    envelopes = estate_evidence_envelopes(result)
-    print(f"evidence-plane observation envelopes emitted: {len(envelopes)}")
+
+    # With --emit-evidence, stdout is PURE envelope JSON (pipeable) and the
+    # human summary goes to stderr; otherwise the summary is the stdout payload.
+    import sys as _sys
+    summary = summarize_estate(result)
+    print(json.dumps(summary, indent=2), file=_sys.stderr if args.emit_evidence else _sys.stdout)
+
+    if args.ledger:
+        from gbrg.governance import ledger
+        vr = ledger.verify_ledger(args.ledger)
+        print(f"ledger: ok={vr.ok} head={vr.head}", file=_sys.stderr)
+        if not vr.ok:
+            return 1
+
+    if args.emit_evidence:
+        print(json.dumps(estate_evidence_envelopes(result), indent=2))
+
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(_demo())
+    raise SystemExit(main())

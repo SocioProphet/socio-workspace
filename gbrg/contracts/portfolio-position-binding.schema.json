@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://socioprophet.ai/gbrg/contracts/portfolio-position-binding.schema.json",
+  "title": "Portfolio / Position -> Hierarchy Binding (OMNI-2)",
+  "description": "A book of positions bound to instruments, issuer/counterparty entities, and the omnirisk allocation hierarchy the OMNI-1 walker aggregates. Supplies the data SOURCE the walker assumes. Read-only over the entity-resolution plane: the 'entities' roster is a by-contract snapshot of regis-entity-graph EntityNodes, never a live read.",
+  "type": "object",
+  "required": ["contract", "binding_id", "entities", "instruments", "positions", "tree"],
+  "additionalProperties": true,
+  "properties": {
+    "contract": {
+      "const": "gbrg.portfolio-position-binding.v0"
+    },
+    "binding_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entities": {
+      "description": "Issuer/counterparty roster. By-contract snapshot of regis-entity-graph EntityNode {node_id, kind}; NOT a live ER read. Keyed by node_id.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": {
+          "kind": {
+            "description": "regis-entity-graph EntityNode.kind. Only ORG/PERSON/ENTITY_CLUSTER may stand as an issuer/counterparty.",
+            "type": "string",
+            "enum": ["PERSON", "PSEUDONYM", "RECORD", "FEATURE_ATOM", "EVENT", "DEVICE", "APP", "SCOPE", "SESSION", "ENTITY_CLUSTER", "ORG", "ROLE", "SERVICE_WORKLOAD", "CREDENTIAL", "PROOF_ARTIFACT", "PROOF_INGRESS_RECORD", "POLICY_WITNESS", "CONSENT_WITNESS", "SOURCE_GRAPH_VIEW", "SOURCE_AUDIT_RECORD"]
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "instruments": {
+      "description": "Instrument catalog keyed by instrument_ref. Each carries an asset_class on the ladder and an issuer_ref resolving into 'entities'.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["asset_class", "issuer_ref"],
+        "properties": {
+          "asset_class": {
+            "description": "A rung on the asset-class ladder; each maps to an economic-prophet F builder.",
+            "type": "string",
+            "enum": ["credit", "equity", "market", "crypto"]
+          },
+          "issuer_ref": {
+            "description": "node_id of the issuer/counterparty EntityNode in 'entities'.",
+            "type": "string",
+            "minLength": 1
+          },
+          "f_builder": {
+            "description": "Soft reference to the F builder that scores this asset class (informational).",
+            "type": "string"
+          },
+          "structure": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "positions": {
+      "description": "The book of holdings. Each position sources exposure onto exactly one hierarchy leaf.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["position_id", "instrument_ref", "quantity", "exposure", "leaf_ref"],
+        "properties": {
+          "position_id": {"type": "string", "minLength": 1},
+          "instrument_ref": {"type": "string", "minLength": 1},
+          "quantity": {"type": "number"},
+          "exposure": {
+            "description": "The economic-capital contribution this holding sources onto its leaf; the conserved quantity.",
+            "type": "number"
+          },
+          "leaf_ref": {
+            "description": "node_ref of the omnirisk hierarchy LEAF this position backs. The tree places that leaf under an org-cut node in every cut.",
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "tree": {
+      "description": "The omnirisk RiskAllocationTree (cuts map) the book rolls into — the exact shape the OMNI-1 walker consumes. Validated by gbrg.governance.omnirisk_allocation.",
+      "type": "object",
+      "required": ["cuts"],
+      "properties": {
+        "cuts": {
+          "type": "object",
+          "minProperties": 1
+        }
+      }
+    }
+  }
+}

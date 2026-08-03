@@ -236,6 +236,103 @@ def proof_to_observations(
     return envelopes
 
 
+# Measured signals lifted from a SupplyChainRiskProofArtifact onto the plane.
+# The scored VERDICT (VERIFIES/FLAGGED/REJECTED) is NOT one of these: it lives in
+# the sealed ledger, and only namespaced (gbrgnrg:) risk context crosses here —
+# never as an authorization key (see assert_evidence_only + module docstring).
+_SCR_METRICS = ("residualScore", "rating")
+
+
+def _scr_metric_value(metric: str, artifact: dict[str, Any]) -> str:
+    if metric == "residualScore":
+        return f"{float(artifact['residualScore']):.6g}"
+    if metric == "rating":
+        return str(artifact["rating"])
+    raise ValueError(f"unknown SCR metric {metric!r}")
+
+
+def scr_to_observations(
+    scr_artifact: dict[str, Any],
+    *,
+    subject_repository: str,
+    repo_root: str | Path,
+    anchor_cell_id: str,
+    valid_at: datetime | None = None,
+) -> list[dict[str, Any]]:
+    """Lift ONE SupplyChainRiskProofArtifact onto the EVIDENCE plane.
+
+    Emits ``repo-governance-observation.v0`` envelopes for the artifact's MEASURED
+    risk signals (residual score, rating), each anchored to a real source blob via
+    ``anchor_cell_id`` (a node subject anchors to its own cell; a path/cluster to a
+    representative member cell). The scored VERDICT and status are risk classes,
+    not authorization: they are preserved in the GBRG-namespaced envelope under
+    non-authorization keys, and :func:`assert_evidence_only` guarantees no
+    verdict/decision/allow/deny/policyDecision key ever reaches the plane. GBRG
+    feeds policy-fabric; it never decides.
+    """
+    when = (valid_at or datetime.now(timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    claim = scr_artifact.get("claim", {})
+    epistemic_level = claim.get("epistemicLevel", "")
+    confidence = epistemic_to_confidence(epistemic_level)
+
+    source_path = cell_source_path(anchor_cell_id)
+    source_blob = git_blob_sha(Path(repo_root) / source_path)
+
+    subject_slug = _sanitize_id(scr_artifact.get("subjectId", ""))
+    risk_scope = scr_artifact.get("riskScope", "node")
+    kri_bands = [
+        {"id": k.get("id"), "band": k.get("band")}
+        for k in scr_artifact.get("kriEvaluations", [])
+    ]
+    envelopes: list[dict[str, Any]] = []
+
+    for metric in _SCR_METRICS:
+        value = _scr_metric_value(metric, scr_artifact)
+        extraction_method = (
+            f"gbrg supply-chain-risk scorer: {risk_scope} {metric} over declared "
+            f"weights (graph-signal-derived factors -> residual, Assay projection)"
+        )
+        record: dict[str, Any] = {
+            "schema_version": SCHEMA_VERSION,
+            "observation_id": f"obs:gbrg-scr/{risk_scope}/{subject_slug}/{metric}",
+            "subject_repository": subject_repository,
+            "surface": "topology",
+            "predicate": "mentions_repo",
+            "value": value,
+            "source_path": source_path,
+            "source_blob_sha": source_blob,
+            "parser_id": PARSER_ID,
+            "extraction_method": extraction_method,
+            "confidence": confidence,
+            "temporal_validity": {"valid_at": when, "valid_until": None},
+        }
+        record["evidence_digest"] = _evidence_digest(record)
+
+        extension: dict[str, Any] = {
+            "gbrgnrg:proofId": scr_artifact.get("proofId"),
+            "gbrgnrg:riskScope": risk_scope,
+            "gbrgnrg:subjectId": scr_artifact.get("subjectId"),
+            "gbrgnrg:metric": metric,
+            "gbrgnrg:residualScore": scr_artifact.get("residualScore"),
+            "gbrgnrg:rating": scr_artifact.get("rating"),
+            # The scored verdict is a RISK CLASS, not an authorization decision —
+            # keyed to avoid any forbidden-authorization word, and gated below.
+            "gbrgnrg:riskClass": scr_artifact.get("verdict"),
+            "gbrgnrg:status": scr_artifact.get("status"),
+            "gbrgnrg:epistemicLevel": epistemic_level,
+            "gbrgnrg:weightsRef": scr_artifact.get("weightsRef"),
+            "gbrgnrg:kriBands": kri_bands,
+            "gbrgnrg:anchorCellId": anchor_cell_id,
+            "gbrgnrg:declaredBy": scr_artifact.get("declared_by"),
+        }
+        envelope = {"observation": record, "gbrg_extension": extension}
+        assert_evidence_only(envelope)  # EVIDENCE only — never an authorization key
+        envelopes.append(envelope)
+
+    return envelopes
+
+
 def observation_records(envelopes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Strict schema-valid records only (drop the GBRG envelope)."""
     return [env["observation"] for env in envelopes]

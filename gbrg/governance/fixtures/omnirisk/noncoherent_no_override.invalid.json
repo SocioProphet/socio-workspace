@@ -1,0 +1,495 @@
+{
+  "confidence": 0.95,
+  "consumes": {
+    "memory_regime": "economic-prophet:memory-regime-characterizer(in-flight)",
+    "risk_kernel": "economic-prophet@feat/risk-adjusted-profit-raroc"
+  },
+  "contract": "gbrg.omnirisk-allocation.v0",
+  "cuts": {
+    "client_segment": {
+      "children": [
+        {
+          "children": [
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                },
+                "structure": {
+                  "attach": 0.03,
+                  "detach": 0.07,
+                  "kind": "tranche"
+                }
+              },
+              "node_ref": "t1",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": true,
+                "component_contribution": 40,
+                "distribution_id": "fp:t1",
+                "horizon": 1.0,
+                "measure": "expected_shortfall",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 8.0,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 55
+              },
+              "term": {
+                "average_life": 3.0,
+                "convexity": 6.0,
+                "duration": 2.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            },
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                }
+              },
+              "node_ref": "t3",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": true,
+                "component_contribution": 20,
+                "distribution_id": "fp:t3",
+                "horizon": 1.0,
+                "measure": "expected_shortfall",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 5.0,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 28
+              },
+              "term": {
+                "average_life": 5.0,
+                "convexity": 25.0,
+                "duration": 4.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            }
+          ],
+          "label": {
+            "asset_class": "credit",
+            "org_cut": "client_segment",
+            "regime": {
+              "fractal_dim": 1.3,
+              "hurst": 0.7,
+              "lyapunov": 0.01,
+              "market_regime": "normal",
+              "memory_regime": "long_memory"
+            }
+          },
+          "node_ref": "Geo_US",
+          "risk": {
+            "alpha": 0.95,
+            "coherent": true,
+            "economic_capital": 60,
+            "horizon": 1.0,
+            "measure": "expected_shortfall"
+          },
+          "term": {
+            "average_life": 4.0,
+            "convexity": 15.5,
+            "duration": 3.0
+          }
+        },
+        {
+          "children": [
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                }
+              },
+              "node_ref": "t2",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": true,
+                "component_contribution": 30,
+                "distribution_id": "fp:t2",
+                "horizon": 1.0,
+                "measure": "expected_shortfall",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 6.0,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 40
+              },
+              "term": {
+                "average_life": 8.0,
+                "convexity": 50.0,
+                "duration": 6.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            },
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                }
+              },
+              "node_ref": "t4",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": true,
+                "component_contribution": 10,
+                "distribution_id": "fp:t4",
+                "horizon": 1.0,
+                "measure": "expected_shortfall",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 1.5,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 15
+              },
+              "term": {
+                "average_life": 10.0,
+                "convexity": 90.0,
+                "duration": 8.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            }
+          ],
+          "label": {
+            "asset_class": "credit",
+            "org_cut": "client_segment",
+            "regime": {
+              "fractal_dim": 1.3,
+              "hurst": 0.7,
+              "lyapunov": 0.01,
+              "market_regime": "normal",
+              "memory_regime": "long_memory"
+            }
+          },
+          "node_ref": "Geo_EU",
+          "risk": {
+            "alpha": 0.95,
+            "coherent": true,
+            "economic_capital": 40,
+            "horizon": 1.0,
+            "measure": "expected_shortfall"
+          },
+          "term": {
+            "average_life": 9.0,
+            "convexity": 70.0,
+            "duration": 7.0
+          }
+        }
+      ],
+      "label": {
+        "asset_class": "credit",
+        "org_cut": "client_segment",
+        "regime": {
+          "fractal_dim": 1.3,
+          "hurst": 0.7,
+          "lyapunov": 0.01,
+          "market_regime": "normal",
+          "memory_regime": "long_memory"
+        }
+      },
+      "node_ref": "Bank",
+      "risk": {
+        "alpha": 0.95,
+        "coherent": true,
+        "economic_capital": 100,
+        "horizon": 1.0,
+        "measure": "expected_shortfall"
+      },
+      "term": {
+        "average_life": 6.5,
+        "convexity": 42.75,
+        "duration": 5.0
+      }
+    },
+    "product": {
+      "children": [
+        {
+          "children": [
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                },
+                "structure": {
+                  "attach": 0.03,
+                  "detach": 0.07,
+                  "kind": "tranche"
+                }
+              },
+              "node_ref": "t1",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": false,
+                "component_contribution": 40,
+                "distribution_id": "fp:t1",
+                "horizon": 1.0,
+                "measure": "var",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 8.0,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 55
+              },
+              "term": {
+                "average_life": 3.0,
+                "convexity": 6.0,
+                "duration": 2.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            },
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                }
+              },
+              "node_ref": "t2",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": false,
+                "component_contribution": 30,
+                "distribution_id": "fp:t2",
+                "horizon": 1.0,
+                "measure": "var",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 6.0,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 40
+              },
+              "term": {
+                "average_life": 8.0,
+                "convexity": 50.0,
+                "duration": 6.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            }
+          ],
+          "label": {
+            "asset_class": "credit",
+            "org_cut": "product",
+            "regime": {
+              "fractal_dim": 1.3,
+              "hurst": 0.7,
+              "lyapunov": 0.01,
+              "market_regime": "normal",
+              "memory_regime": "long_memory"
+            }
+          },
+          "node_ref": "BU_Markets",
+          "risk": {
+            "alpha": 0.95,
+            "coherent": true,
+            "economic_capital": 70,
+            "horizon": 1.0,
+            "measure": "expected_shortfall"
+          },
+          "term": {
+            "average_life": 5.5,
+            "convexity": 28.0,
+            "duration": 4.0
+          }
+        },
+        {
+          "children": [
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                }
+              },
+              "node_ref": "t3",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": true,
+                "component_contribution": 20,
+                "distribution_id": "fp:t3",
+                "horizon": 1.0,
+                "measure": "expected_shortfall",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 5.0,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 28
+              },
+              "term": {
+                "average_life": 5.0,
+                "convexity": 25.0,
+                "duration": 4.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            },
+            {
+              "label": {
+                "asset_class": "credit",
+                "org_cut": null,
+                "regime": {
+                  "fractal_dim": 1.3,
+                  "hurst": 0.7,
+                  "lyapunov": 0.01,
+                  "market_regime": "normal",
+                  "memory_regime": "long_memory"
+                }
+              },
+              "node_ref": "t4",
+              "risk": {
+                "alpha": 0.95,
+                "coherent": true,
+                "component_contribution": 10,
+                "distribution_id": "fp:t4",
+                "horizon": 1.0,
+                "measure": "expected_shortfall",
+                "n_samples": 250,
+                "provisional": false,
+                "risk_adjusted_return": 1.5,
+                "risk_ref": "economic-prophet@feat/risk-adjusted-profit-raroc:risk_measures.risk",
+                "standalone_capital": 15
+              },
+              "term": {
+                "average_life": 10.0,
+                "convexity": 90.0,
+                "duration": 8.0,
+                "kurtosis": 5.0,
+                "principal": 1000.0,
+                "skew": -0.5,
+                "tenor_bucket": "5y",
+                "term_regime": "upward",
+                "value": 1000.0
+              }
+            }
+          ],
+          "label": {
+            "asset_class": "credit",
+            "org_cut": "product",
+            "regime": {
+              "fractal_dim": 1.3,
+              "hurst": 0.7,
+              "lyapunov": 0.01,
+              "market_regime": "normal",
+              "memory_regime": "long_memory"
+            }
+          },
+          "node_ref": "BU_Credit",
+          "risk": {
+            "alpha": 0.95,
+            "coherent": true,
+            "economic_capital": 30,
+            "horizon": 1.0,
+            "measure": "expected_shortfall"
+          },
+          "term": {
+            "average_life": 7.5,
+            "convexity": 57.5,
+            "duration": 6.0
+          }
+        }
+      ],
+      "label": {
+        "asset_class": "credit",
+        "org_cut": "product",
+        "regime": {
+          "fractal_dim": 1.3,
+          "hurst": 0.7,
+          "lyapunov": 0.01,
+          "market_regime": "normal",
+          "memory_regime": "long_memory"
+        }
+      },
+      "node_ref": "Bank",
+      "risk": {
+        "alpha": 0.95,
+        "coherent": true,
+        "economic_capital": 100,
+        "horizon": 1.0,
+        "measure": "expected_shortfall"
+      },
+      "term": {
+        "average_life": 6.5,
+        "convexity": 42.75,
+        "duration": 5.0
+      }
+    }
+  },
+  "horizon": 1.0,
+  "hurdle_rate": 0.12,
+  "tree_id": "noncoherent-no-override"
+}

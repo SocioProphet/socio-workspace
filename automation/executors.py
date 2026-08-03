@@ -275,3 +275,82 @@ def vendored_graph_reconciler() -> Reconciler:
 def reconcile_vendored_graph() -> dict:
     """Executor entry point for a vendored_graph_drift auto_fix decision."""
     return reconcile(vendored_graph_reconciler())
+
+
+# ---------------------------------------------------------------------------
+# propose_pr executor: for cross-repo / low-confidence decisions the responder
+# caps at propose_pr (never auto-act). SAFE BY DEFAULT — the always-on daemon
+# holds no GitHub write credentials, so it RECORDS a durable, reviewable proposal
+# (branch, base, files, title, body, provenance) to state/proposals/ for a human
+# or a credentialed CI job to open. When an `opener` is explicitly injected (a
+# credentialed context), it opens the PR instead. It NEVER auto-applies to main.
+# This keeps outward-facing action out of the autonomous loop (secrets minted in
+# CI, not a standing PAT in a daemon).
+# ---------------------------------------------------------------------------
+
+import hashlib as _hashlib
+import json as _json
+
+from automation.durable_queue import DurableQueue, state_dir
+
+
+def _proposal_id(proposal: dict) -> str:
+    blob = _json.dumps(proposal, sort_keys=True, ensure_ascii=True).encode("utf-8")
+    return _hashlib.sha256(blob).hexdigest()[:16]
+
+
+def _valid_proposal(p) -> bool:
+    """A proposal must name a branch, a title, and at least one file change."""
+    return (
+        isinstance(p, dict)
+        and bool(p.get("title"))
+        and bool(p.get("branch"))
+        and isinstance(p.get("files"), dict)
+        and len(p["files"]) > 0
+    )
+
+
+def propose_pr(*, beacon: dict, proposals_dir: Optional[Path] = None, opener=None) -> dict:
+    """Record (default) or open (when a credentialed opener is injected) a PR proposal.
+
+    Returns {executor, proposed, opened, [proposal_ref|pr_url|error]}. `proposed` True means
+    the situation is resolved into a human-reviewable path; the responder does NOT escalate a
+    successful proposal. A missing/invalid proposal or a failed open leaves proposed False, so
+    the responder escalates to a human.
+    """
+    result = {"executor": "propose_pr", "proposed": False, "opened": False}
+
+    proposal = beacon.get("proposal")
+    if not _valid_proposal(proposal):
+        result["error"] = "beacon carries no valid proposal (need title, branch, files)"
+        return result
+
+    proposal = {"base": "main", **proposal}  # default base branch
+    pid = _proposal_id(proposal)
+    result["proposal_ref"] = pid
+
+    if opener is not None:
+        # Credentialed context: actually open the PR. Never invoked by the default daemon.
+        try:
+            pr_url = opener(proposal)
+        except Exception as exc:
+            result["error"] = f"pr opener failed: {exc}"
+            return result
+        result["proposed"] = True
+        result["opened"] = True
+        result["pr_url"] = pr_url
+        return result
+
+    # Default: durably record the proposal; do not open (no standing creds in the daemon).
+    directory = Path(proposals_dir) if proposals_dir is not None else state_dir() / "proposals"
+    DurableQueue(directory).put(
+        {
+            "id": pid,
+            "proposal": proposal,
+            "beacon_kind": beacon.get("kind_class"),
+            "system": beacon.get("system"),
+            "evidence_ref": beacon.get("evidence_ref"),
+        }
+    )
+    result["proposed"] = True
+    return result

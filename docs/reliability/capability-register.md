@@ -36,6 +36,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Full vertical slice** detect→decide→heal→verify | ✅ | ✅ | ✅ heal **and** escalate+preserve | ✅ | `test_full_loop_detect_decide_heal_verify`, `test_full_loop_corrupt_source_escalates_and_preserves` |
 | **Generic reconciler** (`executors.reconcile`) | ✅ | ✅ both reconcilers use it | ✅ heal/noop/abort/rollback | ✅ | `tests/test_reconcile_generic.py` |
 | **Vendored-graph slice** (detector+executor, real tools) | ✅ | ✅ scheduler jobs | ✅ live break→heal **and** break→escalate | ✅ | `tests/test_vendored_graph_slice.py` |
+| **propose_pr executor** (`executors.propose_pr`) | ✅ | ✅ action-level dispatch | ✅ record/open **and** invalid→escalate | ✅ | `tests/test_propose_pr.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -90,15 +91,15 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
 
 ## Not yet on the board (honest gaps, ranked by leverage)
 
-1. **Detector breadth beyond reconcilable artifacts (SENSE).** Two derived-artifact classes
-   now self-heal on the generic reconciler. The remaining responder classes are a different
-   shape — `build_failure` (observe CI), `stale_vendor` (cross-repo, caps at `propose_pr`),
-   `policy_violation` — and have Law + evidence handling but no detector emits their beacons,
-   so those decisions never fire. These need *action* machinery that does not yet exist
-   (gap 2), so they are decision-only until paired with an executor.
-2. **Executor breadth (ACT).** Only `auto_fix→resync_mirror_drift` is wired. `propose_pr`
-   (open a PR), `canary_fix` (canary then apply), and `quarantine` (isolate) are decided but
-   not carried out — those receipts are decisions, not yet remediations.
+1. **Detector breadth for the propose_pr classes (SENSE).** `propose_pr` now has ACT machinery
+   (gap 2 below), so a `stale_vendor` detector would finally make that class flow end-to-end:
+   observe a stale vendored dep, emit a beacon carrying a `proposal` (branch + files + title),
+   and the responder records a reviewable PR proposal. `build_failure` (observe CI) and
+   `policy_violation` still need their own action machinery before their detectors pay off.
+2. **Executor breadth (ACT).** `auto_fix→resync`/`reconcile` and now `propose_pr` (record a
+   reviewable proposal; open via an injected credentialed opener) are wired. Still missing:
+   `canary_fix` (canary then apply) and `quarantine` (isolate). `propose_pr` is safe by design —
+   the daemon records proposals, it never opens PRs with a standing credential.
 3. **Learning loop ↔ kernel.** `lawful_learning/loop.py` is validated but disjoint from the
    responder. It becomes meaningful now that the slice produces a real receipt stream to learn
    from — improve Law/threshold choices from observed outcomes.

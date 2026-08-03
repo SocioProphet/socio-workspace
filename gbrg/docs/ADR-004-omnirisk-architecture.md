@@ -4,11 +4,14 @@ Status: Accepted
 Date: 2026-08-03
 Scope: `gbrg/governance/omnirisk_allocation.py` + `gbrg/governance/fixtures/omnirisk/*`
 Consumes (soft ref, not forked):
-- `economic-prophet@feat/risk-adjusted-profit-raroc` — RM-1 risk-measure family
+- `economic-prophet#43` (merged) — RM-1 risk-measure family
   (`src/open_ep_framework/risk_measures.py`) + RAP-1 RAROC contract
   (`src/open_ep_framework/risk_adjusted_profit.py`).
-- `economic-prophet` memory-regime characterizer (separate PR, in flight) — Hurst
-  `H` / Lyapunov `λ` / fractal dimension → regime + fat-tailed / long-memory `F`.
+- `economic-prophet#44` (merged) — FTP-1 / MKT-1 FTP separation + vol-surface /
+  Merton bridge (`src/open_ep_framework/market_instruments.py`).
+- `memory-mesh#50` (merged) — memory-regime characterizer — Hurst
+  `H` / Lyapunov `λ` / fractal dimension → regime + fat-tailed / long-memory `F`
+  (emits the `risk_distribution_F` descriptor consumed by the kernel).
 
 ## Context
 
@@ -30,8 +33,8 @@ asset_class {credit, equity, market}
   × org_cut (ANY hierarchy: product-cut or client-segment-cut)
 ```
 
-The per-node risk kernel already exists on `economic-prophet` (the RAROC PR in
-flight). This ADR is about the **architecture + aggregation layer** that sits on
+The per-node risk kernel already exists on `economic-prophet` (merged as
+`economic-prophet#43` / `#44`). This ADR is about the **architecture + aggregation layer** that sits on
 top of it, in the GBRG risk plane. It **consumes, does not fork** the kernel.
 
 ### Home: why GBRG (`sociosphere/gbrg`)
@@ -44,7 +47,7 @@ fixtures (valid + one invalid per tooth), verdicts projected Assay-style
 `gbrg.governance.ledger`, all gated by `pytest -q` in `validate.yml`. A cross-node
 risk **graph/hierarchy** is the natural next node on that plane. `economic-prophet`
 is the canonical *engine* and must not host the estate's blast-radius/risk-graph
-aggregation; and its RAROC kernel PR is in flight there, so authoring here also
+aggregation; and its RAROC kernel is now merged there (`economic-prophet#43` / `#44`), so authoring here also
 avoids collision.
 
 ## Decisions
@@ -59,7 +62,7 @@ This layer never re-derives a measure — it carries the kernel's result per nod
 a given input and *aggregates* it.
 
 ### 2. Regime-aware `F` (fat-tailed / long-memory, per Mandelbrot)
-`F` is not assumed Gaussian. The memory-regime characterizer (consumed PR) labels
+`F` is not assumed Gaussian. The memory-regime characterizer (`memory-mesh#50`) labels
 each node with its memory regime from Hurst `H` (long memory when `H≠0.5`),
 Lyapunov `λ` (sensitivity/chaos) and fractal dimension `D`, and hands the kernel a
 fat-tailed / long-memory `F` accordingly. **Every node in a `RiskAllocationTree`
@@ -153,9 +156,11 @@ duration outside its children's min/max bound.
   at once, and *prove* the allocation is coherent, conserving and cut-invariant.
 - Self-contained: node risk results are given inputs (consumed by reference), so
   `omnirisk-allocation-validate` (wired into `make validate`) and `pytest -q` are
-  independent of the in-flight kernel PR. When that PR merges, the fixtures'
+  independent of the kernel PRs. Now that they are merged
+  (`economic-prophet#43` / `#44`, `memory-mesh#50`), the fixtures'
   `risk_ref` soft-references resolve to live kernel output with no contract change.
-- Follow-up: once the RAROC kernel and the memory-regime characterizer land, add a
+- Follow-up: now that the RAROC kernel (`economic-prophet#43` / `#44`) and the
+  memory-regime characterizer (`memory-mesh#50`) have landed, add a
   thin adapter that emits `RiskAllocationTree` nodes directly from
   `euler_allocation` + the characterizer, replacing hand-authored fixtures with
   live kernel receipts.

@@ -1,0 +1,20 @@
+# git-ops-standards canonical repository admission fragment (auto-registered 2026-08-03)
+id: git-ops-standards
+name: git-ops-standards
+url: https://github.com/SocioProphet/git-ops-standards
+role: standards
+status: active
+description: Canonical git-ops standards + PreToolUse safety hook (capture-before-delete;
+  block push during rebase/merge/conflict)
+primary_language: Python
+tags:
+- git-ops
+- safety-hook
+- pretooluse
+canonical_owner: SocioProphet/git-ops-standards
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: c616eadf73aa24b4795910fd156afc839b20e8c2
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

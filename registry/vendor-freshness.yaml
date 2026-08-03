@@ -743,22 +743,22 @@ artifacts:
         path, retrieval date, asserted digest, and a named regeneration script. It is
         the shape the other entries should be held to.
 
-  - artifact_id: kbpedia-kko@owl-reasoner
+  - artifact_id: kbpedia-kko@sophos-reasoner
     tier: reference  # from the deploy/argocd tier annotation (tier doctrine, prophet-platform #1009)
     source_id: kbpedia-kko
     consumer_repo: SocioProphet/prophet-platform
     consumer_url: https://github.com/SocioProphet/prophet-platform
-    consumer_app: apps/owl-reasoner
-    artifact_path: apps/owl-reasoner/src/owl_reasoner/data/kko-2.10.n3
+    consumer_app: apps/sophos-reasoner
+    artifact_path: apps/sophos-reasoner/src/sophos_reasoner/data/kko-2.10.n3
     vendored_digest: 'sha256:d907919fb40f20ed39a7fde0e8d114027449d9354a1976ce8248db5634cb7b07'
     freshness_policy: pin-exact
     pin_reason: 'Same released KKO 2.10 TBox as the engine copy; moves only with it.'
     owner: '@mdheller'
     disposition: current
     declared_in:
-      - path: apps/owl-reasoner/src/owl_reasoner/data/PROVENANCE.md
+      - path: apps/sophos-reasoner/src/sophos_reasoner/data/PROVENANCE.md
         note: 'states it is byte-identical to the TBox the HellGraph engine vendors'
-      - path: apps/owl-reasoner/src/owl_reasoner/reasoner.py
+      - path: apps/sophos-reasoner/src/sophos_reasoner/reasoner.py
         note: '_kko_tbox() loads it'
     findings:
       - >-

@@ -1,0 +1,24 @@
+# sourceos-asset-ontology canonical repository admission fragment (auto-registered 2026-08-03)
+id: sourceos-asset-ontology
+name: sourceos-asset-ontology
+url: https://github.com/SocioProphet/sourceos-asset-ontology
+role: standards
+status: active
+description: SourceOS asset/identity hypergraph node model (23 HEAVEN/EARTH layers,
+  16 node kinds, 6 edge kinds) bound onto ghostspace-spec ASu/Layer; ratifies the
+  SourceOS x Ghostspace overview diagram.
+primary_language: Python
+tags:
+- ontology
+- ghostspace
+- sourceos
+- asset-graph
+- asu
+- hypergraph
+canonical_owner: SocioProphet/sourceos-asset-ontology
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission only; the repo owns the ontology
+  contracts.
+admitted: 2026-08-03 (created within last 20 days)
+candidate_pin: 9cef0bae5e0f3a37839655c5c7fd55e528c5875e
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md

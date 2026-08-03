@@ -25,6 +25,10 @@ const sh = (args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 64*
 const ghAll = (ep, jq) => sh(['api','-X','GET',ep,'--paginate','--jq',jq]).trim().split('\n').filter(Boolean).map(l=>JSON.parse(l)).flat();
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
+// Org names come from argv (process.argv[2]); escape them before interpolating into a
+// RegExp so a metacharacter in an org name cannot inject a pattern or cause backtracking.
+const reEsc = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // ---- the real repo set (paginated; truncation here is what caused the drift
 //      to be mis-measured in the first place) ---------------------------------
 const realRepos = new Map(); // name -> org
@@ -81,7 +85,7 @@ for (const [name, meta] of scanned) {
       for (const [dep, spec] of Object.entries(deps)) {
         const src = `${dep} ${spec}`;
         for (const org of ORGS) {
-          const m = src.match(new RegExp(`${org}/([A-Za-z0-9._-]+)`));
+          const m = src.match(new RegExp(`${reEsc(org)}/([A-Za-z0-9._-]+)`));
           if (m && m[1] !== name) {
             edges.push({ from: name, to: m[1], type: 'package',
               evidence: `${full}/package.json`, external: !realRepos.has(m[1]) });
@@ -100,7 +104,7 @@ for (const [name, meta] of scanned) {
       const text = readFile(full, `.github/workflows/${wf}`);
       if (!text) continue;
       for (const org of ORGS) {
-        for (const m of text.matchAll(new RegExp(`uses:\\s*${org}/([A-Za-z0-9._-]+)`, 'g'))) {
+        for (const m of text.matchAll(new RegExp(`uses:\\s*${reEsc(org)}/([A-Za-z0-9._-]+)`, 'g'))) {
           if (m[1] !== name) {
             edges.push({ from: name, to: m[1], type: 'workflow',
               evidence: `${full}/.github/workflows/${wf}`, external: !realRepos.has(m[1]) });
@@ -115,7 +119,7 @@ for (const [name, meta] of scanned) {
   const gomod = readFile(full, 'go.mod'); sleep(180);
   if (gomod) {
     for (const org of ORGS) {
-      for (const m of gomod.matchAll(new RegExp(`github\\.com/${org}/([A-Za-z0-9._-]+)`, 'g'))) {
+      for (const m of gomod.matchAll(new RegExp(`github\\.com/${reEsc(org)}/([A-Za-z0-9._-]+)`, 'g'))) {
         if (m[1] !== name) {
           edges.push({ from: name, to: m[1], type: 'gomod',
             evidence: `${full}/go.mod`, external: !realRepos.has(m[1]) });

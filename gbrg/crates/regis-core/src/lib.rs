@@ -22,6 +22,10 @@ use serde::Serialize;
 // Re-export the shared SCOPE-D proof level so callers use one enum across GBRG + Regis.
 pub use gbrg_core::EpistemicLevel;
 
+// The hash-chained, replayable decision ledger (merge/unmerge as first-class ops).
+pub mod ledger;
+pub use ledger::{DecisionLedger, DecisionLedgerEntry, LedgerOp};
+
 // ── Node property keys (namespaced, mirroring gbrg's `gbrg.*` convention) ──
 pub const PROP_REGIS_ID: &str = "regis.id";
 pub const PROP_ENTITY_TYPE: &str = "regis.entity_type";

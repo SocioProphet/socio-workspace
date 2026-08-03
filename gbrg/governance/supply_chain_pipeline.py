@@ -352,7 +352,9 @@ def derive_call_paths(
     for e in edges:
         if e.get("kind") not in kinds:
             continue
-        frm, to = e["from"], e["to"]
+        frm, to = e.get("from"), e.get("to")
+        if not frm or not to:  # malformed edge — skip, don't crash mid-scoring
+            continue
         adj.setdefault(frm, []).append(to)
         indeg[to] = indeg.get(to, 0) + 1
         nodes.add(frm)
@@ -374,13 +376,11 @@ def derive_call_paths(
             seen.add(nxt)
         return path
 
-    for root in roots:
+    for root in roots:  # every root is walked (each bounded by max_len)
         chain = walk_from(root)
         if len(chain) >= 2:  # a path needs at least one edge
             paths.append(chain)
-        if len(paths) >= max_paths:
-            break
-    # Longest chains first, deterministic.
+    # Longest chains first (globally, not just among the first roots), then cap.
     paths.sort(key=lambda p: (-len(p), p))
     return paths[:max_paths]
 
@@ -574,10 +574,16 @@ def estate_evidence_envelopes(
     if cluster is not None:
         aggregates.append(cluster)
     for a in aggregates:
+        # A path/cluster is lifted onto the plane via a real member source blob.
+        # A subject with no real anchor cell (e.g. the cluster of an EMPTY estate)
+        # has no source to anchor to, so it cannot — and must not — be emitted.
+        anchor = getattr(a, "_anchorCellId", None)
+        if not anchor:
+            continue
         envelopes.extend(
             gbrg_evidence.scr_to_observations(
                 a.proof_artifact(), subject_repository=subject_repository,
-                repo_root=root, anchor_cell_id=getattr(a, "_anchorCellId", a.subjectId),
+                repo_root=root, anchor_cell_id=anchor,
             )
         )
     return envelopes

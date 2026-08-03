@@ -286,6 +286,31 @@ def test_module_clusters_derived_from_real_boundaries() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# (11) Hardening: empty / malformed bundles do not crash.
+# --------------------------------------------------------------------------- #
+def test_empty_bundle_emits_no_evidence_without_crashing() -> None:
+    # An empty estate scores a (degenerate) cluster but has NO real source to
+    # anchor onto the evidence plane, so it emits nothing rather than crashing.
+    result = pipe.assess_estate({"artifacts": [], "edges": []}, persist=False)
+    assert result["nodes"] == [] and result["clusters"] == []
+    assert pipe.estate_evidence_envelopes(result, repo_root=_REPO_ROOT) == []
+    # reachable via the adapter surface too.
+    from gbrg.adapters.gbrg_repo_graph_adapter import GbrgRepoGraphAdapter
+    assert GbrgRepoGraphAdapter.from_bundle([]).risk_evidence_records() == []
+
+
+def test_malformed_edges_are_skipped_not_fatal() -> None:
+    edges = [
+        {"kind": "CALLS", "from": "a", "to": "b"},
+        {"kind": "CALLS", "from": "b"},            # missing 'to'
+        {"kind": "CALLS", "to": "c"},              # missing 'from'
+        {"from": "x", "to": "y"},                  # missing 'kind'
+    ]
+    chains = pipe.derive_call_paths(edges)
+    assert chains == [["a", "b"]]  # only the well-formed CALLS edge survives
+
+
+# --------------------------------------------------------------------------- #
 # (9) The RepoGraphAdapter exposes BOTH evidence surfaces over one bundle.
 # --------------------------------------------------------------------------- #
 def test_adapter_risk_evidence_surface() -> None:

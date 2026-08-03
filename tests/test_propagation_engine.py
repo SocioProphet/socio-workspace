@@ -8,12 +8,19 @@ from pathlib import Path
 from engines.propagation_engine import PropagationEngine
 
 
-REGISTRY_DIR = Path(__file__).parent.parent / "registry"
+# Engine LOGIC is tested against a deterministic fixture registry, not the live
+# registry/. The real dependency-graph.yaml is now regenerated from measured
+# evidence, so it changes shape as topology is re-measured and no longer carries
+# hand-authored `dependency_levels` — binding unit tests to it made them assert a
+# fabricated topology. The real artifact is guarded separately by
+# test_real_registry_loads_and_is_acyclic below.
+FIXTURE_DIR = Path(__file__).parent / "fixtures" / "propagation"
+REAL_REGISTRY_DIR = Path(__file__).parent.parent / "registry"
 
 
 @pytest.fixture
 def engine() -> PropagationEngine:
-    e = PropagationEngine(REGISTRY_DIR)
+    e = PropagationEngine(FIXTURE_DIR)
     e.load()
     return e
 
@@ -102,3 +109,17 @@ def test_compute_cascade_depth_ordering(engine: PropagationEngine) -> None:
 def test_no_cycles_in_registry(engine: PropagationEngine) -> None:
     cycles = engine.detect_cycles()
     assert cycles == [], f"Dependency cycles detected: {cycles}"
+
+
+def test_real_registry_loads_and_is_acyclic() -> None:
+    """Guard the ACTUAL committed graph: it must load and stay acyclic.
+
+    Engine logic is covered by the fixture-backed tests above; this one keeps a
+    witness on the real registry/dependency-graph.yaml so a malformed or cyclic
+    regeneration fails here, without pinning assertions to any specific measured
+    edge (which would re-introduce the brittleness we just removed).
+    """
+    e = PropagationEngine(REAL_REGISTRY_DIR)
+    e.load()
+    assert e.all_rules() is not None
+    assert e.detect_cycles() == []

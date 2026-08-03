@@ -1,0 +1,18 @@
+# tests/fixtures/propagation/change-propagation-rules.yaml
+# DETERMINISTIC FIXTURE for PropagationEngine unit tests (see the sibling
+# dependency-graph.yaml). Minimal rule set: a tritrpc trigger with one explicit
+# propagate_to target, enough to exercise get_rule / all_rules / cascade seeding.
+
+version: "fixture-1.0.0"
+
+rules:
+  - id: tritrpc-core
+    trigger:
+      repo: tritrpc
+    max_cascade_depth: 3
+    propagate_to:
+      - repo: sociosphere
+        action: notify
+        message: "tritrpc changed"
+        auto_pr: false
+        pr_title: ""

@@ -73,13 +73,13 @@
   nrg:disposition "current" ;
   nrg:vendoredDigest "sha256:d907919fb40f20ed39a7fde0e8d114027449d9354a1976ce8248db5634cb7b07" .
 
-<https://socioprophet.org/ns/nrg/vendored-artifact/kbpedia-kko@owl-reasoner>
+<https://socioprophet.org/ns/nrg/vendored-artifact/kbpedia-kko@sophos-reasoner>
   a nrg:VendoredArtifact ;
-  nrg:artifactId "kbpedia-kko@owl-reasoner" ;
+  nrg:artifactId "kbpedia-kko@sophos-reasoner" ;
   nrg:sourceId "kbpedia-kko" ;
   nrg:vendoredFrom <https://socioprophet.org/ns/nrg/vendored-source/kbpedia-kko> ;
   nrg:consumerRepo "SocioProphet/prophet-platform" ;
-  nrg:consumerApp "apps/owl-reasoner" ;
+  nrg:consumerApp "apps/sophos-reasoner" ;
   nrg:freshnessPolicy "pin-exact" ;
   nrg:freshnessState "current" ;
   nrg:freshnessReason "pin-exact: intentionally frozen against an observed upstream" ;

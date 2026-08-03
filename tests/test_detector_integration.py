@@ -103,7 +103,8 @@ def test_run_detectors_enqueues_beacon(files, tmp_path, monkeypatch):
     inbox = DurableQueue(state_dir() / "beacons")
 
     emitted = detectors.run_detectors(
-        inbox=inbox, detector_paths={"registry_path": reg, "status_path": status}
+        inbox=inbox, detector_paths={"registry_path": reg, "status_path": status},
+        detectors=[detectors.detect_mirror_drift],
     )
 
     assert len(emitted) == 1
@@ -123,7 +124,7 @@ def test_full_loop_detect_decide_heal_verify(files, tmp_path, monkeypatch):
     paths = {"registry_path": reg, "status_path": status}
 
     # SENSE
-    detectors.run_detectors(inbox=inbox, detector_paths=paths)
+    detectors.run_detectors(inbox=inbox, detector_paths=paths, detectors=[detectors.detect_mirror_drift])
     # DECIDE + ACT + VERIFY
     out = responder.run_once(inbox=inbox, decisions=decisions, execute=True, executor_paths=paths)
 
@@ -147,7 +148,7 @@ def test_full_loop_corrupt_source_escalates_and_preserves(files, tmp_path, monke
     decisions = DurableQueue(state_dir() / "decisions")
     paths = {"registry_path": reg, "status_path": status}
 
-    detectors.run_detectors(inbox=inbox, detector_paths=paths)
+    detectors.run_detectors(inbox=inbox, detector_paths=paths, detectors=[detectors.detect_mirror_drift])
     out = responder.run_once(inbox=inbox, decisions=decisions, execute=True, executor_paths=paths)
 
     assert len(out) == 1

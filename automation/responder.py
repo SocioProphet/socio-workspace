@@ -48,6 +48,7 @@ BOUNDARY_AXES = (
 # breach is never auto-fixed.)
 LAW_BY_KIND: Dict[str, str] = {
     "mirror_drift": "sealed",
+    "vendored_graph_drift": "sealed",  # reversible regenerate-from-source, like mirror_drift
     "build_failure": "probable",
     "stale_vendor": "weak",       # cross-repo: propose only, never auto-act
     "policy_violation": "quarantine",
@@ -69,6 +70,7 @@ IRI_BLOCK = 0.55  # Boundary SPEC block threshold
 # Only wired for verified-safe, idempotent, roll-back-capable remediations.
 EXECUTORS = {
     ("mirror_drift", "auto_fix"): "resync_mirror_drift",
+    ("vendored_graph_drift", "auto_fix"): "reconcile_vendored_graph",
 }
 
 

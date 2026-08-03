@@ -34,6 +34,8 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | Live break→heal / break→abort | ✅ | ✅ | ✅ | ✅ | `test_resync_heals_drifted…`, `test_run_once_execute_escalates_when_executor_cannot_heal` |
 | **Mirror-drift detector** (`detectors.detect_mirror_drift`) | ✅ | ✅ scheduler `detectors` job | ✅ evidence **and** warrantless-on-corrupt | ✅ | `tests/test_detector_integration.py` |
 | **Full vertical slice** detect→decide→heal→verify | ✅ | ✅ | ✅ heal **and** escalate+preserve | ✅ | `test_full_loop_detect_decide_heal_verify`, `test_full_loop_corrupt_source_escalates_and_preserves` |
+| **Generic reconciler** (`executors.reconcile`) | ✅ | ✅ both reconcilers use it | ✅ heal/noop/abort/rollback | ✅ | `tests/test_reconcile_generic.py` |
+| **Vendored-graph slice** (detector+executor, real tools) | ✅ | ✅ scheduler jobs | ✅ live break→heal **and** break→escalate | ✅ | `tests/test_vendored_graph_slice.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -74,20 +76,26 @@ SENSE ─▶ BEACON ─▶ DECIDE ─▶ ACT ─▶ VERIFY ─▶ RECEIPT
  ✅(1)     ✅        ✅        ✅(1)    ✅         ✅
 ```
 
-The **mirror-drift** class is now whole end-to-end: a detector senses drift and emits an
-evidence-bearing beacon, the responder decides `auto_fix` via the kernel `meet`, the executor
-re-syncs, the artifact is verified on disk, and a receipt is recorded — with teeth both ways
-(a corrupt source of truth is escalated to a human and the good artifact is preserved). That
-is the first failure class to traverse every vertebra in production code, not just in isolated
-units. `(1)` marks stages proven for **one** class; breadth is the next work.
+**Two** failure classes are now whole end-to-end — **mirror-drift** and the **vendored-artifact
+graph** — both on one generic mechanism. `executors.reconcile(Reconciler)` is the reusable
+shape ("a derived artifact drifted from its source; regenerate, then VERIFY, roll back on
+failure"); a detector senses drift and emits an evidence-bearing beacon, the responder decides
+`auto_fix` via the kernel `meet`, the reconciler regenerates, the checker re-verifies on disk,
+and a receipt is recorded — with teeth both ways (a corrupt source of truth is escalated to a
+human and the good artifact is preserved). The vendored-graph slice drives the *real* CLIs
+(`check_vendored_artifact_graph.py`, `lift_vendor_freshness_to_graph.py`) as subprocesses and
+verifies by re-running the check, never by trusting an exit code. Adding the Nth reconcilable
+artifact is now a `Reconciler` registration plus a detector, not new verify/rollback code.
+`(1)` on the spine now marks stages proven for **two** classes.
 
 ## Not yet on the board (honest gaps, ranked by leverage)
 
-1. **Detector breadth (SENSE).** Only mirror-drift has a detector. Build-failure,
-   stale-vendor, and policy-violation classes have Law + evidence handling in the responder
-   but nothing *emits* their beacons yet, so those decisions never fire in production. This is
-   the highest-leverage frontier: each new detector lights up decide/act machinery that
-   already exists.
+1. **Detector breadth beyond reconcilable artifacts (SENSE).** Two derived-artifact classes
+   now self-heal on the generic reconciler. The remaining responder classes are a different
+   shape — `build_failure` (observe CI), `stale_vendor` (cross-repo, caps at `propose_pr`),
+   `policy_violation` — and have Law + evidence handling but no detector emits their beacons,
+   so those decisions never fire. These need *action* machinery that does not yet exist
+   (gap 2), so they are decision-only until paired with an executor.
 2. **Executor breadth (ACT).** Only `auto_fix→resync_mirror_drift` is wired. `propose_pr`
    (open a PR), `canary_fix` (canary then apply), and `quarantine` (isolate) are decided but
    not carried out — those receipts are decisions, not yet remediations.

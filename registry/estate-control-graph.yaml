@@ -164,6 +164,62 @@ lanes:
       - closed_providers_not_runtime_dependencies
       - closed_providers_not_canonical_authority
 
+  - id: git-ops-standards
+    owner_repo: SocioProphet/git-ops-standards
+    required: true
+    anchors:
+      - core/controls.yaml
+      - scripts/estate_drift_audit.py
+      - .github/workflows/pr-merge-gate.yml
+      - .github/workflows/estate-ci-health.yml
+    governs:
+      - repo-hygiene-and-naming
+      - pr-merge-readiness
+      - default-branch-ci-health
+      - operational-workflow-branch-ref
+      - ci-credential-minting
+    required_invariants:
+      - controls_cite_a_real_incident
+      - default_branch_ci_is_green
+      - ops_workflows_run_from_default_branch
+      - ci_secrets_minted_never_static_pat
+
+  - id: board-spec-parity
+    owner_repo: SocioProphet/sociosphere
+    required: true
+    anchors:
+      - registry/board-spec.yaml
+      - tools/check_board_spec.py
+    governs:
+      - program-board-source-of-truth
+      - github-projects-render-target
+      - sovereign-board-render-target
+    required_invariants:
+      - board_spec_is_the_source_of_truth
+      - board_spec_is_schema_validated_in_ci
+      - github_and_sovereign_are_render_targets
+
+  - id: consent-plane
+    owner_repo: SocioProphet/socioprophet-agent-standards
+    required: true
+    anchors:
+      - docs/standards/consent-plane/001-purpose-bound-tool-use-and-agent-roles.md
+      - standards/consent-plane/agent-roles_v1.yaml
+      - standards/consent-plane/surfaces_v1.yaml
+      - standards/consent-plane/spaces_v1.yaml
+      - standards/consent-plane/tool-purpose-bindings_v1.yaml
+    governs:
+      - purpose-bound-tool-use
+      - surface-envelope-containment
+      - isolation-space-taints-tolerations
+      - consent-per-purpose
+    required_invariants:
+      - tool_call_declares_a_purpose_or_is_denied
+      - surface_cap_wins_over_role
+      - space_admission_requires_toleration
+      - consent_is_per_purpose_and_revocable
+      - every_decision_emits_a_receipt
+
 required_edges:
   - from: agentic-pr-control
     to: diff-hygiene-gate
@@ -186,3 +242,9 @@ required_edges:
   - from: open-office-runtime
     to: diff-hygiene-gate
     relation: must_preserve_closed_provider_quarantine
+  - from: git-ops-standards
+    to: diff-hygiene-gate
+    relation: co_gates_pre_merge_with
+  - from: git-ops-standards
+    to: fogstack-deployment-parity
+    relation: default_branch_ci_health_covers_operational_runs

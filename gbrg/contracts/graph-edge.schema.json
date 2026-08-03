@@ -7,6 +7,10 @@
   "additionalProperties": false,
   "required": ["from", "to", "kind"],
   "properties": {
+    "record_type": {
+      "const": "GraphEdge",
+      "$comment": "Optional dataset line-type discriminator (gbrg-blast-radius.jsonl multiplexes SemanticCell and GraphEdge lines). Allowed so raw dataset edge records validate as-is; absent on an edge handed in on its own. Mirrors the optional record_type on the pattern SemanticCell branch. See docs/ADR-002-pattern-cells.md."
+    },
     "from": {
       "type": "string",
       "description": "Source cell IRI (the dependent).",
@@ -26,6 +30,11 @@
       "type": "number",
       "default": 1.0,
       "$comment": "graphdb properties are NODE-scoped, so weight CANNOT be a graphdb edge property. GBRG persists it in an explicit side map keyed by (from, to, label) — see gbrg-core::EdgeWeights and docs/ADR-001. It is carried here in the wire contract only."
+    },
+    "line": {
+      "type": "integer",
+      "minimum": 0,
+      "$comment": "Optional source line of the usage site. In the REGEX-corpus projection, each `code -> rx` `imports` edge is one usage site expanded from a pattern record's sources[] (its {repo,file,line}); the same pattern used on N lines yields N edges. Not a graphdb edge property; carried in the wire/projection contract only."
     }
   }
 }

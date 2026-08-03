@@ -2,7 +2,7 @@
 @prefix repo: <https://github.com/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-repo:SocioProphet/hellgraph
+<https://github.com/SocioProphet/hellgraph>
   a nrg:RepositoryGraphFixture ;
   nrg:fixtureId "invalid.missing-boundary" ;
   nrg:expectedResult "block_governed_action" ;

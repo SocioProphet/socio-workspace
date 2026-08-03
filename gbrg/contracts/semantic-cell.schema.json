@@ -2,43 +2,105 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://socioprophet.org/schemas/gbrg/semantic-cell.schema.json",
   "title": "GBRG Semantic Cell",
-  "description": "One unit of code (function/class/import/module) — a node in the Governed Blast-Radius Graph.",
+  "description": "A node in the Governed Blast-Radius Graph. Its `kind` selects the shape: the four CODE kinds (function/class/import/module) carry the code-cell field set; `pattern` is a non-code regex cell from the estate REGEX corpus (prophet-core-catalog ds.regex-operational-dataset) carrying the corpus projection. See docs/ADR-002-pattern-cells.md.",
   "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "cell_id",
-    "kind",
-    "language",
-    "file_path",
-    "symbol_name",
-    "ast_hash",
-    "loc_start",
-    "loc_end"
+  "$comment": "`kind` is the discriminator. A cell validates against EXACTLY ONE of $defs/codeCell or $defs/patternCell — their required sets and closed property sets (additionalProperties:false, scoped per branch) are disjoint, so oneOf resolves unambiguously.",
+  "oneOf": [
+    { "$ref": "#/$defs/codeCell" },
+    { "$ref": "#/$defs/patternCell" }
   ],
-  "properties": {
-    "cell_id": {
-      "type": "string",
-      "description": "Stable code IRI, e.g. code://rust/src/lib.rs#foo. Deterministically hashed to a graphdb NodeId (u64) = first 8 bytes of sha256(cell_id), big-endian.",
-      "minLength": 1
+  "$defs": {
+    "codeCell": {
+      "title": "GBRG code SemanticCell",
+      "description": "One unit of code (function/class/import/module) — the original GBRG cell shape. Unchanged.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cell_id",
+        "kind",
+        "language",
+        "file_path",
+        "symbol_name",
+        "ast_hash",
+        "loc_start",
+        "loc_end"
+      ],
+      "properties": {
+        "cell_id": {
+          "type": "string",
+          "description": "Stable code IRI, e.g. code://rust/src/lib.rs#foo. Deterministically hashed to a graphdb NodeId (u64) = first 8 bytes of sha256(cell_id), big-endian.",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["function", "class", "import", "module"]
+        },
+        "language": { "type": "string", "minLength": 1 },
+        "file_path": { "type": "string", "minLength": 1 },
+        "symbol_name": { "type": "string" },
+        "ast_hash": {
+          "type": "string",
+          "description": "sha256 hex of the cell's AST/source slice.",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "loc_start": { "type": "integer", "minimum": 0 },
+        "loc_end": { "type": "integer", "minimum": 0 },
+        "generated": {
+          "type": "boolean",
+          "default": false,
+          "$comment": "True if this cell is machine-generated (codegen). This is INDEPENDENT of the ProofArtifact epistemicLevel 'synthetic', which means synthetic DATA, never auto-generated code. See blast-radius-proof-artifact.schema.json and docs/ADR-001."
+        }
+      }
     },
-    "kind": {
-      "type": "string",
-      "enum": ["function", "class", "import", "module"]
-    },
-    "language": { "type": "string", "minLength": 1 },
-    "file_path": { "type": "string", "minLength": 1 },
-    "symbol_name": { "type": "string" },
-    "ast_hash": {
-      "type": "string",
-      "description": "sha256 hex of the cell's AST/source slice.",
-      "pattern": "^[0-9a-f]{64}$"
-    },
-    "loc_start": { "type": "integer", "minimum": 0 },
-    "loc_end": { "type": "integer", "minimum": 0 },
-    "generated": {
-      "type": "boolean",
-      "default": false,
-      "$comment": "True if this cell is machine-generated (codegen). This is INDEPENDENT of the ProofArtifact epistemicLevel 'synthetic', which means synthetic DATA, never auto-generated code. See blast-radius-proof-artifact.schema.json and docs/ADR-001."
+    "patternCell": {
+      "title": "GBRG pattern SemanticCell",
+      "description": "A non-code cell standing for one distinct regex from the estate REGEX corpus (prophet-core-catalog ds.regex-operational-dataset). Fields are the corpus projection, NOT the code-cell set. Code-file cells depend on it via `imports`-kind edges (graph-edge.schema.json); a pattern node's in-degree over those edges is `use_count` = its blast radius. See docs/ADR-002-pattern-cells.md.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cell_id",
+        "kind",
+        "intent",
+        "category",
+        "risk_class",
+        "use_count",
+        "provider_reference",
+        "redos_suspect"
+      ],
+      "properties": {
+        "record_type": {
+          "const": "SemanticCell",
+          "$comment": "Optional dataset line-type discriminator (gbrg-blast-radius.jsonl multiplexes SemanticCell and GraphEdge lines). Allowed so raw dataset records validate as-is; absent on a cell handed in on its own."
+        },
+        "cell_id": {
+          "type": "string",
+          "pattern": "^rx://rx-[0-9a-f]{10}$",
+          "description": "Pattern IRI: rx://rx-<sha1[0:10] of the raw pattern>. The rx-<sha1[0:10]> fragment is the corpus record id (content hash: same regex across N repos collapses to ONE node). Deterministically hashed to a graphdb NodeId like any cell_id."
+        },
+        "kind": { "const": "pattern" },
+        "intent": {
+          "type": "string",
+          "$comment": "One-line description of what the pattern matches. Seed field; may be empty ('') pending curation."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["secret", "pii", "url", "identifier", "version", "path", "validation", "classifier", "other"]
+        },
+        "risk_class": {
+          "type": "string",
+          "enum": ["catastrophic", "sensitive", "benign"]
+        },
+        "use_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total usage sites (in-degree over `imports` edges) = the pattern node's blast radius."
+        },
+        "provider_reference": { "type": "boolean" },
+        "redos_suspect": {
+          "type": "boolean",
+          "$comment": "True when the pattern has a catastrophic-backtracking shape (nested/alternation-under-quantifier). See the dataset SCHEMA.md rubric."
+        }
+      }
     }
   }
 }

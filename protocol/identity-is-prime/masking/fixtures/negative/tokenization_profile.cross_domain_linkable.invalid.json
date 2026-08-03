@@ -1,0 +1,14 @@
+{
+  "schema_version": "identity-prime.tokenization-profile.v1",
+  "profile_id": "tp_patient_mrn_cross_domain_leak",
+  "field_selector": {
+    "path": "$.patient.mrn",
+    "data_class": "direct_identifier"
+  },
+  "scheme": "chameleon_token",
+  "reversibility": "reversible",
+  "domain_scope": "INSTITUTION",
+  "cross_domain_linkable": true,
+  "scheme_version": "chameleon.reference@0.1.0",
+  "created_at": "2026-06-29T15:00:00Z"
+}

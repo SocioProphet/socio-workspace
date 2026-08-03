@@ -1,0 +1,169 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "law_compiler",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Boundary record not yet native in repo.",
+    "jurisdiction": "Schema, ontology, SHACL, CRD, and constraint compilation into executable law surfaces.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "ontology-to-schema pipelines",
+      "SHACL or validation contracts",
+      "generated law/constraint artifacts"
+    ]
+  },
+  "catalog": {
+    "asset_count": 675,
+    "by_kind": {
+      "ci-workflows-tests": 16,
+      "design": 2,
+      "gate": 1,
+      "governance": 6,
+      "invariant": 2,
+      "json-schema": 3,
+      "jsonld": 50,
+      "other": 6,
+      "owl": 118,
+      "policy-as-code": 1,
+      "rdf": 36,
+      "rdfs": 1,
+      "readme": 1,
+      "shacl": 85,
+      "skos": 6,
+      "spec": 26,
+      "topic-vocabulary": 315
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "ontologies",
+      "rules-policies",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 197,
+    "sample_assets": [
+      {
+        "asset_id": "doc.ontogenesis.docs-action-ontology-module-note-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Action Ontology module note",
+        "path": "docs/action-ontology-module-note.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-agentic-purple-team-and-mitre-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Agentic Purple Team Ontology and MITRE Alignment",
+        "path": "docs/specs/agentic-purple-team-and-mitre.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-audit-policy-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Audit & supply-chain policy",
+        "path": "docs/specs/audit_policy.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-business-ontology-bridge-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Business ontology bridge",
+        "path": "docs/specs/business_ontology_bridge.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-candidate-link-intelligence-plane-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Candidate Link Intelligence Plane v0.1",
+        "path": "docs/specs/candidate-link-intelligence-plane.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-candidate-link-to-shir-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Candidate Link to SHIR Mapping v0.1",
+        "path": "docs/specs/candidate-link-to-shir.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-capability-fabric-ontology-alignment-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "Capability Fabric Ontology Alignment Note",
+        "path": "docs/CAPABILITY_FABRIC_ONTOLOGY_ALIGNMENT.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-constrained-multistate-pathway-design-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Constrained Multistate Pathway Design for Ontogenesis",
+        "path": "docs/specs/constrained-multistate-pathway-design.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-content-support-ops-ontology-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Content, Support, Query, and Ops Ontology Design",
+        "path": "docs/content-support-ops-ontology.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-design-plan-md",
+        "dataset": "adrs-docs",
+        "kind": "design",
+        "name": "Design plan",
+        "path": "docs/design-plan.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-epi-onto-learning-spec-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Epi‑Onto‑Learning — spec notes",
+        "path": "docs/specs/epi_onto_learning_spec.md"
+      },
+      {
+        "asset_id": "doc.ontogenesis.docs-specs-governed-intelligence-object-model-v0-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "Governed Intelligence Object Model v0",
+        "path": "docs/specs/governed-intelligence-object-model-v0.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "acr",
+    "acset",
+    "act",
+    "action",
+    "active",
+    "actor",
+    "acts",
+    "aer",
+    "aligned",
+    "audit",
+    "authority",
+    "backend",
+    "bindings",
+    "bundle",
+    "business",
+    "bytes",
+    "candidate",
+    "capability",
+    "claim",
+    "conforms"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.ontogenesis",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/ontogenesis",
+    "status": "active",
+    "title": "Ontogenesis (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/ontogenesis",
+  "schema": "self-documentation-record/v0.1",
+  "short": "ontogenesis"
+}

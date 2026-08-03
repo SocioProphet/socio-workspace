@@ -2,7 +2,7 @@
 @prefix repo: <https://github.com/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-repo:SocioProphet/prophet-workspace
+<https://github.com/SocioProphet/prophet-workspace>
   a nrg:RepositoryGraphFixture ;
   nrg:fixtureId "invalid.policy-denied-shacl-pass" ;
   nrg:expectedResult "block_governed_action" ;

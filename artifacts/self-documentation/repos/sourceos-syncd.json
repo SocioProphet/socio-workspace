@@ -1,0 +1,161 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "local_state_integrity",
+    "claim_modes": [
+      "formal_construction",
+      "fixture_validated",
+      "experimental_run"
+    ],
+    "current_status": "Boundary record not yet native in repo.",
+    "jurisdiction": "Local-first state replication, repair, provenance-preserving sync, and reconciliation boundary.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "replication manifests",
+      "repair receipts",
+      "provenance chains",
+      "sync integrity reports"
+    ]
+  },
+  "catalog": {
+    "asset_count": 324,
+    "by_kind": {
+      "adrs-docs": 1,
+      "ci-workflows-tests": 5,
+      "governance": 2,
+      "json-schema": 16,
+      "other": 2,
+      "policy-as-code": 1,
+      "readme": 1,
+      "spec": 7,
+      "topic-vocabulary": 289
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "rules-policies",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 183,
+    "sample_assets": [
+      {
+        "asset_id": "adr.sourceos-syncd.0001",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 0001: SourceOS Control Plane as the Integration Spine",
+        "path": "adr/0001-sourceos-control-plane.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-controller-sovereignty-event-contract-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Controller Event Contract",
+        "path": "docs/controller-sovereignty/event-contract.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-mvp-roadmap-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "MVP Roadmap",
+        "path": "docs/mvp-roadmap.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-policy-fabric-hook-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "PolicyFabric Hook",
+        "path": "docs/policy-fabric-hook.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-specs-sourceos-control-plane-integration-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS Control Plane Integration",
+        "path": "docs/specs/sourceos-control-plane-integration.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-specs-sourceos-index-lanes-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS Index Lanes",
+        "path": "docs/specs/sourceos-index-lanes.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-policy-decision-normalizer-md",
+        "dataset": "adrs-docs",
+        "kind": "governance",
+        "name": "SourceOS Policy Decision Normalizer",
+        "path": "docs/policy-decision-normalizer.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-process-provenance-collector-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS Process Provenance Collector Contract",
+        "path": "docs/process-provenance-collector.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-contracts-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS State Integrity Contracts",
+        "path": "docs/contracts.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-specs-sourceos-state-integrity-report-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS State Integrity Report",
+        "path": "docs/specs/sourceos-state-integrity-report.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-implementation-roadmap-md",
+        "dataset": "adrs-docs",
+        "kind": "other",
+        "name": "SourceOS Telemetry Signal-Control Implementation Roadmap",
+        "path": "docs/implementation-roadmap.md"
+      },
+      {
+        "asset_id": "doc.sourceos-syncd.docs-telemetry-noise-control-spec-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "SourceOS Telemetry Signal-Control Specification",
+        "path": "docs/telemetry-noise-control-spec.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "action",
+    "actor",
+    "additional",
+    "agent",
+    "agentplane",
+    "alpha",
+    "append",
+    "argument",
+    "array",
+    "artifact",
+    "authority",
+    "binding",
+    "boolean",
+    "boundary",
+    "browser",
+    "budget",
+    "bytes",
+    "capability",
+    "causality",
+    "checked"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.sourceos-syncd",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/sourceos-syncd",
+    "status": "active",
+    "title": "Sourceos Syncd (SocioProphet estate repo)"
+  },
+  "repo": "SourceOS-Linux/sourceos-syncd",
+  "schema": "self-documentation-record/v0.1",
+  "short": "sourceos-syncd"
+}

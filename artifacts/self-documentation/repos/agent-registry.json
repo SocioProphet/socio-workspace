@@ -1,0 +1,160 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "agent_identity_capability",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Boundary record not yet native in repo.",
+    "jurisdiction": "Agent identity, capability manifests, versioned admission, and revocation records.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "agent manifests",
+      "capability records",
+      "revocation events"
+    ]
+  },
+  "catalog": {
+    "asset_count": 304,
+    "by_kind": {
+      "agent-manifest": 7,
+      "capability-decl": 8,
+      "ci-workflows-tests": 6,
+      "json-schema": 10,
+      "path": 1,
+      "readme": 1,
+      "topic-vocabulary": 269,
+      "validation": 2
+    },
+    "datasets": [
+      "adrs-docs",
+      "agents-manifests",
+      "ci-workflows-tests",
+      "regex-operational-dataset",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 159,
+    "sample_assets": [
+      {
+        "asset_id": "doc.agent-registry.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "agent-registry",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "ag-a1a812d30d5b",
+        "dataset": "agents-manifests",
+        "kind": "agent-manifest",
+        "name": "agent://professional-intelligence/opportunity-review-agent",
+        "path": "examples/professional-intelligence/agent-specs.example.json"
+      },
+      {
+        "asset_id": "ag-28098829533d",
+        "dataset": "agents-manifests",
+        "kind": "capability-decl",
+        "name": "agent://professional-intelligence/opportunity-review-agent",
+        "path": "examples/professional-intelligence/tool-grants.example.json"
+      },
+      {
+        "asset_id": "ag-03e1fb5e5034",
+        "dataset": "agents-manifests",
+        "kind": "capability-decl",
+        "name": "agent://professional-intelligence/opportunity-review-agent",
+        "path": "examples/professional-intelligence/tool-grants.example.json"
+      },
+      {
+        "asset_id": "ag-32d29372f139",
+        "dataset": "agents-manifests",
+        "kind": "agent-manifest",
+        "name": "agent://professional-intelligence/policy-review-agent",
+        "path": "examples/professional-intelligence/agent-specs.example.json"
+      },
+      {
+        "asset_id": "ag-d2ecd170426b",
+        "dataset": "agents-manifests",
+        "kind": "capability-decl",
+        "name": "agent://professional-intelligence/policy-review-agent",
+        "path": "examples/professional-intelligence/tool-grants.example.json"
+      },
+      {
+        "asset_id": "ag-022b6139f7bb",
+        "dataset": "agents-manifests",
+        "kind": "agent-manifest",
+        "name": "agent://professional-intelligence/relationship-agent",
+        "path": "examples/professional-intelligence/agent-specs.example.json"
+      },
+      {
+        "asset_id": "ag-1b9f527acadb",
+        "dataset": "agents-manifests",
+        "kind": "capability-decl",
+        "name": "agent://professional-intelligence/relationship-agent",
+        "path": "examples/professional-intelligence/tool-grants.example.json"
+      },
+      {
+        "asset_id": "ag-ebdd808009cd",
+        "dataset": "agents-manifests",
+        "kind": "agent-manifest",
+        "name": "agent://professional-intelligence/workspace-setup-agent",
+        "path": "examples/professional-intelligence/agent-specs.example.json"
+      },
+      {
+        "asset_id": "ag-1d4e7ff0cf86",
+        "dataset": "agents-manifests",
+        "kind": "capability-decl",
+        "name": "agent://professional-intelligence/workspace-setup-agent",
+        "path": "examples/professional-intelligence/tool-grants.example.json"
+      },
+      {
+        "asset_id": "ag-e274db99644f",
+        "dataset": "agents-manifests",
+        "kind": "agent-manifest",
+        "name": "agent://socioprophet/demo-analyst",
+        "path": "examples/agent-spec.example.json"
+      },
+      {
+        "asset_id": "ag-d3214285f00e",
+        "dataset": "agents-manifests",
+        "kind": "capability-decl",
+        "name": "agent://socioprophet/demo-analyst",
+        "path": "examples/tool-grant.example.json"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "action",
+    "actions",
+    "active",
+    "actor",
+    "additional",
+    "admission",
+    "agent-registry · LDA topic 0",
+    "agent-registry · LDA topic 1",
+    "agent-registry · LDA topic 2",
+    "agent-registry · LDA topic 3",
+    "agent-registry · LDA topic 4",
+    "agent-registry · LDA topic 5",
+    "agent-registry · LDA topic 6",
+    "agent-registry · LDA topic 7",
+    "agent-registry · LDA topic 8",
+    "agent-registry · LDA topic 9",
+    "agent-registry · LSA topic 0",
+    "agent-registry · LSA topic 1",
+    "agent-registry · LSA topic 2",
+    "agent-registry · LSA topic 3"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.agent-registry",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/agent-registry",
+    "status": "active",
+    "title": "Agent Registry (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/agent-registry",
+  "schema": "self-documentation-record/v0.1",
+  "short": "agent-registry"
+}

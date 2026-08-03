@@ -1,0 +1,1358 @@
+{
+  "link_count": 266,
+  "links": [
+    {
+      "count": 1,
+      "from": "agent-machine",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 3,
+      "from": "agent-machine",
+      "to": "sociosphere"
+    },
+    {
+      "count": 21,
+      "from": "agent-registry",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 1,
+      "from": "agent-registry",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "agent-registry",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 2,
+      "from": "agent-registry",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "agentplane",
+      "to": "memory-mesh"
+    },
+    {
+      "count": 9,
+      "from": "agentplane",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 4,
+      "from": "agentplane",
+      "to": "prophet-mesh"
+    },
+    {
+      "count": 20,
+      "from": "agentplane",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 9,
+      "from": "agentplane",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "alexandrian-academy",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 1,
+      "from": "alexandrian-academy",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 1,
+      "from": "bearbrowser",
+      "to": "prophet-workspace"
+    },
+    {
+      "count": 73,
+      "from": "cloudshell-fog",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "cloudshell-fog",
+      "to": "sociosphere"
+    },
+    {
+      "count": 4,
+      "from": "contractforge",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "delivery-excellence",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 11,
+      "from": "economic-prophet",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 17,
+      "from": "economic-prophet",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "economic-prophet",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "embeddinglab",
+      "to": "sherlock-search"
+    },
+    {
+      "count": 2,
+      "from": "exodus",
+      "to": "agent-registry"
+    },
+    {
+      "count": 8,
+      "from": "exodus",
+      "to": "agentplane"
+    },
+    {
+      "count": 4,
+      "from": "exodus",
+      "to": "policy-fabric"
+    },
+    {
+      "count": 14,
+      "from": "exodus",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 14,
+      "from": "exodus",
+      "to": "sociosphere"
+    },
+    {
+      "count": 9,
+      "from": "gaia-world-model",
+      "to": "alexandrian-academy"
+    },
+    {
+      "count": 6,
+      "from": "gaia-world-model",
+      "to": "procybernetica"
+    },
+    {
+      "count": 4,
+      "from": "gaia-world-model",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 6,
+      "from": "gaia-world-model",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "gaia-world-model",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 2,
+      "from": "gaia-world-model",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 4,
+      "from": "gaia-world-model",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "global-devsecops-intelligence",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 2,
+      "from": "global-devsecops-intelligence",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "global-devsecops-intelligence",
+      "to": "tritrpc"
+    },
+    {
+      "count": 8,
+      "from": "guardrail-fabric",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "heller-godel",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 2,
+      "from": "heller-godel",
+      "to": "sociosphere"
+    },
+    {
+      "count": 2,
+      "from": "human-digital-twin",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "identity-is-prime-reference",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 2,
+      "from": "identity-is-prime-reference",
+      "to": "sociosphere"
+    },
+    {
+      "count": 28,
+      "from": "mcp-a2a-zero-trust",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "mcp-a2a-zero-trust",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 9,
+      "from": "mcp-a2a-zero-trust",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "memory-mesh",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 3,
+      "from": "memory-mesh",
+      "to": "sociosphere"
+    },
+    {
+      "count": 3,
+      "from": "model-governance-ledger",
+      "to": "agent-registry"
+    },
+    {
+      "count": 1,
+      "from": "model-governance-ledger",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 1,
+      "from": "model-governance-ledger",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 7,
+      "from": "model-governance-ledger",
+      "to": "sociosphere"
+    },
+    {
+      "count": 2,
+      "from": "model-router",
+      "to": "agentplane"
+    },
+    {
+      "count": 7,
+      "from": "model-router",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 3,
+      "from": "nlboot",
+      "to": "sociosphere"
+    },
+    {
+      "count": 3,
+      "from": "noetica",
+      "to": "agent-registry"
+    },
+    {
+      "count": 1,
+      "from": "noetica",
+      "to": "hellgraph"
+    },
+    {
+      "count": 155,
+      "from": "noetica",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "noetica",
+      "to": "sherlock-search"
+    },
+    {
+      "count": 1,
+      "from": "noetica",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 15,
+      "from": "noetica",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "noetica",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 1,
+      "from": "noetica-impair",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 11,
+      "from": "ontogenesis",
+      "to": "agent-registry"
+    },
+    {
+      "count": 5,
+      "from": "ontogenesis",
+      "to": "agentplane"
+    },
+    {
+      "count": 2,
+      "from": "ontogenesis",
+      "to": "exodus"
+    },
+    {
+      "count": 20,
+      "from": "ontogenesis",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 4,
+      "from": "ontogenesis",
+      "to": "memory-mesh"
+    },
+    {
+      "count": 10,
+      "from": "ontogenesis",
+      "to": "model-governance-ledger"
+    },
+    {
+      "count": 3,
+      "from": "ontogenesis",
+      "to": "noetica"
+    },
+    {
+      "count": 8,
+      "from": "ontogenesis",
+      "to": "policy-fabric"
+    },
+    {
+      "count": 10,
+      "from": "ontogenesis",
+      "to": "procybernetica"
+    },
+    {
+      "count": 6,
+      "from": "ontogenesis",
+      "to": "prophet-cli"
+    },
+    {
+      "count": 53,
+      "from": "ontogenesis",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "ontogenesis",
+      "to": "prophet-workspace"
+    },
+    {
+      "count": 2,
+      "from": "ontogenesis",
+      "to": "regis-entity-graph"
+    },
+    {
+      "count": 35,
+      "from": "ontogenesis",
+      "to": "scope-d"
+    },
+    {
+      "count": 7,
+      "from": "ontogenesis",
+      "to": "semantic-serdes"
+    },
+    {
+      "count": 2,
+      "from": "ontogenesis",
+      "to": "socioprophet"
+    },
+    {
+      "count": 7,
+      "from": "ontogenesis",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 8,
+      "from": "ontogenesis",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 40,
+      "from": "ontogenesis",
+      "to": "sociosphere"
+    },
+    {
+      "count": 2,
+      "from": "ontogenesis",
+      "to": "sourceos-syncd"
+    },
+    {
+      "count": 2,
+      "from": "ontogenesis",
+      "to": "systems-learning-loops"
+    },
+    {
+      "count": 4,
+      "from": "policy-fabric",
+      "to": "agentplane"
+    },
+    {
+      "count": 2,
+      "from": "policy-fabric",
+      "to": "global-devsecops-intelligence"
+    },
+    {
+      "count": 2,
+      "from": "policy-fabric",
+      "to": "procybernetica"
+    },
+    {
+      "count": 5,
+      "from": "policy-fabric",
+      "to": "profit-mpcc"
+    },
+    {
+      "count": 7,
+      "from": "policy-fabric",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 11,
+      "from": "policy-fabric",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "policy-fabric",
+      "to": "prophet-platform-standards"
+    },
+    {
+      "count": 16,
+      "from": "policy-fabric",
+      "to": "sociosphere"
+    },
+    {
+      "count": 2,
+      "from": "procybernetica",
+      "to": "agentplane"
+    },
+    {
+      "count": 1,
+      "from": "procybernetica",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 14,
+      "from": "procybernetica",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 5,
+      "from": "procybernetica",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 14,
+      "from": "procybernetica",
+      "to": "sociosphere"
+    },
+    {
+      "count": 3,
+      "from": "profit-mpcc",
+      "to": "agentplane"
+    },
+    {
+      "count": 2,
+      "from": "profit-mpcc",
+      "to": "hellgraph"
+    },
+    {
+      "count": 8,
+      "from": "profit-mpcc",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 20,
+      "from": "profit-mpcc",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 3,
+      "from": "prophet-core-contracts",
+      "to": "model-governance-ledger"
+    },
+    {
+      "count": 8,
+      "from": "prophet-core-contracts",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 4,
+      "from": "prophet-core-contracts",
+      "to": "sherlock-search"
+    },
+    {
+      "count": 1,
+      "from": "prophet-core-contracts",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 16,
+      "from": "prophet-core-contracts",
+      "to": "sociosphere"
+    },
+    {
+      "count": 11,
+      "from": "prophet-core-policy",
+      "to": "agent-registry"
+    },
+    {
+      "count": 16,
+      "from": "prophet-domain-gaia-ontology",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "prophet-mesh",
+      "to": "agentplane"
+    },
+    {
+      "count": 5,
+      "from": "prophet-mesh",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "prophet-mesh",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 1,
+      "from": "prophet-mesh",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 1,
+      "from": "prophet-platform",
+      "to": "agent-registry"
+    },
+    {
+      "count": 12,
+      "from": "prophet-platform",
+      "to": "agentplane"
+    },
+    {
+      "count": 308,
+      "from": "prophet-platform",
+      "to": "cloudshell-fog"
+    },
+    {
+      "count": 4,
+      "from": "prophet-platform",
+      "to": "contractforge"
+    },
+    {
+      "count": 2,
+      "from": "prophet-platform",
+      "to": "delivery-excellence-automation"
+    },
+    {
+      "count": 3,
+      "from": "prophet-platform",
+      "to": "economic-prophet"
+    },
+    {
+      "count": 4,
+      "from": "prophet-platform",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 3,
+      "from": "prophet-platform",
+      "to": "global-devsecops-intelligence"
+    },
+    {
+      "count": 2,
+      "from": "prophet-platform",
+      "to": "hellgraph"
+    },
+    {
+      "count": 21,
+      "from": "prophet-platform",
+      "to": "mcp-a2a-zero-trust"
+    },
+    {
+      "count": 5,
+      "from": "prophet-platform",
+      "to": "noetica"
+    },
+    {
+      "count": 2,
+      "from": "prophet-platform",
+      "to": "ontogenesis"
+    },
+    {
+      "count": 6,
+      "from": "prophet-platform",
+      "to": "policy-fabric"
+    },
+    {
+      "count": 228,
+      "from": "prophet-platform",
+      "to": "procybernetica"
+    },
+    {
+      "count": 243,
+      "from": "prophet-platform",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 1,
+      "from": "prophet-platform",
+      "to": "prophet-core-contracts"
+    },
+    {
+      "count": 7,
+      "from": "prophet-platform",
+      "to": "prophet-platform-standards"
+    },
+    {
+      "count": 2,
+      "from": "prophet-platform",
+      "to": "prophet-workspace"
+    },
+    {
+      "count": 9,
+      "from": "prophet-platform",
+      "to": "regis-entity-graph"
+    },
+    {
+      "count": 14,
+      "from": "prophet-platform",
+      "to": "scope-d"
+    },
+    {
+      "count": 1,
+      "from": "prophet-platform",
+      "to": "smart-tree"
+    },
+    {
+      "count": 1,
+      "from": "prophet-platform",
+      "to": "socioprophet"
+    },
+    {
+      "count": 7,
+      "from": "prophet-platform",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 2,
+      "from": "prophet-platform",
+      "to": "socioprophet-seed-deck"
+    },
+    {
+      "count": 1,
+      "from": "prophet-platform",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 9,
+      "from": "prophet-platform",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 102,
+      "from": "prophet-platform",
+      "to": "sociosphere"
+    },
+    {
+      "count": 4,
+      "from": "prophet-platform",
+      "to": "sourceos-devtools"
+    },
+    {
+      "count": 5,
+      "from": "prophet-platform",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 3,
+      "from": "prophet-platform",
+      "to": "sourceos-syncd"
+    },
+    {
+      "count": 3,
+      "from": "prophet-platform",
+      "to": "superconscious"
+    },
+    {
+      "count": 11,
+      "from": "prophet-platform",
+      "to": "tritfabric"
+    },
+    {
+      "count": 1,
+      "from": "prophet-platform",
+      "to": "tritrpc"
+    },
+    {
+      "count": 8,
+      "from": "prophet-platform",
+      "to": "turtleterm"
+    },
+    {
+      "count": 10,
+      "from": "prophet-platform-standards",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "prophet-workspace",
+      "to": "agent-term"
+    },
+    {
+      "count": 2,
+      "from": "prophet-workspace",
+      "to": "agentplane"
+    },
+    {
+      "count": 16,
+      "from": "prophet-workspace",
+      "to": "goose-notes"
+    },
+    {
+      "count": 4,
+      "from": "prophet-workspace",
+      "to": "prophet-mesh"
+    },
+    {
+      "count": 10,
+      "from": "prophet-workspace",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 3,
+      "from": "prophet-workspace",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 1,
+      "from": "prophet-workspace",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 8,
+      "from": "prophet-workspace",
+      "to": "sociosphere"
+    },
+    {
+      "count": 2,
+      "from": "prophet-workspace",
+      "to": "sourceos-devtools"
+    },
+    {
+      "count": 1,
+      "from": "prophet-workspace",
+      "to": "systems-learning-loops"
+    },
+    {
+      "count": 2,
+      "from": "regis-entity-graph",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 3,
+      "from": "regis-entity-graph",
+      "to": "hellgraph"
+    },
+    {
+      "count": 11,
+      "from": "regis-entity-graph",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 5,
+      "from": "regis-entity-graph",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "scope-d",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 2,
+      "from": "scope-d",
+      "to": "ontogenesis"
+    },
+    {
+      "count": 35,
+      "from": "scope-d",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 30,
+      "from": "scope-d",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "sherlock-search",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 1,
+      "from": "sherlock-search",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 6,
+      "from": "sherlock-search",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 11,
+      "from": "sherlock-search",
+      "to": "sociosphere"
+    },
+    {
+      "count": 42,
+      "from": "sherlock-search",
+      "to": "sourceos"
+    },
+    {
+      "count": 5,
+      "from": "socioprophet",
+      "to": "sociosphere"
+    },
+    {
+      "count": 7,
+      "from": "socioprophet",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 3,
+      "from": "socioprophet-agent-standards",
+      "to": "agentplane"
+    },
+    {
+      "count": 9,
+      "from": "socioprophet-agent-standards",
+      "to": "alexandrian-academy"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-agent-standards",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-agent-standards",
+      "to": "procybernetica"
+    },
+    {
+      "count": 4,
+      "from": "socioprophet-agent-standards",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-agent-standards",
+      "to": "prophet-core-contracts"
+    },
+    {
+      "count": 14,
+      "from": "socioprophet-agent-standards",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-agent-standards",
+      "to": "prophet-platform-standards"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-agent-standards",
+      "to": "sherlock-search"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-agent-standards",
+      "to": "source-os"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-knowledge",
+      "to": "agentplane"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-knowledge",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 5,
+      "from": "socioprophet-standards-knowledge",
+      "to": "goose-notes"
+    },
+    {
+      "count": 11,
+      "from": "socioprophet-standards-knowledge",
+      "to": "ontogenesis"
+    },
+    {
+      "count": 36,
+      "from": "socioprophet-standards-knowledge",
+      "to": "procybernetica"
+    },
+    {
+      "count": 6,
+      "from": "socioprophet-standards-knowledge",
+      "to": "prophet-cli"
+    },
+    {
+      "count": 10,
+      "from": "socioprophet-standards-knowledge",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-knowledge",
+      "to": "prophet-core-contracts"
+    },
+    {
+      "count": 3,
+      "from": "socioprophet-standards-knowledge",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-knowledge",
+      "to": "prophet-platform-standards"
+    },
+    {
+      "count": 3,
+      "from": "socioprophet-standards-knowledge",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-knowledge",
+      "to": "socioprophet-seed-deck"
+    },
+    {
+      "count": 15,
+      "from": "socioprophet-standards-knowledge",
+      "to": "sociosphere"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-knowledge",
+      "to": "tritrpc"
+    },
+    {
+      "count": 5,
+      "from": "socioprophet-standards-storage",
+      "to": "agentplane"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-storage",
+      "to": "bsd-proof-program"
+    },
+    {
+      "count": 12,
+      "from": "socioprophet-standards-storage",
+      "to": "contractforge"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-storage",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 10,
+      "from": "socioprophet-standards-storage",
+      "to": "heller-godel"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-storage",
+      "to": "heller-winters-theorem"
+    },
+    {
+      "count": 4,
+      "from": "socioprophet-standards-storage",
+      "to": "identity-is-prime-reference"
+    },
+    {
+      "count": 12,
+      "from": "socioprophet-standards-storage",
+      "to": "mcp-a2a-zero-trust"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-storage",
+      "to": "noetica"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-storage",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-storage",
+      "to": "prophet-mesh"
+    },
+    {
+      "count": 12,
+      "from": "socioprophet-standards-storage",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-storage",
+      "to": "prophet-platform-standards"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-storage",
+      "to": "socioprophet"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-storage",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 1,
+      "from": "socioprophet-standards-storage",
+      "to": "socioprophet-seed-deck"
+    },
+    {
+      "count": 13,
+      "from": "socioprophet-standards-storage",
+      "to": "sociosphere"
+    },
+    {
+      "count": 12,
+      "from": "socioprophet-standards-storage",
+      "to": "tritrpc"
+    },
+    {
+      "count": 2,
+      "from": "socioprophet-standards-storage",
+      "to": "yang-mills"
+    },
+    {
+      "count": 1,
+      "from": "socios",
+      "to": "agentplane"
+    },
+    {
+      "count": 1,
+      "from": "socios",
+      "to": "ontogenesis"
+    },
+    {
+      "count": 8,
+      "from": "socios",
+      "to": "policy-fabric"
+    },
+    {
+      "count": 17,
+      "from": "socios",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 8,
+      "from": "sociosphere",
+      "to": "cloudshell-fog"
+    },
+    {
+      "count": 2,
+      "from": "sociosphere",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 1,
+      "from": "sociosphere",
+      "to": "global-devsecops-intelligence"
+    },
+    {
+      "count": 3,
+      "from": "sociosphere",
+      "to": "ontogenesis"
+    },
+    {
+      "count": 5,
+      "from": "sociosphere",
+      "to": "policy-fabric"
+    },
+    {
+      "count": 7,
+      "from": "sociosphere",
+      "to": "procybernetica"
+    },
+    {
+      "count": 153,
+      "from": "sociosphere",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 48,
+      "from": "sociosphere",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 4,
+      "from": "sociosphere",
+      "to": "socioprophet"
+    },
+    {
+      "count": 2,
+      "from": "sociosphere",
+      "to": "socioprophet-seed-deck"
+    },
+    {
+      "count": 2,
+      "from": "sociosphere",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 4,
+      "from": "sociosphere",
+      "to": "superconscious"
+    },
+    {
+      "count": 1,
+      "from": "sociosphere",
+      "to": "tritfabric"
+    },
+    {
+      "count": 1,
+      "from": "sociosphere",
+      "to": "tritrpc"
+    },
+    {
+      "count": 53,
+      "from": "sourceos",
+      "to": "sherlock-search"
+    },
+    {
+      "count": 4,
+      "from": "sourceos-boot",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 3,
+      "from": "sourceos-boot",
+      "to": "sourceos-workspace"
+    },
+    {
+      "count": 2,
+      "from": "sourceos-continuum",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "sourceos-model-carry",
+      "to": "model-governance-ledger"
+    },
+    {
+      "count": 1,
+      "from": "sourceos-spec",
+      "to": "agentos-spine"
+    },
+    {
+      "count": 2,
+      "from": "sourceos-spec",
+      "to": "agentplane"
+    },
+    {
+      "count": 9,
+      "from": "sourceos-spec",
+      "to": "bearbrowser"
+    },
+    {
+      "count": 4,
+      "from": "sourceos-spec",
+      "to": "ontogenesis"
+    },
+    {
+      "count": 3,
+      "from": "sourceos-spec",
+      "to": "procybernetica"
+    },
+    {
+      "count": 5,
+      "from": "sourceos-spec",
+      "to": "prophet-core-catalog"
+    },
+    {
+      "count": 4,
+      "from": "sourceos-spec",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 4,
+      "from": "sourceos-spec",
+      "to": "socioprophet"
+    },
+    {
+      "count": 2,
+      "from": "sourceos-spec",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 10,
+      "from": "sourceos-spec",
+      "to": "sociosphere"
+    },
+    {
+      "count": 3,
+      "from": "sourceos-spec",
+      "to": "sourceos"
+    },
+    {
+      "count": 3,
+      "from": "sourceos-spec",
+      "to": "sourceos-boot"
+    },
+    {
+      "count": 2,
+      "from": "sourceos-spec",
+      "to": "sourceos-devtools"
+    },
+    {
+      "count": 3,
+      "from": "sourceos-spec",
+      "to": "sourceos-workspace"
+    },
+    {
+      "count": 1,
+      "from": "sourceos-spec",
+      "to": "workstation-contracts"
+    },
+    {
+      "count": 2,
+      "from": "sourceos-syncd",
+      "to": "procybernetica"
+    },
+    {
+      "count": 2,
+      "from": "sourceos-syncd",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 1,
+      "from": "synapseiq",
+      "to": "gaia-world-model"
+    },
+    {
+      "count": 2,
+      "from": "synapseiq",
+      "to": "socioprophet-standards-knowledge"
+    },
+    {
+      "count": 2,
+      "from": "synapseiq",
+      "to": "sourceos-spec"
+    },
+    {
+      "count": 1,
+      "from": "tritfabric",
+      "to": "agentplane"
+    },
+    {
+      "count": 6,
+      "from": "tritfabric",
+      "to": "prophet-platform"
+    },
+    {
+      "count": 2,
+      "from": "tritfabric",
+      "to": "socioprophet-agent-standards"
+    },
+    {
+      "count": 2,
+      "from": "tritfabric",
+      "to": "sociosphere"
+    },
+    {
+      "count": 4,
+      "from": "tritrpc",
+      "to": "socioprophet-standards-storage"
+    },
+    {
+      "count": 9,
+      "from": "turtleterm",
+      "to": "agent-registry"
+    },
+    {
+      "count": 4,
+      "from": "turtleterm",
+      "to": "agentplane"
+    },
+    {
+      "count": 8,
+      "from": "turtleterm",
+      "to": "policy-fabric"
+    }
+  ],
+  "note": "repo->repo edges derived from catalog blast-radius / lineage; restricted to edges touching a Boundary-Atlas repo.",
+  "schema": "cross-repo-link-view/v0.1",
+  "scope": [
+    "agent-registry",
+    "agentplane",
+    "gaia-world-model",
+    "hellgraph",
+    "model-governance-ledger",
+    "ontogenesis",
+    "policy-fabric",
+    "prophet-platform",
+    "prophet-platform-standards",
+    "prophet-workspace",
+    "sherlock-search",
+    "socioprophet-agent-standards",
+    "socioprophet-standards-knowledge",
+    "socioprophet-standards-storage",
+    "sociosphere",
+    "sourceos-boot",
+    "sourceos-spec",
+    "sourceos-syncd",
+    "tritrpc"
+  ]
+}

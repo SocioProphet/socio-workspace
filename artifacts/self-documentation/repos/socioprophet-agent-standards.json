@@ -1,0 +1,156 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "agent_profile_standard",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Active-spine promotion candidate; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "Agent profile contracts, behavior constraints, capability descriptors, lifecycle rules, and admission criteria.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "agent profile schemas",
+      "capability descriptor contracts",
+      "lifecycle/admission fixtures"
+    ]
+  },
+  "catalog": {
+    "asset_count": 342,
+    "by_kind": {
+      "adrs-docs": 1,
+      "ci-workflows-tests": 2,
+      "json-schema": 28,
+      "readme": 1,
+      "spec": 4,
+      "topic-vocabulary": 306
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "schemas-contracts",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 181,
+    "sample_assets": [
+      {
+        "asset_id": "doc.socioprophet-agent-standards.docs-standards-agent-plane-001-agent-action-trace-conformanc",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "001. Agent Action / Trace Conformance Profile (v0.1)",
+        "path": "docs/standards/agent-plane/001-agent-action-trace-conformance-profile.md"
+      },
+      {
+        "asset_id": "adr.socioprophet-agent-standards.0001",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001: Repository Role and Ownership",
+        "path": "adr/ADR-0001-repo-role-and-ownership.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-agent-standards.docs-agentos-spec-0001-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "AgentOS Spec 0001",
+        "path": "docs/AGENTOS_SPEC_0001.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-agent-standards.docs-control-plane-contracts-md",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Control-plane contracts",
+        "path": "docs/control-plane-contracts.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-agent-standards.docs-standards-networking-002-mesh-capability-manifest-canon",
+        "dataset": "adrs-docs",
+        "kind": "spec",
+        "name": "Mesh Capability Manifest Canonicalization and Conformance",
+        "path": "docs/standards/networking/002-mesh-capability-manifest-canonicalization-and-conformance.md"
+      },
+      {
+        "asset_id": "doc.socioprophet-agent-standards.readme",
+        "dataset": "adrs-docs",
+        "kind": "readme",
+        "name": "SocioProphet Agent Standards",
+        "path": "README.md"
+      },
+      {
+        "asset_id": "wf-c9b637f20a",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Makefile",
+        "path": "Makefile"
+      },
+      {
+        "asset_id": "wf-6aff5c28d3",
+        "dataset": "ci-workflows-tests",
+        "kind": "ci-workflows-tests",
+        "name": "Multi-Domain Geospatial Agent Standards",
+        "path": ".github/workflows/multidomain-geospatial-agent.yml"
+      },
+      {
+        "asset_id": "ct-6ca4999333fc",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "adapter-ipc-deps-inventory.schema.json",
+        "path": "schemas/m2/adapter-ipc-deps-inventory.schema.json"
+      },
+      {
+        "asset_id": "ct-68cd88278966",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "adapter-ipc-env-realize.schema.json",
+        "path": "schemas/m2/adapter-ipc-env-realize.schema.json"
+      },
+      {
+        "asset_id": "ct-94b599a44cf2",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "adapter-ipc-error.schema.json",
+        "path": "schemas/m2/adapter-ipc-error.schema.json"
+      },
+      {
+        "asset_id": "ct-cbffa6b6bbbb",
+        "dataset": "schemas-contracts",
+        "kind": "json-schema",
+        "name": "adapter-ipc-hello.schema.json",
+        "path": "schemas/m2/adapter-ipc-hello.schema.json"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "action",
+    "adapter",
+    "additional",
+    "agent",
+    "alias",
+    "array",
+    "authentication",
+    "authenticator",
+    "based",
+    "bootstrap",
+    "canonical",
+    "capability",
+    "cell",
+    "channel",
+    "compatibility",
+    "conformance",
+    "consumers",
+    "context",
+    "contract",
+    "control"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.socioprophet-agent-standards",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/socioprophet-agent-standards",
+    "status": "active",
+    "title": "Socioprophet Agent Standards (SocioProphet estate repo)"
+  },
+  "repo": "SocioProphet/socioprophet-agent-standards",
+  "schema": "self-documentation-record/v0.1",
+  "short": "socioprophet-agent-standards"
+}

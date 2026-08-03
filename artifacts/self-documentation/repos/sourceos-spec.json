@@ -1,0 +1,166 @@
+{
+  "atlas_backed": true,
+  "boundary": {
+    "boundary_class": "sourceos_spec_standard",
+    "claim_modes": [
+      "formal_construction",
+      "illustrative_schema",
+      "fixture_validated"
+    ],
+    "current_status": "Adjacent SourceOS active-spine lane; boundary record newly represented in Sociosphere atlas.",
+    "jurisdiction": "SourceOS schema/specification boundary, host-state contracts, ostree/system-space obligations, and adjacent SourceOS compatibility rules.",
+    "maturity": "L0",
+    "owned_artifacts": [
+      "SourceOS specification schemas",
+      "host-state contracts",
+      "system-space compatibility rules"
+    ]
+  },
+  "catalog": {
+    "asset_count": 747,
+    "by_kind": {
+      "adrs-docs": 35,
+      "ci-workflows-tests": 19,
+      "design": 2,
+      "http-api": 1,
+      "invariant": 2,
+      "json-schema": 341,
+      "jsonld": 17,
+      "openapi": 13,
+      "owl": 1,
+      "policy-as-code": 12,
+      "readme": 4,
+      "spec": 35,
+      "topic-vocabulary": 265
+    },
+    "datasets": [
+      "adrs-docs",
+      "ci-workflows-tests",
+      "ontologies",
+      "rules-policies",
+      "schemas-contracts",
+      "services-endpoints",
+      "topic-vocabulary"
+    ],
+    "glossary_term_count": 166,
+    "sample_assets": [
+      {
+        "asset_id": "adr.sourceos-spec.0001-5",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 0001 — Agentic Mesh Access and Workspace Contract Expansion",
+        "path": "docs/adr/0001-agentic-mesh-access-and-workspace-contract-expansion.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0001-6",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 0001 — Workstation and Execution Contract Boundaries",
+        "path": "docs/adr/0001-workstation-and-execution-contract-boundaries.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0001-7",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 0001 — sourceos-shell contract boundary",
+        "path": "docs/adr/0001-sourceos-shell-boundary.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0001",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 0001: Architecture-aware Boot and Storage Profiles",
+        "path": "docs/adr/0001-architecture-aware-boot-storage-profiles.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0002-2",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 0002 — sourceos-shell API and event backlog",
+        "path": "docs/adr/0002-sourceos-shell-api-event-backlog.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.9000",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR 9000: UMA Pistis ecosystem placement and lane split",
+        "path": "docs/adr/9000-uma-pistis-ecosystem-placement.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.adr-diagnostics-bundle-evidence-artifact",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR — Diagnostics bundle as evidence artifact",
+        "path": "docs/adr/ADR-diagnostics-bundle-evidence-artifact.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.adr-proof-of-self-identity-plane",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR — Proof-of-Self Identity Plane",
+        "path": "docs/adr/ADR-proof-of-self-identity-plane.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.2026-2",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR — Triune / Exodus placement and contract boundaries",
+        "path": "docs/adr/2026-04-15-triune-exodus-placement.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0001-4",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001 Appendix A — (Deprecated) TruthSurface/DeltaSurface reuse map",
+        "path": "docs/adr/0001-truth-surfaces-b11-delta-appendix-a-reuse-map.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0001-2",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001 — (Deprecated) Truth Surfaces (B¹¹) + Δ-Surfaces",
+        "path": "docs/adr/0001-truth-surfaces-b11-delta.md"
+      },
+      {
+        "asset_id": "adr.sourceos-spec.0001-8",
+        "dataset": "adrs-docs",
+        "kind": "adrs-docs",
+        "name": "ADR-0001: OS build / cybernetic boundary contracts",
+        "path": "docs/adr/0001-os-build-cybernetic-boundary.md"
+      }
+    ]
+  },
+  "glossary_terms": [
+    "acme",
+    "additional",
+    "agent",
+    "agentos",
+    "alpha",
+    "array",
+    "asahi",
+    "assay",
+    "authority",
+    "base",
+    "boolean",
+    "boot",
+    "browser",
+    "capability",
+    "capital",
+    "checks",
+    "community",
+    "content",
+    "context",
+    "contract"
+  ],
+  "provenance": {
+    "catalog_source_id": "src.sourceos-spec",
+    "license": "unknown",
+    "owner": "SocioProphet",
+    "provenance_ref": "https://github.com/SocioProphet/sourceos-spec",
+    "status": "active",
+    "title": "Sourceos Spec (SocioProphet estate repo)"
+  },
+  "repo": "SourceOS-Linux/sourceos-spec",
+  "schema": "self-documentation-record/v0.1",
+  "short": "sourceos-spec"
+}

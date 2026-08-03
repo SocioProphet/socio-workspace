@@ -1,0 +1,29 @@
+{
+  "schema_version": "identity-prime.masking-decision.v1",
+  "decision_id": "md_reidentify_no_reason_0001",
+  "subject_ref": "tp_patient_mrn_chameleon::tok_2Fad78",
+  "requesting_realm": "INSTITUTION",
+  "audience": { "role": "legal_counsel", "openid_profile_attr": "can_reidentify=true" },
+  "requested_op": "re_identify",
+  "verdict": "allow",
+  "applied_transforms": [
+    {
+      "field_path": "$.patient.mrn",
+      "profile_ref": "tp_patient_mrn_chameleon",
+      "scheme": "chameleon_token",
+      "reversibility": "reversible"
+    }
+  ],
+  "re_identification": {
+    "permitted": true,
+    "reason_for_action": "",
+    "authorized_by": "custodian:mdheller",
+    "separation_of_duty": true
+  },
+  "receipt": {
+    "policy_decision_ref": "pd_reidentify_no_reason_0001"
+  },
+  "policy_version": "regis.identity.polytope.core@0.1.0",
+  "decided_by": "masking-pdp-agent",
+  "created_at": "2026-06-29T15:06:00Z"
+}

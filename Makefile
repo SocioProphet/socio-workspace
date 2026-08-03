@@ -23,9 +23,9 @@ ui-dev: ui-preflight
 # --- end ui-workbench targets ---
 
 # --- standards validation targets ---
-.PHONY: validate validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate neurosymbolic-vendored-artifact-graph-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate multidomain-geospatial-standards-compliance-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-v1-resolution-live corpus-loop-demo-packet-validate corpus-loop-demo-assemble-check corpus-loop-demo-assemble-write corpus-loop-check svf-registry-validate svf-runner-list svf-runner-select-smoke svf-runner-verify-receipt-smoke svf-runner-run-smoke svf-runner-tampered-receipt-smoke svf-runner-unregistered-action-smoke svf-export-latest svf-export-manifest-validate svf-workspace-validate registry-admissions-validate effective-canonical-registry-validate vendor-freshness-validate vendor-freshness-detect vendor-freshness-detect-check
+.PHONY: validate validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate first-party-rdf-parse-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate neurosymbolic-vendored-artifact-graph-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate multidomain-geospatial-standards-compliance-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate corpus-loop-v1-resolution-live corpus-loop-demo-packet-validate corpus-loop-demo-assemble-check corpus-loop-demo-assemble-write corpus-loop-check svf-registry-validate svf-runner-list svf-runner-select-smoke svf-runner-verify-receipt-smoke svf-runner-run-smoke svf-runner-tampered-receipt-smoke svf-runner-unregistered-action-smoke svf-export-latest svf-export-manifest-validate svf-workspace-validate registry-admissions-validate effective-canonical-registry-validate vendor-freshness-validate vendor-freshness-detect vendor-freshness-detect-check
 
-validate: validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate neurosymbolic-vendored-artifact-graph-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate svf-workspace-validate vendor-freshness-validate
+validate: validate-standards spine-v0-validate active-spine-overlay-validate active-spine-sources-validate spine-canonical-sources-drift-validate topology-doc-active-spine-validate active-spine-boundaries-validate active-spine-validation-stack-doc-validate neurosymbolic-repo-graph-reasoner-doc-validate neurosymbolic-repo-graph-fixtures-validate neurosymbolic-repo-graph-ttl-fixtures-validate first-party-rdf-parse-validate neurosymbolic-repo-graph-vocabulary-validate neurosymbolic-repo-graph-shacl-contract-validate neurosymbolic-vendored-artifact-graph-validate runner-overlay-discovery-validate runner-overlay-merge-order-validate agent-reliability-governance-queue-validate authority-dependencies-validate governed-intelligence-rollout-validate program-dashboard-validate model-fabric-work-register-validate lattice-data-governai-topology-validate lattice-runtime-profile-consumer-parity-validate lattice-demo-readiness-validate lattice-replay-evidence-membrane-validate lattice-runtime-release-readiness-validate lattice-product-readiness-program-validate lattice-operating-model-validate lattice-deployment-topology-validate lattice-security-isolation-model-validate lattice-observability-sre-validate lattice-release-rollback-controls-validate lattice-environment-fingerprints-validate superconscious-reasoning-validate sociosphere-authority-dependency-graph-tier2-binding-ci lawful-learning-phase8-registration-validate evidence-fabric-repos-validate evidence-fabric-surface-integrations-validate context-fabric-registration-validate corpus-loop-v0-validate neurosymbolic-chronos-validate corpus-loop-v1-validate corpus-loop-v1-resolution-validate svf-workspace-validate vendor-freshness-validate board-spec-validate agent-prompt-catalog-validate
 	@echo "OK: validate"
 
 validate-standards:
@@ -60,6 +60,9 @@ neurosymbolic-repo-graph-fixtures-validate:
 
 neurosymbolic-repo-graph-ttl-fixtures-validate:
 	python3 tools/check_neurosymbolic_repo_graph_ttl_fixtures.py
+
+first-party-rdf-parse-validate:
+	python3 tools/check_first_party_rdf_parses.py
 
 neurosymbolic-repo-graph-vocabulary-validate:
 	python3 tools/check_neurosymbolic_repo_graph_vocabulary.py
@@ -118,6 +121,12 @@ governed-intelligence-rollout-validate:
 
 program-dashboard-validate:
 	python3 tools/validate_program_dashboard.py
+
+board-spec-validate:
+	python3 tools/check_board_spec.py
+
+agent-prompt-catalog-validate:
+	python3 tools/check_agent_prompt_catalog.py
 
 model-fabric-work-register-validate:
 	python3 tools/validate_model_fabric_work_register.py
@@ -308,3 +317,20 @@ contract-lock-validate:
 	python3 tools/validate_contract_locks.py
 
 ontology-validate: registry-validate
+
+# --- self-documenting-estate targets ---------------------------------------
+# Code is the source of truth; docs are DERIVED from the code-derived catalog.
+# CATALOG points at a prophet-core-catalog checkout (pinned in
+# artifacts/self-documentation/catalog-pin.json).
+CATALOG ?= ../prophet-core-catalog
+.PHONY: estate-enumerate self-doc-compose self-doc-verify
+
+estate-enumerate:
+	python3 tools/enumerate_estate.py --catalog $(CATALOG)
+
+self-doc-compose:
+	python3 tools/compose_self_documentation.py --catalog $(CATALOG)
+
+self-doc-verify:
+	python3 tools/verify_self_documentation.py --catalog $(CATALOG)
+# --- end self-documenting-estate targets -----------------------------------

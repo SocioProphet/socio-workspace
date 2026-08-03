@@ -44,7 +44,7 @@
   nrg:consumerApp "apps/market-replay" ;
   nrg:freshnessPolicy "track-latest" ;
   nrg:freshnessState "stale" ;
-  nrg:freshnessReason "vendored commit 487e4b614b79e556af3aea2c70471eca13281377 != upstream 65925aed8974f66757b729a9e0b9500227944583" ;
+  nrg:freshnessReason "vendored commit 487e4b614b79e556af3aea2c70471eca13281377 != upstream db941c58edb1d771a90a221bbfbe5acccb013651" ;
   nrg:disposition "remediation-required" ;
   nrg:vendoredDigest "sha256:7d18865d1a435f8a2e78977ef51f865b842c810f4648faa8755b506fe8b13d55" .
 
@@ -57,7 +57,7 @@
   nrg:consumerApp "apps/hellgraph-service" ;
   nrg:freshnessPolicy "track-latest" ;
   nrg:freshnessState "stale" ;
-  nrg:freshnessReason "vendored commit 7d74db818a943f2070285c2fc16e22f975d1b8d0 != upstream 65925aed8974f66757b729a9e0b9500227944583" ;
+  nrg:freshnessReason "vendored commit 7d74db818a943f2070285c2fc16e22f975d1b8d0 != upstream db941c58edb1d771a90a221bbfbe5acccb013651" ;
   nrg:disposition "remediation-required" .
 
 <https://socioprophet.org/ns/nrg/vendored-artifact/kbpedia-kko@hellgraph>
@@ -107,9 +107,9 @@
   nrg:consumerRepo "SocioProphet/prophet-platform" ;
   nrg:consumerApp "apps/lattice-studio" ;
   nrg:freshnessPolicy "track-latest" ;
-  nrg:freshnessState "current" ;
-  nrg:freshnessReason "commit matches upstream" ;
-  nrg:disposition "current" .
+  nrg:freshnessState "stale" ;
+  nrg:freshnessReason "vendored commit e791402 != upstream 59615f0738b4b67f379967828b9bf230e6f6c501" ;
+  nrg:disposition "remediation-required" .
 
 <https://socioprophet.org/ns/nrg/vendored-artifact/tritrpc-go-bindings@tritrpcbridge>
   a nrg:VendoredArtifact ;
@@ -179,8 +179,9 @@
   a nrg:VendoredSource ;
   nrg:sourceId "ontogenesis-ontology-index" ;
   nrg:consumerCount 1 ;
-  nrg:staleConsumerCount 0 ;
-  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; ontogenesis-ontology-index staleness reaches {none}" .
+  nrg:staleConsumerCount 1 ;
+  nrg:staleConsumer <https://socioprophet.org/ns/nrg/vendored-artifact/ontogenesis-ontology-index@lattice-studio> ;
+  nrg:chronosReasoning "a stale source propagates to every consumer that vendors it; ontogenesis-ontology-index staleness reaches {ontogenesis-ontology-index@lattice-studio}" .
 
 <https://socioprophet.org/ns/nrg/vendored-source/regis-entity-graph-schemas>
   a nrg:VendoredSource ;

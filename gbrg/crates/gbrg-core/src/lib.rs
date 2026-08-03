@@ -89,6 +89,11 @@ pub enum CellKind {
     Class,
     Import,
     Module,
+    /// A non-code cell: a distinct regex from the estate REGEX corpus
+    /// (prophet-core-catalog `ds.regex-operational-dataset`). Its `cell_id` is an
+    /// `rx://rx-<sha1[0:10]>` IRI and code-file cells depend on it via `Imports`
+    /// edges. See `docs/ADR-002-pattern-cells.md`.
+    Pattern,
 }
 
 impl CellKind {
@@ -100,6 +105,7 @@ impl CellKind {
             CellKind::Class => "class",
             CellKind::Import => "import",
             CellKind::Module => "module",
+            CellKind::Pattern => "pattern",
         }
     }
 }

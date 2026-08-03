@@ -2,7 +2,7 @@
 @prefix repo: <https://github.com/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-repo:SocioProphet/prophet-platform
+<https://github.com/SocioProphet/prophet-platform>
   a nrg:RepositoryGraphFixture ;
   nrg:fixtureId "valid.active-spine-inference" ;
   nrg:expectedResult "governed_candidate" ;

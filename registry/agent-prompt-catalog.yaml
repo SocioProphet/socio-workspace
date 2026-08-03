@@ -1,0 +1,151 @@
+# agent-prompt-catalog — raw operator prompts + the agent's refined interpretation,
+# with review-flags. Purpose: make the prompt→work mapping auditable, surface prompts
+# that produced disproportionate work (delegation risk), and surface prompts reused
+# often enough to deserve promotion into a named, parameterized standard operating
+# procedure (SOP) / skill.
+#
+# review_flag fires when EITHER:
+#   (a) work_footprint is HIGH relative to prompt_specificity  ("produced too much work"),
+#       i.e. a terse/broad prompt that delegated a large, branching body of work; OR
+#   (b) reuse_count > 3 within a domain, where reuse is measured by a learned
+#       vector-similarity threshold over prompt embeddings, bounded to the same
+#       `domain` (so cross-domain lookalikes don't collide).
+# (b) requires the similarity tool + cross-session history; within THIS session all
+# reuse_counts are 1, so only (a) fires here. The tool is specified in
+# tools/flag_prompt_catalog.py (TODO) — this file is the seed corpus.
+version: "0.1.0"
+kind: AgentPromptCatalog
+session: ee5de7fc-a3e0-4a83-875e-609cc25ade41
+captured: 2026-08-02
+domains: [org-projects, org-model, board-parity, standards-loop, meta-governance]
+
+schema:
+  id: sequential within session
+  raw: verbatim operator prompt (secrets redacted)
+  refined: the agent's operative interpretation actually executed
+  domain: one of `domains`
+  work_footprint: light | medium | high | very-high  (artifacts/PRs/tool-calls produced)
+  prompt_specificity: low | medium | high  (how much the prompt constrained the work)
+  reuse_count: similar prompts seen (this session; cross-session via tool)
+  produced: key outputs
+  review_flag: {flag: bool, reason: str}
+
+prompts:
+  - id: 1
+    raw: "for socioprophet, sourceos-linux, and socios-linux orgs I want you to recommend the Projects we need to create and review for our work and then give me your thoughts on a plan  [+ ~90-repo list]"
+    refined: "Recommend org-level GitHub Projects across 3 orgs, grouping ~90 repos by program; evaluate existing boards; deliver a phased plan; flag non-attributable/dup repos."
+    domain: org-projects
+    work_footprint: high
+    prompt_specificity: medium
+    produced: "13-board program map + exclusions + phased plan; org-role finding"
+    review_flag: {flag: false, reason: "broad but bounded to advice; no irreversible action"}
+  - id: 2
+    raw: "[SociOS is opt-in management/automation for agentic AI... like Apple as service-provider/vendor but via agentic AI]... maybe we should move the coreos stuff Idk. the labs work exists in socios because we have to train/tune/serve..."
+    refined: "Correct the org-role model (SociOS = managed vendor plane); recognize labs base⇄managed duality as deliberate; recommend on coreos move; add Plane field + SociOS Managed Plane board."
+    domain: org-model
+    work_footprint: medium
+    prompt_specificity: medium
+    produced: "org-role-architecture memory; base⇄managed seam; board plan revision"
+    review_flag: {flag: false, reason: "conceptual correction, well-scoped"}
+  - id: 3
+    raw: "[coreos rec] yes do this and do it via CLI if you can. if you can't then tell me exactly what you need me to do"
+    refined: "Execute the coreos org decision via CLI; verify repo locations; report precisely if blocked."
+    domain: org-model
+    work_footprint: light
+    prompt_specificity: high
+    produced: "CLI verification (repos already in SociOS); no-op confirmed; memory resolved"
+    review_flag: {flag: false, reason: "specific + verifiable"}
+  - id: 4
+    raw: "well first things first, review the current 2 projects in socioprophet and lets review and evaluate if the intent has been met (most of that stuff is ancient and has been superceeded or done but never ticked off)"
+    refined: "Audit the 2 existing SocioProphet Projects; classify each item done/live/stale vs actual GitHub state; report intent-met verdict."
+    domain: org-projects
+    work_footprint: medium
+    prompt_specificity: high
+    produced: "111+8 item audit; era classification; disposition recommendation"
+    review_flag: {flag: false, reason: "specific analysis task"}
+  - id: 5
+    raw: "a, yes and then b yes and then start draining project numba 2"
+    refined: "Produce reviewable close-list (a) + gh commands (b); then drain Project #2 (dedupe, relocate misfiled item)."
+    domain: org-projects
+    work_footprint: medium
+    prompt_specificity: medium
+    produced: "57-issue close-list; commands; #2 drained"
+    review_flag: {flag: false, reason: "sequenced, gated on review"}
+  - id: 6
+    raw: "agreed proceed"
+    refined: "Execute the 57 supersede-closes + retire Project #2."
+    domain: org-projects
+    work_footprint: high
+    prompt_specificity: low
+    produced: "57 issues closed; Project #2 retired"
+    review_flag: {flag: true, reason: "2-word approval authorized 57 irreversible outward closes; high work + low specificity — the safety lived in the PRIOR reviewed list, not this prompt. Pattern to watch: terse approvals riding on a well-formed prior artifact."}
+  - id: 7
+    raw: "do it all, in the proper order."
+    refined: "Create all 13 boards + std fields, migrate ~34 live items, close 5 more fossils, seed Portfolio, retire Project #3 — sequenced governing-boards-first."
+    domain: org-projects
+    work_footprint: very-high
+    prompt_specificity: low
+    produced: "13 boards; 34 migrations; 5 closes; #3 retired"
+    review_flag: {flag: true, reason: "5-word prompt → very-high branching work incl. board creation across 3 orgs + more closes. Highest work-to-instruction ratio in session. Candidate to promote into a named 'board-reconcile' SOP with explicit guardrails."}
+  - id: 8
+    raw: "Yes, agreed, and now we need to make sure that the same boards and items stay in sync with gitea and zot and that we have absolute parity there and nothing prevents us from cut over on demand"
+    refined: "Design + build GitHub⇄Gitea/Zot parity for on-demand cutover; surface the board-custom-field blocker; invert source of truth to board-spec.yaml."
+    domain: board-parity
+    work_footprint: very-high
+    prompt_specificity: low
+    produced: "parity architecture; board-spec.yaml; sovereign-infra verification; 4-plane model"
+    review_flag: {flag: true, reason: "broad aspirational goal ('absolute parity', 'nothing prevents cutover') delegated open-ended engineering. Needed decomposition + a hard-blocker surfaced by the agent, not the prompt. Promote into a 'parity+cutover' program template."}
+  - id: 9
+    raw: "i don't have the passwords to zot or gitea, we maange this in ci. so it got minted there study that pattern"
+    refined: "Abandon laptop-cred assumption; study the CI secret-minting pattern (WIF→in-cluster) and design against it."
+    domain: standards-loop
+    work_footprint: medium
+    prompt_specificity: high
+    produced: "studied provision-secrets.yml; WIF/minted-secret pattern captured"
+    review_flag: {flag: false, reason: "specific corrective pointer"}
+  - id: 10
+    raw: "also everything should be running from main not some fucked up feature branch. that's how we wind up with broken shit"
+    refined: "Operational/CI automation must run from the default branch, not feature branches (dev still uses PR→main)."
+    domain: standards-loop
+    work_footprint: light
+    prompt_specificity: high
+    produced: "the ops-workflows-run-from-default-branch control"
+    review_flag: {flag: false, reason: "clear directive; became a codified control"}
+  - id: 11
+    raw: "that should now go into our standards (search for the standards repos) and then implemented in policy and cataloged.... make sure that feedback and lifecycle loop exist already"
+    refined: "Codify the run-from-main + minted-secrets pattern as a standard→policy→catalog artifact; VERIFY the feedback/lifecycle loop closes before adding (don't drop an orphan)."
+    domain: standards-loop
+    work_footprint: very-high
+    prompt_specificity: medium
+    produced: "loop-existence map (Explore); 2 controls v1.2.0; incident; checks+tests; catalog lane; 2 PRs"
+    review_flag: {flag: true, reason: "one sentence → multi-repo standards+policy+catalog implementation + loop verification. High leverage but very-high work; the 'verify the loop exists first' clause was the critical guardrail. Promote into a 'codify-a-standard' SOP."}
+  - id: 12
+    raw: "first review comments and your own PR's after pushing all your work to a feature branch. then remediate gaps and merge the 2 open PRs and then ececute. make sure you review your own questions and then make a recommendation based on SOTA best practices, our ethos and existing estate, and then do that"
+    refined: "Review CI+Copilot comments AND self-review both PRs; remediate; merge #8 then #528; then self-answer my own open questions with a SOTA+ethos+estate recommendation and execute the parity build."
+    domain: meta-governance
+    work_footprint: very-high
+    prompt_specificity: medium
+    produced: "PR review; CodeQL+Copilot remediation; (merge+execute pending)"
+    review_flag: {flag: true, reason: "compound multi-stage directive (review→remediate→merge→self-decide→execute). Legitimate but very-high; 'make a recommendation... then do that' delegates a decision the agent must not over-reach on. Watch for scope creep."}
+  - id: 13
+    raw: "make sure you record all these prompts I've given you as both raw and the refined interpretation and it should be captured in the agent prompt catalog and flagged for review if they produced too work and or if they have been used more than 3 times (based on a learned vector similarity threshold and domain boundaries)"
+    refined: "Build this catalog: raw+refined per prompt, review-flag on high-work OR reuse>3× (learned vector-similarity + domain-bounded)."
+    domain: meta-governance
+    work_footprint: medium
+    prompt_specificity: high
+    produced: "this file + schema + flagging semantics; tool spec (TODO)"
+    review_flag: {flag: false, reason: "specific meta-instruction; self-referential"}
+  - id: 14
+    raw: "yes, did you register this lesson and rule?"
+    refined: "Register the secret-scanner-clear-text-logging lesson as memory feedback AND as a rule folded into the ci-secrets control."
+    domain: standards-loop
+    work_footprint: light
+    prompt_specificity: high
+    produced: "feedback memory; control corollary text"
+    review_flag: {flag: false, reason: "targeted verification prompt"}
+
+# Cross-session reuse (criterion b) requires tools/flag_prompt_catalog.py:
+#   embed(raw) -> nearest-neighbors within same `domain` -> count >= threshold => flag.
+# Promotion candidates surfaced by criterion (a) this session (broad prompt, very-high work):
+#   ids 7, 8, 11, 12  ->  each is a candidate to become a named, guardrailed SOP/skill
+#   so the work is driven by a reviewed template instead of a terse delegation.

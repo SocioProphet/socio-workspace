@@ -12,6 +12,7 @@ VALIDATORS=(
   validate_hell_er_negative_fixtures.py
   validate_er_plus_workspace.py
   validate_regis_extract_masking_fixtures.py
+  validate_masking_extract_negative_fixtures.py
 )
 
 fail=0

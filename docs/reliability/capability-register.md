@@ -32,6 +32,8 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Mirror-drift executor** (`executors.resync_mirror_drift`) | ✅ | ✅ scheduler runs `run_once(execute=True)` | ✅ heal **and** abort | ✅ | `tests/test_executor_integration.py` |
 | Verify-the-artifact + rollback (executor) | ✅ | ✅ | ✅ corrupt source → good artifact preserved | ✅ | `test_resync_aborts_and_preserves…`, `test_verification_failure_after_write_rolls_back` |
 | Live break→heal / break→abort | ✅ | ✅ | ✅ | ✅ | `test_resync_heals_drifted…`, `test_run_once_execute_escalates_when_executor_cannot_heal` |
+| **Mirror-drift detector** (`detectors.detect_mirror_drift`) | ✅ | ✅ scheduler `detectors` job | ✅ evidence **and** warrantless-on-corrupt | ✅ | `tests/test_detector_integration.py` |
+| **Full vertical slice** detect→decide→heal→verify | ✅ | ✅ | ✅ heal **and** escalate+preserve | ✅ | `test_full_loop_detect_decide_heal_verify`, `test_full_loop_corrupt_source_escalates_and_preserves` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -65,18 +67,38 @@ beacon ─▶ boundary fence ─▶ IRI gate ─▶ meet(Law, Evidence) ─▶ a
 - The meet cannot exceed either arm — weak evidence can *never* be talked up into an auto-fix,
   and a low-trust failure class can *never* be auto-fixed however strong the evidence.
 
-## Not yet on the board (honest gaps)
+## The spine, and where it is whole
 
-- **Action executors.** The responder decides `auto_fix` / `canary_fix` / `propose_pr`; the
-  handlers that *carry those out* (open the PR, run the canary, apply the re-sync) are not yet
-  wired. Today a decision is a durable receipt in `state/decisions/`, not yet an executed
-  remediation. This is deliberate: decide correctly first, execute second.
-- **Live break→abort test.** We prove the *decision* with teeth both ways; we have not yet run
-  a real induced failure end-to-end through an executor and confirmed rollback.
-- **Learning loop ↔ kernel.** `lawful_learning/loop.py` (upstream) is validated but still
-  disjoint from the responder; closing that is the next integration, not this one.
-- **Cross-pod queue in k8s.** Compose shares state via a volume; the k8s manifest still needs
-  an RWX PV or a Redis backend for the webhook and scheduler pods to share the queue.
+```
+SENSE ─▶ BEACON ─▶ DECIDE ─▶ ACT ─▶ VERIFY ─▶ RECEIPT
+ ✅(1)     ✅        ✅        ✅(1)    ✅         ✅
+```
+
+The **mirror-drift** class is now whole end-to-end: a detector senses drift and emits an
+evidence-bearing beacon, the responder decides `auto_fix` via the kernel `meet`, the executor
+re-syncs, the artifact is verified on disk, and a receipt is recorded — with teeth both ways
+(a corrupt source of truth is escalated to a human and the good artifact is preserved). That
+is the first failure class to traverse every vertebra in production code, not just in isolated
+units. `(1)` marks stages proven for **one** class; breadth is the next work.
+
+## Not yet on the board (honest gaps, ranked by leverage)
+
+1. **Detector breadth (SENSE).** Only mirror-drift has a detector. Build-failure,
+   stale-vendor, and policy-violation classes have Law + evidence handling in the responder
+   but nothing *emits* their beacons yet, so those decisions never fire in production. This is
+   the highest-leverage frontier: each new detector lights up decide/act machinery that
+   already exists.
+2. **Executor breadth (ACT).** Only `auto_fix→resync_mirror_drift` is wired. `propose_pr`
+   (open a PR), `canary_fix` (canary then apply), and `quarantine` (isolate) are decided but
+   not carried out — those receipts are decisions, not yet remediations.
+3. **Learning loop ↔ kernel.** `lawful_learning/loop.py` is validated but disjoint from the
+   responder. It becomes meaningful now that the slice produces a real receipt stream to learn
+   from — improve Law/threshold choices from observed outcomes.
+4. **Telemetry / alerting.** Receipts land in `state/decisions/` as files; no Prometheus/Loki
+   consumer or alert on escalations. We can heal silently but cannot yet *observe* healing.
+5. **Cross-pod queue in k8s.** Compose shares state via a volume; the k8s manifest still needs
+   an RWX PV or a Redis backend for the webhook and scheduler pods to share the queue. Required
+   to *deploy* multi-pod, not to *prove* the loop.
 
 Each gap is a row that has not yet earned its rightmost column. When it does, it moves — and a
 test moves with it.

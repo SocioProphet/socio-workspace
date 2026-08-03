@@ -160,9 +160,20 @@ class RegistryScheduler:
             misfire_grace_time=600,
         )
 
+        # SENSE: run detectors every minute. Each detector turns a real failure into an
+        # evidence-bearing beacon on the inbox (the front of the self-heal spine). Runs
+        # ahead of the responder so a detected drift is decided on the next drain.
+        self._scheduler.add_job(
+            self._run_detectors,
+            "interval",
+            minutes=1,
+            id="detectors",
+            misfire_grace_time=30,
+        )
+
         # Drain the beacon inbox every minute: the reasoned responder decides
-        # fix/alert/escalate for each beacon. This is what closes the loop —
-        # observe_and_beacon fills the inbox; the responder acts on it.
+        # fix/alert/escalate for each beacon and (execute=True) carries out verified-safe
+        # auto-fixes. Detectors fill the inbox; the responder acts on it.
         self._scheduler.add_job(
             self._run_responder,
             "interval",
@@ -232,6 +243,22 @@ class RegistryScheduler:
         except Exception as exc:
             self._metrics["jobs_failed"] += 1
             logger.exception("Registry rebuild failed: %s", exc)
+
+    def _run_detectors(self) -> None:
+        """Run the SENSE stage: emit evidence-bearing beacons for detected failures.
+
+        Imported lazily so the scheduler still constructs when engines/yaml are
+        unavailable; a detector failure records but never crashes the daemon.
+        """
+        self._metrics["jobs_run"] += 1
+        try:
+            from automation import detectors  # lazy: keeps engine/yaml import off the path
+            emitted = detectors.run_detectors()
+            if emitted:
+                logger.info("Detectors emitted %d beacon(s)", len(emitted))
+        except Exception as exc:
+            self._metrics["jobs_failed"] += 1
+            logger.exception("Detector run failed: %s", exc)
 
     def _run_responder(self) -> None:
         """Drain beacons and let the reasoned responder decide on each.

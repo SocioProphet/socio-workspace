@@ -233,7 +233,10 @@ def test_estate_seals_and_whole_ledger_verifies() -> None:
     with tempfile.TemporaryDirectory() as td:
         lp = Path(td) / "scr-ledger.jsonl"
         result = pipe.assess_estate(_bundle(), ledger_path=lp, persist=True)
-        n_sealed = len(result["nodes"]) + len(result["paths"]) + 1  # + cluster
+        n_sealed = (
+            len(result["nodes"]) + len(result["paths"])
+            + len(result["clusters"]) + 1  # + estate-level cluster
+        )
         vr = ledger.verify_ledger(lp)
         assert vr.ok, f"live-pipeline ledger failed to verify: {vr.reason}"
         assert len(ledger.read_all(lp)) == n_sealed
@@ -247,13 +250,39 @@ def test_estate_seals_and_whole_ledger_verifies() -> None:
 def test_summarize_estate() -> None:
     result = pipe.assess_estate(_bundle(), persist=False)
     summary = pipe.summarize_estate(result)
-    assert summary["subjects"] == len(result["nodes"]) + len(result["paths"]) + 1
+    assert summary["subjects"] == (
+        len(result["nodes"]) + len(result["paths"]) + len(result["clusters"]) + 1
+    )
     # no evidence -> everything fails closed to REJECTED.
     assert summary["by_verdict"] == {scr.REJECTED: summary["subjects"]}
     assert len(summary["worst_residuals"]) <= 5
     assert summary["worst_residuals"] == sorted(
         summary["worst_residuals"], key=lambda s: -s["residual"]
     )
+
+
+# --------------------------------------------------------------------------- #
+# (10) Per-module common-mode concentration clusters from real boundaries.
+# --------------------------------------------------------------------------- #
+def test_module_clusters_derived_from_real_boundaries() -> None:
+    bundle = _bundle()
+    result = pipe.assess_estate(bundle, persist=False)
+    # the containment fixture is one module -> one per-module cluster (>=2 cells).
+    assert len(result["clusters"]) >= 1
+    for c in result["clusters"]:
+        assert c.riskScope == "cluster"
+        assert c.subjectId.startswith("cluster:module:")
+        # every module cluster derives KCI02 + KRI04 off its own members.
+        bands = {k["id"] for k in c.kriEvaluations}
+        assert {"KCI02", "KRI04"} <= bands
+        # anchors to a real member source blob for the evidence-plane lift.
+        assert getattr(c, "_anchorCellId", "").startswith("code://")
+
+    # a single-cell module is NOT a cluster (degenerate concentration).
+    solo = [{"cell_id": "code://rust/gbrg/x/solo.rs#only", "blast_radius": 0.1,
+             "dependents_count": 0, "churn_frequency": 0.0,
+             "test_coverage_reach": False, "claim": {"epistemicLevel": "speculative"}}]
+    assert pipe.derive_module_clusters(solo) == []
 
 
 # --------------------------------------------------------------------------- #

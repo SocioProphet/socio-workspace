@@ -58,9 +58,20 @@ unless supplied externally.
 ### 4. Real paths and clusters from real topology
 A path subject is a real `CALLS` chain enumerated off the edge topology
 (`derive_call_paths`), scored as the scorer's noisy-OR over its members'
-residuals. The cluster's common-mode components (HHI over `dependents_count`
-shares, worst-case blast, untested fraction, mean opacity) are an aggregate over
-real member artifacts.
+residuals. Clusters come at two granularities, both aggregating the common-mode
+components (HHI over `dependents_count` shares, worst-case blast, untested
+fraction, mean opacity) over real member artifacts:
+
+- **per-module** (`derive_module_clusters`) — each source file is a natural
+  common-mode boundary (shared ownership / build / publish authority), so a
+  failure there is common-mode across its cells. This is the faithful
+  "concentration cluster" and makes `KRI04` (clusters above 70% concentration) a
+  real cross-cluster count instead of one trivial value.
+- **estate roll-up** — the whole corpus as a single cluster, kept as the
+  estate-level common-mode view.
+
+A single-cell module is excluded (degenerate concentration is not a cluster
+story).
 
 ### 5. Emit onto the evidence plane — EVIDENCE ONLY, never authorization
 `scr_to_observations` lifts each sealed `SupplyChainRiskProofArtifact` onto

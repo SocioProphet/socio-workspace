@@ -133,6 +133,17 @@ def validate_signal_map(
             violations.append(
                 f"derived_kri_kci: {kri_id!r} has no threshold in weights kri_kci_thresholds"
             )
+
+    # Every declared path-signal regex must compile — a malformed pattern in the
+    # declared data must be caught HERE (fail-closed), not crash mid-scoring.
+    for fac, spec in signal_map["inherent_factor_derivation"]["factors"].items():
+        for sig in spec.get("path_signals", []):
+            try:
+                re.compile(sig["pattern"])
+            except re.error as exc:
+                violations.append(
+                    f"inherent_factor {fac}: uncompilable path_signal {sig.get('pattern')!r} ({exc})"
+                )
     return violations
 
 
@@ -375,6 +386,31 @@ def derive_call_paths(
 
 
 # --------------------------------------------------------------------------- #
+# Cluster derivation from real module boundaries.
+# --------------------------------------------------------------------------- #
+def derive_module_clusters(
+    artifacts: list[dict[str, Any]], *, min_members: int = 2
+) -> list[tuple[str, list[dict[str, Any]]]]:
+    """Group artifacts into per-module common-mode clusters (by source locator).
+
+    A source file is a natural common-mode boundary — its cells share ownership,
+    build, and publish authority, so a failure there is a *common-mode* failure
+    across all of them. Returns ``[(module_locator, members), ...]`` sorted by
+    locator, keeping only modules with at least ``min_members`` cells (a
+    single-cell module has degenerate concentration and is not a cluster story).
+    """
+    by_module: dict[str, list[dict[str, Any]]] = {}
+    for art in artifacts:
+        locator = _source_locator(art)
+        by_module.setdefault(locator, []).append(art)
+    return [
+        (loc, members)
+        for loc, members in sorted(by_module.items())
+        if len(members) >= min_members
+    ]
+
+
+# --------------------------------------------------------------------------- #
 # (3) Orchestration: assess the estate over real topology.
 # --------------------------------------------------------------------------- #
 def assess_estate(
@@ -450,33 +486,40 @@ def assess_estate(
         a._anchorCellId = chain[0]  # head node anchors the evidence-plane lift
         path_assessments.append(a)
 
-    # ── Cluster (whole corpus as a common-mode concentration cluster) ─────────
-    components, shares = cluster_components_from_artifacts(artifacts, signal_map)
-    hhi = scr.hhi_normalized(shares)
-    resilience = _cluster_resilience(cluster_subject_id, evidence_index)
-    cluster_controls = controls_from_index(cluster_subject_id, evidence_index)
-    cluster_kri = cluster_kri_metrics(artifacts, hhi, signal_map)
-    cluster_kri.update(_external_kri(cluster_subject_id, evidence_index))
-    cluster_assessment = scr.assess_cluster(
-        subject_id=cluster_subject_id,
-        components=components,
-        shares=shares,
-        resilience_control=resilience,
-        controls_evidence=cluster_controls,
-        kri_metrics=cluster_kri,
-        crosswalk_refs=node_crosswalk_refs,
-        weights=weights, crosswalk=crosswalk,
-        ledger_path=ledger_path, persist=persist,
-    )
-    if artifacts:
-        cluster_assessment._anchorCellId = max(
-            artifacts, key=lambda a: a.get("blast_radius", 0.0)
-        )["cell_id"]
+    def _score_cluster(subject_id: str, members: list[dict[str, Any]]) -> scr.Assessment:
+        components, shares = cluster_components_from_artifacts(members, signal_map)
+        hhi = scr.hhi_normalized(shares)
+        cluster_kri = cluster_kri_metrics(members, hhi, signal_map)
+        cluster_kri.update(_external_kri(subject_id, evidence_index))
+        a = scr.assess_cluster(
+            subject_id=subject_id,
+            components=components,
+            shares=shares,
+            resilience_control=_cluster_resilience(subject_id, evidence_index),
+            controls_evidence=controls_from_index(subject_id, evidence_index),
+            kri_metrics=cluster_kri,
+            crosswalk_refs=node_crosswalk_refs,
+            weights=weights, crosswalk=crosswalk,
+            ledger_path=ledger_path, persist=persist,
+        )
+        if members:  # highest-blast member anchors the evidence-plane lift
+            a._anchorCellId = max(members, key=lambda m: m.get("blast_radius", 0.0))["cell_id"]
+        return a
+
+    # ── Cluster: whole corpus (estate-level common-mode roll-up) ──────────────
+    cluster_assessment = _score_cluster(cluster_subject_id, artifacts)
+
+    # ── Clusters: per real module boundary (common-mode concentration groups) ─
+    module_clusters = [
+        _score_cluster(f"cluster:module:{locator}", members)
+        for locator, members in derive_module_clusters(artifacts)
+    ]
 
     return {
         "nodes": node_assessments,
         "paths": path_assessments,
-        "cluster": cluster_assessment,
+        "cluster": cluster_assessment,     # estate-level roll-up
+        "clusters": module_clusters,       # per-module concentration clusters
         "residual_by_cell": residual_by_cell,
     }
 
@@ -525,19 +568,16 @@ def estate_evidence_envelopes(
                 repo_root=root, anchor_cell_id=a.subjectId,
             )
         )
-    for a in result.get("paths", []):
+    aggregates = list(result.get("paths", []))
+    aggregates += list(result.get("clusters", []))
+    cluster = result.get("cluster")
+    if cluster is not None:
+        aggregates.append(cluster)
+    for a in aggregates:
         envelopes.extend(
             gbrg_evidence.scr_to_observations(
                 a.proof_artifact(), subject_repository=subject_repository,
                 repo_root=root, anchor_cell_id=getattr(a, "_anchorCellId", a.subjectId),
-            )
-        )
-    cluster = result.get("cluster")
-    if cluster is not None:
-        envelopes.extend(
-            gbrg_evidence.scr_to_observations(
-                cluster.proof_artifact(), subject_repository=subject_repository,
-                repo_root=root, anchor_cell_id=getattr(cluster, "_anchorCellId", cluster.subjectId),
             )
         )
     return envelopes
@@ -554,6 +594,7 @@ def summarize_estate(result: dict[str, Any]) -> dict[str, Any]:
     """
     subjects: list[scr.Assessment] = list(result.get("nodes", []))
     subjects += list(result.get("paths", []))
+    subjects += list(result.get("clusters", []))
     cluster = result.get("cluster")
     if cluster is not None:
         subjects.append(cluster)

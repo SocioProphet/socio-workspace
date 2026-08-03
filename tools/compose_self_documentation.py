@@ -41,6 +41,7 @@ import subprocess
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:
     import yaml
@@ -58,6 +59,23 @@ CATALOG_REPO = "SocioProphet/prophet-core-catalog"
 
 def short(full_name: str) -> str:
     return full_name.split("/", 1)[-1].lower()
+
+
+def github_repo_path(url: str) -> str | None:
+    """'org/repo…' IFF url's host is exactly github.com, else None. A substring test
+    (`"github.com/" in url`) matches `https://evil.example/github.com/x`
+    (CodeQL py/incomplete-url-substring-sanitization) — parse and compare the host."""
+    if not url:
+        return None
+    u = url.strip()
+    if u.startswith("git@github.com:"):
+        return u[len("git@github.com:"):].removesuffix(".git") or None
+    if "://" not in u:
+        u = "https://" + u
+    parsed = urlparse(u)
+    if (parsed.hostname or "").lower() != "github.com":
+        return None
+    return parsed.path.lstrip("/").removesuffix(".git") or None
 
 
 def sha256_file(p: Path) -> str:
@@ -94,8 +112,8 @@ def parse_estate_graph(ttl: Path) -> dict[str, dict]:
             return fm.group(1) if fm else None
 
         prov = field("cat:provenanceRef")
-        key = short(prov.split("github.com/", 1)[1]) if prov and "github.com/" in prov \
-            else m.group(1).lower()
+        prov_path = github_repo_path(prov) if prov else None
+        key = short(prov_path) if prov_path else m.group(1).lower()
         out[key] = {
             "catalog_source_id": field("cat:catalogId"),
             "owner": field("cat:owner"),

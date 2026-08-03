@@ -29,6 +29,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:
     import tomllib  # py3.11+
@@ -53,6 +54,26 @@ def now_iso() -> str:
 def short(full_name: str) -> str:
     """org/Repo -> canonical short key (lowercase repo name)."""
     return full_name.split("/", 1)[-1].lower()
+
+
+def github_repo_path(url: str) -> str | None:
+    """Return the 'org/repo…' path IFF url's host is exactly github.com, else None.
+
+    A substring test like `"github.com/" in url` is not host validation — it matches
+    `https://evil.example/github.com/x` (CodeQL py/incomplete-url-substring-sanitization).
+    Parse the host and compare it exactly. Handles https, scheme-less, and scp-style ssh.
+    """
+    if not url:
+        return None
+    u = url.strip()
+    if u.startswith("git@github.com:"):
+        return u[len("git@github.com:"):].removesuffix(".git") or None
+    if "://" not in u:
+        u = "https://" + u
+    parsed = urlparse(u)
+    if (parsed.hostname or "").lower() != "github.com":
+        return None
+    return parsed.path.lstrip("/").removesuffix(".git") or None
 
 
 def gh_repos(org: str) -> list[dict]:
@@ -100,9 +121,9 @@ def load_workspace_roles() -> dict[str, str]:
     data = tomllib.loads(WORKSPACE.read_text("utf-8"))
     out = {}
     for r in data.get("repos", []):
-        url = r.get("url") or ""
-        if "github.com/" in url:
-            out[short(url.split("github.com/", 1)[1])] = r.get("role")
+        path = github_repo_path(r.get("url") or "")
+        if path:
+            out[short(path)] = r.get("role")
     return out
 
 

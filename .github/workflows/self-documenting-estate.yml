@@ -38,11 +38,20 @@ jobs:
     steps:
       - name: Check out sociosphere
         uses: actions/checkout@v4
+        with:
+          # Untrusted PR content is read as data only; drop the token from .git so a
+          # checked-out working tree can never reuse it (CodeQL actions/untrusted-checkout).
+          persist-credentials: false
 
       - name: Read pinned catalog commit
         id: pin
         run: |
           commit=$(python3 -c "import json;print(json.load(open('artifacts/self-documentation/catalog-pin.json'))['catalog_commit'])")
+          # The pin comes from a PR-controlled file; require a full 40-hex commit SHA so it
+          # cannot be steered to an arbitrary branch/tag/ref (checkout of untrusted code).
+          if ! printf '%s' "$commit" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::catalog_commit is not a 40-hex commit SHA: '$commit'"; exit 1
+          fi
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
           echo "Pinned catalog commit: $commit"
 
@@ -52,6 +61,7 @@ jobs:
           repository: SocioProphet/prophet-core-catalog
           ref: ${{ steps.pin.outputs.commit }}
           path: prophet-core-catalog
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v5

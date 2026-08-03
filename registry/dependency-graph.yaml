@@ -19,6 +19,7 @@
 #   submodule  .gitmodules url declarations
 #   package    package.json deps naming an estate org
 #   gomod      go.mod requires naming an estate org
+#   workflow   .github/workflows 'uses:' a reusable workflow / composite action
 #
 # READ THE TYPES BEFORE READING THE COUNTS. 'submodule' turned out to measure
 # VENDORING, not architecture: the heaviest submodule users are vendored forks
@@ -28,9 +29,9 @@
 # types into one number and call it architecture.
 
 version: "2.0.0"
-generated_at: "2026-08-03T21:34:22.926Z"
+generated_at: "2026-08-03T22:06:14.078Z"
 generated_by: tools/generate_dependency_graph.mjs
-method: gitmodules+package+gomod-scan
+method: gitmodules+package+gomod+workflow-scan
 basis: measured
 scope:
   orgs: ["SocioProphet", "SociOS-Linux", "SourceOS-Linux"]
@@ -38,33 +39,32 @@ scope:
   repos_live: 2116
   repos_scanned: 228
   repos_scan_failed: 0
+# FINDING (derived, regenerated with the data):
+# 15 first-party edge(s) across 228 scanned repos.
+# By type: submodule=2, package=1, gomod=0, workflow=12.
+# HUBS (>=2 dependents): git-ops-standards (5), sociosphere (4), .github (3).
+# The estate is coupled through CI GOVERNANCE, not through code: shared
+# reusable workflows outnumber package/module dependencies 12 to 1.
+# Repos are joined by the standards they must satisfy rather than by the
+# libraries they import. Whether that is disciplined governance or missing
+# shared libraries is a judgement this file does not try to settle.
+# 'submodule' largely measures VENDORING of forks, not architecture — read the
+# types before reading the total, and do not sum them into one number.
 summary:
-  edges_total: 79
-  edges_internal: 3
-  edges_external: 76
-  nodes: 86
-# FINDING: across 228 scanned repos there are THREE first-party edges, and two
-# of them (asahi-installer -> artwork, -> m1n1) are inside a fork of Asahi Linux.
-# The only genuine estate coupling observed is Noetica -> hellgraph via
-# package.json. The estate is essentially UNCOUPLED at the code level: repos are
-# joined by contracts, schemas and conventions, not by package dependencies.
-# Whether that is clean boundaries or missing shared libraries is a judgement
-# call, not something this file can settle — it reports what is there.
+  edges_total: 88
+  edges_internal: 15
+  edges_external: 73
+  nodes: 100
 by_type:
-  submodule: 78
+  submodule: 75
   package: 1
   gomod: 0
-first_party_# FINDING: across 228 scanned repos there are THREE first-party edges, and two
-# of them (asahi-installer -> artwork, -> m1n1) are inside a fork of Asahi Linux.
-# The only genuine estate coupling observed is Noetica -> hellgraph via
-# package.json. The estate is essentially UNCOUPLED at the code level: repos are
-# joined by contracts, schemas and conventions, not by package dependencies.
-# Whether that is clean boundaries or missing shared libraries is a judgement
-# call, not something this file can settle — it reports what is there.
-by_type:
+  workflow: 12
+first_party_by_type:
   submodule: 2
   package: 1
   gomod: 0
+  workflow: 12
 
 edges:
   - from: kustomize
@@ -247,16 +247,11 @@ edges:
     type: submodule
     evidence: SocioProphet/unilm/.gitmodules
     external: true
-  - from: unilm
-    to: fairseq
-    type: submodule
-    evidence: SocioProphet/unilm/.gitmodules
-    external: true
-  - from: unilm
-    to: fairseq
-    type: submodule
-    evidence: SocioProphet/unilm/.gitmodules
-    external: true
+  - from: socioprophet-docs
+    to: git-ops-standards
+    type: workflow
+    evidence: SocioProphet/socioprophet-docs/.github/workflows/git-ops-standards.yml
+    external: false
   - from: asahi-installer
     to: artwork
     type: submodule
@@ -272,6 +267,11 @@ edges:
     type: submodule
     evidence: SocioProphet/sociosphere/.gitmodules
     external: true
+  - from: Heller-Winters-Theorem
+    to: sociosphere
+    type: workflow
+    evidence: SocioProphet/Heller-Winters-Theorem/.github/workflows/proof-apparatus-continuous-validation.yml
+    external: false
   - from: composio
     to: effect
     type: submodule
@@ -292,6 +292,11 @@ edges:
     type: submodule
     evidence: SocioProphet/composio/.gitmodules
     external: true
+  - from: ontogenesis
+    to: git-ops-standards
+    type: workflow
+    evidence: SocioProphet/ontogenesis/.github/workflows/git-ops-standards.yml
+    external: false
   - from: Skill_Seekers
     to: skill-seekers-configs
     type: submodule
@@ -368,11 +373,6 @@ edges:
     evidence: SocioProphet/openvino/.gitmodules
     external: true
   - from: openvino
-    to: oneDNN
-    type: submodule
-    evidence: SocioProphet/openvino/.gitmodules
-    external: true
-  - from: openvino
     to: json
     type: submodule
     evidence: SocioProphet/openvino/.gitmodules
@@ -432,10 +432,50 @@ edges:
     type: submodule
     evidence: SocioProphet/openvino/.gitmodules
     external: true
+  - from: memory-mesh
+    to: .github
+    type: workflow
+    evidence: SocioProphet/memory-mesh/.github/workflows/images.yml
+    external: false
+  - from: prophet-workspace
+    to: git-ops-standards
+    type: workflow
+    evidence: SocioProphet/prophet-workspace/.github/workflows/git-ops-standards.yml
+    external: false
+  - from: tritfabric
+    to: .github
+    type: workflow
+    evidence: SocioProphet/tritfabric/.github/workflows/images.yml
+    external: false
+  - from: yang-mills
+    to: sociosphere
+    type: workflow
+    evidence: SocioProphet/yang-mills/.github/workflows/proof-apparatus-continuous-validation.yml
+    external: false
+  - from: hphd-zeta-mirror-lattice
+    to: sociosphere
+    type: workflow
+    evidence: SocioProphet/hphd-zeta-mirror-lattice/.github/workflows/proof-apparatus-continuous-validation.yml
+    external: false
+  - from: Heller-Godel
+    to: sociosphere
+    type: workflow
+    evidence: SocioProphet/Heller-Godel/.github/workflows/proof-apparatus-continuous-validation.yml
+    external: false
   - from: Noetica
     to: hellgraph
     type: package
     evidence: SocioProphet/Noetica/package.json
+    external: false
+  - from: prophet-mesh
+    to: git-ops-standards
+    type: workflow
+    evidence: SocioProphet/prophet-mesh/.github/workflows/catalog.yml
+    external: false
+  - from: prophet-health
+    to: .github
+    type: workflow
+    evidence: SocioProphet/prophet-health/.github/workflows/images.yml
     external: false
   - from: TurtleTerm
     to: harfbuzz
@@ -462,3 +502,8 @@ edges:
     type: submodule
     evidence: SourceOS-Linux/librewolf-source-mirror/.gitmodules
     external: true
+  - from: sourceos-continuum
+    to: git-ops-standards
+    type: workflow
+    evidence: SourceOS-Linux/sourceos-continuum/.github/workflows/git-ops-standards.yml
+    external: false

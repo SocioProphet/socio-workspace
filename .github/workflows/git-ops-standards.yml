@@ -2,6 +2,24 @@ name: git-ops-standards
 
 on:
   pull_request:
+  # For bot-authored PRs (e.g. vendor-freshness-detect.yml) whose pull_request-
+  # triggered run never fires -- GITHUB_TOKEN no-recursion. That workflow
+  # dispatches this one directly and supplies real PR context explicitly since
+  # there's no github.event.pull_request to read here.
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        type: string
+        required: false
+        default: ''
+      base_sha:
+        type: string
+        required: false
+        default: ''
+      head_sha:
+        type: string
+        required: false
+        default: ''
 
 jobs:
   gate:
@@ -9,3 +27,7 @@ jobs:
       contents: read
       pull-requests: read
     uses: SocioProphet/git-ops-standards/.github/workflows/pr-merge-gate.yml@main
+    with:
+      pr_number: ${{ inputs.pr_number }}
+      base_sha: ${{ inputs.base_sha }}
+      head_sha: ${{ inputs.head_sha }}

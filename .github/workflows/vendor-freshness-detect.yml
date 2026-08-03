@@ -63,6 +63,9 @@ jobs:
     permissions:
       contents: write        # push the register-refresh branch
       pull-requests: write   # open the PR for it
+      actions: write         # dispatch git-ops-standards.yml onto our own branch
+      statuses: write        # publish gate / check, since our PR's pull_request
+                              # event never triggers it (GITHUB_TOKEN no-recursion)
     steps:
       - uses: actions/checkout@v4
 
@@ -114,6 +117,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Open the register-refresh PR
+        id: open_pr
         if: steps.detect.outputs.register_changed == 'true' && (github.event_name != 'workflow_dispatch' || inputs.open_pr)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -128,10 +132,101 @@ jobs:
           git add registry/vendor-freshness.yaml
           git commit -m "vendor-freshness: refresh upstream observation $(date -u +%Y-%m-%d)"
           git push --force origin "$BRANCH"
-          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')" ]; then
+          PR_NUMBER=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
+          if [ -z "$PR_NUMBER" ]; then
             gh pr create --base main --head "$BRANCH" \
               --title "vendor-freshness: refresh upstream observation ($(date -u +%Y-%m-%d))" \
               --body-file detect-summary.md
+            PR_NUMBER=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
           else
             gh pr edit "$BRANCH" --body-file detect-summary.md
           fi
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
+
+      # ── Satisfy the required 'gate / check' context for this bot-authored PR ──────
+      # This PR is opened with GITHUB_TOKEN, so its own pull_request-triggered run of
+      # git-ops-standards.yml never fires -- the no-recursion rule. Dispatch it
+      # explicitly with real PR context (git-ops-standards PR #12 taught it to accept
+      # that), wait for the real outcome, then publish the commit status directly.
+      # Fail-closed by construction: publish `pending` before dispatching, and nothing
+      # downgrades that to `success` except a measured green run -- if this job dies
+      # partway, the PR is left visibly blocked, never invisibly blocked.
+      - name: Satisfy gate / check for this bot-authored PR
+        if: steps.open_pr.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.open_pr.outputs.pr_number }}
+          BRANCH: ${{ steps.open_pr.outputs.branch }}
+          HEAD_SHA: ${{ steps.open_pr.outputs.head_sha }}
+          BASE_SHA: ${{ steps.open_pr.outputs.base_sha }}
+        run: |
+          set -euo pipefail
+          post_status() {   # $1=state $2=description $3=target_url
+            gh api -X POST "repos/${{ github.repository }}/statuses/${HEAD_SHA}" \
+              -f state="$1" -f context='gate / check' \
+              -f description="$(printf '%.140s' "$2")" \
+              -f target_url="${3:-https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}}" >/dev/null
+          }
+          post_status pending "gate dispatched onto ${BRANCH}"
+
+          dispatched=""
+          for attempt in 1 2 3; do
+            if gh workflow run git-ops-standards.yml --ref "$BRANCH" \
+                 -f pr_number="$PR_NUMBER" -f base_sha="$BASE_SHA" -f head_sha="$HEAD_SHA"; then
+              dispatched=1; echo "dispatched gate onto $BRANCH (attempt $attempt)"; break
+            fi
+            echo "dispatch attempt $attempt failed; retrying in 10s"; sleep 10
+          done
+          if [ -z "$dispatched" ]; then
+            post_status failure "could not dispatch git-ops-standards after 3 attempts"
+            echo "::error::could not dispatch git-ops-standards for $BRANCH"; exit 1
+          fi
+
+          RUN_ID=""
+          for attempt in $(seq 1 20); do
+            api_err=$(mktemp)
+            if RUN_ID=$(gh api "repos/${{ github.repository }}/actions/workflows/git-ops-standards.yml/runs?branch=${BRANCH}&event=workflow_dispatch&per_page=1" \
+                          --jq '.workflow_runs[0].id // empty' 2>"$api_err"); then
+              rm -f "$api_err"
+              [ -n "$RUN_ID" ] && break
+              echo "run not yet visible (attempt $attempt) -- eventual consistency, retrying"
+            else
+              echo "::warning::gh api failed on attempt $attempt: $(head -3 "$api_err")"
+              rm -f "$api_err"
+              if [ "$attempt" -ge 3 ]; then
+                post_status failure "querying workflow runs failed (see this run's log)"
+                echo "::error::gh api failed 3 times -- refusing to certify silently"; exit 1
+              fi
+            fi
+            sleep 15
+          done
+          if [ -z "$RUN_ID" ]; then
+            post_status failure "gate run never appeared for ${BRANCH}"
+            echo "::error::dispatched run never materialised"; exit 1
+          fi
+          DIAG_URL="https://github.com/${{ github.repository }}/actions/runs/${RUN_ID}"
+          post_status pending "gate run ${RUN_ID} dispatched -- awaiting outcome"
+
+          if ! timeout 900 gh run watch "${RUN_ID}" --interval 10 >/dev/null 2>&1; then
+            STATUS=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}" --jq '.status' 2>/dev/null || echo "")
+            if [ "$STATUS" != "completed" ]; then
+              post_status failure "gate run ${RUN_ID} did not complete within the budget" "$DIAG_URL"
+              echo "::error::timed out waiting for run ${RUN_ID} (status=${STATUS:-unknown})"; exit 1
+            fi
+          fi
+
+          BAD=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/jobs" --paginate \
+                  --jq '.jobs[] | select(.conclusion != "success") | .name' 2>/dev/null || echo "API_READ_FAILED")
+          if [ "$BAD" = "API_READ_FAILED" ]; then
+            post_status failure "could not read job results for run ${RUN_ID}" "$DIAG_URL"
+            echo "::error::job-list read failed -- refusing to certify"; exit 1
+          fi
+          if [ -n "$BAD" ]; then
+            post_status failure "gate job(s) not successful: $(printf '%s\n' "$BAD" | head -3 | tr '\n' ',' | sed 's/,$//')" "$DIAG_URL"
+            echo "::error::gate did not pass"; exit 1
+          fi
+          post_status success "git-ops-standards gate passed for ${HEAD_SHA}" "$DIAG_URL"
+          echo "gate / check is green for ${HEAD_SHA}"

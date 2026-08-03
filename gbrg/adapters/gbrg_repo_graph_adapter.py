@@ -11,9 +11,13 @@ consumes GBRG ``gbrg-analyze`` ProofArtifacts and satisfies the SAME protocol �
     graph_fixture()  -> the corpus-loop-pinned governance fixture header
     source_inputs()  -> the parsed source files the artifacts came from
 
-plus a GBRG-specific :meth:`evidence_records` that emits
+plus two GBRG-specific evidence surfaces that emit
 ``repo-governance-observation.v0`` records (see ``evidence.py``), making GBRG a
-first-class evidence source for the governance corpus loop.
+first-class evidence source for the governance corpus loop:
+
+    evidence_records()       -> blast-radius observations (per code cell)
+    risk_evidence_records()  -> supply-chain RISK observations (node/path/cluster,
+                                via the live supply_chain_pipeline scorer)
 
 CONSUME-ONLY: this adapter READS the estate protocol (``repo_graph_adapter.py``)
 and the corpus-loop pin as its contract; it never modifies them. All new code
@@ -86,10 +90,12 @@ class GbrgRepoGraphAdapter:
         self,
         artifacts: list[dict[str, Any]],
         *,
+        edges: list[dict[str, Any]] | None = None,
         subject_repository: str = "SocioProphet/sociosphere",
         repo_root: str | Path = _REPO_ROOT,
     ) -> None:
         self._artifacts = list(artifacts)
+        self._edges = list(edges or [])
         self._subject_repository = subject_repository
         self._repo_root = Path(repo_root)
 
@@ -102,6 +108,19 @@ class GbrgRepoGraphAdapter:
         for path in sorted(directory.glob("proof-artifact*.json")):
             artifacts.append(json.loads(path.read_text(encoding="utf-8")))
         return cls(artifacts, **kwargs)
+
+    @classmethod
+    def from_bundle(cls, bundle: dict[str, Any] | str | Path, **kwargs: Any) -> "GbrgRepoGraphAdapter":
+        """Load a ``gbrg-analyze --emit-edges`` bundle ``{artifacts, edges}``.
+
+        Accepts the bundle dict directly or a path to it. Carrying the edges lets
+        :meth:`risk_evidence_records` derive real CALLS paths (not just nodes).
+        """
+        if isinstance(bundle, (str, Path)):
+            bundle = json.loads(Path(bundle).read_text(encoding="utf-8"))
+        if isinstance(bundle, list):  # bare artifact array (no edges)
+            bundle = {"artifacts": bundle, "edges": []}
+        return cls(bundle.get("artifacts", []), edges=bundle.get("edges", []), **kwargs)
 
     # ── RepoGraphAdapter protocol ────────────────────────────────────────────
     def repositories(self) -> list[Any]:
@@ -151,7 +170,7 @@ class GbrgRepoGraphAdapter:
 
     # ── GBRG evidence surface ────────────────────────────────────────────────
     def evidence_records(self) -> list[dict[str, Any]]:
-        """All evidence ENVELOPES (record + gbrg_extension) for every artifact."""
+        """All blast-radius evidence ENVELOPES (record + gbrg_extension) per artifact."""
         envelopes: list[dict[str, Any]] = []
         for artifact in self._artifacts:
             envelopes.extend(
@@ -162,6 +181,33 @@ class GbrgRepoGraphAdapter:
                 )
             )
         return envelopes
+
+    def risk_evidence_records(
+        self,
+        *,
+        evidence_index: dict[str, list[dict[str, Any]]] | None = None,
+        tier0: bool = True,
+    ) -> list[dict[str, Any]]:
+        """Supply-chain RISK evidence ENVELOPES for node/path/cluster subjects.
+
+        Runs the live scoring pipeline over this adapter's artifacts + edges (the
+        UNMODIFIED ``supply_chain_risk`` scorer, fed graph-derived factors) and
+        lifts each sealed ``SupplyChainRiskProofArtifact`` onto the evidence plane
+        via the same evidence-only invariant as :meth:`evidence_records`. With no
+        ``evidence_index`` and ``tier0``, every subject fails CLOSED (REJECTED).
+        Imported lazily so the blast-radius surface has no scoring dependency.
+        """
+        from gbrg.governance import supply_chain_pipeline as pipeline
+
+        result = pipeline.assess_estate(
+            {"artifacts": self._artifacts, "edges": self._edges},
+            evidence_index=evidence_index, tier0=tier0, persist=False,
+        )
+        return pipeline.estate_evidence_envelopes(
+            result,
+            subject_repository=self._subject_repository,
+            repo_root=self._repo_root,
+        )
 
     # ── helpers ──────────────────────────────────────────────────────────────
     def _source_digest(self) -> str:

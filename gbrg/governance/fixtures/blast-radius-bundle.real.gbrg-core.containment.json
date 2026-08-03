@@ -1,0 +1,509 @@
+{
+  "artifacts": [
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.82c20f8580ed8256",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs (containment): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-82c20f8580ed8256",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#ContainmentProofArtifact",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.c774189ed62eae34",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#ContainmentProofArtifact (ContainmentProofArtifact): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-c774189ed62eae34",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#ContainmentReading",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.fde39205495611f4",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#ContainmentReading (ContainmentReading): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-fde39205495611f4",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#Direction",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.198adaf48cee9353",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#Direction (Direction): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-198adaf48cee9353",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#SeverScope",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.dcb0ef1b95ceb779",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#SeverScope (SeverScope): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-dcb0ef1b95ceb779",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.225,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#as_str",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.ef111aed34709206",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#as_str (as_str): 2 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 2,
+      "derivation": "no test function's call path reaches this cell; 2 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-ef111aed34709206",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#baseline_count",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.e3e32187033cf9d3",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#baseline_count (baseline_count): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-e3e32187033cf9d3",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#build_containment_artifact",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.b237736e863902d2",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#build_containment_artifact (build_containment_artifact): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-b237736e863902d2",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#contained_count",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.73fa6770f4ffbbc8",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#contained_count (contained_count): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-73fa6770f4ffbbc8",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#emit_containment_artifact",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.c749f5543e5f003d",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#emit_containment_artifact (emit_containment_artifact): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-c749f5543e5f003d",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:1",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.f66cf6362890f10a",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:1 (use std::collections::VecDeque;): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-f66cf6362890f10a",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:2",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.f3136af38e32c3f2",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:2 (use hg_analytics::{bfs_on_csr, GraphCore, GraphIndex, NodeId};): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-f3136af38e32c3f2",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:3",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.a74475c1a1db7a0b",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:3 (use serde::Serialize;): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-a74475c1a1db7a0b",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:4",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.ca5bf3c7a8786260",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:4 (use crate::scoring::{EpistemicLevel, DECLARED_BY};): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-ca5bf3c7a8786260",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#neighbors",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.c56228cfb69e1546",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#neighbors (neighbors): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-c56228cfb69e1546",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#reachable_set",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.e557af7eb5b66810",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#reachable_set (reachable_set): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-e557af7eb5b66810",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_bfs",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.33e2b629f6ce2904",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_bfs (residual_bfs): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-33e2b629f6ce2904",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_count",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.5183e3302be8c441",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_count (residual_count): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-5183e3302be8c441",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#sever_residual",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.a3c907aa920427c1",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#sever_residual (sever_residual): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-a3c907aa920427c1",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.21250000000000002,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.81befa169d1ec337",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors (successors): 1 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 1,
+      "derivation": "no test function's call path reaches this cell; 1 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-81befa169d1ec337",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#to_json",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.f2e275fc006bd2d6",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#to_json (to_json): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-f2e275fc006bd2d6",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    },
+    {
+      "blast_radius": 0.2,
+      "cell_id": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#to_json_pretty",
+      "churn_frequency": 0.0,
+      "claim": {
+        "claimId": "claim.gbrg.blast_radius.fd9a6daf53040890",
+        "claimType": "scope_bound",
+        "epistemicLevel": "speculative",
+        "statement": "blast radius of code://rust/gbrg/crates/gbrg-core/src/containment.rs#to_json_pretty (to_json_pretty): 0 direct dependents, test_coverage_reach=false, churn=0.0000/day \u2192 speculative"
+      },
+      "declared_by": "agent-registry://gbrg-scorer",
+      "dependents_count": 0,
+      "derivation": "no test function's call path reaches this cell; 0 dependents is within the bounded threshold of 15, but absent any test-reach the behaviour can only be speculated \u2192 speculative",
+      "generated": false,
+      "proofId": "proof-gbrg-fd9a6daf53040890",
+      "schemaVersion": "0.1.0",
+      "status": "INCONCLUSIVE",
+      "test_coverage_reach": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs",
+      "kind": "IMPORTS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:1"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs",
+      "kind": "IMPORTS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:2"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs",
+      "kind": "IMPORTS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:3"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs",
+      "kind": "IMPORTS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#import:4"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#build_containment_artifact",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#baseline_count"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#build_containment_artifact",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#contained_count"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#build_containment_artifact",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_count"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#emit_containment_artifact",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#build_containment_artifact"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#emit_containment_artifact",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#sever_residual"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_bfs",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#sever_residual",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#as_str"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#sever_residual",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#reachable_set"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#sever_residual",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#residual_bfs"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#as_str"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#neighbors"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#neighbors"
+    },
+    {
+      "from": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#successors",
+      "kind": "CALLS",
+      "to": "code://rust/gbrg/crates/gbrg-core/src/containment.rs#neighbors"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/supply-chain-graph-signal-map.v0.json",
+  "title": "GBRG Supply-Chain Graph-Signal Map (declared)",
+  "schemaVersion": "gbrg.supply-chain-graph-signal-map.v0",
+  "description": "DECLARED mapping from real gbrg-analyze BlastRadiusProofArtifact graph signals (over the HellGraph blast-radius topology) to the six inherent-risk factors and the four common-mode cluster components consumed by gbrg.governance.supply_chain_risk. This is the LIVE-scoring counterpart to supply-chain-risk-weights.v0.json: the weights say how factors combine, THIS file says how each factor is DERIVED from an observed graph signal — so the scorer runs over real topology instead of hand-supplied dicts. Numbers are DATA, never magic numbers in code: gbrg.governance.supply_chain_pipeline loads THIS file. A factor the code graph cannot observe (execution/publishing authority) is marked observable:false and derived from a declared conservative (fail-closed) prior plus real source-locator path signals, never fabricated as a measurement.",
+  "provenance": {
+    "derived_from": "gbrg-analyze --emit-edges BlastRadiusProofArtifact + CALLS/IMPORTS/TESTED_BY edges over real gbrg crate topology",
+    "consume_not_fork": true,
+    "cross_ref": ["SocioProphet/sociosphere#547", "prophet-workspace#108 item 2"]
+  },
+
+  "inherent_factor_derivation": {
+    "description": "Each of the six declared inherent factors (K,P,E,O,C,V of supply-chain-risk-weights.v0.json) is derived from an observed BlastRadiusProofArtifact signal. `observable:true` factors are read directly off the frozen-index graph; `observable:false` factors are not visible in a code-call graph and use a declared conservative prior raised only by real path signals on the cell's source locator (fail-closed, and recorded as a PRIOR in the derivation string).",
+    "factors": {
+      "criticality_K": {
+        "observable": true,
+        "source": "blast_radius",
+        "transform": "identity",
+        "rationale": "blast_radius (0..1) already models downstream business impact if the cell fails/is compromised — the estate's own criticality signal."
+      },
+      "concentration_C": {
+        "observable": true,
+        "source": "dependents_count",
+        "transform": "saturating",
+        "saturation": 15,
+        "rationale": "high in-degree hub = single point of failure / weak alternatives. Saturation 15 = the analyzer's own bounded dependents threshold; dependents_count/15 clamped to 1."
+      },
+      "velocity_V": {
+        "observable": true,
+        "source": "churn_frequency",
+        "transform": "saturating",
+        "saturation": 0.5,
+        "rationale": "historical change rate (per day). Saturation 0.5/day marks sustained churn as maximal operational instability."
+      },
+      "opacity_O": {
+        "observable": true,
+        "rationale": "lack of test evidence + weak epistemic grounding = low graph visibility / attestation. Combines an untested component with an epistemicLevel opacity scale; the two weights sum to 1.",
+        "untested_component": {
+          "weight": 0.5,
+          "value_when_untested": 1.0,
+          "value_when_tested": 0.0,
+          "source": "test_coverage_reach"
+        },
+        "epistemic_component": {
+          "weight": 0.5,
+          "source": "claim.epistemicLevel",
+          "opacity_by_level": {
+            "proved": 0.0,
+            "empirical": 0.1,
+            "bounded": 0.3,
+            "synthetic": 0.6,
+            "speculative": 0.8,
+            "rejected": 1.0
+          }
+        }
+      },
+      "execution_E": {
+        "observable": false,
+        "conservative_prior": 0.5,
+        "generated_raises_to": 0.7,
+        "rationale": "capability to run code during install/build/runtime is NOT observable from a function-call graph. A moderate fail-closed prior is used; machine-generated cells are raised (codegen runs at build); real source-locator path signals raise it further. Never emitted as a measurement.",
+        "path_signals": [
+          { "pattern": "(^|/)build\\.rs$", "value": 0.9, "note": "cargo build script executes at build time" },
+          { "pattern": "(^|/)(scripts|ci)/", "value": 0.8, "note": "CI / helper scripts run in the pipeline" },
+          { "pattern": "\\.github/workflows/", "value": 0.8, "note": "workflow definitions execute privileged CI steps" }
+        ]
+      },
+      "privilege_P": {
+        "observable": false,
+        "conservative_prior": 0.4,
+        "rationale": "publish/sign/administer authority is NOT observable from a function-call graph. A fail-closed prior is used, raised only by real source-locator path signals. Never emitted as a measurement.",
+        "path_signals": [
+          { "pattern": "(publish|release|sign|deploy|token|secret|cred|attest)", "value": 0.9, "note": "publishing / signing / credential surfaces carry high authority" },
+          { "pattern": "\\.github/workflows/", "value": 0.7, "note": "workflows commonly hold publish authority" }
+        ]
+      }
+    }
+  },
+
+  "cluster_common_mode_derivation": {
+    "description": "The four declared common-mode cluster components (cluster_common_mode_weights of supply-chain-risk-weights.v0.json) are derived from an aggregate over the cluster's member artifacts. Provider `shares` for the normalized HHI are the members' dependents_count normalized to sum 1 (a node carrying more of the cluster's dependents is a larger 'provider').",
+    "components": {
+      "hhi_normalized_concentration": {
+        "source": "member.dependents_count -> shares",
+        "transform": "hhi_normalized",
+        "rationale": "concentration of the cluster's dependent load across its member nodes (Herfindahl-Hirschman, normalized 0..1)."
+      },
+      "blast_radius": {
+        "source": "max(member.blast_radius)",
+        "transform": "identity",
+        "rationale": "cluster blast = worst-case member blast_radius (how many critical services the cluster can take down)."
+      },
+      "time_to_recover": {
+        "source": "fraction(member.test_coverage_reach == false)",
+        "transform": "identity",
+        "rationale": "fraction of members with NO test path proxies how hard the cluster is to restore/verify after failure."
+      },
+      "exit_difficulty": {
+        "source": "mean(member.opacity_O)",
+        "transform": "identity",
+        "rationale": "mean member opacity proxies how hard the cluster is to substitute, mirror, or contractually exit."
+      }
+    }
+  },
+
+  "derived_kri_kci": {
+    "description": "KRI/KCI metrics that are GENUINELY computable from the graph corpus (feeding gbrg.governance.supply_chain_risk.evaluate_kri against supply-chain-risk-weights.v0.json thresholds). Only these are auto-derived; every other indicator must come from an external evidence source and is otherwise left unevaluated (never silently passed).",
+    "indicators": {
+      "KCI02": {
+        "metric": "Critical dependencies with SBOM and graph visibility",
+        "computed_as": "100 * count(epistemicLevel in graph_visible_levels) / count(members)",
+        "graph_visible_levels": ["proved", "empirical", "bounded"],
+        "unit": "percent",
+        "scope": "cluster"
+      },
+      "KRI04": {
+        "metric": "Critical clusters above 70% provider concentration",
+        "computed_as": "1 if hhi_normalized_concentration > 0.70 else 0",
+        "concentration_threshold": 0.70,
+        "unit": "count",
+        "scope": "cluster"
+      }
+    }
+  }
+}

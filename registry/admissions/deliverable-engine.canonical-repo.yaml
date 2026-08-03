@@ -1,0 +1,19 @@
+# deliverable-engine canonical repository admission fragment (auto-registered 2026-08-03)
+id: deliverable-engine
+name: deliverable-engine
+url: https://github.com/SocioProphet/deliverable-engine
+role: component
+status: active
+description: "The product core primitive (SP-PRODUCT-001): the Deliverable — price = time x complexity x market_rate under a ResourceContract; executor human|agent|hybrid; ledgered lifecycle; Assay verdict; receipt settlement. The unit every product surface (LinkedIn/Upwork/McKinsey/Uber) sits over."
+primary_language: Python
+tags:
+  - deliverable
+  - pricing-engine
+  - resource-contract
+  - agentic-labor-network
+  - decision-ledger
+canonical_owner: SocioProphet/deliverable-engine
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: "SocioSphere records workspace admission only; the repo owns the Deliverable contract."
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md
+candidate_pin: 1f7d61856f15ac1bd83c4bc9a67ef3c3cba4e4fc

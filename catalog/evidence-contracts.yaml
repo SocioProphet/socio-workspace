@@ -111,3 +111,48 @@ contracts:
     downgrade_rules:
       - Missing repair receipt for repair claim -> INCONCLUSIVE
       - Unsigned state mutation -> violation or trust-root failure depending on context
+
+  resource_control_sufficiency_evidence:
+    owner: SocioProphet/global-devsecops-intelligence
+    purpose: >-
+      SufficiencyVerdict on whether a DECLARED resource control (sourceos-spec ResourceContract)
+      actually enforces. It is the learning-feedback output of the ops measurement plane
+      (ops.learning.feedback.v1), derived from a gate-eligible Measurement of the observed peak.
+      This is the consumer/learning half of the producer -> consumer -> learning loop: a runner
+      emits a ResourceContract, global-devsecops-intelligence normalizes it, and this evidence
+      lets Sociosphere learn WHICH declared controls actually have teeth versus which are paper.
+    upstream_input:
+      repo: SocioProphet/global-devsecops-intelligence
+      mapping: mappings/resource-contract-measurement-telemetry-v1.yaml
+      topic: ops.learning.feedback.v1
+      object: SufficiencyVerdict
+    required_fields:
+      - schema_version
+      - resource_contract_id
+      - enforcement            # observe | throttle | refuse | terminate
+      - fired_count
+      - observed_peak_ref      # a gate-eligible Measurement (source == measured, unobserved == 0)
+      - verdict                # PROVED | VIOLATION | INCONCLUSIVE
+      - reason
+      - evidence_artifact_ref
+    verdicts:
+      PROVED: >-
+        An enforcing control (throttle/refuse/terminate) was observed to act on real load
+        (fired_count > 0) with a gate-eligible peak — the control has teeth.
+      VIOLATION: >-
+        An enforcing control was exceeded in production and never once fired
+        (observed_peak > limit AND fired_count == 0) — a never-fired control, a counterexample
+        to the claim that it is a control, not the absence of one.
+      INCONCLUSIVE: >-
+        the observed peak is not gate-eligible (measurement source != measured, or members were
+        unobserved), OR the contract is observe-mode — a declared gauge that makes no enforcement
+        promise and so cannot violate one. In neither case can a teeth-verdict be drawn.
+    required_trust_roots:
+      - measurement gate-eligibility (Measurement.source == measured, unobserved == 0)
+      - resolvable negative-control procedure for any enforcing (non-observe) mode
+      - cgroup/instrument counter provenance for fired_count and observed_peak
+    downgrade_rules:
+      - Observed peak not gate-eligible -> INCONCLUSIVE
+      - Observe-mode exceedance -> INCONCLUSIVE (a gauge cannot violate an enforcement promise it never made)
+      - Enforcing-mode negative control missing or unresolvable -> reject as trust-root failure
+      - Unknown schema version -> reject artifact

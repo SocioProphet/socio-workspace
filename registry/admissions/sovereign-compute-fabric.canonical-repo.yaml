@@ -1,0 +1,19 @@
+# sovereign-compute-fabric canonical repository admission fragment (auto-registered 2026-08-03)
+id: sovereign-compute-fabric
+name: sovereign-compute-fabric
+url: https://github.com/SocioProphet/sovereign-compute-fabric
+role: component
+status: active
+description: "SP-COMPUTE-001: closed-loop control (RCS-4D/OODA, bounded+convergent+fail-closed; VJ==Assay verdict) + resource-aware JIT-DAG multi-cloud/HPC compute fabric + cloud cost/capability matrix (IBM/Azure/GCP/AWS incl. Beam) + OmniRisk fabric-blueprint + BOINC donor ResourceContract. Derived by OCR+visual reasoning over a 15-diagram capability landscape; feeds Deliverable pricing."
+primary_language: Python
+tags:
+  - compute-fabric
+  - closed-loop-control
+  - jit-dag
+  - multi-cloud
+  - decision-ledger
+canonical_owner: SocioProphet/sovereign-compute-fabric
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: "SocioSphere records workspace admission only; the repo owns the compute-fabric + control-loop contracts."
+source_ledger: docs/integration/recent-repos-admission-ledger-2026-08-03.md
+candidate_pin: 7b17fbb68f2cb8362c6c43c8eb19933a18651032

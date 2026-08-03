@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://socioprophet.org/schemas/gbrg/supply-chain-bian-fico-crosswalk.v0.json",
+  "title": "GBRG Supply-Chain Risk <-> BIAN / FICO Crosswalk (governed)",
+  "schemaVersion": "gbrg.supply-chain-risk.crosswalk.v0",
+  "description": "Binds the software supply-chain operational-risk control taxonomy to the estate's GOVERNED ontology and, through it, to recognized banking architecture (BIAN service domains) and decisioning (FICO capabilities). Consumed (not forked) from software_supply_chain_operational_risk_framework_v0_2_bian_fico.xlsx (sheets: Ontology, Controls_Evidence, BIAN_Crosswalk, FICO_Crosswalk). TEETH: every crosswalk entry binds one or more `binds_ontology` terms; a term that is NOT a member of `governed_ontology` is REJECTED by gbrg.governance.supply_chain_risk.validate_crosswalk_term (a crosswalk cannot smuggle an ungoverned control term into the estate vocabulary).",
+  "provenance": {
+    "consumed_from": "spec-intake/2026-08-03/inbound-ibm-labor-va/software_supply_chain_operational_risk_framework_v0_2_bian_fico.xlsx",
+    "workbook_version": "v0.2 (BIAN/FICO)",
+    "consume_not_fork": true
+  },
+
+  "governed_ontology": {
+    "description": "The estate-governed supply-chain-risk vocabulary. This is the SINGLE allow-list a crosswalk term may bind to. Node/edge/event/service terms are transcribed verbatim from the workbook 'Ontology' sheet; control families from 'Weights' + 'Controls_Evidence'; risk objects are the estate-owned scoring artifacts this contract produces.",
+    "node_types": [
+      "Source repository", "Maintainer identity", "CI/CD runner / build system",
+      "Registry / package index", "Mirror / proxy / cache", "OS package overlay",
+      "Artifact store / release channel", "Signing / attestation / transparency service",
+      "External model / API provider", "Runtime plugin / tool / MCP endpoint",
+      "Secrets / identity provider"
+    ],
+    "edge_types": [
+      "Code dependency", "Build dependency", "Signing authority",
+      "Publish / update authority", "Runtime invocation", "Secret / data flow",
+      "Rollback / recovery path"
+    ],
+    "event_classes": [
+      "Privileged insider tampering", "External compromise", "Maintainer / segregation failure",
+      "Product / business practice failure", "Infrastructure / system outage",
+      "Execution / release process failure", "Common-mode concentration failure"
+    ],
+    "critical_services": [
+      "Install", "Update", "Build", "Publish", "Authenticate",
+      "Execute privileged action", "Model invoke", "Recover / rollback"
+    ],
+    "control_families": [
+      "Governance", "Identity & publishing authority", "Build provenance",
+      "Artifact integrity", "Distribution guardrails", "Monitoring & recovery",
+      "Dependency transparency", "Third-party lifecycle", "Open source baseline hygiene"
+    ],
+    "risk_objects": [
+      "node_risk", "path_risk", "cluster_risk", "controls_evidence",
+      "kri_kci", "scenario", "risk_taxonomy"
+    ]
+  },
+
+  "bian_crosswalk": {
+    "interpretation": "BIAN is the bank operating-model anchor. Maps software-supply-chain risk objects to BIAN service domains so the framework can be discussed in recognized banking architecture terms.",
+    "entries": [
+      { "alignment_id": "B001", "software_ormf_object": "Risk taxonomy, scoring model, scenario design", "binds_ontology": ["risk_taxonomy", "node_risk", "path_risk", "cluster_risk", "scenario"], "bian_service_domain": "Operational Risk Models", "bian_business_area": "Risk and Compliance", "suggested_bank_owner": "Operational Risk / Model Risk", "priority": "Tier 0", "why": "BIAN Operational Risk Models is the banking home for node/path/cluster scoring and scenario analysis.", "source_url": "https://bian.org/servicelandscape-10-0-0/object_24.html?object=42288" },
+      { "alignment_id": "B002", "software_ormf_object": "Release gating and pre-production assessment", "binds_ontology": ["path_risk", "controls_evidence", "scenario"], "bian_service_domain": "Production Release", "bian_business_area": "IT Management", "suggested_bank_owner": "Release Engineering / Change Advisory", "priority": "Tier 0", "why": "BIAN Production Release evaluates production/business/operational risk before change is accepted.", "source_url": "https://bian.org/servicelandscape-10-0-0/views/view_53368.html" },
+      { "alignment_id": "B005", "software_ormf_object": "Standards for tooling, testing, and deployment", "binds_ontology": ["controls_evidence"], "bian_service_domain": "IT Standards And Guidelines", "bian_business_area": "Solution Development", "suggested_bank_owner": "Architecture / Engineering Governance", "priority": "Tier 1", "why": "BIAN IT Standards and Guidelines covers tooling, testing, deployment, platforms and IT policies.", "source_url": "https://bian.org/servicelandscape-10-0-0/views/view_49413.html" },
+      { "alignment_id": "B007", "software_ormf_object": "Security validation of controls and environments", "binds_ontology": ["controls_evidence", "kri_kci"], "bian_service_domain": "Security Assurance", "bian_business_area": "Non-IT and Non-HR Enterprise Services", "suggested_bank_owner": "CISO / Security Assurance", "priority": "Tier 0", "why": "Security Assurance maintains assurance checks confirming countermeasures are in place and effective.", "source_url": "https://bian.org/servicelandscape-12-0-0/object_22.html?object=46014" },
+      { "alignment_id": "B008", "software_ormf_object": "Continuity, recovery, fallback, and exit planning", "binds_ontology": ["path_risk", "cluster_risk", "scenario"], "bian_service_domain": "Continuity Planning", "bian_business_area": "Business Direction", "suggested_bank_owner": "Operational Resilience / BCM", "priority": "Tier 0", "why": "Continuity Planning is the banking home for recovery objectives, rollback, mirror and provider-exit planning.", "source_url": "https://bian.org/servicelandscape-13-0-0/object_21.html?object=29102" },
+      { "alignment_id": "B009", "software_ormf_object": "Third-party and supplier governance", "binds_ontology": ["cluster_risk", "controls_evidence"], "bian_service_domain": "Procurement", "bian_business_area": "Enterprise Services", "suggested_bank_owner": "Procurement / TPRM", "priority": "Tier 0", "why": "BIAN Procurement anchors registry, CI, cloud, model-provider and tool-vendor due diligence.", "source_url": "https://bian.org/servicelandscape-10-0-0/views/view_53746.html" },
+      { "alignment_id": "B010", "software_ormf_object": "Approved third-party universe and concentration view", "binds_ontology": ["cluster_risk", "controls_evidence"], "bian_service_domain": "Approved Supplier Directory", "bian_business_area": "Enterprise Services", "suggested_bank_owner": "TPRM / Architecture Review", "priority": "Tier 0", "why": "Approved Supplier Directory fits mirrored registries, approved package channels, CI providers, model/tool vendors.", "source_url": "https://bian.org/servicelandscape-13-0-0/object_23.html?object=48020" },
+      { "alignment_id": "B011", "software_ormf_object": "Auditability, challenge, and evidence review", "binds_ontology": ["controls_evidence", "kri_kci"], "bian_service_domain": "Internal Audit", "bian_business_area": "Non-IT and Non-HR Enterprise Services", "suggested_bank_owner": "Internal Audit", "priority": "Tier 0", "why": "Internal Audit is the banking owner for challenging assumptions, evidence freshness, exceptions and residual-risk statements.", "source_url": "https://bian.org/servicelandscape-12-0-0/object_36.html?object=34494" }
+    ]
+  },
+
+  "fico_crosswalk": {
+    "interpretation": "FICO is the decisioning / customer-lifecycle anchor. Maps software-supply-chain risk objects to FICO platform capabilities, governance concepts, and lifecycle use cases.",
+    "entries": [
+      { "alignment_id": "F001", "software_ormf_object": "Inventory of critical nodes, decision assets, and dependencies", "binds_ontology": ["node_risk", "risk_taxonomy"], "fico_capability": "Collaboration & Asset Reusability", "fico_layer": "Platform capability", "suggested_bank_owner": "Decision Management COE", "priority": "Tier 0", "why": "FICO Platform manages decision assets and tracks dependencies/lineage — the analog to the node/path graph and evidence model.", "source_url": "https://www.fico.com/en/fico-platform" },
+      { "alignment_id": "F002", "software_ormf_object": "External providers, plugins, APIs, and ecosystem boundaries", "binds_ontology": ["node_risk", "cluster_risk"], "fico_capability": "Openness & Extensibility", "fico_layer": "Platform capability", "suggested_bank_owner": "Enterprise Architecture / Platform", "priority": "Tier 0", "why": "Anchors external model providers, tool servers, data providers, and integration trust boundaries.", "source_url": "https://www.fico.com/en/fico-platform" },
+      { "alignment_id": "F003", "software_ormf_object": "Governance of model-dependent and AI-dependent paths", "binds_ontology": ["controls_evidence", "kri_kci", "scenario"], "fico_capability": "Responsible AI & Governance / FICO Responsible AI", "fico_layer": "Platform capability / product", "suggested_bank_owner": "AI Governance / Model Risk", "priority": "Tier 0", "why": "FICO Responsible AI covers building, executing, monitoring and governing models — AI/model-provider risk, evidence, auditability.", "source_url": "https://www.fico.com/en/products/fico-responsible-ai" },
+      { "alignment_id": "F006", "software_ormf_object": "Monitoring, KRIs, model/service drift, and operating feedback", "binds_ontology": ["kri_kci"], "fico_capability": "Continuous Feedback", "fico_layer": "Outcome capability", "suggested_bank_owner": "Operational Risk / Service Ops", "priority": "Tier 0", "why": "Continuous Feedback = real-time insight into business/system/model performance: the anchor for KRIs, KCIs, drift, degradation.", "source_url": "https://www.fico.com/en/products" },
+      { "alignment_id": "F007", "software_ormf_object": "Scenario analysis and ex-ante change impact testing", "binds_ontology": ["scenario", "path_risk"], "fico_capability": "Digital Twins & Simulation / Business Outcome Simulator", "fico_layer": "Outcome capability / product", "suggested_bank_owner": "Operational Risk / Change Risk", "priority": "Tier 0", "why": "Frames severe-but-plausible supply-chain scenarios and release simulations before making a change.", "source_url": "https://www.fico.com/en/products" }
+    ]
+  }
+}

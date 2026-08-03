@@ -1,0 +1,20 @@
+# ghostspace-spec canonical repository admission fragment (auto-registered 2026-08-03)
+id: ghostspace-spec
+name: ghostspace-spec
+url: https://github.com/SocioProphet/ghostspace-spec
+role: standards
+status: active
+description: 'Ghostspace Modeling Framework: trit → triad → simplex → ASu; S-layer
+  strata; projection/collapse/re-anchoring/accreditation lifecycle; claim-boundary
+  discipline'
+primary_language: Python
+tags:
+- ghostspace
+- trit-triad-simplex
+- asu
+- modeling-framework
+canonical_owner: SocioProphet/ghostspace-spec
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)

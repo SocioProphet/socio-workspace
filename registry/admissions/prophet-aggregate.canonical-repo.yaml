@@ -1,0 +1,21 @@
+# prophet-aggregate canonical repository admission fragment (auto-registered 2026-08-03)
+id: prophet-aggregate
+name: prophet-aggregate
+url: https://github.com/SocioProphet/prophet-aggregate
+role: component
+status: active
+description: 'Search over the manifest sheaf: enumerates the closed, coherent sections
+  that complete a seed assembly, deduplicated up to isomorphism, deterministically.
+  The SP-3 aggregator atop prophet-sheaf. MIT.'
+primary_language: Rust
+tags:
+- sheaf
+- aggregator
+- rust
+- mit
+- SP-3
+canonical_owner: SocioProphet/prophet-aggregate
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)

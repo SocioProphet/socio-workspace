@@ -1,0 +1,16 @@
+# spine-integration-pack canonical repository admission fragment (auto-registered 2026-08-03)
+id: spine-integration-pack
+name: spine-integration-pack
+url: https://github.com/SocioProphet/spine-integration-pack
+role: standards
+status: active
+description: Spine integration pack
+primary_language: Python
+tags:
+- spine
+- integration-pack
+canonical_owner: SocioProphet/spine-integration-pack
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)

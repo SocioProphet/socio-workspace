@@ -1,0 +1,18 @@
+# hellgraph-bench canonical repository admission fragment (auto-registered 2026-08-03)
+id: hellgraph-bench
+name: hellgraph-bench
+url: https://github.com/SocioProphet/hellgraph-bench
+role: testing
+status: active
+description: 'Reproducible benchmarks + receipts: HellGraph vs the graph-DB/analytics
+  field'
+primary_language: Shell
+tags:
+- hellgraph
+- benchmark
+- receipts
+canonical_owner: SocioProphet/hellgraph-bench
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)

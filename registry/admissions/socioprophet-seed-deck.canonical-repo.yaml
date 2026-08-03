@@ -1,0 +1,18 @@
+# socioprophet-seed-deck canonical repository admission fragment (auto-registered 2026-08-03)
+id: socioprophet-seed-deck
+name: socioprophet-seed-deck
+url: https://github.com/SocioProphet/socioprophet-seed-deck
+role: documentation
+status: active
+description: SocioProphet seed deck generator + assumption reconciliation (epistemicLevel-governed)
+  + estate Lawful-Learning conformance audit
+primary_language: JavaScript
+tags:
+- seed-deck
+- assumption-reconciliation
+- lawful-learning
+canonical_owner: SocioProphet/socioprophet-seed-deck
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)

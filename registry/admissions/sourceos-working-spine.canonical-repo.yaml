@@ -1,0 +1,18 @@
+# sourceos-working-spine canonical repository admission fragment (auto-registered 2026-08-03)
+id: sourceos-working-spine
+name: sourceos-working-spine
+url: https://github.com/SourceOS-Linux/sourceos-working-spine
+role: component
+status: active
+description: SourceOS working spine — turn-capture + multi-tier retrieval + proof
+  packs
+primary_language: Makefile
+tags:
+- sourceos
+- retrieval
+- proof-packs
+canonical_owner: SourceOS-Linux/sourceos-working-spine
+sociosphere_role: estate-registration-and-propagation
+claim_boundary: SocioSphere records workspace admission and cross-repo propagation
+  only; the repo owns implementation and contracts.
+admitted: 2026-08-03 (created within last 20 days)

@@ -1,0 +1,13 @@
+{
+  "source_repo": "SocioProphet/prophet-platform",
+  "source_path": "contracts/crystal-atlas/schemas",
+  "source_commit": "896fca9d",
+  "contract": "graph-upsert-request.v0",
+  "files": {
+    "graph-upsert-request.v0.schema.json": "1f8e1578283fceebf21478210375e659dc68081d536f7575541bb45a2d34302a",
+    "graph-node.v0.schema.json": "9d25815e6b4daee8af98ac09c43cc483f27ec7af534eb28044e271e0cb5db274",
+    "graph-edge.v0.schema.json": "17e1cb56fbff349fc4df2e150e496aba8fc7803a2b2e2d5adda8d74caa518a3b",
+    "claim.v0.schema.json": "831fa074da481cd9acc4b00b530a897d2511d04d737b3e3561a5413b82b30c34",
+    "evidence.v0.schema.json": "fc472c7392ecb239874c46c1a6bb5a9871a590ec9243fd415b478471cc5eb3ce"
+  }
+}

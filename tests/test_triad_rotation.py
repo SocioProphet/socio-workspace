@@ -7,9 +7,16 @@ sys.path.insert(0, str(ROOT))
 
 from automation.triad_rotation import (  # noqa: E402
     Assignment, RotationSchedule, epoch_for_time, leader_counts, load_schedule, rotate,
+    scheduled_leader_at, writers_on_schedule,
 )
 
 TRIAD = ["did:web:a", "did:web:b", "did:web:c"]
+# A schedule whose masters ARE the writer identities (period 1h from the unix epoch).
+SCHED = RotationSchedule(masters=TRIAD, period_s=3600, step=1)
+
+
+def _rcpt(writer, issued_at):
+    return {"writer_principal": writer, "issued_at": issued_at}
 
 
 def test_rotation_walks_the_triangle():
@@ -89,6 +96,38 @@ def test_load_declared_schedule_validates():
     # the declared schedule is itself triangular-even
     counts = leader_counts(sched.masters, range(0, 30), step=sched.step)
     assert set(counts.values()) == {10}
+
+
+# --- schedule verification (off-schedule writer = the compromise signal) ----------------------
+
+def test_scheduled_leader_at_matches_epoch():
+    # epoch 0 (t=0) -> leader a; epoch 1 (t=3600) -> b; epoch 2 (t=7200) -> c
+    assert scheduled_leader_at(SCHED, "1970-01-01T00:00:00Z") == "did:web:a"
+    assert scheduled_leader_at(SCHED, "1970-01-01T01:00:00Z") == "did:web:b"
+    assert scheduled_leader_at(SCHED, "1970-01-01T02:00:00Z") == "did:web:c"
+
+
+def test_writer_on_schedule_passes_when_leader_writes():
+    # at epoch 1 the scheduled leader is b; b writing is on-schedule
+    ok, why = writers_on_schedule([_rcpt("did:web:b", "1970-01-01T01:00:00Z")], SCHED)
+    assert ok and why == []
+
+
+def test_off_schedule_writer_is_flagged():
+    # at epoch 1 leader is b, but a (a known master) wrote -> out of turn -> flagged
+    ok, why = writers_on_schedule([_rcpt("did:web:a", "1970-01-01T01:00:00Z")], SCHED)
+    assert not ok and "out of turn" in why[0]
+
+
+def test_unknown_writer_not_flagged_by_schedule():
+    # a principal not in the triad is a different concern; the schedule check must not false-alarm
+    ok, why = writers_on_schedule([_rcpt("did:web:stranger", "1970-01-01T01:00:00Z")], SCHED)
+    assert ok and why == []
+
+
+def test_untimed_receipt_skipped():
+    ok, why = writers_on_schedule([_rcpt("did:web:a", "not-a-time")], SCHED)
+    assert ok and why == []
 
 
 def _run_all():

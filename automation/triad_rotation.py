@@ -100,6 +100,49 @@ class RotationSchedule:
         return self.at_epoch(epoch_for_time(t_epoch_s, period_s=self.period_s, phase_s=self.phase_s))
 
 
+def _parse_iso_z(ts: object) -> Optional[float]:
+    """Parse an RFC3339 ``...Z`` timestamp to unix seconds; None if it doesn't parse."""
+    from datetime import datetime, timezone
+    if not isinstance(ts, str):
+        return None
+    try:
+        return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+    except ValueError:
+        return None
+
+
+def scheduled_leader_at(schedule: RotationSchedule, issued_at_iso: object) -> Optional[str]:
+    """The master the schedule says should LEAD (write) at ``issued_at_iso``; None if untimed."""
+    t = _parse_iso_z(issued_at_iso)
+    return None if t is None else schedule.at_time(t).leader
+
+
+def writers_on_schedule(receipts: Sequence[dict], schedule: RotationSchedule) -> Tuple[bool, List[str]]:
+    """Check each receipt was written by the master scheduled to lead at its epoch.
+
+    Returns ``(ok, reasons)``. A KNOWN master (one of the triad) whose receipt claims it wrote the
+    state in an epoch it was not scheduled to lead is flagged — that is a master acting out of its
+    rotation turn, exactly the anomaly the deterministic schedule exists to make visible (a likely
+    compromise or a clock/config split). Receipts with an unparseable time are skipped here (their
+    grammar is the linter's job, not the schedule's), and a writer that is not in the triad at all
+    is a different concern (unknown writer) left to other checks — this flags only *out-of-turn*
+    writes by legitimate masters, so it does not false-alarm on unrelated principals.
+    """
+    reasons: List[str] = []
+    masters = set(schedule.masters)
+    for i, r in enumerate(receipts):
+        if not isinstance(r, dict):
+            continue
+        writer = r.get("writer_principal")
+        expected = scheduled_leader_at(schedule, r.get("issued_at"))
+        if expected is None:
+            continue  # untimed receipt -> cannot place it on the schedule
+        if writer in masters and writer != expected:
+            reasons.append(
+                f"receipt[{i}] writer {writer} wrote out of turn — scheduled leader was {expected}")
+    return (not reasons, reasons)
+
+
 def load_schedule(path: Optional[Path] = None) -> RotationSchedule:
     """Load the declared rotation from registry/triad-rotation.yaml. Validates it (a bad schedule
     raises here, not at rotate-time), so the governance file cannot declare an uneven rotation."""

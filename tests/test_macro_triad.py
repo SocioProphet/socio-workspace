@@ -212,6 +212,24 @@ def test_detector_split_brain_emits_warrantless_for_human():
     assert "split-brain" in b["detail"]["condition"]
 
 
+def test_detector_flags_off_schedule_writer():
+    """A healthy triad whose state agrees, but written by a master OUT OF its rotation turn, yields
+    the integrity beacon (orthogonal to divergence). Identities derive from the declared schedule."""
+    from automation.triad_rotation import load_schedule, scheduled_leader_at
+    sched = load_schedule()
+    issued = "1970-01-01T01:00:00Z"                       # epoch 1
+    leader = scheduled_leader_at(sched, issued)           # who SHOULD have led epoch 1
+    intruder = next(m for m in sched.masters if m != leader)  # a real master, but not the leader
+
+    def r(c):
+        return {**receipt(c), "writer_principal": intruder, "replica_principal": leader,
+                "issued_at": issued}  # same state_root -> healthy; only the writer is off-schedule
+    p = _receipts_file({"repo": "SocioProphet/infra", "receipts": [r("a"), r("b"), r("c")]})
+    beacons = detect_macro_triad_divergence(receipts_path=p)
+    assert len(beacons) == 1
+    assert "off-schedule" in beacons[0]["detail"]["condition"]
+
+
 def _run_all():
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in fns:

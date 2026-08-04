@@ -48,6 +48,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Telemetry + alerting** (`telemetry.py`) | ✅ | ✅ scheduler `telemetry` job → metrics.prom + alert logs | ✅ alerts fire on real conditions **and** silent when clean | ✅ | `tests/test_telemetry.py` |
 | **Learning recommendations** (`learning.py`) | ✅ | ✅ scheduler `learning` job (hourly, advisory) | ✅ demote on failures; none below-n/success/floor | ✅ | `tests/test_learning.py` |
 | **k8s shared-state queue** (`deployment/kubernetes.yaml`) | ✅ | ✅ RWX volume in all 3 workloads | ✅ asserts PVC RWX + mounts + STATE_DIR | ✅ | `tests/test_k8s_shared_state.py` |
+| **Deploy integrity** (image ships loop deps; `scheduler.preflight`) | ✅ | ✅ Dockerfile + fail-fast at boot | ✅ guard fires on the original broken image | ✅ | `tests/test_deploy_integrity.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -126,16 +127,32 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
    direction (never promotes) and never mutates governance: recommendations are recorded and
    logged for a human to apply by editing the declared policy. Auto-application is deliberately
    NOT wired — governance stays human-owned.
-4. **Telemetry / alerting — done.** `telemetry.py` aggregates the receipt streams
-   (non-destructively) into a scrapeable `state/metrics.prom` and fires SRE alerts (a quarantine
-   occurred; an executor did not resolve; escalations over threshold). The scheduler runs it each
-   cycle and logs alerts; `python -m automation.telemetry --alerts` is a probe with teeth.
-5. **Cross-pod queue in k8s — done.** `deployment/kubernetes.yaml` declares a ReadWriteMany
-   `automation-state` PVC mounted at `/app/state` in the webhooks Deployment (producer), the
-   scheduler Deployment (consumer + writer), and the proposal-opener CronJob (reader), with
-   `SOCIOSPHERE_STATE_DIR` pointed there — so beacons/decisions/proposals are one shared queue
-   across pods and nodes. Requires an RWX StorageClass (NFS/CephFS/EFS/Filestore) or a Redis
-   backend as the documented alternative. `tests/test_k8s_shared_state.py` asserts the wiring.
+4. **Telemetry — PRODUCED, not yet OBSERVED (honest correction).** `telemetry.py` writes
+   `state/metrics.prom` and logs alerts, and the CLI `--alerts` probe has teeth. But **nothing
+   scrapes the metrics file and nothing routes the alert logs** — no Prometheus textfile
+   collector / node_exporter sidecar, no Loki/Alertmanager wiring in the manifest. So today the
+   signal is real but lands in the void. Done on the produce side; the observe/route side is open.
+5. **Cross-pod queue in k8s — manifest fixed, not proven live.** `deployment/kubernetes.yaml`
+   declares a ReadWriteMany `automation-state` PVC in all three workloads (asserted by
+   `tests/test_k8s_shared_state.py`). But it is a *manifest*, not a running deployment — see the
+   deployment-reality gaps below.
+
+## Deployment reality (the honest, unglamorous part)
+
+The reasoning core is real and connected to live estate state (`detect_stale_vendors()` flags 3
+actual stale vendored deps right now). But being *tested green* is not being *running in the
+estate*. Open, in order of how badly they bite:
+
+- **No image build/push pipeline.** The manifest references `sociosphere/automation:latest`, but
+  **no workflow builds or pushes that image**. Until it does, the manifest cannot deploy.
+- **No running instance.** There is no evidence any `automation.scheduler`/`webhooks` daemon is
+  deployed and beating. The loop is dormant code + a manifest, not a live control plane.
+- **Liveness still only checks the heartbeat.** `scheduler.preflight` now makes a *broken image*
+  crash loudly at boot (fixed the worst silent failure), but a running daemon whose individual
+  jobs start failing only logs + increments `jobs_failed` — `healthz` won't go red. Health should
+  degrade (or alert) when jobs fail persistently; not yet wired.
+- **Metrics/alerts unobserved** (gap 4 above).
 
 Each gap is a row that has not yet earned its rightmost column. When it does, it moves — and a
-test moves with it.
+test moves with it. The `Deploy integrity` row above earned its column by *failing on the actual
+broken image first*, then passing — a control proven to fire, not merely present.

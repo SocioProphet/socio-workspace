@@ -15,7 +15,48 @@ import signal
 import threading
 import time
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Callable, Optional
+
+_ROOT = Path(__file__).resolve().parents[1]
+
+# Tools the detectors/executors shell out to. Present in the repo; MUST be in the image.
+_REQUIRED_TOOLS = (
+    "check_vendored_artifact_graph.py",
+    "lift_vendor_freshness_to_graph.py",
+    "generate_workspace_resolved_lock.py",
+    "validate_vendor_freshness.py",
+    "check_source_exposure.py",
+)
+
+
+def preflight(root: Optional[Path] = None) -> None:
+    """Fail FAST if this deployment cannot actually run the self-heal loop.
+
+    A green heartbeat over a loop whose every job ImportErrors is the exact 'instruments lie'
+    trap: the scheduler jobs catch their own import failures and keep beating, so `healthz`
+    (heartbeat-only) reports alive while nothing heals. This eagerly imports the vendored
+    kernel + engines the jobs need and verifies the tools they invoke exist; if anything is
+    missing it raises, so the process exits non-zero (CrashLoopBackOff) — loud, not silent.
+    """
+    root = root or _ROOT
+    try:
+        # importing these pulls in third_party/procyber (the kernel) and engines/
+        from automation import responder, executors, detectors  # noqa: F401
+    except Exception as exc:
+        raise RuntimeError(
+            "preflight FAILED: the self-heal loop cannot import its dependencies — the image "
+            "is missing the vendored kernel (third_party/) or engines/. Refusing to run a "
+            f"daemon that would beat a green heartbeat while every job fails. Cause: {exc}"
+        ) from exc
+    missing = [f"tools/{t}" for t in _REQUIRED_TOOLS if not (root / "tools" / t).exists()]
+    if missing:
+        raise RuntimeError(
+            f"preflight FAILED: required tool(s) missing from the image: {missing}. "
+            "Detectors/executors that shell out to them would fail silently behind a green "
+            "heartbeat. Refusing to start."
+        )
+    logger.info("preflight OK: kernel + engines import, %d tools present", len(_REQUIRED_TOOLS))
 
 logger = logging.getLogger(__name__)
 
@@ -451,6 +492,9 @@ def run(heartbeat_interval: float = 30.0) -> None:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
     interval = float(os.environ.get("SOCIOSPHERE_HEARTBEAT_INTERVAL", heartbeat_interval))
+
+    # Refuse to run a daemon that would beat a green heartbeat while every job fails.
+    preflight()
 
     scheduler = build_scheduler()
     scheduler.start()

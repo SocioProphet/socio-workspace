@@ -297,7 +297,7 @@ svf-workspace-validate: svf-registry-validate svf-runner-list svf-runner-select-
 	@echo "OK: svf-workspace-validate"
 
 # --- registry targets ---
-.PHONY: registry-validate registry-admissions-validate effective-canonical-registry-validate ontology-validate dep-cycles mirror-drift-check build-intelligence-validate deployment-topology-validate contract-lock-validate
+.PHONY: registry-validate registry-admissions-validate admission-governance-shape-validate interpretability-harness-vocabulary-validate effective-canonical-registry-validate ontology-validate dep-cycles mirror-drift-check build-intelligence-validate deployment-topology-validate contract-lock-validate
 
 mirror-drift-check:
 	python3 engines/mirror_drift_engine.py check
@@ -305,10 +305,20 @@ mirror-drift-check:
 registry-admissions-validate:
 	python3 tools/validate_registry_admissions.py
 
+# Admission records that a repository exists; it does not govern it. This fails when an
+# admitted repo never acquired a lane, dependency edges or a propagation rule -- the
+# gap that let noetica-impair sit in the staging area while every merge cascaded to
+# nothing.
+admission-governance-shape-validate:
+	python3 tools/check_admission_governance_shape.py
+
+interpretability-harness-vocabulary-validate:
+	python3 tools/check_interpretability_harness_vocabulary.py
+
 effective-canonical-registry-validate:
 	python3 tools/build_effective_canonical_registry.py
 
-registry-validate: registry-admissions-validate effective-canonical-registry-validate
+registry-validate: registry-admissions-validate admission-governance-shape-validate effective-canonical-registry-validate
 	@echo "==> Validating registry ontology roles and layers..."
 	python3 engines/ontology_engine.py validate
 	@echo "==> Checking dependency graph for cycles..."

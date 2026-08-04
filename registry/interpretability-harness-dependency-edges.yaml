@@ -51,6 +51,55 @@ edges:
     lane: interpretability-harness
     comment: "Stable interpretability harness vocabulary may promote to Ontogenesis after v0.1 terms stop changing."
 
+  # ── Executor edges (added 2026-08-04) ──────────────────────────────────────
+  # These were the missing half of the lane. The rig declared its dependencies
+  # inside its own capd/impair-rig.capd.json, which nothing outside that repo
+  # reads -- so the graph could not see that continuum-local and mesh-plane had
+  # gained a consumer, and a breaking change to either would not have listed
+  # noetica-impair as affected.
+
+  - from: noetica-impair
+    to: superconscious
+    type: schema_conformance
+    state: active
+    lane: interpretability-harness
+    comment: "noetica-impair validates emitted fragments against superconscious schemas/interpretability/; superconscious remains schema owner and never resolves the hashes it binds."
+
+  - from: noetica-impair
+    to: Noetica
+    type: fragment_emission
+    state: active
+    lane: interpretability-harness
+    comment: "The rig emits content-addressed fragments that Noetica ingests and renders as the impairment trail; Noetica verifies the receipt chain on read."
+
+  - from: Noetica
+    to: superconscious
+    type: schema_vendoring
+    state: active
+    lane: interpretability-harness
+    comment: "Noetica vendors superconscious interpretability, lawful-learning and composition schemas with a sha256-per-file manifest; the vendored copy is authority and upstream is used only to detect drift."
+
+  - from: noetica-impair
+    to: sourceos-continuum
+    type: capability_composition
+    state: active
+    lane: interpretability-harness
+    comment: "capd/impair-rig.capd.json composes_with caps.infra.paas.continuum-local@0.1.0; the rig runs as the same Job on a local kind/k3s cluster or the cloud twin, differing only by kube context."
+
+  - from: noetica-impair
+    to: prophet-platform
+    type: image_build
+    state: active
+    lane: interpretability-harness
+    comment: "prophet-platform builds and publishes the noetica-impair and noetica-impair-cpu images via its images.yml matrix; the rig itself never builds them."
+
+  - from: noetica-impair
+    to: ProCybernetica
+    type: governance_doctrine_reference
+    state: active
+    lane: interpretability-harness
+    comment: "Claim tags (M/T/S/E/G), circuit registry entries and forbidden-circuit enforcement follow ProCybernetica lawful-learning doctrine; the rig emits claims as 'captured' and may never self-promote."
+
 non_claims:
   - does_not_create_runtime_dependency
   - does_not_promote_schemas_to_sourceos_spec

@@ -1,0 +1,228 @@
+@prefix ih:   <https://socioprophet.org/ns/interpretability-harness#> .
+@prefix nrg:  <https://socioprophet.org/ns/neurosymbolic-repo-graph#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Interpretability harness vocabulary, v0.1 (repo-local).
+#
+# The harness lane minted a substantial vocabulary inside Python constants and
+# docstrings, where a reader of the source can see it and the graph cannot. This file
+# lifts those terms so the estate can reason over them: which faculty a limb is
+# predicted to damage, which fragment kind an artifact satisfies, which claim tag a
+# statement carries and therefore what evidence it owes.
+#
+# Two link kinds are carried deliberately, because either alone is useless:
+#
+#   SEMANTIC     rdfs:subClassOf / ih:predicts / ih:requiresEvidence -- what a term
+#                MEANS and what it entails.
+#   OPERATIONAL  ih:definedIn / ih:emittedBy / ih:enforcedBy -- where the term is
+#                actually implemented, so a change to that file is traceable to the
+#                concepts it moves.
+#
+# Promotion state: repo_local_draft. Per the lane's dependency edges, stable terms may
+# promote to Ontogenesis only after v0.1 stops changing. Nothing here is promoted.
+
+ih:Vocabulary a owl:Ontology ;
+    rdfs:label "Interpretability harness vocabulary v0.1" ;
+    ih:lane "interpretability-harness" ;
+    ih:promotionState "repo_local_draft" ;
+    ih:executorRepo "SocioProphet/noetica-impair" ;
+    ih:schemaOwnerRepo "SocioProphet/superconscious" ;
+    ih:capabilityId "caps.research.interpretability.impair-rig@0.1.0" .
+
+# ── link predicates ──────────────────────────────────────────────────────────
+
+ih:definedIn       a rdfs:Property ; rdfs:range xsd:string ;
+    rdfs:comment "Source path implementing this term. The operational link: a diff to this path moves this concept." .
+ih:emittedBy       a rdfs:Property ; rdfs:range xsd:string .
+ih:enforcedBy      a rdfs:Property ; rdfs:range xsd:string ;
+    rdfs:comment "The check that makes the term binding rather than aspirational." .
+ih:predicts        a rdfs:Property ; rdfs:range ih:Faculty ;
+    rdfs:comment "Which faculty a mechanism limb is HYPOTHESISED to degrade. Never a measurement." .
+ih:satisfiesFragment a rdfs:Property ; rdfs:range ih:FragmentKind .
+ih:requiresEvidence  a rdfs:Property ; rdfs:range xsd:string .
+ih:claimTag        a rdfs:Property ; rdfs:range xsd:string .
+ih:invariantRef    a rdfs:Property ; rdfs:range xsd:string .
+
+# ── pharmacology → computation (all T-tagged: parallels under test) ──────────
+
+ih:MechanismLimb a rdfs:Class ;
+    rdfs:comment "A receptor-level pharmacological action made machine-readable, composed into a substance rather than hard-coded per drug. Every limb is a TYPOLOGICAL claim: 'GABA-A potentiation resembles self-monitor ablation' is an analogy the rig TESTS, never a result it assumes. Tagging one empirical would dress a metaphor as a measurement." ;
+    ih:definedIn "src/noetica_impair/substances/limbs.py" ;
+    ih:claimTag "T" ;
+    ih:requiresEvidence "typological_parallel_target" .
+
+ih:requiresAny a rdfs:Property ; rdfs:range xsd:string ;
+    rdfs:comment "Preset fields a limb needs before it can be expressed." .
+ih:expressedBy a rdfs:Property ; rdfs:range xsd:string ;
+    rdfs:comment "Intervention kinds that realise the limb. A limb with no expression is a LOST LIMB." .
+
+ih:LostLimbGuard a rdfs:Class ;
+    rdfs:subClassOf ih:PlaceboGuard ;
+    rdfs:comment "Refuses a compile in which a declared limb produced no intervention. MDMA compiling to a single logit op because no SAE was present is the case this exists for: a substance that silently loses its mechanism still runs, still scores, and measures nothing but noise." ;
+    ih:definedIn "src/noetica_impair/substances/limbs.py" ;
+    ih:enforcedBy "strict_limbs=True (default)" .
+
+ih:PlaceboGuard a rdfs:Class ;
+    rdfs:comment "Any check that a nominal intervention actually intervened." .
+
+ih:DoseEnvelope a rdfs:Class ;
+    rdfs:comment "Pharmacokinetics as a per-step scalar: dose = peak x envelope(step). What separates crack from cocaine is not a different receptor but a different curve over the same one." ;
+    ih:definedIn "src/noetica_impair/hooks/envelope.py" .
+ih:Bolus a rdfs:Class ; rdfs:subClassOf ih:DoseEnvelope ;
+    rdfs:comment "onset / plateau / half_life / rebound. Rebound is why a crash is measurable rather than merely described." .
+ih:Constant a rdfs:Class ; rdfs:subClassOf ih:DoseEnvelope ;
+    rdfs:comment "A flat envelope. The null kinetics against which a bolus is a shape rather than an assertion." .
+
+ih:PriorAttenuation a rdfs:Class ; rdfs:subClassOf ih:Intervention ;
+    rdfs:comment "REBUS-style relaxation of learned priors by scaling the MLP branch, depth-gated. The psychedelic limb's mechanism, distinct from disconnection." ;
+    ih:definedIn "src/noetica_impair/hooks/mlp.py" ;
+    ih:predicts ih:Coherence .
+ih:LayerBypass a rdfs:Class ; rdfs:subClassOf ih:Intervention ;
+    rdfs:comment "Blends a layer's output toward its input -- functional disconnection, the NMDA-antagonist limb. Dissociatives and psychedelics are NOT the same operation, which is the distinction the limb model exists to preserve." ;
+    ih:definedIn "src/noetica_impair/hooks/layers.py" ;
+    ih:predicts ih:Binding .
+ih:BiphasicInversion a rdfs:Class ; rdfs:subClassOf ih:Intervention ;
+    rdfs:comment "Sign inversion above a dose threshold, modelling CB1 partial agonism: low dose and high dose move a faculty in OPPOSITE directions, so a monotonic dose-response model would average the effect to nothing." .
+ih:ReleaseVsReuptake a rdfs:Class ; rdfs:subClassOf ih:Intervention ;
+    rdfs:comment "Release is constant feature steering; reuptake inhibition is proportional to existing activation. Same monoamine, different arithmetic -- this is what distinguishes meth from cocaine mechanically rather than by label." .
+
+ih:Intervention a rdfs:Class ;
+    rdfs:comment "A concrete edit to the forward pass -- the thing a mechanism limb compiles down to. A limb that compiles to no intervention has been lost, not applied." ;
+    ih:satisfiesFragment ih:SteeringIntervention .
+
+# ── readout ──────────────────────────────────────────────────────────────────
+
+ih:Faculty a rdfs:Class ;
+    rdfs:comment "A measured capacity. The unit of the signature." .
+ih:Coherence a ih:Faculty . ih:Binding a ih:Faculty . ih:Recall a ih:Faculty .
+ih:SelfMonitor a ih:Faculty . ih:Inhibition a ih:Faculty . ih:Temporal a ih:Faculty .
+
+ih:DissociationSignature a rdfs:Class ;
+    rdfs:comment "WHICH faculty degrades first, not how much degrades. The entire thesis: a uniform drop across all faculties is a coarse lesion and carries no information; a signature is an ORDERING. A negative gap means the intervention was blunt, and reporting it as impairment would be the central failure mode." ;
+    ih:definedIn "src/noetica_impair/readout/metrics.py" ;
+    ih:claimTag "E" ;
+    ih:requiresEvidence "empirical_measurement_ref" .
+
+ih:FacultyVector a rdfs:Class ;
+    rdfs:comment "Retained fraction per faculty, always normalised against the run's OWN paired sober control. Comparing raw scores across models would measure capability, not the condition." ;
+    ih:invariantRef "invariant 0.3 (paired sober control)" .
+
+ih:FacultyTrajectory a rdfs:Class ;
+    rdfs:comment "Faculty scores across the dose envelope. compare_kinetics refuses a flat trajectory rather than reporting a shape that is not there." ;
+    ih:definedIn "src/noetica_impair/readout/trajectory.py" .
+
+ih:SoberControl a rdfs:Class ;
+    rdfs:comment "The dose-0 run, required to be bit-for-bit identical to an uninstrumented run." ;
+    ih:invariantRef "invariant 0.3" ;
+    ih:claimTag "G" ;
+    ih:satisfiesFragment ih:ManifoldBaseline .
+
+ih:DoseScalar a rdfs:Class ;
+    rdfs:comment "d in [0,1]. Impairment is graded, not binary." ;
+    ih:invariantRef "invariant 0.1" ; ih:claimTag "G" .
+
+# ── defensibility: the machinery that stops a number becoming a claim ────────
+
+ih:MeasurementInvariance a rdfs:Class ;
+    rdfs:comment "Whether a signature is a property of the CONDITION or of one lab's pipeline. Established by measuring the same condition across unrelated white-box models and requiring both magnitude agreement and rank agreement. Only an invariant signature may be used as a ruler for a black box." ;
+    ih:definedIn "src/noetica_impair/readout/invariance.py" ;
+    ih:satisfiesFragment ih:RobustnessCertificate .
+ih:rankAgreement a rdfs:Property ; rdfs:range xsd:decimal ;
+    rdfs:comment "Agreement on WHICH faculty is hit first -- the shape of the signature." .
+ih:facultySpread a rdfs:Property ; rdfs:range xsd:decimal .
+ih:transportable a rdfs:Property ; rdfs:range xsd:boolean .
+
+ih:KinshipGrade a rdfs:Class ;
+    rdfs:comment "How related the white-box ruler is to the black-box target. 'none_available' means no open-weight model exists from that lab, so the reading is not calibrated to that vendor at all -- a caveat that must travel with the number." .
+
+ih:LatentSignatureAttribution a rdfs:Class ;
+    rdfs:comment "The DUAL of invariance: invariance asks whether a signature is SHARED across models, attribution asks whether a fingerprint is SPECIFIC to one. Needed because a reference can be re-downloaded, re-quantised or replaced, moving the ladder underneath every comparison drawn against it. A name string is not evidence of identity." ;
+    ih:definedIn "src/noetica_impair/attribution" .
+
+ih:SplitHalfReliability a rdfs:Class ;
+    rdfs:comment "Whether a discovered feature reproduces on held-out halves. A gate, not a report: discovery exits non-zero below threshold." ;
+    ih:definedIn "src/noetica_impair/provenance/features.py" ;
+    ih:enforcedBy "experiments/discover_features.py exit 3" .
+ih:LexicalControl a rdfs:Class ;
+    rdfs:comment "Runs discovery against untrained weights. If a 'concept feature' appears there too, it is lexical structure, not a concept." ;
+    ih:enforcedBy "--lexical-control" .
+ih:ContrastSet a rdfs:Class ;
+    rdfs:comment "Index-aligned minimal pairs, audited for length skew, pair overlap and lexical separability before use." ;
+    ih:definedIn "src/noetica_impair/provenance/contrasts.py" ;
+    ih:enforcedBy "experiments/discover_features.py exit 2" ;
+    ih:satisfiesFragment ih:FeatureActivationSet .
+
+# ── release bundle: the 14 bound fragment kinds ──────────────────────────────
+
+ih:FragmentKind a rdfs:Class ;
+    rdfs:comment "One of exactly 14 kinds in the tier-2 release bundle, bound by opaque sha256. The schema pins minItems and maxItems at 14, so a short bundle is not a partial binding -- it is an invalid one, and padding it would attest to artifacts that do not exist." ;
+    ih:definedIn "src/noetica_impair/conformance/bundle.py" .
+
+ih:ModelArtifact a ih:FragmentKind . ih:SAEArtifact a ih:FragmentKind .
+ih:FeatureArtifact a ih:FragmentKind . ih:FeatureExplanation a ih:FragmentKind .
+ih:FeatureActivationSet a ih:FragmentKind . ih:SteeringIntervention a ih:FragmentKind .
+ih:CausalTriad a ih:FragmentKind ; ih:producibleByExecutor false .
+ih:AttributionGraph a ih:FragmentKind ; ih:producibleByExecutor false .
+ih:OffTargetAudit a ih:FragmentKind . ih:ManifoldBaseline a ih:FragmentKind .
+ih:ImplementabilityCurve a ih:FragmentKind . ih:RobustnessCertificate a ih:FragmentKind .
+ih:BenchmarkResult a ih:FragmentKind .
+ih:PublicInterpretabilityNote a ih:FragmentKind ; ih:producibleByExecutor false ;
+    rdfs:comment "A promotion step the executor must not take: no_public_claim_promotion." .
+
+ih:producibleByExecutor a rdfs:Property ; rdfs:range xsd:boolean ;
+    rdfs:comment "False means structurally cannot, as opposed to has not yet. Saying so is the point -- a bundle that quietly invented these would be worse than an incomplete one." .
+
+# ── lawful learning: what may be asserted, what may be touched ───────────────
+
+ih:ClaimTag a rdfs:Class ;
+    rdfs:comment "M/T/S/E/G. The tag determines what evidence the claim owes; a tag without its supporting reference is the mis-tagging this discipline exists to catch." ;
+    ih:definedIn "src/noetica_impair/conformance/lawful.py" .
+ih:TagM a ih:ClaimTag ; ih:requiresEvidence "mathematical_dependency" .
+ih:TagT a ih:ClaimTag ; ih:requiresEvidence "typological_parallel_target" .
+ih:TagS a ih:ClaimTag ; ih:requiresEvidence "speculative_test_artifact" .
+ih:TagE a ih:ClaimTag ; ih:requiresEvidence "empirical_measurement_ref" .
+ih:TagG a ih:ClaimTag ; ih:requiresEvidence "governance_invariant_ref" .
+
+ih:CircuitRegistryEntry a rdfs:Class ;
+    rdfs:comment "Requires BOTH discovery and ablation evidence: discovery alone is a correlation, ablation alone is a lesion with no named target." ;
+    ih:definedIn "src/noetica_impair/conformance/lawful.py" .
+
+ih:ForbiddenCircuit a rdfs:Class ;
+    rdfs:comment "A circuit declared off-limits. Checked BEFORE a run compiles, because discovering afterwards that you ablated a deployment-gated circuit is not a check, it is an incident report." ;
+    ih:enforcedBy "check_forbidden(); deployment_gate blocks, other modes advisory" .
+
+ih:NoSelfPromotion a rdfs:Class ;
+    rdfs:comment "The executor emits claims as 'captured' only. Promotion is a human decision made elsewhere; a rig that promoted its own claims would violate the doctrine it conforms to." ;
+    ih:claimTag "G" ; ih:invariantRef "no_public_claim_promotion" .
+
+# ── execution plane ──────────────────────────────────────────────────────────
+
+ih:ExecutionPlane a rdfs:Class ;
+    rdfs:comment "Where a run executes. One manifest and one code path; the only thing that changes between a laptop and the cloud twin is the kube context." ;
+    ih:definedIn "src/noetica_impair/planes/kube.py" .
+
+ih:RequiredContext a rdfs:Class ;
+    rdfs:comment "A kube context is REQUIRED and never inferred. kubectl's current context on this estate is the production GKE cluster, so a plane that shells out to a bare apply would land a refusal-ablating experiment on prod because someone forgot to switch. There is no default and no current-context fallback; an unrecognised context is rejected rather than assumed benign." ;
+    ih:claimTag "G" ;
+    ih:enforcedBy "UnsafeContextError" .
+
+ih:SchemaDriftCheck a rdfs:Class ;
+    rdfs:comment "The vendored copy is authority; upstream is used only to detect drift. A missing schema fails loudly, but a STALE schema validates happily against a contract that has since moved -- which is the case this exists for." ;
+    ih:definedIn "src/noetica_impair/conformance/schema_source.py" ;
+    ih:enforcedBy "verify_manifest + drift_against_upstream" .
+
+# ── estate-graph bridge ──────────────────────────────────────────────────────
+# Ties the vocabulary into the repo graph so blast-radius traversal can reach these
+# concepts from a repository node, rather than the two graphs sitting side by side.
+
+ih:concernsRepo a rdfs:Property ; rdfs:range xsd:string .
+ih:Vocabulary ih:concernsRepo "noetica-impair", "superconscious", "Noetica" .
+
+ih:repoTopic a rdfs:Property ; rdfs:range xsd:string ;
+    rdfs:comment "GitHub topics on the executor repo, kept aligned with these terms so discovery by topic and discovery by vocabulary agree." .
+ih:Vocabulary ih:repoTopic
+    "interpretability", "mechanistic-interpretability", "llm-evaluation",
+    "model-steering", "capability-declaration", "dissociation-signature",
+    "lawful-learning", "noetica", "superconscious" .

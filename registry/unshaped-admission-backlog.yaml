@@ -1,0 +1,31 @@
+# Acknowledged unshaped admissions.
+#
+# An admitted repo that never acquired a lane, dependency edges or a propagation rule
+# is debt. This file is where that debt is ADMITTED rather than tolerated: an entry
+# here downgrades the failure to a warning until `review_by`, and after that date the
+# check fails regardless of any grace window.
+#
+# It is deliberately not an allowlist. There is no "permanent" option, every entry
+# carries a date, and the date is what makes this different from simply not running
+# the check. If an entry is about to expire the answer is to govern the repo or to
+# argue for a new date in review -- not to bump it silently.
+
+schema_version: "1.0.0"
+updated_at: "2026-08-04"
+
+entries:
+  - repo: tritfabric
+    reason: >-
+      Admitted 2026-05-27 and never laned. Its only declared graph edge is a CI
+      evidence edge to .github, and it has no recorded dependents, so the estate does
+      not currently know who consumes it. A propagation rule written today would be
+      invented rather than derived, which is the failure mode this whole check exists
+      to prevent -- so the gap is recorded instead of papered over.
+    unmet: [laned, propagating]
+    owner: SocioProphet/sociosphere
+    review_by: "2026-09-15"
+    next_action: >-
+      Determine tritfabric's real consumers (its tags claim atlas, tritrpc,
+      model-governance, community-learning, serve, framework-catalog) and either add a
+      lane registration with dependency edges, or record that it has no downstream
+      consumers explicitly.

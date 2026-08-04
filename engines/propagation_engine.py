@@ -118,6 +118,12 @@ class PropagationEngine:
         self._dep_levels: dict[str, int] = {}
         self._adjacency: dict[str, list[str]] = defaultdict(list)
         self._reverse_adjacency: dict[str, list[str]] = defaultdict(list)
+        #: Governance/provenance edges from lane packs that declare
+        #: does_not_create_runtime_dependency. Recorded and traversable, but kept out of
+        #: cycle detection and dependency levels -- see load().
+        self._reference_edges: list[dict[str, Any]] = []
+        self._ref_adjacency: dict[str, list[str]] = defaultdict(list)
+        self._ref_reverse_adjacency: dict[str, list[str]] = defaultdict(list)
         self._loaded = False
 
     def load(self) -> None:
@@ -139,6 +145,52 @@ class PropagationEngine:
             if not isinstance(edge, dict):
                 continue
             add_edge(edge.get("from"), edge.get("to"), str(edge.get("type", "depends_on")))
+
+        # Additive edge packs. Lanes record their edges in registry/*-dependency-edges.yaml
+        # specifically to avoid rewriting the large aggregate file -- but this engine only
+        # ever read the aggregate, so every pack was dark: 17 governed edges across the
+        # interpretability-harness and lawful-learning lanes existed on disk, were
+        # validated by their own CI, and reached nothing. A registry fragment nothing
+        # loads is a document, not an edge.
+        #
+        # They are loaded as REFERENCE edges, not dependencies, because both packs
+        # declare `does_not_create_runtime_dependency` and `does_not_change_dependency_
+        # _graph_aggregate` in their own non_claims. Folding them into the dependency
+        # adjacency would contradict the thing the file says about itself -- and does so
+        # visibly: it introduces a sociosphere -> superconscious -> systems-learning-loops
+        # -> sociosphere cycle out of what is really "sociosphere RECORDS superconscious
+        # as doctrine owner". Reference edges are traversable and reportable; they do not
+        # drive cycle detection or dependency levels, and notification reach for these
+        # lanes comes from explicit propagation rules instead.
+        #
+        # Deferred/pre-promotion edges are skipped entirely: they describe a path a lane
+        # INTENDS to take, and traversing one would assert a relationship that does not
+        # exist yet.
+        for pack_path in sorted(self._dir.glob("*-dependency-edges.yaml")):
+            pack = _load_yaml(pack_path)
+            non_claims = set(pack.get("non_claims") or [])
+            as_dependency = "does_not_create_runtime_dependency" not in non_claims
+            for edge in pack.get("edges", []):
+                if not isinstance(edge, dict):
+                    continue
+                if str(edge.get("state", "active")).lower() not in ("active", "in_use"):
+                    continue
+                src = _normalize_repo_id(edge.get("from"))
+                dst = _normalize_repo_id(edge.get("to"))
+                if not src or not dst:
+                    continue
+                etype = str(edge.get("type", "depends_on"))
+                if as_dependency:
+                    add_edge(src, dst, etype)
+                    continue
+                if dst not in self._ref_adjacency[src]:
+                    self._ref_adjacency[src].append(dst)
+                if src not in self._ref_reverse_adjacency[dst]:
+                    self._ref_reverse_adjacency[dst].append(src)
+                self._reference_edges.append({
+                    "from": src, "to": dst, "type": etype,
+                    "lane": edge.get("lane"), "pack": pack_path.name,
+                })
 
         for repo_name, entry in dep_raw.get("dependencies", {}).items():
             normalized_repo = _normalize_repo_id(repo_name)
@@ -256,6 +308,24 @@ class PropagationEngine:
     def dependents_of(self, repo_id: str) -> list[str]:
         self._ensure_loaded()
         return list(self._reverse_adjacency.get(_normalize_repo_id(repo_id) or repo_id, []))
+
+    def references_of(self, repo_id: str) -> list[str]:
+        """Governance/provenance edges out of this repo, from lane packs.
+
+        Separate from dependencies_of by design: these are relationships the estate
+        RECORDS, not ones a build or runtime consumes. Blast-radius analysis wants both;
+        cycle detection wants only the latter.
+        """
+        self._ensure_loaded()
+        return list(self._ref_adjacency.get(_normalize_repo_id(repo_id) or repo_id, []))
+
+    def referrers_of(self, repo_id: str) -> list[str]:
+        self._ensure_loaded()
+        return list(self._ref_reverse_adjacency.get(_normalize_repo_id(repo_id) or repo_id, []))
+
+    def reference_edges(self) -> list[dict[str, Any]]:
+        self._ensure_loaded()
+        return list(self._reference_edges)
 
     def dependency_level(self, repo_id: str) -> int | None:
         self._ensure_loaded()

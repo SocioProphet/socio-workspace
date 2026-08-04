@@ -63,6 +63,54 @@ surfaces:
       non_claim_analysis: explicit_propagate_or_resolve_v1
       monitor_independence_analysis: declared_monitor_independence_v1
       evidence_freshness_analysis: declared_evidence_freshness_v1
+  execution:
+    # The lane had no slot for an executor, which is why the rig could not be filed
+    # even by hand. The tier-2 binding's non_claims (no_live_steering_execution,
+    # no_runtime_provider_access) are what DEFINE the superconscious layer, so the
+    # component that actually installs hooks and runs interventions cannot live there.
+    # It is a separate repo by construction, and the lane must name it as such.
+    repo: SocioProphet/noetica-impair
+    role: fragment-producer-and-intervention-executor
+    status: registered
+    registered_at: "2026-08-04"
+    produces_fragments:
+      # Which of the 14 bound fragment kinds this executor actually supplies.
+      - ModelArtifact
+      - SAEArtifact
+      - FeatureArtifact
+      - FeatureExplanation
+      - FeatureActivationSet
+      - SteeringIntervention
+      - OffTargetAudit
+      - ManifoldBaseline
+      - ImplementabilityCurve
+      - RobustnessCertificate
+      - BenchmarkResult
+    cannot_produce:
+      # Recorded as gaps rather than silently omitted: a bundle that invented these
+      # would validate while attesting to artifacts that do not exist.
+      CausalTriad: "requires attribution methods not implemented in the executor"
+      AttributionGraph: "requires attribution methods not implemented in the executor"
+      PublicInterpretabilityNote: "promotion step forbidden by no_public_claim_promotion"
+    capability_declaration:
+      path: capd/impair-rig.capd.json
+      capability_id: caps.research.interpretability.impair-rig@0.1.0
+      composes_with:
+        - caps.infra.paas.continuum-local@0.1.0
+        - caps.compute.mesh-plane@0.1.0
+    schema_conformance:
+      consumes: SocioProphet/superconscious schemas/interpretability/
+      vendored_via: SocioProphet/Noetica vendor/superconscious/schemas/
+      integrity: sha256-per-file manifest.json, recomputed by the conformance suite
+    vocabulary:
+      path: registry/interpretability-harness.vocab.ttl
+      ci_target: make interpretability-harness-vocabulary-validate
+    claim_boundary: >-
+      SocioSphere records that this repo executes interventions and emits
+      content-addressed fragments. It does not certify any result, and an emitted
+      fragment is bound by opaque hash on the superconscious side without being
+      resolved there.
+
   governance_doctrine:
     repo: SocioProphet/ProCybernetica
     paths:
@@ -85,6 +133,8 @@ surfaces:
 
 canonical_relationships:
   doctrine_owner: SocioProphet/superconscious
+  execution_owner: SocioProphet/noetica-impair
+  integration_surface_owner: SocioProphet/Noetica
   governance_doctrine_owner: SocioProphet/ProCybernetica
   registry_owner: SocioProphet/sociosphere
   future_schema_standard_owner: SourceOS-Linux/sourceos-spec

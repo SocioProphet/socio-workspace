@@ -1,36 +1,24 @@
-# automation-image — build & push the self-heal control-plane image.
+# automation-image — build & publish the self-heal control-plane image.
 #
-# ⚠️  HUMAN-MERGE ONLY. This is a `.github/workflows/**` change: per the estate guardrail,
-#     agent auto-merge NEVER lands workflow / token / permission / secret changes. A human
-#     must review and merge this file. It is also DARK until two things exist that this PR
-#     deliberately does NOT create:
-#       1. registry access for the `ci` user on `sociosphere/automation` in the sovereign
-#          zot (`registry.socioprophet.ai`). This workflow MINTS NO SECRETS — it reuses the
-#          existing `ZOT_CI_USERNAME` / `ZOT_CI_PASSWORD` that the image pipeline already
-#          uses. Grant the ci user push on this repo path (htpasswd is authn; accessControl
-#          is authz — a user that authenticates still 403s on push until listed under
-#          accessControl.repositories[**].policies[].users, and zot needs a rollout restart
-#          after that config change because it does not hot-reload).
-#       2. the deployment manifest must reference the image BY DIGEST, not `:latest`.
+# Publishes through the ESTATE'S SHARED LANE (SocioProphet/.github build-image.yml), not a
+# hand-rolled build. That reusable workflow owns login-host derivation, the SHA/latest/semver
+# tagging contract the Argo ApplicationSets promote, and KEYLESS cosign signing (Fulcio/Rekor
+# via the job's OIDC identity) so admission can verify provenance. A bespoke copy of that logic
+# here would drift from the estate and re-earn bugs the shared lane already fixed.
 #
-# Why it exists: `deployment/kubernetes.yaml` references `sociosphere/automation:latest`, but
-# no workflow builds or pushes that image — the manifest could not deploy (capability-register
-# "Deployment reality", gap 1). This closes that gap.
+# Credentials: registry.socioprophet.ai is htpasswd-walled and has no GCP identity, so the push
+# uses `registry_auth: basic` with the ZOT_CI_* ORG secrets (scoped to prophet-platform +
+# sociosphere only). One credential for the estate, one rotation point — not a per-repo copy.
 #
-# The moving-tag trap (estate maxim): `:latest` + the default `imagePullPolicy: IfNotPresent`
-# means a node that already cached `:latest` NEVER pulls a new build — the daemon silently runs
-# stale code. So this workflow pushes an IMMUTABLE `sha-<gitsha>` tag as the source of truth and
-# surfaces the manifest digest in the run summary; pin the manifest to that digest. It also moves
-# `:latest` as a convenience pointer only — never deploy from it.
+# The moving-tag trap: the shared lane pushes an immutable `<sha>` tag AND moves `latest`.
+# Deploy from the DIGEST (or the sha tag), never `latest` — with the default
+# `imagePullPolicy: IfNotPresent`, a node that cached `latest` silently runs stale code.
 name: automation-image
 
 on:
-  workflow_dispatch:
-    inputs:
-      push:
-        description: 'Push to the sovereign registry (off = build + verify only)'
-        type: boolean
-        default: false
+  # NOTE: the two `paths` lists are duplicated on purpose. GitHub Actions does NOT support
+  # YAML anchors/aliases — a `&anchor`/`*alias` parses fine locally (PyYAML resolves it) and
+  # is then rejected by GitHub, which is a false-green waiting to happen. Keep them in sync.
   push:
     branches: [main]
     paths:
@@ -43,90 +31,73 @@ on:
       - 'requirements-dev.txt'
       - 'deployment/Dockerfile'
       - '.github/workflows/automation-image.yml'
+  pull_request:
+    paths:
+      - 'automation/**'
+      - 'registry/**'
+      - 'third_party/**'
+      - 'engines/**'
+      - 'tools/**'
+      - 'requirements-dev.txt'
+      - 'deployment/Dockerfile'
+      - '.github/workflows/automation-image.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
+  id-token: write   # cosign keyless signing in the shared lane
 
 concurrency:
   group: automation-image-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  OCI_REGISTRY: registry.socioprophet.ai
-  IMAGE_REPO: sociosphere/automation
-
 jobs:
-  build-push:
+  # Deploy-integrity gate — runs with NO credentials, so it also protects pull requests.
+  #
+  # This is the control that caught the original paper tiger: the image built fine but was
+  # missing loop dependencies, so every scheduler job would ImportError at runtime while the
+  # heartbeat stayed green. `scheduler.preflight()` fails fast on exactly that, and running it
+  # INSIDE the freshly built image is the only way to prove the shipped artifact can boot.
+  # It costs one extra build; that is the price of the control, and it is worth paying.
+  verify:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-buildx-action@v3
+      - name: Build the image (no push, no credentials)
+        run: docker build -f deployment/Dockerfile -t automation:verify .
+      - name: Prove the built image can preflight the loop
+        run: docker run --rm automation:verify python -c "from automation.scheduler import preflight; preflight(); print('preflight OK')"
 
-      # Decide whether to push. Fail-SAFE, never fail-red: if the zot credential is absent
-      # (the pipeline isn't wired up yet), SKIP the push and still build+verify — the same
-      # skip-clean-when-unconfigured contract as the crystal-atlas-poster / proposal-opener
-      # jobs. A missing secret must NEVER turn every push to main red. Push only when a real
-      # credential exists AND (it's a push to main, or a dispatch that opted in).
-      - name: Decide whether to push
-        id: gate
-        env:
-          OCI_USERNAME: ${{ secrets.ZOT_CI_USERNAME }}
-        run: |
-          set -euo pipefail
-          if [ -z "${OCI_USERNAME:-}" ]; then
-            echo "::notice::ZOT_CI_USERNAME not set — build + verify only, no push (grant the ci user push on ${IMAGE_REPO} to enable)."
-            echo "push=false" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event_name }}" = "push" ]; then
-            echo "push=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "push=${{ inputs.push }}" >> "$GITHUB_OUTPUT"
-          fi
+  # Publish only after the artifact is proven bootable, and never from a pull request (a fork
+  # PR gets no secrets, and an unreviewed PR must not be able to publish an estate image).
+  publish:
+    needs: verify
+    if: github.event_name != 'pull_request'
+    uses: SocioProphet/.github/.github/workflows/build-image.yml@main
+    with:
+      image: sociosphere-automation
+      context: .
+      dockerfile: deployment/Dockerfile
+      registry: registry.socioprophet.ai
+      registry_auth: basic
+    secrets:
+      registry_username: ${{ secrets.ZOT_CI_USERNAME }}
+      registry_password: ${{ secrets.ZOT_CI_PASSWORD }}
 
-      - name: Log in to the sovereign registry
-        if: steps.gate.outputs.push == 'true'
-        env:
-          OCI_USERNAME: ${{ secrets.ZOT_CI_USERNAME }}
-          OCI_PASSWORD: ${{ secrets.ZOT_CI_PASSWORD }}
-        run: |
-          set -euo pipefail
-          echo "$OCI_PASSWORD" | docker login "$OCI_REGISTRY" -u "$OCI_USERNAME" --password-stdin
-
-      - name: Build and (optionally) push
-        id: build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: deployment/Dockerfile
-          push: ${{ steps.gate.outputs.push == 'true' }}
-          # Immutable SHA tag is the source of truth; :latest is a convenience pointer only.
-          tags: |
-            ${{ env.OCI_REGISTRY }}/${{ env.IMAGE_REPO }}:sha-${{ github.sha }}
-            ${{ env.OCI_REGISTRY }}/${{ env.IMAGE_REPO }}:latest
-          provenance: false
-
-      # The image must actually be able to boot the loop. scheduler.preflight fails fast if a
-      # loop dependency is missing from the image (the exact "paper tiger" failure #572 caught),
-      # so running it in the freshly built image is a real deploy-integrity gate, not a smoke test.
-      - name: Verify the built image can preflight the loop
-        run: |
-          set -euo pipefail
-          docker build -f deployment/Dockerfile -t automation:verify .
-          docker run --rm automation:verify python -c "from automation.scheduler import preflight; preflight(); print('preflight OK')"
-
-      - name: Report
+  report:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report the pinnable reference
         run: |
           {
             echo "## automation-image"
             echo ""
-            echo "- pushed: ${{ steps.gate.outputs.push == 'true' && 'yes' || 'NO (build + verify only)' }}"
-            echo "- immutable tag: \`${OCI_REGISTRY}/${IMAGE_REPO}:sha-${{ github.sha }}\`"
-            echo "- manifest digest: \`${{ steps.build.outputs.digest }}\`"
+            echo "- image:  \`${{ needs.publish.outputs.image }}\`"
+            echo "- digest: \`${{ needs.publish.outputs.digest }}\`"
             echo ""
-            echo "**Pin the manifest to the digest** — do not deploy from \`:latest\` (moving-tag +"
-            echo "\`IfNotPresent\` = a node silently runs stale code). Set every"
-            echo "\`image: sociosphere/automation:latest\` in \`deployment/kubernetes.yaml\` to"
-            echo "\`${OCI_REGISTRY}/${IMAGE_REPO}@${{ steps.build.outputs.digest }}\`."
+            echo "**Pin \`deployment/kubernetes.yaml\` to the digest** —"
+            echo "\`registry.socioprophet.ai/sociosphere-automation@${{ needs.publish.outputs.digest }}\`."
+            echo "Never deploy from \`:latest\` (moving tag + IfNotPresent = a node silently runs stale code)."
           } >> "$GITHUB_STEP_SUMMARY"

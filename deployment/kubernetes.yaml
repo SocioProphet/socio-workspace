@@ -134,7 +134,7 @@ spec:
     spec:
       initContainers:
         - name: auto-merge
-          image: sociosphere/automation:latest
+          image: registry.socioprophet.ai/sociosphere-automation:latest
           command:
             - python
             - -c
@@ -152,7 +152,7 @@ spec:
                   key: github-token
       containers:
         - name: webhooks
-          image: sociosphere/automation:latest
+          image: registry.socioprophet.ai/sociosphere-automation:latest
           command: ["python", "-m", "automation.webhooks"]
           ports:
             - containerPort: 5000
@@ -219,7 +219,7 @@ spec:
     spec:
       containers:
         - name: scheduler
-          image: sociosphere/automation:latest
+          image: registry.socioprophet.ai/sociosphere-automation:latest
           command: ["python", "-m", "automation.scheduler"]
           env:
             - name: GITHUB_TOKEN
@@ -298,7 +298,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: proposal-opener
-              image: sociosphere/automation:latest
+              image: registry.socioprophet.ai/sociosphere-automation:latest
               command: ["python", "-m", "automation.open_recorded_proposals"]
               env:
                 - name: GITHUB_TOKEN
@@ -363,7 +363,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: crystal-atlas-poster
-              image: sociosphere/automation:latest
+              image: registry.socioprophet.ai/sociosphere-automation:latest
               command: ["python", "-m", "automation.post_graph_upserts"]
               env:
                 - name: CRYSTAL_ATLAS_GRAPH_UPSERT_URL

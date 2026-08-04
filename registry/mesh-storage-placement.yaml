@@ -1,0 +1,43 @@
+# registry/mesh-storage-placement.yaml
+# Declared, governed storage placement for the Merkle leaves across the k-mesh.
+#
+# "Size the parity to the threat" is a REVIEWED config change here, not a code change. Each threat
+# tier declares how one leaf is laid down: warm block replicas (the CP write tier), the cold
+# Reed-Solomon erasure code RS(k, m), how many times each cold shard is itself replicated across
+# distinct nodes, and whether the seizable tiers are encrypted at rest. Loaded + validated by
+# automation/storage_placement.load_placement (an unsafe tier — e.g. a seizable tier left
+# unencrypted, or k<1 — is rejected here, before anything relies on it).
+#
+# Guidance (confirmed by tools/simulate_storage_resilience.py):
+#   * parity (rs_m) buys durability up to ~half the mesh seized, then tops out.
+#   * shard_replicas > 1 pushes durability PAST half — P(shard lost) = frac**R shrinks geometrically
+#     — at the cost of n*R/k storage. Reach for it only when the threat warrants (density > a fixed n).
+#   * encrypted_at_rest MUST be true on any seizable tier; a captured node must yield ciphertext.
+
+default_tier: hardened
+
+tiers:
+  # Everyday integrity. Cheapest durable erasure; survives loss of a small minority.
+  baseline:
+    replicas: 3
+    rs_k: 6
+    rs_m: 3            # RS(6,3) -> n=9, tolerate any 3 lost, 1.5x storage
+    shard_replicas: 1
+    encrypted_at_rest: true
+
+  # Elevated: certain-durable at a third of the mesh seized (2x storage), still no shard replication.
+  hardened:
+    replicas: 3
+    rs_k: 9
+    rs_m: 9            # RS(9,9) -> n=18, tolerate any 9 lost, 2.0x storage
+    shard_replicas: 1
+    encrypted_at_rest: true
+
+  # Hostile (seizure + partition, the Tehran/Israel case): replicate each shard so a leaf survives
+  # PAST half the mesh being seized. Storage cost is deliberate — durability is the priority.
+  hostile:
+    replicas: 3
+    rs_k: 6
+    rs_m: 3
+    shard_replicas: 2  # each of the 9 shards has 2 copies -> 3.0x storage; P(shard lost)=frac^2
+    encrypted_at_rest: true

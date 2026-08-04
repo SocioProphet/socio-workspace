@@ -62,6 +62,7 @@ class Placement:
     rs_k: int = 6              # RS data shards — need k to reconstruct
     rs_m: int = 3              # RS parity shards — tolerate losing any m
     encrypted_at_rest: bool = True
+    shard_replicas: int = 1    # copies of EACH cold shard, dispersed to distinct nodes (R=1 = none)
 
     @property
     def rs_n(self) -> int:
@@ -69,8 +70,20 @@ class Placement:
 
     @property
     def durability_overhead(self) -> float:
-        """Storage blow-up of the cold tier: n/k (e.g. 9/6 = 1.5×, vs 3× for triple replication)."""
-        return self.rs_n / self.rs_k
+        """Storage blow-up of the cold tier: n·R/k. RS(6,3) R=1 = 1.5×; R=2 = 3× (buys past-half
+        seizure survival — parity alone tops out near half the mesh; replicating shards beats it)."""
+        return self.rs_n * self.shard_replicas / self.rs_k
+
+    def expected_durable_under_seizure(self, frac: float) -> float:
+        """Analytic durability under an independent per-node seizure probability ``frac``.
+
+        A shard is lost only if ALL R of its replicas are seized -> P(shard lost) = frac**R, so a
+        shard survives w.p. 1 - frac**R. With n shards the expected number surviving is
+        n·(1 - frac**R); the leaf is durable when that is >= k. Replication (R>1) shrinks the loss
+        term geometrically, which is why it pushes durability PAST half the mesh being seized where
+        parity alone cannot. (Mean-field estimate; the simulation confirms it empirically.)"""
+        survive_p = 1.0 - (frac ** self.shard_replicas)
+        return self.rs_n * survive_p >= self.rs_k
 
 
 # ── the resilience predicates (pure, testable) ───────────────────────────────────────────────
@@ -117,3 +130,26 @@ def disperse_shards(nodes: List[str], placement: Placement) -> dict:
     # stride across the ordered leaves so consecutive shards land in different subtrees
     stride = max(1, len(ordered) // placement.rs_n)
     return {ordered[(i * stride) % len(ordered)]: f"shard-{i}" for i in range(placement.rs_n)}
+
+
+def disperse_with_replicas(nodes: List[str], placement: Placement) -> dict:
+    """Assign each of the n shards to ``shard_replicas`` DISTINCT nodes, spread across the mesh.
+
+    Returns ``{shard_id: [node, ...]}`` with n·R total copies on distinct nodes. A shard survives a
+    seizure iff at least one of its replica-nodes is not seized — so P(shard lost) = frac**R — which
+    is how replication buys past-half durability the parity alone cannot reach.
+    """
+    tree = build_tree(nodes)
+    ordered = leaves(tree)
+    total = placement.rs_n * placement.shard_replicas
+    if total > len(ordered):
+        raise ValueError(f"need {total} distinct nodes for {placement.rs_n} shards × "
+                         f"{placement.shard_replicas} replicas; mesh has {len(ordered)}")
+    stride = max(1, len(ordered) // total)
+    out: dict = {f"shard-{s}": [] for s in range(placement.rs_n)}
+    slot = 0
+    for s in range(placement.rs_n):
+        for _ in range(placement.shard_replicas):
+            out[f"shard-{s}"].append(ordered[(slot * stride) % len(ordered)])
+            slot += 1
+    return out

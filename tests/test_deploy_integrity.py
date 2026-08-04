@@ -40,6 +40,30 @@ def test_image_copies_every_loop_dependency():
     )
 
 
+# Dockerfile only treats `#` as a comment at the START of a line. A `#` after a non-shell
+# instruction (COPY/ADD/FROM/…) is parsed as an ARGUMENT, not a comment — buildx then chokes
+# (`COPY … # the responder's core` → "unexpected end of statement looking for matching
+# single-quote"). This shipped and the build had NEVER succeeded via buildx; the other tests
+# here only regex the COPY *source*, so they passed anyway. This guard catches the class.
+_NON_SHELL_INSTRUCTIONS = ("COPY", "ADD", "FROM", "WORKDIR", "ENV", "EXPOSE", "ARG",
+                           "LABEL", "USER", "ENTRYPOINT", "CMD", "VOLUME", "STOPSIGNAL")
+
+
+def test_no_inline_comments_on_dockerfile_instructions():
+    offenders = []
+    for n, line in enumerate(DOCKERFILE.read_text("utf-8").splitlines(), 1):
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        if s.split()[0].upper() in _NON_SHELL_INSTRUCTIONS and "#" in s:
+            offenders.append(f"L{n}: {s}")
+    assert not offenders, (
+        "Dockerfile has inline `#` comments on non-shell instructions — Dockerfile does NOT "
+        "strip these, so buildx parses them as arguments and the build fails. Move the comment "
+        f"to its own line above the instruction:\n  " + "\n  ".join(offenders)
+    )
+
+
 def test_required_tools_actually_exist_in_repo():
     # keeps the preflight list honest — a renamed/removed tool fails here, not silently in prod
     for tool in scheduler._REQUIRED_TOOLS:

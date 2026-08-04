@@ -47,8 +47,15 @@ permissions:
   contents: read
   id-token: write   # cosign keyless signing in the shared lane
 
+# Key the group on the COMMIT, not the ref. Keying on the ref means every push to main lands in
+# one queue, and GitHub keeps only the newest PENDING run per group — it cancels the older ones.
+# On a busy main that is not "queueing", it is silent loss: observed 2026-08-04, three consecutive
+# automation-image runs cancelled before they ever started, so those commits produced NO image at
+# all. `cancel-in-progress: false` does not save you; it governs the running job, not the pending
+# queue. Since each commit publishes its own immutable <sha> tag, each commit deserves its own
+# build, and the only redundancy worth cancelling is a re-run of the SAME sha.
 concurrency:
-  group: automation-image-${{ github.ref }}
+  group: automation-image-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:

@@ -35,6 +35,11 @@ verdict_action:
 # Identity-risk block threshold: IRI >= this escalates to a human regardless of verdict.
 iri_block: 0.55
 
+# Suppression window (seconds). A condition already decided within this window is suppressed,
+# so a persistent failure (e.g. a stale cross-repo vendor that can't heal locally) is escalated
+# once per window instead of every scheduler cycle. 0 disables suppression.
+suppression_cooldown_seconds: 3600
+
 # Ring-1 octonion safety axes. A plan touching any axis (norm >= 1) is force-escalated and
 # may never auto-act.
 boundary_axes:

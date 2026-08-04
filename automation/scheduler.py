@@ -272,12 +272,18 @@ class RegistryScheduler:
         try:
             from automation import responder  # lazy: keeps kernel import off the hot path
             from automation.policy import load_policy
+            from automation.suppression import Suppressor
             # execute=True: a verified-safe auto_fix (e.g. mirror-drift re-sync) is carried
             # out by its registered executor, which verifies the artifact and rolls back on
-            # failure. Decisions are still recorded for every beacon regardless. The declared
-            # policy (registry/self-heal-policy.yaml) governs the decision; if absent, the
-            # opinionated default applies.
-            receipts = responder.run_once(execute=True, policy=load_policy())
+            # failure. The declared policy (registry/self-heal-policy.yaml) governs the
+            # decision; if absent, the opinionated default applies. The suppressor coalesces a
+            # persistent condition (e.g. a stale cross-repo vendor) to one decision per
+            # policy cooldown, so the daemon does not re-escalate the same thing every cycle.
+            receipts = responder.run_once(
+                execute=True,
+                policy=load_policy(),
+                suppressor=Suppressor(state_dir() / "suppressions.json"),
+            )
             if receipts:
                 logger.info("Responder decided on %d beacon(s)", len(receipts))
         except Exception as exc:

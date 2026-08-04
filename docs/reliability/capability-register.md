@@ -39,6 +39,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **propose_pr executor** (`executors.propose_pr`) | ✅ | ✅ action-level dispatch | ✅ record/open **and** invalid→escalate | ✅ | `tests/test_propose_pr.py` |
 | **Policy-bound governance** (`policy.ResponsePolicy`) | ✅ | ✅ daemon loads declared policy | ✅ governs decide **and** rejects invalid | ✅ | `tests/test_policy.py` |
 | **stale_vendor detector** (`detectors.detect_stale_vendors`) | ✅ | ✅ scheduler `detectors` job | ✅ detect+escalate w/ report; waived not flagged | ✅ | `tests/test_stale_vendor_detector.py` |
+| **Escalation suppression** (`suppression.Suppressor`) | ✅ | ✅ daemon passes to `run_once` | ✅ suppress within cooldown; re-arm after; durable | ✅ | `tests/test_suppression.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 

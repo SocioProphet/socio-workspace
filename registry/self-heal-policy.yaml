@@ -1,0 +1,48 @@
+# registry/self-heal-policy.yaml
+# Declared governance for the reasoned self-heal responder (automation/responder.py).
+#
+# This IS the opinionated default (automation/policy.py::DEFAULT_POLICY); a test asserts the
+# two are identical so the declared policy and the code default cannot drift. Edit this file
+# to govern the loop WITHOUT a code change — a partial edit merges over the default, so you can
+# tighten or relax one class without redeclaring the rest. Every value is validated on load
+# (law/verdict/action must be known; iri_block in [0,1]; boundary_axes non-empty).
+
+# The LAW: the strongest verdict a failure CLASS may reach for auto-action.
+#   sealed     -> may auto_fix (reversible, verifiable regenerate-from-source)
+#   probable   -> canary_fix
+#   weak       -> propose_pr (cross-repo / low-confidence: reviewed, never auto-applied)
+#   quarantine -> quarantine (isolate; never auto-fixed)
+#   refuse     -> block
+law_by_kind:
+  mirror_drift: sealed            # derived artifact reconcilable in-process
+  vendored_graph_drift: sealed    # derived artifact reconcilable via the lift
+  build_failure: probable
+  stale_vendor: weak              # cross-repo re-vendor: propose/escalate, never auto-act
+  policy_violation: quarantine
+  unknown: refuse                 # fail-closed for an unrecognized class
+
+# The Law for a class not listed above (fail-closed).
+default_law: refuse
+
+# Verdict -> action on the lattice.
+verdict_action:
+  sealed: auto_fix
+  probable: canary_fix
+  weak: propose_pr
+  quarantine: quarantine
+  refuse: block
+
+# Identity-risk block threshold: IRI >= this escalates to a human regardless of verdict.
+iri_block: 0.55
+
+# Ring-1 octonion safety axes. A plan touching any axis (norm >= 1) is force-escalated and
+# may never auto-act.
+boundary_axes:
+  - legality
+  - containment
+  - provenance
+  - privacy
+  - performance
+  - reproducibility
+  - licensing
+  - governance

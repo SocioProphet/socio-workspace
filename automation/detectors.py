@@ -154,6 +154,14 @@ def detect_stale_vendors(*, register_path: Optional[Path] = None) -> List[dict]:
             continue
         if art.get("disposition") == "waived":
             continue  # deliberately accepted staleness — don't nag
+        # Carry the SCHEME-APPROPRIATE identity in typed fields, not just the prose reason:
+        # a commit/digest-scheme vendor has a null vendored_version, so hardcoding the semver
+        # fields left a machine reading detail.vendored_ref blind. Pick by version_scheme.
+        _v, _u = {
+            "semver": ("vendored_version", "upstream_latest_version"),
+            "digest": ("vendored_digest", "upstream_latest_digest"),
+            "commit": ("vendored_commit", "upstream_latest_commit"),
+        }.get(source.get("version_scheme"), ("vendored_version", "upstream_latest_version"))
         beacons.append({
             "kind_class": "stale_vendor",
             "system": f"vendored:{art.get('artifact_id')}",
@@ -167,8 +175,9 @@ def detect_stale_vendors(*, register_path: Optional[Path] = None) -> List[dict]:
                 "artifact_id": art.get("artifact_id"),
                 "source_id": art.get("source_id"),
                 "consumer_repo": art.get("consumer_repo"),
-                "vendored_version": art.get("vendored_version"),
-                "upstream_latest_version": source.get("upstream_latest_version"),
+                "version_scheme": source.get("version_scheme"),
+                "vendored_ref": art.get(_v),
+                "upstream_ref": source.get(_u),
                 "disposition": art.get("disposition"),
                 "state": state,
                 "reason": reason,

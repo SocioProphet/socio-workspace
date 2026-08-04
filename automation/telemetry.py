@@ -46,8 +46,12 @@ def collect(state: Optional[Path] = None) -> dict:
             proposals += 1
         if ex.get("quarantined"):
             quarantines += 1
-        # an executor ran but did not resolve (healed/proposed/quarantined all falsey)
-        if ex and not (ex.get("healed") or ex.get("proposed") or ex.get("quarantined")):
+        # A healing FAILURE is a remediation that was ATTEMPTED and undone — i.e. a fix
+        # executor wrote/regenerated and had to roll back. It is NOT an intended escalation
+        # (e.g. stale_vendor's propose_pr correctly declining because the fix is cross-repo):
+        # counting those inflates the drift signal and would teach the learning loop that a
+        # working class is failing. `rolled_back` marks exactly "tried to fix, undid it".
+        if ex.get("rolled_back"):
             healing_failures += 1
 
     return {
@@ -104,7 +108,7 @@ def alerts(metrics: dict, *, escalation_threshold: int = DEFAULT_ESCALATION_ALER
                     "message": f"{metrics['quarantines_total']} subject(s) quarantined — review the policy breach"})
     if metrics.get("healing_failures_total", 0) > 0:
         out.append({"severity": "warning", "kind": "healing_failure",
-                    "message": f"{metrics['healing_failures_total']} executor run(s) did not resolve"})
+                    "message": f"{metrics['healing_failures_total']} remediation(s) attempted and rolled back"})
     if metrics.get("escalations_total", 0) >= escalation_threshold:
         out.append({"severity": "warning", "kind": "escalation_backlog",
                     "message": f"{metrics['escalations_total']} escalations pending (>= {escalation_threshold})"})

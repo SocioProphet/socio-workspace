@@ -11,7 +11,9 @@ def _seed(state):
     dec.put({"beacon_kind": "mirror_drift", "verdict": "sealed", "action": "auto_fix",
              "execution": {"healed": True}})
     dec.put({"beacon_kind": "stale_vendor", "verdict": "weak", "action": "escalate_human",
-             "execution": {"proposed": False}})            # ran, did not resolve
+             "execution": {"proposed": False}})            # a DECLINE (no local fix) — NOT a failure
+    dec.put({"beacon_kind": "mirror_drift", "verdict": "sealed", "action": "auto_fix",
+             "execution": {"healed": False, "rolled_back": True}})  # attempted + undone = failure
     dec.put({"beacon_kind": "workspace_lock_drift", "verdict": "weak", "action": "propose_pr",
              "execution": {"proposed": True}})
     dec.put({"beacon_kind": "policy_violation", "verdict": "quarantine", "action": "quarantine",
@@ -23,22 +25,29 @@ def _seed(state):
 def test_collect_counts(tmp_path):
     _seed(tmp_path)
     m = telemetry.collect(state=tmp_path)
-    assert m["decisions_total"] == 5
+    assert m["decisions_total"] == 6
     assert m["heals_total"] == 1
     assert m["proposals_total"] == 1
     assert m["quarantines_total"] == 1
     assert m["escalations_total"] == 2
-    assert m["healing_failures_total"] == 1          # the escalate_human with execution proposed=False
+    assert m["healing_failures_total"] == 1          # only the rolled-back auto_fix; the decline does NOT count
     assert m["by_action"]["escalate_human"] == 2
-    assert m["by_kind"]["mirror_drift"] == 2
-    assert m["queue_depth"]["decisions"] == 5
+    assert m["by_kind"]["mirror_drift"] == 3
+    assert m["queue_depth"]["decisions"] == 6
+
+
+def test_decline_is_not_a_healing_failure(tmp_path):
+    # a propose_pr that correctly declined (no computable fix) must not inflate the drift signal
+    DurableQueue(tmp_path / "decisions").put(
+        {"beacon_kind": "stale_vendor", "action": "escalate_human", "execution": {"proposed": False}})
+    assert telemetry.collect(state=tmp_path)["healing_failures_total"] == 0
 
 
 def test_collect_is_non_destructive(tmp_path):
     dec = _seed(tmp_path)
     telemetry.collect(state=tmp_path)
     telemetry.collect(state=tmp_path)
-    assert dec.qsize() == 5                            # scraping never drains the queue
+    assert dec.qsize() == 6                            # scraping never drains the queue
 
 
 def test_render_prometheus(tmp_path):
@@ -47,7 +56,7 @@ def test_render_prometheus(tmp_path):
     assert "# TYPE sociosphere_selfheal_heals_total counter" in text
     assert "sociosphere_selfheal_heals_total 1" in text
     assert 'sociosphere_selfheal_decisions_by_action{action="escalate_human"} 2' in text
-    assert 'sociosphere_selfheal_queue_depth{queue="decisions"} 5' in text
+    assert 'sociosphere_selfheal_queue_depth{queue="decisions"} 6' in text
 
 
 def test_alerts_fire_on_real_conditions(tmp_path):

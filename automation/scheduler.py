@@ -191,6 +191,16 @@ class RegistryScheduler:
             misfire_grace_time=30,
         )
 
+        # LEARN (hourly): turn the receipt stream into safe policy-demotion recommendations
+        # for a human to apply. Never mutates governance itself.
+        self._scheduler.add_job(
+            self._run_learning,
+            "interval",
+            hours=1,
+            id="learning",
+            misfire_grace_time=300,
+        )
+
     # ------------------------------------------------------------------
     # Job implementations
     # ------------------------------------------------------------------
@@ -252,6 +262,18 @@ class RegistryScheduler:
         except Exception as exc:
             self._metrics["jobs_failed"] += 1
             logger.exception("Registry rebuild failed: %s", exc)
+
+    def _run_learning(self) -> None:
+        """Record safe policy-demotion recommendations from observed outcomes (advisory)."""
+        self._metrics["jobs_run"] += 1
+        try:
+            from automation import learning
+            recs = learning.run_once()
+            for rec in recs:
+                logger.warning("SELF-HEAL LEARNING recommend: %s", rec["rationale"])
+        except Exception as exc:
+            self._metrics["jobs_failed"] += 1
+            logger.exception("Learning run failed: %s", exc)
 
     def _run_telemetry(self) -> None:
         """Aggregate receipts -> metrics.prom (scrapeable) and log any firing SRE alert."""

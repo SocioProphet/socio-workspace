@@ -47,6 +47,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **build_failure detector** (`detectors.detect_build_failures`) | ✅ | ✅ scheduler `detectors` job (network-gated) | ✅ failed run→escalate; none/no-gh→none | ✅ | `tests/test_build_policy_detectors.py` |
 | **Telemetry + alerting** (`telemetry.py`) | ✅ | ✅ scheduler `telemetry` job → metrics.prom + alert logs | ✅ alerts fire on real conditions **and** silent when clean | ✅ | `tests/test_telemetry.py` |
 | **Learning recommendations** (`learning.py`) | ✅ | ✅ scheduler `learning` job (hourly, advisory) | ✅ demote on failures; none below-n/success/floor | ✅ | `tests/test_learning.py` |
+| **k8s shared-state queue** (`deployment/kubernetes.yaml`) | ✅ | ✅ RWX volume in all 3 workloads | ✅ asserts PVC RWX + mounts + STATE_DIR | ✅ | `tests/test_k8s_shared_state.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -129,9 +130,12 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
    (non-destructively) into a scrapeable `state/metrics.prom` and fires SRE alerts (a quarantine
    occurred; an executor did not resolve; escalations over threshold). The scheduler runs it each
    cycle and logs alerts; `python -m automation.telemetry --alerts` is a probe with teeth.
-5. **Cross-pod queue in k8s.** Compose shares state via a volume; the k8s manifest still needs
-   an RWX PV or a Redis backend for the webhook and scheduler pods to share the queue. Required
-   to *deploy* multi-pod, not to *prove* the loop.
+5. **Cross-pod queue in k8s — done.** `deployment/kubernetes.yaml` declares a ReadWriteMany
+   `automation-state` PVC mounted at `/app/state` in the webhooks Deployment (producer), the
+   scheduler Deployment (consumer + writer), and the proposal-opener CronJob (reader), with
+   `SOCIOSPHERE_STATE_DIR` pointed there — so beacons/decisions/proposals are one shared queue
+   across pods and nodes. Requires an RWX StorageClass (NFS/CephFS/EFS/Filestore) or a Redis
+   backend as the documented alternative. `tests/test_k8s_shared_state.py` asserts the wiring.
 
 Each gap is a row that has not yet earned its rightmost column. When it does, it moves — and a
 test moves with it.

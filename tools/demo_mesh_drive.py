@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from automation.mesh_fs_store import MeshFsStore  # noqa: E402
-from automation.mesh_sync import get_file, list_files, pull_dir, push_dir, put_file  # noqa: E402
+from automation.mesh_sync import get_file, list_files, pull_dir, push_dir  # noqa: E402
 from automation.storage_resilience import Placement  # noqa: E402
 
 NODES = [f"n{i:02d}" for i in range(27)]

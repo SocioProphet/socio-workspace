@@ -151,3 +151,27 @@ becomes a beacon, the responder reasons a verdict, and — for classes it caps a
 Remaining wiring: the per-class **beacon producers** that turn a specific CI-red
 shape (name/version drift, moving-tag, lockfile break, layout) into a proposal with
 a concrete patch. The mechanism is now in place for them to target.
+
+## v0.1.2 — one sealed control model (synthesis of the two self-heal arms)
+
+Two arms grew in parallel: **ControlLoop** (bounded/convergent/fail-closed,
+verify-by-re-observe, sealed trace) and the **PR opener** (real actuation,
+credential-split, dead-letter). Rather than pick one, `automation/self_heal.py`
+composes them on a single insight:
+
+> **Opening a reviewable fix PR *is* convergence** — the target is "a remediation
+> the system cannot apply autonomously now exists on a human's desk."
+
+So both remediation modes are the *same* loop with different invariants:
+
+| action | invariant (error → 0) | converged means | not converged → |
+|---|---|---|---|
+| `auto_fix` | the artifact is in sync | healed in place | `quarantine-escalate` |
+| `propose_pr` | a reviewable PR exists | PR opened for review | fail-close to human (carrying the PR if one was opened) |
+
+`remediate(beacon, receipt, …)` routes to the right invariant and **always returns one
+sealed `LoopResult`** (`trace_hash` provenance) — the responder, the daemon, and the
+audit trail speak one language. Genes kept from each arm: ControlLoop's verify-by-
+re-observe + seal; the opener's real actuation and fail-closed-*with-the-error-detail*
+(the loop swallows-and-re-observes, but the operator still gets the reason). The drainer
+now runs every proposal through this model, so each opened PR carries a sealed trace.

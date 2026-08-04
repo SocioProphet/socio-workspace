@@ -23,6 +23,7 @@ from typing import Callable, List, Optional
 
 from automation.durable_queue import DurableQueue, state_dir
 from automation.pr_opener import open_pr
+from automation.self_heal import remediate_via_pr
 
 MAX_ATTEMPTS = 3
 
@@ -89,27 +90,34 @@ def drain_and_open(
         attempts = int(entry.get("attempts", 0)) + 1
         proposal = entry.get("proposal") or {}
         rid = entry.get("id", "?")
+        base = {"id": rid, "kind": entry.get("beacon_kind"), "attempts": attempts}
+        # Each proposal is remediated as a ControlLoop: opening a reviewable PR IS
+        # convergence, and the sealed result (trace_hash) is the provenance. Within-run
+        # bounded retry lives in the loop; the dead-letter below is the ORTHOGONAL
+        # cross-run bound for transient infra (a clone/credential blip between runs).
         try:
             with tempfile.TemporaryDirectory(prefix="self-heal-open-") as tmp:
                 target = checkout(proposal["repo"], Path(tmp)) if proposal.get("repo") else repo_dir
-                kwargs = {"repo_dir": target}
-                if runner is not None:
-                    kwargs["runner"] = runner
-                pr_url = opener(proposal, **kwargs)
-            results.append({"id": rid, "kind": entry.get("beacon_kind"),
-                            "opened": True, "pr_url": pr_url, "attempts": attempts})
-        except Exception as exc:
-            entry["attempts"] = attempts
-            entry["last_error"] = str(exc)
-            if attempts >= MAX_ATTEMPTS:
-                dead.put(entry)  # give up loudly instead of retrying forever
-                results.append({"id": rid, "kind": entry.get("beacon_kind"),
-                                "opened": False, "error": str(exc),
-                                "attempts": attempts, "dead_lettered": True})
-            else:
-                proposals.put(entry)  # transient — let the next run retry
-                results.append({"id": rid, "kind": entry.get("beacon_kind"),
-                                "opened": False, "error": str(exc), "attempts": attempts})
+                sealed = remediate_via_pr(proposal, opener=opener, repo_dir=target, runner=runner)
+        except Exception as exc:  # checkout (clone) failure — never opened a PR
+            sealed = {"converged": False, "pr_url": None, "trace_hash": None,
+                      "error": f"checkout failed: {exc}"}
+
+        if sealed.get("converged"):
+            results.append({**base, "opened": True, "pr_url": sealed.get("pr_url"),
+                            "trace_hash": sealed.get("trace_hash")})
+            continue
+
+        entry["attempts"] = attempts
+        entry["last_error"] = sealed.get("error") or sealed.get("reason")
+        rec = {**base, "opened": False, "error": entry["last_error"],
+               "pr_url": sealed.get("pr_url"), "trace_hash": sealed.get("trace_hash")}
+        if attempts >= MAX_ATTEMPTS:
+            dead.put(entry)          # give up loudly instead of retrying forever
+            rec["dead_lettered"] = True
+        else:
+            proposals.put(entry)     # transient — let the next run retry
+        results.append(rec)
     return results
 
 

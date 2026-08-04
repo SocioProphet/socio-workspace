@@ -57,6 +57,32 @@ def test_opens_new_pr_and_writes_files(tmp_path):
     assert git.ran("gh", "pr", "create")
 
 
+REVERT = {
+    "title": "revert(self-heal): abc123 — search-api regressed",
+    "branch": "self-heal/deploy_regression/revert-abc123",
+    "base": "main",
+    "revert": "abc123def456",
+    "repo": "SocioProphet/demo",
+}
+
+
+def test_revert_proposal_git_reverts_the_bad_commit(tmp_path):
+    git = FakeGit(pr_exists=False)
+    url = open_pr(REVERT, repo_dir=tmp_path, runner=git)
+    assert url == "https://example/pr/42"
+    # it git-reverts the offending commit (not a hand-patch), then pushes + opens the PR
+    assert git.ran("git", "revert", "--no-edit", "abc123def456")
+    assert not git.ran("git", "add")            # no file materialization on a revert
+    assert git.ran("git", "push", "--force-with-lease")
+    assert git.ran("gh", "pr", "create")
+
+
+def test_proposal_needs_files_or_revert(tmp_path):
+    import pytest
+    with pytest.raises(ValueError):
+        open_pr({"title": "t", "branch": "b", "repo": "o/r"}, repo_dir=tmp_path, runner=FakeGit())
+
+
 def test_reuses_existing_pr(tmp_path):
     (tmp_path / "packaging").mkdir()
     git = FakeGit(pr_exists=True)

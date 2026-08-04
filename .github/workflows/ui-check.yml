@@ -2,8 +2,21 @@ name: ui-check
 
 on:
   push:
+    paths:
+      - 'client-vue/**'
+      - 'ui/**'
+      - '**/*.vue'
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '.github/workflows/ui-check.yml'
   pull_request:
-
+    paths:
+      - 'client-vue/**'
+      - 'ui/**'
+      - '**/*.vue'
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '.github/workflows/ui-check.yml'
 jobs:
   ui:
     runs-on: ubuntu-latest

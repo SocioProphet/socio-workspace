@@ -2,8 +2,19 @@ name: compliance
 
 on:
   push:
+    paths:
+      - 'registry/**'
+      - 'standards/**'
+      - 'spec/**'
+      - 'tools/check_*.py'
+      - '.github/workflows/compliance.yml'
   pull_request:
-
+    paths:
+      - 'registry/**'
+      - 'standards/**'
+      - 'spec/**'
+      - 'tools/check_*.py'
+      - '.github/workflows/compliance.yml'
 permissions:
   contents: read
 

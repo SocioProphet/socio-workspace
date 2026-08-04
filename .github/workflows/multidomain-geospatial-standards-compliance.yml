@@ -2,10 +2,20 @@ name: Multi-Domain Geospatial Standards Compliance
 
 on:
   pull_request:
+    paths:
+      - 'standards/**'
+      - 'registry/**geo**'
+      - '**/*geo*'
+      - '**/*osm*'
+      - '.github/workflows/multidomain-geospatial-standards-compliance.yml'
   push:
-    branches:
-      - main
-
+    branches: [main]
+    paths:
+      - 'standards/**'
+      - 'registry/**geo**'
+      - '**/*geo*'
+      - '**/*osm*'
+      - '.github/workflows/multidomain-geospatial-standards-compliance.yml'
 jobs:
   validate:
     name: Validate implementation standards compliance registry

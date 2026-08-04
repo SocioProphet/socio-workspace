@@ -2,8 +2,21 @@ name: standards-validate
 
 on:
   push:
+    paths:
+      - 'standards/**'
+      - 'spec/**'
+      - 'registry/**'
+      - 'tools/validate_*standards*.py'
+      - 'tools/requirements-standards.txt'
+      - '.github/workflows/standards-validate.yml'
   pull_request:
-
+    paths:
+      - 'standards/**'
+      - 'spec/**'
+      - 'registry/**'
+      - 'tools/validate_*standards*.py'
+      - 'tools/requirements-standards.txt'
+      - '.github/workflows/standards-validate.yml'
 jobs:
   validate:
     runs-on: ubuntu-latest

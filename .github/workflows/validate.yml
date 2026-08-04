@@ -2,8 +2,25 @@ name: validate
 
 on:
   push:
+    paths:
+      - 'registry/**'
+      - 'standards/**'
+      - 'spec/**'
+      - 'manifest/**'
+      - 'schemas/**'
+      - 'tools/check_*.py'
+      - 'tools/check_*.sh'
+      - '.github/workflows/validate.yml'
   pull_request:
-
+    paths:
+      - 'registry/**'
+      - 'standards/**'
+      - 'spec/**'
+      - 'manifest/**'
+      - 'schemas/**'
+      - 'tools/check_*.py'
+      - 'tools/check_*.sh'
+      - '.github/workflows/validate.yml'
 permissions:
   contents: read
 

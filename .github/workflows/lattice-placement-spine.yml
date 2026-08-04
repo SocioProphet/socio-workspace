@@ -3,9 +3,20 @@ name: lattice-placement-spine
 on:
   push:
     branches: [main]
+    paths:
+      - 'registry/lattice-**'
+      - 'spec/lattice/**'
+      - 'tools/**lattice**'
+      - 'tools/runner/**'
+      - '.github/workflows/lattice-placement-spine.yml'
   pull_request:
     branches: [main]
-
+    paths:
+      - 'registry/lattice-**'
+      - 'spec/lattice/**'
+      - 'tools/**lattice**'
+      - 'tools/runner/**'
+      - '.github/workflows/lattice-placement-spine.yml'
 permissions:
   contents: read
 

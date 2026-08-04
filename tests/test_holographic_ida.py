@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from automation.holographic_ida import (  # noqa: E402
-    _EXP, _LOG, _inv, _mul, disperse, merkle_root, reconstruct,
+    _EXP, _inv, _mul, disperse, merkle_root, reconstruct,
 )
 
 

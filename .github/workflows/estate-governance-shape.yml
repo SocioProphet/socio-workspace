@@ -1,12 +1,23 @@
 name: estate-governance-shape
 
-# `make registry-validate` has existed for a long time and no workflow ever ran it.
-# That is why a repository could be auto-admitted, sit in registry/admissions/ with a
-# null role and no lane, and have every merge cascade to nothing -- the validation was
-# written, had a Makefile target, and never executed. A gate nobody runs is a comment.
+# CORRECTION to this file's original rationale: an earlier version of this comment (and
+# of the commit that added it) claimed `make registry-validate` had never been run by any
+# workflow. That was FALSE -- validate.yml has run it on every push and pull_request all
+# along. The claim was made without checking validate.yml, and it is corrected here
+# rather than quietly dropped.
 #
-# This runs it, plus the admission-shape check that fails when an admitted repo never
-# reached a governed shape (no lane, no dependency edges, no propagation rule).
+# The real defect is worse than an unrun gate. The gate RAN, PASSED, and did not check.
+# registry-validate verified that an admission fragment had the right schema and folded
+# it into an effective list; it never asked whether the admitted repo acquired a lane,
+# dependency edges, or a propagation rule. So a repo could be admitted, validated green
+# on every PR, and still have every merge cascade to nothing. A control that executes and
+# checks the wrong thing is more dangerous than one that never executes, because it also
+# supplies the reassurance.
+#
+# admission-governance-shape-validate is now a prerequisite of registry-validate, so it
+# runs wherever that target does -- including validate.yml. This workflow adds what a
+# per-PR gate cannot: a weekly run, because an admission's grace window expires with the
+# calendar rather than with a commit, and a retained JSON artifact of the shape.
 
 on:
   pull_request:
@@ -52,20 +63,11 @@ jobs:
       - name: Install dependencies
         run: python -m pip install pyyaml
 
-      - name: Registry validation (admissions, ontology roles, dependency cycles)
+      # Runs admission-governance-shape, gossip-beacon-audit and
+      # propagation-feedback as prerequisites -- listing them again as separate
+      # steps would execute each twice.
+      - name: Registry validation
         run: make registry-validate
-
-      - name: Admission governance shape
-        run: python3 tools/check_admission_governance_shape.py
-
-      # Hyperedge closure. A lane binding fewer than two repos is not a relation.
-      - name: Gossip beacon audit
-        run: python3 engines/gossip_beacon.py audit
-
-      # The return path: declared reach vs actuated reach, dead rules, sinks.
-      # Non-strict — coverage gaps are reported, only real dispatch failures fail.
-      - name: Propagation feedback
-        run: python3 tools/check_propagation_feedback.py
 
       - name: Report (always, so the shape is visible even on failure)
         if: always()

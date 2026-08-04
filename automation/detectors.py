@@ -32,6 +32,7 @@ from automation.beacon_producers import propose_state_failback
 from automation.durable_queue import DurableQueue, state_dir
 from automation.executors import is_in_sync, vendored_graph_in_sync
 from automation.macro_triad import assess_triad
+from automation.triad_rotation import load_schedule, writers_on_schedule
 from engines.mirror_drift_engine import REGISTRY_PATH, STATUS_PATH
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -336,6 +337,16 @@ _LAZERUS_TRIAD_RECEIPTS = _ROOT / "status" / "lazerus-triad-receipts.json"
 _DEFAULT_INFRA_REPO = "SocioProphet/prophet-platform"
 
 
+def _load_rotation_schedule_optional():
+    """The declared triad rotation, or None if it isn't declared / won't load. Defensive: a missing
+    or malformed registry/triad-rotation.yaml must never crash the live detector — it just means the
+    off-schedule-writer check is not performed (no false alarms in envs without a schedule)."""
+    try:
+        return load_schedule()
+    except Exception:  # noqa: BLE001 — defensive: a bad/absent schedule must not crash the detector
+        return None
+
+
 def detect_macro_triad_divergence(*, receipts_path: Optional[Path] = None) -> List[dict]:
     """SENSE the k3s master triad: emit a failback beacon when a master diverged from the quorum.
 
@@ -371,32 +382,48 @@ def detect_macro_triad_divergence(*, receipts_path: Optional[Path] = None) -> Li
     except (TypeError, ValueError):
         quorum = 2
 
-    # ACTUATE: quorum-gated failback(s) for any master that diverged from the canonical state.
-    beacons = propose_state_failback(receipts, repo=repo, quorum=quorum)
-    if beacons:
-        return beacons
+    out: List[dict] = []
 
-    # No failback proposed. Either the triad is healthy (nothing to do) OR it is split-brain with
-    # no quorum — a condition propose_state_failback correctly refuses to act on (no trusted
-    # target). Surface the latter warrantlessly so a human is paged instead of silence.
-    assessment = assess_triad(receipts, quorum=quorum)
-    # Page a human only when enough masters reported that a quorum SHOULD have formed but did not
-    # (a genuine split-brain), not when the report is merely incomplete (fewer than `quorum`
-    # masters have checked in yet — a liveness/producer concern, handled elsewhere).
-    if not assessment.quorum_ok and len(receipts) >= quorum:
-        return [{
-            "kind_class": "deploy_regression",
-            "system": f"{repo}::macro-triad",
-            # NO evidence + NO proposal on purpose: we see the split-brain but cannot warrant a
-            # failback (no quorum) -> the responder routes this to a human, never auto-acts.
-            "detail": {
-                "condition": "split-brain: no k3s master quorum -> no trusted failback target",
-                "sick": [s.cluster for s in assessment.sick_clusters],
-                "reasons": list(assessment.reasons),
-            },
-            "observed_at": _now(),
-        }]
-    return []  # healthy triad — nothing to heal
+    # ACTUATE: quorum-gated failback(s) for any master that diverged from the canonical state.
+    out.extend(propose_state_failback(receipts, repo=repo, quorum=quorum))
+
+    # If no failback was proposed, distinguish healthy from split-brain (no quorum). Surface the
+    # latter warrantlessly so a human is paged — but only when enough masters reported that a
+    # quorum SHOULD have formed (not merely incomplete reporting, a separate liveness concern).
+    if not out:
+        assessment = assess_triad(receipts, quorum=quorum)
+        if not assessment.quorum_ok and len(receipts) >= quorum:
+            out.append({
+                "kind_class": "deploy_regression",
+                "system": f"{repo}::macro-triad",
+                # NO evidence + NO proposal on purpose: we see the split-brain but cannot warrant a
+                # failback (no quorum) -> the responder routes this to a human, never auto-acts.
+                "detail": {
+                    "condition": "split-brain: no k3s master quorum -> no trusted failback target",
+                    "sick": [s.cluster for s in assessment.sick_clusters],
+                    "reasons": list(assessment.reasons),
+                },
+                "observed_at": _now(),
+            })
+
+    # INTEGRITY (orthogonal to divergence): if a rotation schedule is declared, check that each
+    # receipt was written by the master scheduled to LEAD at its epoch. A known master writing out
+    # of its rotation turn is a compromise/clock-split signal — warrantless -> human, never auto-act.
+    sched = _load_rotation_schedule_optional()
+    if sched is not None:
+        ok, why = writers_on_schedule(receipts, sched)
+        if not ok:
+            out.append({
+                "kind_class": "deploy_regression",
+                "system": f"{repo}::macro-triad-rotation",
+                "detail": {
+                    "condition": "off-schedule writer: a master led out of its rotation turn",
+                    "reasons": why,
+                },
+                "observed_at": _now(),
+            })
+
+    return out
 
 
 # Registered detectors: each is a keyword-arg callable returning None, a beacon, or a list.

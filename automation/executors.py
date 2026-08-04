@@ -354,3 +354,101 @@ def propose_pr(*, beacon: dict, proposals_dir: Optional[Path] = None, opener=Non
     )
     result["proposed"] = True
     return result
+
+
+# ---------------------------------------------------------------------------
+# quarantine executor: for a policy_violation (verdict quarantine) the responder
+# must ISOLATE, never auto-fix. This records a durable quarantine marker for the
+# subject so it is contained and visible (a human, and downstream tooling, can see
+# it is quarantined) — the honest "isolate, don't fix, don't ignore" action.
+# ---------------------------------------------------------------------------
+
+from datetime import datetime as _dt, timezone as _tz
+
+
+def quarantine(*, beacon: dict, quarantine_dir: Optional[Path] = None) -> dict:
+    """Isolate a subject by recording a durable quarantine marker. Returns {quarantined}."""
+    result = {"executor": "quarantine", "quarantined": False}
+    subject = beacon.get("system")
+    if not subject:
+        result["error"] = "beacon has no subject (system) to quarantine"
+        return result
+    directory = Path(quarantine_dir) if quarantine_dir is not None else state_dir() / "quarantine"
+    DurableQueue(directory).put({
+        "subject": subject,
+        "kind_class": beacon.get("kind_class"),
+        "reason": (beacon.get("detail") or {}).get("reason") or beacon.get("reason"),
+        "evidence_ref": beacon.get("evidence_ref"),
+        "quarantined_at": _dt.now(_tz.utc).isoformat(),
+    })
+    result["quarantined"] = True
+    result["subject"] = subject
+    return result
+
+
+# ---------------------------------------------------------------------------
+# canary_fix executor: "prove the fix mechanism on a canary, then apply". Before
+# touching the real artifact at probable (not sealed) confidence, run the SAME fix
+# against a synthetic guaranteed-input -> provable-output case. If the canary heals
+# as expected, the mechanism is trusted and we apply to the real target (with the
+# executor's own verify + rollback). If the canary fails, the mechanism itself is
+# suspect: we do NOT touch the real artifact and the responder escalates.
+# Only classes with a clean isolated canary are registered; others escalate.
+# ---------------------------------------------------------------------------
+
+_CANARY_REGISTRY = """version: "1.0.0"
+updated_at: "2026-01-01"
+mirrors:
+  - name: canary
+    org: Canary
+    url: https://example.invalid/canary
+    upstream:
+      url: https://example.invalid/upstream
+      ref: main
+      head_sha: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+      checked_at: "2026-01-01"
+    mirror_head_sha: cafebabecafebabecafebabecafebabecafebabe
+    drift:
+      status: behind
+      note: canary
+"""
+
+
+def _mirror_drift_canary() -> bool:
+    """Guaranteed input -> provable output: resync must heal a synthetic drift on disk."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        reg = Path(d) / "registry.yaml"
+        status = Path(d) / "status.yaml"
+        reg.write_text(_CANARY_REGISTRY, encoding="utf-8")
+        # induce drift: no status artifact -> a working resync must create the correct one
+        res = resync_mirror_drift(registry_path=reg, status_path=status)
+        return bool(res.get("healed")) and is_in_sync(reg, status)
+
+
+# kind_class -> (canary_fn, apply_fn). apply_fn receives the executor_paths kwargs.
+_CANARY_FIX = {
+    "mirror_drift": (_mirror_drift_canary, resync_mirror_drift),
+}
+
+
+def canary_fix(*, beacon: dict, **apply_kwargs) -> dict:
+    """Canary the fix mechanism, then apply to the real artifact; escalate if unproven."""
+    kind = beacon.get("kind_class")
+    entry = _CANARY_FIX.get(kind)
+    if entry is None:
+        return {"executor": "canary_fix", "healed": False, "canary_passed": False,
+                "error": f"no canary mechanism for class {kind!r} — cannot prove a fix"}
+    canary_fn, apply_fn = entry
+    try:
+        passed = bool(canary_fn())
+    except Exception as exc:  # pragma: no cover - defensive
+        return {"executor": "canary_fix", "healed": False, "canary_passed": False,
+                "error": f"canary raised: {exc}"}
+    if not passed:
+        return {"executor": "canary_fix", "healed": False, "canary_passed": False,
+                "error": "canary failed: fix mechanism not trusted, real artifact untouched"}
+    result = apply_fn(**apply_kwargs)
+    result["canary_passed"] = True
+    return result

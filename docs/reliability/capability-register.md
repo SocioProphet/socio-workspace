@@ -40,6 +40,8 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Policy-bound governance** (`policy.ResponsePolicy`) | ✅ | ✅ daemon loads declared policy | ✅ governs decide **and** rejects invalid | ✅ | `tests/test_policy.py` |
 | **stale_vendor detector** (`detectors.detect_stale_vendors`) | ✅ | ✅ scheduler `detectors` job | ✅ detect+escalate w/ report; waived not flagged | ✅ | `tests/test_stale_vendor_detector.py` |
 | **Escalation suppression** (`suppression.Suppressor`) | ✅ | ✅ daemon passes to `run_once` | ✅ suppress within cooldown; re-arm after; durable | ✅ | `tests/test_suppression.py` |
+| **quarantine executor** (`executors.quarantine`) | ✅ | ✅ action-level dispatch | ✅ isolate+record **and** subjectless→escalate | ✅ | `tests/test_canary_quarantine.py` |
+| **canary_fix executor** (`executors.canary_fix`) | ✅ | ✅ action-level dispatch | ✅ canary-then-heal **and** failed-canary→untouched+escalate | ✅ | `tests/test_canary_quarantine.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -106,10 +108,11 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
    surfaces a staleness report to a human rather than auto-acting). Still without detectors:
    `build_failure` (observe CI) and `policy_violation` — and both also need their own action
    machinery (gap 2) before a detector pays off.
-2. **Executor breadth (ACT).** `auto_fix→resync`/`reconcile` and now `propose_pr` (record a
-   reviewable proposal; open via an injected credentialed opener) are wired. Still missing:
-   `canary_fix` (canary then apply) and `quarantine` (isolate). `propose_pr` is safe by design —
-   the daemon records proposals, it never opens PRs with a standing credential.
+2. **Executor breadth (ACT) — complete.** Every action now has an executor: `auto_fix`
+   (`resync`/`reconcile`), `propose_pr` (record; open via an injected credentialed opener),
+   `canary_fix` (prove the mechanism on a guaranteed-input→provable-output canary, then apply;
+   escalate if unproven), `quarantine` (isolate + record), and `block` (terminal — refusing is
+   the action). No decision silently dead-ends: an executor that does not resolve escalates.
 3. **Learning loop ↔ kernel.** `lawful_learning/loop.py` is validated but disjoint from the
    responder. It becomes meaningful now that the slice produces a real receipt stream to learn
    from — improve Law/threshold choices from observed outcomes.

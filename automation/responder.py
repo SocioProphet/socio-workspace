@@ -60,6 +60,8 @@ EXECUTORS = {
 # reviewable PR proposal for any class the responder caps at propose_pr.
 ACTION_EXECUTORS = {
     "propose_pr": "propose_pr",
+    "canary_fix": "canary_fix",   # canary the mechanism, then apply; escalate if unproven
+    "quarantine": "quarantine",   # isolate + record; never auto-fix a policy breach
 }
 
 
@@ -169,7 +171,10 @@ def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> Non
         outcome = {"executor": fn_name, "healed": False, "proposed": False, "error": str(exc)}
 
     receipt["execution"] = outcome
-    resolved = bool(outcome.get("healed") or outcome.get("proposed"))
+    # Resolved iff the executor healed the artifact, filed a proposal, or quarantined the
+    # subject. Anything else (a failed canary, a proposal with nothing to file, a subjectless
+    # quarantine) is unresolved and escalates — no decision silently dead-ends.
+    resolved = bool(outcome.get("healed") or outcome.get("proposed") or outcome.get("quarantined"))
     if not resolved:
         receipt["action"] = "escalate_human"
         receipt["reason"] = f"{receipt.get('reason', '')} | executor '{fn_name}' did not resolve"

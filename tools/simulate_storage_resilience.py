@@ -17,9 +17,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from automation.mesh_topology import build_tree, depth, leaves, tree_healthy  # noqa: E402
+from automation.storage_placement import load_all  # noqa: E402
 from automation.storage_resilience import (  # noqa: E402
     BLOCK_REPLICATED, FLASH_LOCAL, OBJECT_DISPERSED, Placement, confidential,
-    disperse_shards, durable, max_seizable_nodes,
+    disperse_shards, disperse_with_replicas, durable, max_seizable_nodes,
     read_available_under_partition, write_consistent_under_partition,
 )
 
@@ -36,6 +37,18 @@ def _mc_seizure(nodes, placement, frac, trials, rng):
         dur += durable(survived, placement)
         con += confidential(seized_shards, placement)
     return dur / trials, con / trials
+
+
+def _mc_seizure_replicated(nodes, placement, frac, trials, rng):
+    """P(durable) with shard replication: a shard survives iff >=1 of its replica-nodes survives."""
+    placed = disperse_with_replicas(nodes, placement)  # shard_id -> [nodes]
+    n_seize = round(frac * len(nodes))
+    dur = 0
+    for _ in range(trials):
+        seized = set(rng.sample(nodes, n_seize))
+        survived_shards = sum(1 for copies in placed.values() if any(c not in seized for c in copies))
+        dur += durable(survived_shards, placement)
+    return dur / trials
 
 
 def report():
@@ -109,6 +122,23 @@ def report():
     print("  hot working set = leader's local NVMe (RWO). On a leadership ROTATION the volume")
     print("  re-homes to the new leader from the warm block replica — 'state follows TopoLVM',")
     print("  the volume follows the workload; no shared-disk single point, no cross-AZ RWO stall.")
+
+    # ── DECLARED, GOVERNED TIERS (registry/mesh-storage-placement.yaml) ───────────────────
+    print("\nDECLARED THREAT TIERS  (registry/mesh-storage-placement.yaml — reviewed config, not code)")
+    tiers = load_all()
+    order = [t for t in ("baseline", "hardened", "hostile") if t in tiers]
+    print(f"    {'tier':>9}  {'scheme':>16}  {'overhead':>8}  {'P(dur)@33%':>10}  {'P(dur)@50%':>10}  {'@66%':>7}")
+    for name in order:
+        p = tiers[name]
+        mc = _mc_seizure_replicated if p.shard_replicas > 1 else lambda n, pl, f, t, r: _mc_seizure(n, pl, f, t, r)[0]
+        d33 = mc(nodes, p, 0.33, 60_000, rng)
+        d50 = mc(nodes, p, 0.50, 60_000, rng)
+        d66 = mc(nodes, p, 0.66, 60_000, rng)
+        scheme = f"RS({p.rs_k},{p.rs_m})×{p.shard_replicas}"
+        print(f"    {name:>9}  {scheme:>16}  {p.durability_overhead:>7.2f}×  {d33:>10.5f}  {d50:>10.5f}  {d66:>7.5f}")
+    print("    baseline collapses past a third; hardened (more parity) holds a third; HOSTILE")
+    print("    (shard_replicas=2) survives PAST half — P(shard lost)=frac² — at 3× storage. The")
+    print("    posture is a declared tier the governance plane validates, swappable without a rebuild.")
 
     print("\nVERDICT: with parity sized to the threat (RS(9,9) here) the state is certain-durable")
     print("under a third of the mesh seized, confidential under ANY seizure (ciphertext),")

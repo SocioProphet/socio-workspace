@@ -31,6 +31,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Canonical envelope + EpistemicLevel** (`envelope.py`) | ✅ | ✅ beacons + receipts stamped | ✅ trace propagates; graded by outcome | ✅ | `tests/test_envelope.py` |
 | **Shared reasoning runtime** (`automation/reasoning/`) | ✅ | ✅ self-heal is its first adapter | ✅ decoupling proven in a fresh interpreter | ✅ | `tests/test_reasoning_core_decoupled.py` |
 | **Crystal Atlas graph-upsert** (`crystal_atlas.py`) | ✅ | ✅ decision→claim+evidence, durable emit | ✅ conforms to vendored graph-upsert-request.v0 (jsonschema) | ✅ | `tests/test_crystal_atlas_conformance.py` |
+| **Crystal Atlas live POST** (`post_graph_upserts.py`) | ✅ | ✅ `run_once(emit_graph=True)` records; `crystal-atlas-poster` CronJob drains+POSTs | ✅ bounded retry→dead-letter; blank endpoint no-ops | ✅ | `tests/test_post_graph_upserts.py` |
 | **WordOps incident router** (`wordops.py`) | ✅ | ✅ daemon routes escalations to outbox | ✅ escalate→A0/quarantine→A4; heals open no room | ✅ | `tests/test_wordops.py` |
 | End-to-end inbox→responder→kernel→decisions | ✅ | ✅ | ✅ | ✅ | `test_end_to_end_inbox_to_decisions` |
 | Responder canary (guaranteed in → provable verdict) | ✅ | ✅ | ✅ | ✅ | `test_canary_guaranteed_input…` |
@@ -166,6 +167,11 @@ estate*. Open, in order of how badly they bite:
   whose decision cycle crashes every tick reads **degraded** (`healthz` fails), not green — the
   residual "instruments lie" gap is closed (`tests/test_liveness_healthz.py`).
 - **Metrics/alerts unobserved** (gap 4 above) — still open; routing to WordOps is the fix.
+- **Crystal Atlas POST — produce/deliver split wired.** The daemon now records each decision as a
+  graph-upsert (`emit_graph=True`) and the `crystal-atlas-poster` CronJob drains+POSTs them with a
+  scoped token; the daemon itself holds no graph credential. Live *only* once the real endpoint is
+  set in `crystal-atlas-secrets` (blank = no-op, never a failure) — so this is wired end-to-end but
+  still dark until that endpoint exists, same as the image gap above.
 
 Each gap is a row that has not yet earned its rightmost column. When it does, it moves — and a
 test moves with it. The `Deploy integrity` row above earned its column by *failing on the actual

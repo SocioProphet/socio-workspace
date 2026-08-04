@@ -285,7 +285,8 @@ def run_once(inbox: Optional[DurableQueue] = None,
              execute: bool = False,
              executor_paths: Optional[dict] = None,
              policy: Optional[ResponsePolicy] = None,
-             suppressor=None) -> List[dict]:
+             suppressor=None,
+             emit_graph: bool = False) -> List[dict]:
     """Drain the beacon inbox, decide each, emit decision receipts. Returns the receipts.
 
     With ``execute=True`` a decided auto_fix is carried out by its registered executor
@@ -294,6 +295,8 @@ def run_once(inbox: Optional[DurableQueue] = None,
     ``policy`` governs the decision (default: the opinionated DEFAULT_POLICY). When a
     ``suppressor`` is provided, a condition already decided within the policy cooldown is
     skipped, so a persistent (e.g. cross-repo) failure is not re-escalated every cycle.
+    With ``emit_graph=True`` each decision is recorded as a Crystal Atlas graph-upsert
+    (claim + evidence) for a credentialed job to POST to the shared graph.
     """
     from collections import OrderedDict
 
@@ -328,6 +331,9 @@ def run_once(inbox: Optional[DurableQueue] = None,
         if execute:
             primary = max(group, key=lambda b: _EVIDENCE_WEIGHT.get(evidence_verdict(b), 0))
             _execute(primary, receipt, executor_paths)
+        if emit_graph:
+            from automation import crystal_atlas  # lazy: domain adapter, keeps import light
+            crystal_atlas.emit_graph_upsert(receipt, group)
         decisions.put(receipt)
         out.append(receipt)
     return out

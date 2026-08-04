@@ -369,6 +369,7 @@ class RegistryScheduler:
                 execute=True,
                 policy=load_policy(),
                 suppressor=Suppressor(state_dir() / "suppressions.json"),
+                emit_graph=True,  # record each decision as a Crystal Atlas claim+evidence upsert
             )
             if receipts:
                 logger.info("Responder decided on %d beacon(s)", len(receipts))

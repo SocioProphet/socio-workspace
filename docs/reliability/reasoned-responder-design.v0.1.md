@@ -117,3 +117,37 @@ The responder is itself a control, so it must be shown to *refuse*, not only to 
 4. Bind three playbooks (drift re-sync, re-vendor plan, propagation rollback) behind the
    decision, each with the both-ways tests of §5.
 5. Only then remove `observe_and_beacon`'s "deferred" default.
+
+## v0.1.1 — closing the loop: recorded proposal → opened fix PR
+
+The responder decides `propose_pr` and records a proposal, but recording is not
+remediation until a PR actually exists. The credential split makes that safe:
+
+- **The daemon has no credentials.** `propose_pr` durably records the proposal
+  (branch, base, files, title, body, provenance) to the state volume and returns
+  `proposed: true`. It never touches a remote.
+- **A credentialed CronJob opens it.** `automation.open_recorded_proposals` drains
+  recorded proposals and, for each, checks out the target repo and calls
+  `automation.pr_opener.open_pr` — create branch from base, write the proposed
+  files, commit, push `--force-with-lease`, `gh pr create`. It **opens, never
+  merges**, so every self-healed change still passes human review, and the
+  CI-workflow / token-change review guardrail is never bypassed.
+
+Properties:
+
+- **Fail-closed.** Any git/gh non-zero exit raises; a partial push never reports
+  success. A proposal whose files escape the repo, or that is malformed, is rejected.
+- **Idempotent.** Re-running reuses an existing open PR for the branch and rewrites
+  the same files — the same proposal converges on one PR.
+- **Bounded retry, then dead-letter.** A transient failure is re-queued for the next
+  run; after `MAX_ATTEMPTS` it moves to a dead-letter queue and the run fails loudly.
+  This is the deliberate refusal of the "retry masquerades as a fix" trap — a proposal
+  can never silently retry forever while looking healthy.
+
+This is what makes *"the next red opens its own fix PR"* real: a detected failure
+becomes a beacon, the responder reasons a verdict, and — for classes it caps at
+`propose_pr` — a reviewable fix PR appears, on a human's desk, with provenance.
+
+Remaining wiring: the per-class **beacon producers** that turn a specific CI-red
+shape (name/version drift, moving-tag, lockfile break, layout) into a proposal with
+a concrete patch. The mechanism is now in place for them to target.

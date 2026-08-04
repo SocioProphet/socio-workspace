@@ -88,3 +88,37 @@ def _run_all():
 
 if __name__ == "__main__":
     raise SystemExit(_run_all())
+
+
+# ── deploy-regression → git-revert (the "still self-heals if it slips the canary" path) ──────
+from automation.beacon_producers import propose_deploy_revert  # noqa: E402
+
+DEPLOY_POLICY = dataclasses.replace(
+    DEFAULT_POLICY,
+    law_by_kind={**DEFAULT_POLICY.law_by_kind, "deploy_regression": "weak"},
+)
+
+
+def test_deploy_revert_beacon_carries_the_revert():
+    b = propose_deploy_revert(repo="SocioProphet/prophet-platform", bad_commit="deadbeef1234",
+                              app_name="search-api", reason="Degraded: 6/10 pods CrashLoopBackOff")
+    assert b["kind_class"] == "deploy_regression"
+    assert b["proposal"]["revert"] == "deadbeef1234"
+    assert "files" not in b["proposal"]
+    assert b["proposal"]["branch"].startswith("self-heal/deploy_regression/revert-")
+
+
+def test_deploy_regression_end_to_end_opens_a_revert_pr(tmp_path):
+    b = propose_deploy_revert(repo="SocioProphet/prophet-platform", bad_commit="deadbeef1234",
+                              app_name="search-api", reason="sync failed")
+    receipt = decide(b, policy=DEPLOY_POLICY)
+    assert receipt["action"] == "propose_pr", receipt
+
+    seen = {}
+    def fake_opener(proposal, *, repo_dir):
+        seen["revert"] = proposal.get("revert")
+        return "https://example/pr/rollback-1"
+
+    sealed = remediate(b, receipt, opener=fake_opener, repo_dir=tmp_path)
+    assert sealed["converged"] is True and sealed["pr_url"] == "https://example/pr/rollback-1"
+    assert seen["revert"] == "deadbeef1234"     # the loop reverts the offending commit

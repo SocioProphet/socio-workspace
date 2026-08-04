@@ -38,13 +38,12 @@ def _subprocess_runner(argv, *, cwd: Optional[Path] = None) -> RunResult:
 
 
 def _valid(proposal: dict) -> bool:
-    return (
-        isinstance(proposal, dict)
-        and bool(proposal.get("title"))
-        and bool(proposal.get("branch"))
-        and isinstance(proposal.get("files"), dict)
-        and len(proposal["files"]) > 0
-    )
+    if not (isinstance(proposal, dict) and proposal.get("title") and proposal.get("branch")):
+        return False
+    # A proposal fixes forward (write files) OR reverts a bad commit — exactly one.
+    has_files = isinstance(proposal.get("files"), dict) and len(proposal["files"]) > 0
+    has_revert = isinstance(proposal.get("revert"), str) and bool(proposal.get("revert"))
+    return has_files or has_revert
 
 
 def open_pr(
@@ -60,7 +59,7 @@ def open_pr(
     exists it is reused, and re-running writes the same files to the same branch.
     """
     if not _valid(proposal):
-        raise ValueError("proposal must carry title, branch, and at least one file change")
+        raise ValueError("proposal must carry title, branch, and either file changes or a `revert` commit")
 
     repo_dir = Path(repo_dir)
     branch = proposal["branch"]
@@ -79,21 +78,25 @@ def open_pr(
     run(["git", "fetch", "origin", base])
     run(["git", "checkout", "-B", branch, f"origin/{base}"])
 
-    # 2. Materialize the proposed files (paths are repo-relative).
-    changed = []
-    for rel, content in proposal["files"].items():
-        dest = repo_dir / rel
-        if ".." in Path(rel).parts:
-            raise ValueError(f"proposal file escapes the repo: {rel!r}")
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(content, encoding="utf-8")
-        changed.append(rel)
-    run(["git", "add", "--", *changed])
-
-    # 3. Commit only if there is a delta (a re-run with identical content is a no-op).
-    status = run(["git", "status", "--porcelain"])
-    if status.stdout.strip():
-        run(["git", "commit", "-m", title])
+    # 2. Produce the change — either revert a bad commit, or write forward-fix files.
+    if proposal.get("revert"):
+        # git revert creates its own commit; --no-edit keeps it non-interactive. A bad deploy
+        # heals by reverting the offending commit, not by hand-patching over it.
+        run(["git", "revert", "--no-edit", str(proposal["revert"])])
+    else:
+        changed = []
+        for rel, content in proposal["files"].items():
+            dest = repo_dir / rel
+            if ".." in Path(rel).parts:
+                raise ValueError(f"proposal file escapes the repo: {rel!r}")
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(content, encoding="utf-8")
+            changed.append(rel)
+        run(["git", "add", "--", *changed])
+        # commit only if there is a delta (a re-run with identical content is a no-op).
+        status = run(["git", "status", "--porcelain"])
+        if status.stdout.strip():
+            run(["git", "commit", "-m", title])
 
     # 4. Push the branch (safe: only ever this self-heal branch, never base).
     run(["git", "push", "--force-with-lease", "-u", "origin", branch])

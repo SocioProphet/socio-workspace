@@ -81,3 +81,53 @@ def propose_derived_content_fix(
         },
         "observed_at": _now(),
     }
+
+
+def propose_deploy_revert(
+    *,
+    repo: str,
+    bad_commit: str,
+    app_name: str,
+    reason: str,
+    kind_class: str = "deploy_regression",
+    branch: Optional[str] = None,
+    base: str = "main",
+) -> dict:
+    """Beacon (with a REVERT proposal) for a deploy regression.
+
+    An Argo app went unhealthy on a known git commit. The corrective action is a revert of that
+    commit — and it must be a git revert, because Argo CD ``selfHeal: true`` re-applies git, so an
+    in-cluster rollback gets undone; only reverting the offending commit sticks. This is the
+    "if a bad merge slips the canary, it STILL self-heals" path: detect unhealthy -> this beacon
+    -> reasoned responder -> a reviewed revert PR (governed to ``propose_pr``, never a silent
+    force-push to prod). Shaped to pass the responder's fences (no boundary axis; IRI 0;
+    reproducible detector), so ``meet(class-law, evidence)`` decides.
+    """
+    short = str(bad_commit)[:12]
+    branch = branch or f"self-heal/{kind_class}/revert-{short}"
+    title = f"revert(self-heal): {short} — {app_name} regressed in prod"
+    body = (
+        f"Argo app `{app_name}` went unhealthy on commit `{bad_commit}`.\n\n"
+        f"- **reason:** {reason}\n"
+        f"- **why a revert (not a patch):** Argo CD `selfHeal: true` re-applies git, so the only "
+        f"rollback that sticks is reverting the offending commit.\n"
+        f"- **why a PR (not auto-merge):** a production revert is reviewed.\n\n"
+        f"Opened by the self-heal responder (class `{kind_class}`)."
+    )
+    return {
+        "kind_class": kind_class,
+        "system": f"{repo}@{short}",
+        "evidence": {"detector": "deploy_health", "reproducible": True, "stale": False},
+        "evidence_ref": f"argocd://app/{app_name}",
+        "plan": {},  # reverting an in-repo commit breaches no Ring-1 boundary axis
+        "detail": {"app": app_name, "bad_commit": bad_commit, "reason": reason},
+        "proposal": {
+            "repo": repo,
+            "base": base,
+            "branch": branch,
+            "title": title,
+            "revert": bad_commit,
+            "body": body,
+        },
+        "observed_at": _now(),
+    }

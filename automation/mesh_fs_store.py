@@ -43,11 +43,16 @@ class MeshFsStore:
             return None            # absent node/fragment == unreachable, not corrupt
 
     # ── fragment I/O (put/get seams for leaf_propagation) ────────────────────────────────────
-    def put(self, node: str, frag: int, data: bytes) -> None:
-        self._write_atomic(self._node_dir(node) / f"frag-{int(frag)}", data)
+    def put(self, node: str, frag, data: bytes) -> None:
+        self._write_atomic(self._node_dir(node) / self._frag_name(frag), data)
 
-    def get(self, node: str, frag: int) -> Optional[bytes]:
-        return self._read(self._node_dir(node) / f"frag-{int(frag)}")
+    def get(self, node: str, frag) -> Optional[bytes]:
+        return self._read(self._node_dir(node) / self._frag_name(frag))
+
+    @staticmethod
+    def _frag_name(frag) -> str:
+        # frag is a content-scoped id ("<root>#<i>"); hash it to a safe, fixed filename.
+        return "frag-" + hashlib.sha256(str(frag).encode("utf-8")).hexdigest()
 
     # ── blob I/O (put_blob/get_blob seams for manifest_store) ─────────────────────────────────
     def put_blob(self, node: str, key: str, data: bytes) -> None:

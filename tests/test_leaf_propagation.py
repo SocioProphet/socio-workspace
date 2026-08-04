@@ -62,8 +62,8 @@ def test_byzantine_fragment_is_routed_around():
     leaf = os.urandom(60)
     m = propagate(leaf, nodes=NODES, put=put, placement=P)
     x = list(m.fragment_nodes)[3]
-    node = m.fragment_nodes[x][0]
-    store[(node, x)] = bytes([store[(node, x)][0] ^ 0xFF]) + store[(node, x)][1:]  # corrupt it
+    key = (m.fragment_nodes[x][0], f"{m.root}#{x}")   # content-scoped fragment key
+    store[key] = bytes([store[key][0] ^ 0xFF]) + store[key][1:]  # corrupt it
     assert fetch(m, get=get) == leaf  # n=9 > k=6 slack -> a clean subset verifies the root
 
 
@@ -73,8 +73,8 @@ def test_too_much_corruption_raises_integrity_error():
     leaf = os.urandom(60)
     m = propagate(leaf, nodes=NODES, put=put, placement=P)
     for x in list(m.fragment_nodes)[:4]:
-        node = m.fragment_nodes[x][0]
-        store[(node, x)] = bytes([store[(node, x)][0] ^ 0xFF]) + store[(node, x)][1:]
+        key = (m.fragment_nodes[x][0], f"{m.root}#{x}")
+        store[key] = bytes([store[key][0] ^ 0xFF]) + store[key][1:]
     try:
         fetch(m, get=get)
     except IntegrityError:

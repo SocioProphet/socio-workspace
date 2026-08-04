@@ -199,3 +199,37 @@ def optimal_tier(placements: Dict[str, "object"], *, threat_frac: float, value_o
     # (over-provisioning is the cheap mistake, under-provisioning the ruinous one — loss aversion).
     ranked.sort(key=lambda c: (c.expected_value, c.overhead), reverse=True)
     return ranked[0].tier, ranked
+
+
+# ── the stateful control step (what the live detector runs each cycle) ───────────────────────
+#
+# The controller needs MEMORY: the dwell counter and the level currently in force. `step` is the
+# pure transition — (reports, previous state, policy) -> (new state, assessment) — so the detector
+# that wires it into the loop stays a thin I/O shell and the hysteresis logic is unit-testable.
+# It APPLIES the assessment to the runtime posture: escalation raises the level immediately;
+# a de-escalation (only reached after the dwell) lowers it toward the declared floor (baseline is
+# the lowest tier, so the runtime posture never drops below the human-sanctioned minimum). Either
+# transition resets the dwell; a hold accumulates it while the raw level sits below the level in
+# force. The runtime posture IS the actuation — the mesh reads this state for new writes.
+
+@dataclass(frozen=True)
+class MeshThreatState:
+    level: str = "calm"
+    calm_dwell: int = 0
+
+
+def step(reports: Sequence[VantageReport], state: MeshThreatState, policy: ThreatPolicy,
+         *, quorum: int = 3) -> "tuple":
+    """One control cycle: aggregate -> assess -> apply to the runtime posture. Returns
+    ``(new_state, assessment)``. Pure: no I/O, so it is fully testable."""
+    sig = aggregate_vantages(reports, quorum=quorum)
+    a = assess_threat(sig, previous_level=state.level, calm_dwell=state.calm_dwell, policy=policy)
+    if a.actuation == "auto_escalate":
+        new_state = MeshThreatState(level=a.level, calm_dwell=0)
+    elif a.actuation == "propose_deescalate":
+        new_state = MeshThreatState(level=a.proposed_level, calm_dwell=0)  # bounded at baseline floor
+    else:  # hold — accumulate the calm streak while raw sits below the level in force
+        raw = _raw_level(sig, policy)
+        streak = state.calm_dwell + 1 if _rank(raw) < _rank(state.level) else 0
+        new_state = MeshThreatState(level=state.level, calm_dwell=streak)
+    return new_state, a

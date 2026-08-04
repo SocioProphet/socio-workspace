@@ -426,6 +426,102 @@ def detect_macro_triad_divergence(*, receipts_path: Optional[Path] = None) -> Li
     return out
 
 
+_MESH_VANTAGE_REPORTS = _ROOT / "status" / "mesh-vantage-reports.json"
+_MESH_THREAT_STATE = _ROOT / "status" / "mesh-threat-state.json"
+
+
+def _load_threat_policy_optional():
+    """The declared threat policy, or None if it isn't declared / won't load (defensive)."""
+    try:
+        from automation.mesh_threat import load_threat_policy
+        return load_threat_policy()
+    except Exception:  # noqa: BLE001 — a bad/absent policy must not crash the detector
+        return None
+
+
+def _write_state_atomic(path: Path, doc: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp.replace(path)  # atomic: a reader sees the old or new posture, never a partial one
+
+
+def detect_mesh_threat(*, reports_path: Optional[Path] = None,
+                       state_path: Optional[Path] = None) -> List[dict]:
+    """ADAPT the mesh posture to the sensed threat, and beacon every level transition.
+
+    The mesh's nodes publish per-vantage reports; this resolves them HOLOGRAPHICALLY (a quorum
+    median, robust to a lying/partitioned minority), runs the escalate-fast / de-escalate-slow
+    control step, and PERSISTS the runtime posture (status/mesh-threat-state.json) — which is the
+    actuation: the mesh reads that tier for new writes. A beacon is emitted only on a level CHANGE:
+    an escalation into a higher tier (auto-applied; page-worthy at hostile) or a reviewed
+    de-escalation. Producer-gated and defensive: no reports, or no declared threat_policy, is a
+    safe no-op; a rising threat is applied without waiting for a human (more resilience is safe)."""
+    from automation.mesh_threat import MeshThreatState, VantageReport, step
+
+    policy = _load_threat_policy_optional()
+    if policy is None:
+        return []  # no declared adaptation rule -> do not act
+    rpath = Path(reports_path) if reports_path is not None else _MESH_VANTAGE_REPORTS
+    try:
+        doc = json.loads(rpath.read_text("utf-8"))
+    except (FileNotFoundError, ValueError):
+        return []  # no vantage reports published -> cannot sense -> nothing (producer-gated)
+    if not isinstance(doc, dict) or not isinstance(doc.get("reports"), list) or not doc["reports"]:
+        return []
+    quorum = int(doc.get("quorum", 3) or 3)
+
+    reports = []
+    for r in doc["reports"]:
+        if not isinstance(r, dict):
+            continue
+        try:
+            reports.append(VantageReport(
+                vantage=str(r.get("vantage", "?")),
+                unreachable_fraction=float(r.get("unreachable_fraction", 0.0)),
+                anomalies_seen=int(r.get("anomalies_seen", 0)),
+                partition_suspected=bool(r.get("partition_suspected", False)),
+            ))
+        except (TypeError, ValueError):
+            continue  # a malformed report is dropped; the quorum simply shrinks (fail toward blind)
+    if not reports:
+        return []
+
+    spath = Path(state_path) if state_path is not None else _MESH_THREAT_STATE
+    try:
+        prev = json.loads(spath.read_text("utf-8"))
+        prior = MeshThreatState(level=str(prev.get("level", "calm")),
+                                calm_dwell=int(prev.get("calm_dwell", 0)))
+    except (FileNotFoundError, ValueError, TypeError):
+        prior = MeshThreatState()
+
+    new_state, assessment = step(reports, prior, policy, quorum=quorum)
+    _write_state_atomic(spath, {
+        "level": new_state.level, "calm_dwell": new_state.calm_dwell,
+        "tier": assessment.tier if assessment.actuation != "propose_deescalate" else assessment.proposed_tier,
+        "actuation": assessment.actuation, "updated_at": _now(),
+    })
+
+    if new_state.level == prior.level:
+        return []  # no transition — posture unchanged, nothing to beacon
+    escalated = assessment.actuation == "auto_escalate"
+    return [{
+        "kind_class": "deploy_regression",
+        "system": "mesh::threat-posture",
+        # Warrantless: the tier change is APPLIED via the state file; this beacon is the audit /
+        # page. Escalation is auto (safe); a de-escalation is the reviewed direction.
+        "detail": {
+            "condition": ("threat ESCALATED — harder placement tier auto-applied"
+                          if escalated else "threat cleared — de-escalation applied (reviewed direction)"),
+            "from_level": prior.level,
+            "to_level": new_state.level,
+            "tier": new_state.level,
+            "reasons": list(assessment.reasons),
+        },
+        "observed_at": _now(),
+    }]
+
+
 # Registered detectors: each is a keyword-arg callable returning None, a beacon, or a list.
 DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
     detect_mirror_drift,
@@ -435,6 +531,7 @@ DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
     detect_policy_violations,
     detect_build_failures,
     detect_macro_triad_divergence,
+    detect_mesh_threat,
 ]
 
 

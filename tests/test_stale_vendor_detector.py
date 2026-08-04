@@ -59,9 +59,31 @@ def test_detects_only_unwaived_stale(register):
     b = beacons[0]
     assert b["kind_class"] == "stale_vendor"
     assert b["evidence"]["detector"] == "vendor_freshness.compute_state"
-    assert b["detail"]["vendored_version"] == "1.0.0"
-    assert b["detail"]["upstream_latest_version"] == "2.0.0"
+    assert b["detail"]["version_scheme"] == "semver"
+    assert b["detail"]["vendored_ref"] == "1.0.0"        # scheme-appropriate typed identity
+    assert b["detail"]["upstream_ref"] == "2.0.0"
     assert "proposal" not in b                    # no locally-computable fix
+
+
+def test_commit_scheme_carries_shas_not_null(tmp_path):
+    # the real defect: a commit-scheme vendor had null vendored_version; the identity must
+    # now land in the scheme-appropriate typed fields, not only in the prose reason.
+    reg = tmp_path / "reg.yaml"
+    reg.write_text(textwrap.dedent("""\
+        sources:
+          - source_id: schemas
+            version_scheme: commit
+            upstream_latest_commit: 90c1384032cc069738d273df8e9877d46ec2820f
+        artifacts:
+          - artifact_id: schemas@consumer
+            source_id: schemas
+            vendored_commit: 487e4b614b79e556af3aea2c70471eca13281377
+            disposition: remediation-required
+    """), encoding="utf-8")
+    b = detectors.detect_stale_vendors(register_path=reg)[0]
+    assert b["detail"]["version_scheme"] == "commit"
+    assert b["detail"]["vendored_ref"] == "487e4b614b79e556af3aea2c70471eca13281377"
+    assert b["detail"]["upstream_ref"] == "90c1384032cc069738d273df8e9877d46ec2820f"
 
 
 def test_no_stale_no_beacons(tmp_path):

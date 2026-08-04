@@ -14,9 +14,12 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 # preflight in automation.scheduler fails fast if any of these is missing.
 COPY automation/ ./automation/
 COPY registry/ ./registry/
-COPY third_party/ ./third_party/   # vendored procyber.semantic kernel (the responder's core)
-COPY engines/ ./engines/           # mirror_drift_engine etc. (executors + detectors)
-COPY tools/ ./tools/               # check_/lift_/generate_/validate_ CLIs the detectors run
+# vendored procyber.semantic kernel (the responder's core)
+COPY third_party/ ./third_party/
+# mirror_drift_engine etc. (executors + detectors)
+COPY engines/ ./engines/
+# check_/lift_/generate_/validate_ CLIs the detectors run
+COPY tools/ ./tools/
 
 ENV PYTHONUNBUFFERED=1
 

@@ -1,0 +1,30 @@
+# registry/triad-rotation.yaml
+# Declared, governed rotation schedule for the k3s master triad (the "k3 regime").
+#
+# The three masters are the vertices of a triangle; the leader/writer role rotates 120° around
+# it each epoch (the cyclic group C3). Over every full turn of 3 epochs each master holds each
+# role exactly once — triangular evenness. Deterministic: every master and the receipt verifier
+# (automation/triad_rotation.py) compute the same assignment from this file + the clock, with no
+# leader election. Loaded and VALIDATED by triad_rotation.load_schedule (an uneven step is
+# rejected here, not silently tolerated).
+#
+# Set `masters` to the real k3s HA control-plane identities. The order is the triangle's vertex
+# order (A -> B -> C); rotation walks it.
+
+masters:
+  - did:web:master-a.k3s.socioprophet.io
+  - did:web:master-b.k3s.socioprophet.io
+  - did:web:master-c.k3s.socioprophet.io
+
+# Rotation step in units of 120° turns per epoch. Must be coprime with 3 (1 or 2) so a full turn
+# visits every vertex. 1 = walk A->B->C; 2 = walk A->C->B (the reverse orientation).
+step: 1
+
+# Epoch length in seconds. 3600 = rotate the leader hourly (each master leads 8h/day — a
+# reasonable density: frequent enough to bound single-master exposure, slow enough that a
+# rotation is cheap relative to a control-plane epoch).
+period_s: 3600
+
+# Schedule origin (unix seconds). 0 anchors epoch 0 at the unix epoch; set to a deployment t0
+# to align rotations with a known boundary.
+phase_s: 0

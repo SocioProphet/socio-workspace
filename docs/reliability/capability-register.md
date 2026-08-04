@@ -42,6 +42,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Escalation suppression** (`suppression.Suppressor`) | ✅ | ✅ daemon passes to `run_once` | ✅ suppress within cooldown; re-arm after; durable | ✅ | `tests/test_suppression.py` |
 | **quarantine executor** (`executors.quarantine`) | ✅ | ✅ action-level dispatch | ✅ isolate+record **and** subjectless→escalate | ✅ | `tests/test_canary_quarantine.py` |
 | **canary_fix executor** (`executors.canary_fix`) | ✅ | ✅ action-level dispatch | ✅ canary-then-heal **and** failed-canary→untouched+escalate | ✅ | `tests/test_canary_quarantine.py` |
+| **workspace-lock detector** (`detectors.detect_workspace_lock_drift`) | ✅ | ✅ scheduler `detectors` job (network-gated) | ✅ drift→propose; in-sync/no-resolver→none | ✅ | `tests/test_workspace_lock_detector.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -103,11 +104,10 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
 
 ## Not yet on the board (honest gaps, ranked by leverage)
 
-1. **Detector breadth for the remaining classes (SENSE).** `stale_vendor` now flows end-to-end
-   as detect→escalate (its real fix is a cross-repo re-vendor, not locally computable, so it
-   surfaces a staleness report to a human rather than auto-acting). Still without detectors:
-   `build_failure` (observe CI) and `policy_violation` — and both also need their own action
-   machinery (gap 2) before a detector pays off.
+1. **Detector breadth for the remaining classes (SENSE).** `stale_vendor` (detect→escalate) and
+   `workspace_lock_drift` (network-gated detect→propose the freshly resolved lock) now flow
+   end-to-end. Still without detectors: `build_failure` (observe CI) and `policy_violation` —
+   nothing emits their beacons yet.
 2. **Executor breadth (ACT) — complete.** Every action now has an executor: `auto_fix`
    (`resync`/`reconcile`), `propose_pr` (record; open via an injected credentialed opener),
    `canary_fix` (prove the mechanism on a guaranteed-input→provable-output canary, then apply;

@@ -225,6 +225,16 @@ rules:
   # of those seams is a place a change can silently invalidate the layer next to it,
   # and none of them had a rule until now.
 
+  # Split by lane. superconscious is a member of BOTH interpretability-harness and
+  # lawful-learning, and one rule covering all three schema families notified only the
+  # interpretability co-parties -- a lawful-learning schema could change and the repos
+  # that answer to it heard nothing.
+  #
+  # Targets are chosen by whether the change actually concerns them, NOT to make the
+  # coverage number reach 100%. prophet-platform and sourceos-continuum are active
+  # co-parties of this lane but a schema edit does not change an image build or a PaaS,
+  # so they are deliberately absent and the coverage metric will read ~75%. Notifying
+  # them to close a gap is how notifications become noise and then get ignored.
   - id: interpretability-schema-change
     trigger:
       repo: superconscious
@@ -232,7 +242,6 @@ rules:
       branches: [main]
       paths:
         - "schemas/interpretability/**"
-        - "schemas/lawful-learning/**"
         - "schemas/composition/**"
     propagate_to:
       - repo: Noetica
@@ -244,7 +253,39 @@ rules:
         pr_title: "chore(vendor): re-vendor superconscious interpretability schemas"
       - repo: noetica-impair
         action: notify
-        message: "superconscious schemas changed — run the conformance suite; drift_against_upstream must be clean before any emitted fragment is trusted"
+        message: "superconscious interpretability/composition schemas changed — run the conformance suite; drift_against_upstream must be clean before any emitted fragment is trusted"
+      - repo: ProCybernetica
+        action: notify
+        message: "superconscious composition schemas changed — the tier-2 binding encodes ProCybernetica composition doctrine; confirm the 14 fragment kinds and 10 non_claims still match"
+      - repo: sociosphere
+        action: notify
+        message: "superconscious schemas changed — the interpretability-harness lane registration pins the fragment list and schema paths; revalidate"
+    max_cascade_depth: 2
+
+  # The lawful-learning half, which previously had no rule at all.
+  - id: lawful-learning-schema-change
+    trigger:
+      repo: superconscious
+      events: [push, release]
+      branches: [main]
+      paths:
+        - "schemas/lawful-learning/**"
+    propagate_to:
+      - repo: noetica-impair
+        action: notify
+        message: "lawful-learning schemas changed — the claim ledger (M/T/S/E/G), circuit registry and forbidden-circuit checks are implemented against them; re-run conformance"
+      - repo: ProCybernetica
+        action: notify
+        message: "lawful-learning schemas changed — confirm they still express ProCybernetica doctrine"
+      - repo: systems-learning-loops
+        action: notify
+        message: "lawful-learning schemas changed — review loop conformance"
+      - repo: agentplane
+        action: notify
+        message: "lawful-learning schemas changed — review runtime evidence emission against the new shape"
+      - repo: sociosphere
+        action: notify
+        message: "lawful-learning schemas changed — revalidate the lawful-learning lane registration"
     max_cascade_depth: 2
 
   - id: interpretability-executor-change

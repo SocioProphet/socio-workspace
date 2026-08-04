@@ -4,7 +4,7 @@
   "composed_by": "tools/compose_self_documentation.py",
   "inputs": {
     "assets": "sha256:687f0d875f4c281b9a527bf979002c8fbc3793ac52907b5dedfb19195cbf9b15",
-    "atlas": "sha256:b7500db2f561362933324473eb6167ab663e13d0a4c2fc9172c01a34562bab66",
+    "atlas": "sha256:e4da85c1f11a0fb92a84176ecbc44f0e15d8e1f402576c1b98ac58f8f8e36b37",
     "edges": "sha256:5634d28ce6d97c906016f75d7c62d705a3f9a57834cde46205bee4dcf5680bfd",
     "estate_edges": "sha256:4035a2330098f72258b074323e6e98c656ffdf1e61413ba030c84a238c67b7b9",
     "estate_graph": "sha256:32449dd42a7b88804698f9bb3b29f9de12f83b75f1a74e7708a181d1ce419544",

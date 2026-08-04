@@ -31,8 +31,15 @@ from automation.storage_placement import load_runtime_placement
 from automation.storage_resilience import Placement
 
 # put(node, fragment_id, fragment_bytes) -> None ; get(node, fragment_id) -> bytes | None
-PutFn = Callable[[str, int, bytes], None]
-GetFn = Callable[[str, int], Optional[bytes]]
+# The fragment_id is CONTENT-SCOPED ("<root>#<index>") so different leaves — many files in a Drive —
+# never collide on the same (node, index) slot. Without this, every file's shard-3 overwrites the
+# last (the shard->node placement is identical for every leaf); the Drive exposed it immediately.
+PutFn = Callable[[str, str, bytes], None]
+GetFn = Callable[[str, str], Optional[bytes]]
+
+
+def _frag_key(root: str, index: int) -> str:
+    return f"{root}#{index}"
 
 
 class LeafUnavailable(Exception):
@@ -88,11 +95,12 @@ def propagate(leaf: bytes, *, nodes: Sequence[str], put: PutFn,
     placement = placement if placement is not None else load_runtime_placement()
     k, n, r = placement.rs_k, placement.rs_n, placement.shard_replicas
     d = disperse(leaf, k, n)
+    root = merkle_root(leaf)
     mapping = _place(nodes, d.xs, r)
     for x, node_list in mapping.items():
         for node in node_list:
-            put(node, x, d.fragments[x])
-    return PropagationManifest(root=merkle_root(leaf), k=k, n=n, orig_len=d.orig_len,
+            put(node, _frag_key(root, x), d.fragments[x])
+    return PropagationManifest(root=root, k=k, n=n, orig_len=d.orig_len,
                                tier=tier, replicas=r, fragment_nodes=mapping)
 
 
@@ -114,7 +122,7 @@ def fetch(manifest: PropagationManifest, *, get: GetFn,
             if reachable is not None and node not in reachable:
                 continue
             try:
-                b = get(node, x)
+                b = get(node, _frag_key(manifest.root, x))
             except Exception:  # noqa: BLE001 — an errored fetch is an unreachable copy, not a healthy one
                 b = None
             if b is not None:

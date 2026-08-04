@@ -83,12 +83,12 @@ class MeshHttpStore:
         except (URLError, OSError):
             return None                # node down / partitioned -> unreachable, not healthy
 
-    def put(self, node: str, frag: int, data: bytes) -> None:
-        self._put(f"{self.node_urls[node]}/frag/{int(frag)}", data)
+    def put(self, node: str, frag, data: bytes) -> None:
+        self._put(f"{self.node_urls[node]}/frag/{quote(str(frag), safe='')}", data)
 
-    def get(self, node: str, frag: int) -> Optional[bytes]:
+    def get(self, node: str, frag) -> Optional[bytes]:
         base = self.node_urls.get(node)
-        return None if base is None else self._get(f"{base}/frag/{int(frag)}")
+        return None if base is None else self._get(f"{base}/frag/{quote(str(frag), safe='')}")
 
     def put_blob(self, node: str, key: str, data: bytes) -> None:
         self._put(f"{self.node_urls[node]}/blob/{quote(key, safe='')}", data)

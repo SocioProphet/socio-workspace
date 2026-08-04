@@ -77,6 +77,7 @@ DEFAULT_POLICY = ResponsePolicy(
         "vendored_graph_drift": "sealed",
         "build_failure": "probable",
         "stale_vendor": "weak",
+        "workspace_lock_drift": "weak",  # bumps pins -> propose for review, never auto-apply
         "policy_violation": "quarantine",
         "unknown": "refuse",
     },

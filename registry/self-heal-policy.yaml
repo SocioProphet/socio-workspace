@@ -18,6 +18,7 @@ law_by_kind:
   vendored_graph_drift: sealed    # derived artifact reconcilable via the lift
   build_failure: probable
   stale_vendor: weak              # cross-repo re-vendor: propose/escalate, never auto-act
+  workspace_lock_drift: weak      # regenerating bumps pinned refs: propose for review
   policy_violation: quarantine
   unknown: refuse                 # fail-closed for an unrecognized class
 

@@ -19,6 +19,9 @@ A detector must be honest three ways:
 from __future__ import annotations
 
 import importlib.util
+import json
+import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, List, Optional, Union
@@ -176,11 +179,78 @@ def detect_stale_vendors(*, register_path: Optional[Path] = None) -> List[dict]:
     return beacons
 
 
+_WSLOCK_TOOL = _ROOT / "tools" / "generate_workspace_resolved_lock.py"
+_WSLOCK_ARTIFACT = _ROOT / "manifest" / "workspace.resolved.lock.json"
+
+
+def _lock_identity(text: str) -> str:
+    """Content identity of a resolved lock, ignoring the volatile generated_at timestamp."""
+    try:
+        data = json.loads(text)
+    except (ValueError, TypeError):
+        return text
+    if isinstance(data, dict):
+        data.pop("generated_at", None)
+    return json.dumps(data, sort_keys=True)
+
+
+def detect_workspace_lock_drift(*, resolver_args: Optional[List[str]] = None,
+                                lock_path: Optional[Path] = None) -> Optional[dict]:
+    """Network-gated: propose a refresh when the committed resolved lock drifts from resolution.
+
+    A resolved lock pins repo refs to SHAs; regenerating it tracks LIVE upstream, so it must
+    NOT be silently auto-applied — the responder caps `workspace_lock_drift` at propose_pr and
+    the beacon carries a computed proposal (the freshly resolved lock as the file change) for
+    review. Resolution needs a resolver: `--live` (network + token) in the daemon, or a
+    `--fixture-map` offline. If the resolver is unavailable, we cannot assess — emit nothing.
+    """
+    resolver = resolver_args if resolver_args is not None else ["--live"]
+    lock = Path(lock_path) if lock_path is not None else _WSLOCK_ARTIFACT
+    proc = subprocess.run(
+        [sys.executable, str(_WSLOCK_TOOL), *resolver],
+        cwd=str(_ROOT), capture_output=True, text=True,
+    )
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None  # cannot resolve (network-gated) -> cannot assess -> no beacon
+    fresh = proc.stdout
+    try:
+        committed = lock.read_text("utf-8")
+    except FileNotFoundError:
+        committed = ""
+    if _lock_identity(fresh) == _lock_identity(committed):
+        return None  # in sync (ignoring the timestamp)
+    return {
+        "kind_class": "workspace_lock_drift",
+        "system": "workspace-resolved-lock",
+        "evidence": {
+            "detector": "generate_workspace_resolved_lock",
+            "reproducible": True,
+            "stale": False,
+        },
+        "evidence_ref": "file://manifest/workspace.resolved.lock.json",
+        "proposal": {
+            "branch": "auto/workspace-resolved-lock-refresh",
+            "title": "Refresh workspace.resolved.lock.json from resolved refs",
+            "body": (
+                "Automated proposal: the committed resolved lock differs from a fresh "
+                "resolution. This bumps pinned refs, so review the changes before merging."
+            ),
+            "files": {"manifest/workspace.resolved.lock.json": fresh},
+        },
+        "detail": {
+            "artifact": "manifest/workspace.resolved.lock.json",
+            "drift": "committed lock != freshly resolved lock (excluding generated_at)",
+        },
+        "observed_at": _now(),
+    }
+
+
 # Registered detectors: each is a keyword-arg callable returning None, a beacon, or a list.
 DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
     detect_mirror_drift,
     detect_vendored_graph_drift,
     detect_stale_vendors,
+    detect_workspace_lock_drift,
 ]
 
 

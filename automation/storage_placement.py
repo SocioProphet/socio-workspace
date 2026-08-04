@@ -8,6 +8,7 @@ in production after a raid.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -15,6 +16,7 @@ from automation.storage_resilience import Placement
 
 _ROOT = Path(__file__).resolve().parents[1]
 _REGISTRY = _ROOT / "registry" / "mesh-storage-placement.yaml"
+_THREAT_STATE = _ROOT / "status" / "mesh-threat-state.json"
 
 
 def _validate(tier: str, p: Placement) -> None:
@@ -74,3 +76,33 @@ def load_all(path: Optional[Path] = None) -> dict:
         _validate(tier, p)
         out[tier] = p
     return out
+
+
+def load_runtime_placement(*, state_path: Optional[Path] = None,
+                           path: Optional[Path] = None) -> Placement:
+    """The placement NEW WRITES should use RIGHT NOW — honoring the live threat posture.
+
+    This is the actuation->EFFECT link: the adaptive controller (detect_mesh_threat) escalates by
+    writing the runtime posture to status/mesh-threat-state.json; this reads that posture's ``tier``
+    and returns its Placement, so an escalation actually changes what parity new leaves are written
+    with. Bounded and fail-safe:
+      * no posture file / unreadable / unknown tier -> the registry ``default_tier`` (the floor).
+      * a posture BELOW the floor is clamped UP to the floor — the runtime posture may only ADD
+        resilience above the human-sanctioned baseline, never subtract it (compared by overhead).
+    So the storage layer can never end up weaker than the reviewed default, whatever the state file
+    says, and an escalation is realized without a redeploy.
+    """
+    floor = load_placement(path=path)  # the registry default_tier — the sanctioned minimum
+    spath = Path(state_path) if state_path is not None else _THREAT_STATE
+    try:
+        tier = json.loads(spath.read_text("utf-8")).get("tier")
+    except (FileNotFoundError, ValueError, AttributeError):
+        return floor
+    if not isinstance(tier, str) or not tier:
+        return floor
+    try:
+        chosen = load_placement(tier, path=path)
+    except ValueError:
+        return floor  # posture names a tier the storage registry doesn't declare -> floor
+    # never below the floor: the runtime posture may only raise resilience, never lower it.
+    return chosen if chosen.durability_overhead >= floor.durability_overhead else floor

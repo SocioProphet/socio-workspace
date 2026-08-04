@@ -297,7 +297,7 @@ svf-workspace-validate: svf-registry-validate svf-runner-list svf-runner-select-
 	@echo "OK: svf-workspace-validate"
 
 # --- registry targets ---
-.PHONY: registry-validate registry-admissions-validate admission-governance-shape-validate interpretability-harness-vocabulary-validate propagation-detect effective-canonical-registry-validate ontology-validate dep-cycles mirror-drift-check build-intelligence-validate deployment-topology-validate contract-lock-validate
+.PHONY: registry-validate registry-admissions-validate admission-governance-shape-validate interpretability-harness-vocabulary-validate propagation-detect gossip-beacon-audit propagation-feedback effective-canonical-registry-validate ontology-validate dep-cycles mirror-drift-check build-intelligence-validate deployment-topology-validate contract-lock-validate
 
 mirror-drift-check:
 	python3 engines/mirror_drift_engine.py check
@@ -320,10 +320,20 @@ interpretability-harness-vocabulary-validate:
 propagation-detect:
 	python3 tools/detect_main_merges.py
 
+# Hyperedge reach. `converge` walks to closure and reports whether it CLOSED, because a
+# TTL-truncated reach reported as a result is a partial cycle sold as a whole one.
+gossip-beacon-audit:
+	python3 engines/gossip_beacon.py audit
+
+# The return path. Declared reach (hypergraph) vs actuated reach (rules); dead rules;
+# failed dispatches; sinks. Offline, read-only.
+propagation-feedback:
+	python3 tools/check_propagation_feedback.py
+
 effective-canonical-registry-validate:
 	python3 tools/build_effective_canonical_registry.py
 
-registry-validate: registry-admissions-validate admission-governance-shape-validate effective-canonical-registry-validate
+registry-validate: registry-admissions-validate admission-governance-shape-validate gossip-beacon-audit propagation-feedback effective-canonical-registry-validate
 	@echo "==> Validating registry ontology roles and layers..."
 	python3 engines/ontology_engine.py validate
 	@echo "==> Checking dependency graph for cycles..."

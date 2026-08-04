@@ -58,12 +58,25 @@ jobs:
       - name: Admission governance shape
         run: python3 tools/check_admission_governance_shape.py
 
+      # Hyperedge closure. A lane binding fewer than two repos is not a relation.
+      - name: Gossip beacon audit
+        run: python3 engines/gossip_beacon.py audit
+
+      # The return path: declared reach vs actuated reach, dead rules, sinks.
+      # Non-strict — coverage gaps are reported, only real dispatch failures fail.
+      - name: Propagation feedback
+        run: python3 tools/check_propagation_feedback.py
+
       - name: Report (always, so the shape is visible even on failure)
         if: always()
-        run: python3 tools/check_admission_governance_shape.py --json > admission-shape.json || true
+        run: |
+          python3 tools/check_admission_governance_shape.py --json > admission-shape.json || true
+          python3 tools/check_propagation_feedback.py --json > propagation-feedback.json || true
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: admission-governance-shape
-          path: admission-shape.json
+          path: |
+            admission-shape.json
+            propagation-feedback.json

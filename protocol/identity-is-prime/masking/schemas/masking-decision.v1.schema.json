@@ -19,9 +19,17 @@
     "created_at"
   ],
   "properties": {
-    "schema_version": { "const": "identity-prime.masking-decision.v1" },
-    "decision_id": { "type": "string", "pattern": "^md_[a-zA-Z0-9_.:-]+$" },
-    "subject_ref": { "type": "string", "description": "Asset/record/field the decision ranges over." },
+    "schema_version": {
+      "const": "identity-prime.masking-decision.v1"
+    },
+    "decision_id": {
+      "type": "string",
+      "pattern": "^md_[a-zA-Z0-9_.:-]+$"
+    },
+    "subject_ref": {
+      "type": "string",
+      "description": "Asset/record/field the decision ranges over."
+    },
     "requesting_realm": {
       "type": "string",
       "pattern": "^(CITIZEN_FOG|CITIZEN_CLOUD|INSTITUTION|ADTECH|HSM|DEVICE|APP|CLOUD)([A-Z0-9_]*[A-Z0-9])?$"
@@ -31,24 +39,56 @@
       "additionalProperties": false,
       "description": "Who is asking (role/profile). Re-identification gates on a profile attribute (OpenID Connect).",
       "properties": {
-        "role": { "type": ["string", "null"] },
-        "openid_profile_attr": { "type": ["string", "null"] }
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "openid_profile_attr": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
     "requested_op": {
       "type": "string",
-      "enum": ["read", "export", "activate", "re_identify", "re_tokenize"]
+      "enum": [
+        "read",
+        "export",
+        "activate",
+        "re_identify",
+        "re_tokenize"
+      ]
     },
     "verdict": {
       "type": "string",
       "description": "PDP outcome. allow_masked = returnable only through the applied transforms.",
-      "enum": ["allow", "allow_masked", "deny", "review_required"]
+      "enum": [
+        "allow",
+        "allow_masked",
+        "deny",
+        "review_required"
+      ]
     },
-    "reason_codes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "forbidden_mixture": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "description": "Populated when the deny is a policy-polytope veto (e.g. health + adtech).",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "applied_transforms": {
       "type": "array",
@@ -56,56 +96,298 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["field_path", "scheme", "reversibility"],
+        "required": [
+          "field_path",
+          "scheme",
+          "reversibility"
+        ],
         "properties": {
-          "field_path": { "type": "string" },
-          "profile_ref": { "type": ["string", "null"], "pattern": "^tp_[a-zA-Z0-9_.:-]+$" },
-          "scheme": { "type": "string" },
-          "reversibility": { "type": "string", "enum": ["reversible", "one_way"] },
-          "key_epoch": { "type": ["integer", "null"], "minimum": 0 },
-          "target_domain": { "type": ["string", "null"], "description": "For re_tokenize: destination domain reached via homomorphic tweak." }
-        }
+          "field_path": {
+            "type": "string"
+          },
+          "profile_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^tp_[a-zA-Z0-9_.:-]+$"
+          },
+          "scheme": {
+            "type": "string"
+          },
+          "reversibility": {
+            "type": "string",
+            "enum": [
+              "reversible",
+              "one_way"
+            ]
+          },
+          "key_epoch": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "target_domain": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "For re_tokenize: destination domain reached via homomorphic tweak."
+          },
+          "classification": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "stance"
+            ],
+            "description": "What the six-layer fingerprint classifier concluded this field IS (SP-FPRINT-STACK-001). The masking PDP decides what to DO with a field; without this binding it cannot tell 'confidently public' from 'we have no idea what this is' \u2014 both arrive as the absence of a matching policy, and the unknown field is served.",
+            "properties": {
+              "data_class_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^urn:srcos:data-class:"
+              },
+              "stance": {
+                "enum": [
+                  "POS",
+                  "NEG",
+                  "ZERO",
+                  "INADMISSIBLE"
+                ],
+                "description": "POS supported / NEG refuted / ZERO ignorance / INADMISSIBLE conflict. ZERO and INADMISSIBLE are DIFFERENT failures: a gap wants more evidence, a glut wants a human. An absent classification block is read as ZERO, never as safe."
+              },
+              "stance_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^urn:srcos:stance:"
+              },
+              "zero_disposition": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "fail-closed",
+                  "fail-open",
+                  null
+                ],
+                "description": "DR-4. What this PDP does when the field's classification is ZERO. fail-closed over-blocks (a cost in access); fail-open leaks (a cost in exposure). Neither is universally right, so it is an attested decision rather than a default."
+              },
+              "zero_attestation_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "required": [
+                "classification"
+              ],
+              "properties": {
+                "classification": {
+                  "type": "object",
+                  "required": [
+                    "stance",
+                    "zero_disposition"
+                  ],
+                  "properties": {
+                    "stance": {
+                      "const": "ZERO"
+                    },
+                    "zero_disposition": {
+                      "const": "fail-open"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "classification": {
+                  "required": [
+                    "zero_attestation_ref"
+                  ],
+                  "properties": {
+                    "zero_attestation_ref": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "re_identification": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": false,
       "description": "Present only when requested_op = re_identify. Re-id is a governed, audited, reversible release.",
-      "required": ["permitted", "reason_for_action"],
+      "required": [
+        "permitted",
+        "reason_for_action"
+      ],
       "properties": {
-        "permitted": { "type": "boolean" },
-        "reason_for_action": { "type": "string", "minLength": 1, "description": "Mandatory free-text justification — recorded for audit." },
-        "authorized_by": { "type": ["string", "null"] },
-        "separation_of_duty": { "type": "boolean", "default": false },
-        "release_pack_ref": { "type": ["string", "null"], "description": "HELL-ER release pack, if a bundle is emitted." }
+        "permitted": {
+          "type": "boolean"
+        },
+        "reason_for_action": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Mandatory free-text justification \u2014 recorded for audit."
+        },
+        "authorized_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "separation_of_duty": {
+          "type": "boolean",
+          "default": false
+        },
+        "release_pack_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HELL-ER release pack, if a bundle is emitted."
+        }
       }
     },
     "side_channel_mitigations": {
       "type": "array",
       "uniqueItems": true,
       "description": "Active mitigations against the 4 re-identification risks.",
-      "items": { "type": "string", "enum": ["sandbox", "monitoring", "policy", "collusion_prevention", "separation_of_duty", "trusted_third_party", "key_rotation", "unlinkable_identifiers"] }
+      "items": {
+        "type": "string",
+        "enum": [
+          "sandbox",
+          "monitoring",
+          "policy",
+          "collusion_prevention",
+          "separation_of_duty",
+          "trusted_third_party",
+          "key_rotation",
+          "unlinkable_identifiers"
+        ]
+      }
     },
     "receipt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_decision_ref"],
+      "required": [
+        "policy_decision_ref"
+      ],
       "description": "Makes the decision itself verifiable evidence.",
       "properties": {
-        "policy_decision_ref": { "type": "string" },
-        "beacon_commit_receipt": { "type": ["string", "null"], "description": "TriTRPC BEACON_COMMIT receipt sealing this decision into the custody chain." },
-        "certificate_hash": { "type": ["string", "null"] }
+        "policy_decision_ref": {
+          "type": "string"
+        },
+        "beacon_commit_receipt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "TriTRPC BEACON_COMMIT receipt sealing this decision into the custody chain."
+        },
+        "certificate_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-    "policy_version": { "type": "string" },
-    "scheme_version": { "type": ["string", "null"] },
-    "decided_by": { "type": "string", "description": "Agent identity (e.g. masking-pdp-agent)." },
-    "created_at": { "type": "string", "format": "date-time" }
+    "policy_version": {
+      "type": "string"
+    },
+    "scheme_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decided_by": {
+      "type": "string",
+      "description": "Agent identity (e.g. masking-pdp-agent)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
   },
   "allOf": [
     {
-      "if": { "properties": { "requested_op": { "const": "re_identify" } } },
-      "then": { "required": ["re_identification"] }
+      "if": {
+        "properties": {
+          "requested_op": {
+            "const": "re_identify"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "re_identification"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "applied_transforms": {
+            "contains": {
+              "properties": {
+                "classification": {
+                  "type": "object",
+                  "properties": {
+                    "stance": {
+                      "const": "INADMISSIBLE"
+                    }
+                  },
+                  "required": [
+                    "stance"
+                  ]
+                }
+              },
+              "required": [
+                "classification"
+              ]
+            }
+          }
+        },
+        "required": [
+          "applied_transforms"
+        ]
+      },
+      "then": {
+        "properties": {
+          "verdict": {
+            "not": {
+              "const": "allow"
+            }
+          }
+        }
+      }
     }
   ]
 }

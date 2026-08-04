@@ -1,0 +1,45 @@
+{
+  "schema_version": "identity-prime.masking-decision.v1",
+  "decision_id": "md_zero_failopen_unattested",
+  "subject_ref": "ce_patient_0042",
+  "requesting_realm": "ADTECH",
+  "audience": {
+    "role": "ad_audience_builder",
+    "openid_profile_attr": null
+  },
+  "requested_op": "read",
+  "verdict": "allow",
+  "reason_codes": [
+    "FORBIDDEN_IDENTITY_MIXTURE",
+    "NO_HEALTH_ADTECH"
+  ],
+  "applied_transforms": [
+    {
+      "field_path": "$.unknown_column",
+      "scheme": "chameleon_token",
+      "reversibility": "reversible",
+      "classification": {
+        "data_class_ref": null,
+        "stance": "ZERO",
+        "stance_ref": null,
+        "zero_disposition": "fail-open",
+        "zero_attestation_ref": null
+      }
+    }
+  ],
+  "re_identification": null,
+  "side_channel_mitigations": [
+    "policy",
+    "unlinkable_identifiers",
+    "monitoring"
+  ],
+  "receipt": {
+    "policy_decision_ref": "pd_no_health_adtech_0001",
+    "beacon_commit_receipt": "beacon:placeholder-health-adtech-deny",
+    "certificate_hash": "sha256:masking-health-adtech-deny-placeholder"
+  },
+  "policy_version": "regis.identity.polytope.core@0.1.0",
+  "scheme_version": "identity-prime.tokenization-profile.v1",
+  "decided_by": "masking-pdp-agent",
+  "created_at": "2026-06-29T15:04:00Z"
+}

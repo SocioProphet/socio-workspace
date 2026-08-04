@@ -60,6 +60,37 @@ def _reidentify_without_reason(d: dict[str, Any]) -> bool:
     return not reid.get("reason_for_action")
 
 
+def _classifications(d: dict[str, Any]) -> list[dict[str, Any]]:
+    out = []
+    for tr in d.get("applied_transforms") or []:
+        c = tr.get("classification") if isinstance(tr, dict) else None
+        if isinstance(c, dict):
+            out.append(c)
+    return out
+
+
+def _inadmissible_classification_allowed(d: dict[str, Any]) -> bool:
+    """A glut resolved in the requester's favour.
+
+    INADMISSIBLE means two fingerprint layers disagree about what this field IS, and one of
+    the readings may well be "personal data". Serving it lets the contradiction settle itself
+    in favour of whoever asked — the one resolution nobody chose.
+    """
+    if d.get("verdict") != "allow":
+        return False
+    return any(c.get("stance") == "INADMISSIBLE" for c in _classifications(d))
+
+
+def _zero_failopen_unattested(d: dict[str, Any]) -> bool:
+    """Data whose classification is unknown, served with nobody on the record for it.
+
+    fail-open on ZERO is a legitimate choice for a public reference table and a breach for a
+    customer-master column. That is exactly why it is attested rather than defaulted.
+    """
+    return any(c.get("stance") == "ZERO" and c.get("zero_disposition") == "fail-open"
+               and not c.get("zero_attestation_ref") for c in _classifications(d))
+
+
 def _empty_feature_sets(d: dict[str, Any]) -> bool:
     return d.get("feature_sets") == []
 
@@ -78,6 +109,14 @@ INVARIANTS: dict[str, tuple[str, Callable[[dict[str, Any]], bool]]] = {
         "masking/schemas/masking-decision.v1.schema.json",
         _reidentify_without_reason,
     ),
+    "INADMISSIBLE_CLASSIFICATION_ALLOWED": (
+        "masking/schemas/masking-decision.v1.schema.json",
+        _inadmissible_classification_allowed,
+    ),
+    "ZERO_CLASSIFICATION_FAIL_OPEN_UNATTESTED": (
+        "masking/schemas/masking-decision.v1.schema.json",
+        _zero_failopen_unattested,
+    ),
     "EMPTY_FEATURE_SETS": (
         "extract/schemas/grasp-pattern.v1.schema.json",
         _empty_feature_sets,
@@ -89,6 +128,8 @@ NEGATIVE_FIXTURES: dict[str, str] = {
     "masking/fixtures/negative/tokenization_profile.cross_domain_linkable.invalid.json": "CROSS_DOMAIN_LINKABLE_TOKEN",
     "masking/fixtures/negative/tokenization_profile.under_masked_hmac.invalid.json": "ONE_WAY_SCHEME_DECLARED_REVERSIBLE",
     "masking/fixtures/negative/masking_decision.reidentify_without_reason.invalid.json": "REIDENTIFY_WITHOUT_REASON",
+    "masking/fixtures/negative/masking_decision.inadmissible_classification_allowed.invalid.json": "INADMISSIBLE_CLASSIFICATION_ALLOWED",
+    "masking/fixtures/negative/masking_decision.zero_failopen_unattested.invalid.json": "ZERO_CLASSIFICATION_FAIL_OPEN_UNATTESTED",
     "extract/fixtures/negative/grasp_pattern.empty_feature_sets.invalid.json": "EMPTY_FEATURE_SETS",
 }
 
@@ -97,6 +138,7 @@ VALID_FIXTURES: dict[str, str] = {
     "masking/fixtures/tokenization_profile.chameleon_patient_mrn.valid.json": "masking/schemas/tokenization-profile.v1.schema.json",
     "masking/fixtures/masking_decision.reidentify_with_reason.valid.json": "masking/schemas/masking-decision.v1.schema.json",
     "masking/fixtures/masking_decision.health_adtech_deny.valid.json": "masking/schemas/masking-decision.v1.schema.json",
+    "masking/fixtures/masking_decision.classified_governed.valid.json": "masking/schemas/masking-decision.v1.schema.json",
     "extract/fixtures/grasp_pattern.compliance_sentence.valid.json": "extract/schemas/grasp-pattern.v1.schema.json",
 }
 

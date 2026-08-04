@@ -17,8 +17,18 @@ name: propagation-poll
 #
 # ── credentials ──────────────────────────────────────────────────────────────
 # Reading commits in other private org repos needs more than this repo's GITHUB_TOKEN,
-# which is scoped to sociosphere alone. Configure a GitHub App with read access to the
-# org's contents and set:
+# which is scoped to sociosphere alone. Configure an org-wide GitHub App with EXACTLY:
+#
+#     Contents: Read    list commits on main; read changed files for trigger.paths
+#     Issues:   Write   `notify` actions open an issue in the target repo
+#     Metadata: Read    implied prerequisite
+#
+# DO NOT grant Contents: Write. Nothing here pushes to another repository. The only
+# action that would need it is `trigger_ci` (repository_dispatch), and that is refused
+# in code unless PROPAGATION_ALLOW_DISPATCH is set -- so the read-only posture holds
+# even if the App is later over-granted, rather than depending on the grant.
+#
+# Then set:
 #     vars.PROPAGATION_APP_ID  +  secrets.PROPAGATION_APP_PRIVATE_KEY
 # Until then the job runs with GITHUB_TOKEN, can only observe sociosphere itself, and
 # SAYS SO. It does not fail -- an unconfigured capability is a skip, not a breakage --

@@ -94,6 +94,9 @@ def simulate_automation(action_type: str, targets: list[str], repo: str) -> dict
 
 
 ORG = os.environ.get("SOCIOSPHERE_ORG", "SocioProphet")
+#: Opt-in for repository_dispatch, which needs Contents: Write on the target.
+ALLOW_DISPATCH = os.environ.get("PROPAGATION_ALLOW_DISPATCH", "").lower() in ("1", "true", "yes")
+
 #: Marks issues this engine opened, so a repeated merge updates rather than duplicates.
 PROPAGATION_MARKER = "<!-- sociosphere:propagation -->"
 
@@ -135,6 +138,22 @@ def _dispatch(step: dict[str, Any], source: str, ref: str) -> dict[str, Any]:
                               "depth": step.get("depth")}
 
     if action == "trigger_ci":
+        # repository_dispatch requires CONTENTS: WRITE on the target -- the ability to
+        # push to someone else's repo. A governance beacon's job is to tell people, not
+        # to change their repos, so this is refused by default rather than merely
+        # unfunded by the token.
+        #
+        # Relying on token scope alone would make the read-only posture a property of
+        # how the App happens to be granted, and a later over-grant would silently turn
+        # writes back on with nobody deciding to. Refusing here means the posture holds
+        # regardless of the credential, and the credential is a second line of defence.
+        if not ALLOW_DISPATCH:
+            result["status"] = "blocked_no_dispatch"
+            result["detail"] = (
+                "trigger_ci needs Contents: Write on the target; refused because "
+                "PROPAGATION_ALLOW_DISPATCH is not set. Change the rule to `notify` if "
+                "an issue is enough, or set the flag deliberately.")
+            return result
         rc, out = _gh(["api", f"repos/{ORG}/{target}/dispatches", "-X", "POST",
                        "-f", "event_type=sociosphere-propagation",
                        "-f", f"client_payload[source_repo]={source}",
@@ -240,9 +259,19 @@ def propagate(repo_name: str, ref: str = "refs/heads/main",
             continue
         if execute:
             actions_triggered.append(_dispatch(step, repo_name, ref))
-        else:
-            actions_triggered.append(
-                simulate_automation(step.get("action", "notify"), [step["repo"]], repo_name))
+            continue
+        # A dry run must predict what execution WOULD do. Reporting "simulated" for a
+        # trigger_ci that execution will refuse describes a run that cannot happen, and
+        # the whole point of the dry mode is to be trusted before the switch is flipped.
+        if step.get("action") == "trigger_ci" and not ALLOW_DISPATCH:
+            actions_triggered.append({
+                "repo": step["repo"], "action": "trigger_ci",
+                "rule": step.get("source_rule"), "depth": step.get("depth"),
+                "status": "blocked_no_dispatch",
+            })
+            continue
+        actions_triggered.append(
+            simulate_automation(step.get("action", "notify"), [step["repo"]], repo_name))
 
     event["actions_triggered"] = actions_triggered
     failed = [a for a in actions_triggered if a.get("status") == "failed"]

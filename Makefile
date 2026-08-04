@@ -330,6 +330,11 @@ gossip-beacon-audit:
 propagation-feedback:
 	python3 tools/check_propagation_feedback.py
 
+# Mint a short-lived Gitea token IN-CLUSTER and run something with it. There is no
+# stored Gitea credential and there should not be one — see the script header.
+gitea-ci-probe:
+	bash tools/mint_gitea_token.sh
+
 effective-canonical-registry-validate:
 	python3 tools/build_effective_canonical_registry.py
 

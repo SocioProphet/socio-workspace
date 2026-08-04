@@ -30,6 +30,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Evidence composition** (`decide_composed`, per-subject) | ✅ | ✅ `run_once` groups by subject | ✅ weak-compose **and** strict-Law fences | ✅ | `tests/test_evidence_composition.py` |
 | **Canonical envelope + EpistemicLevel** (`envelope.py`) | ✅ | ✅ beacons + receipts stamped | ✅ trace propagates; graded by outcome | ✅ | `tests/test_envelope.py` |
 | **Shared reasoning runtime** (`automation/reasoning/`) | ✅ | ✅ self-heal is its first adapter | ✅ decoupling proven in a fresh interpreter | ✅ | `tests/test_reasoning_core_decoupled.py` |
+| **Crystal Atlas graph-upsert** (`crystal_atlas.py`) | ✅ | ✅ decision→claim+evidence, durable emit | ✅ conforms to vendored graph-upsert-request.v0 (jsonschema) | ✅ | `tests/test_crystal_atlas_conformance.py` |
 | End-to-end inbox→responder→kernel→decisions | ✅ | ✅ | ✅ | ✅ | `test_end_to_end_inbox_to_decisions` |
 | Responder canary (guaranteed in → provable verdict) | ✅ | ✅ | ✅ | ✅ | `test_canary_guaranteed_input…` |
 | **Mirror-drift executor** (`executors.resync_mirror_drift`) | ✅ | ✅ scheduler runs `run_once(execute=True)` | ✅ heal **and** abort | ✅ | `tests/test_executor_integration.py` |

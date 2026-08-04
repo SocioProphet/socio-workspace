@@ -212,6 +212,55 @@ rules:
         action: trigger_ci
         message: "Run E2E tests to catch visual regressions"
 
+  # ── Interpretability harness: schemas down, evidence up ────────────────────
+  # The harness lane is three repos with a strict layering: superconscious owns the
+  # schemas and binds fragments by opaque hash, noetica-impair executes interventions
+  # and emits those fragments, Noetica vendors both and renders the trail. Every one
+  # of those seams is a place a change can silently invalidate the layer next to it,
+  # and none of them had a rule until now.
+
+  - id: interpretability-schema-change
+    trigger:
+      repo: superconscious
+      events: [push, release]
+      branches: [main]
+      paths:
+        - "schemas/interpretability/**"
+        - "schemas/lawful-learning/**"
+        - "schemas/composition/**"
+    propagate_to:
+      - repo: Noetica
+        action: notify
+        # The dangerous case is not a missing schema -- that fails loudly. It is a
+        # STALE vendored copy, which validates happily against a contract that moved.
+        message: "superconscious interpretability/lawful-learning/composition schemas changed — re-vendor into Noetica vendor/superconscious/schemas/ and regenerate manifest.json; a stale vendored copy validates against a contract that has moved"
+        auto_pr: true
+        pr_title: "chore(vendor): re-vendor superconscious interpretability schemas"
+      - repo: noetica-impair
+        action: trigger_ci
+        message: "superconscious schemas changed — run the conformance suite; drift_against_upstream must be clean before any emitted fragment is trusted"
+    max_cascade_depth: 2
+
+  - id: interpretability-executor-change
+    trigger:
+      repo: noetica-impair
+      events: [push, release]
+      branches: [main]
+    propagate_to:
+      - repo: Noetica
+        action: notify
+        message: "noetica-impair updated — the fragment producer changed; re-check lib/impair ingest and the ImpairTrailPanel against the emitted bundle shape"
+      - repo: superconscious
+        action: notify
+        message: "noetica-impair updated — the tier-2 release bundle's producer changed; confirm the 14 fragment kinds and 10 non_claims are still satisfied by what it emits"
+      - repo: prophet-platform
+        action: trigger_ci
+        message: "noetica-impair updated — rebuild the noetica-impair and noetica-impair-cpu images from the images.yml matrix"
+      - repo: sociosphere
+        action: trigger_ci
+        message: "noetica-impair updated — revalidate the interpretability-harness lane registration and vocabulary"
+    max_cascade_depth: 2
+
   # ── Adapter contract changes cascade to all adapters ───────────────────────
   - id: adapter-contracts-change
     trigger:

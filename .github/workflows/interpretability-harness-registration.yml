@@ -5,6 +5,8 @@ on:
     paths:
       - 'registry/interpretability-harness-registration.yaml'
       - 'registry/interpretability-harness-dependency-edges.yaml'
+      - 'registry/interpretability-harness.vocab.ttl'
+      - 'tools/check_interpretability_harness_vocabulary.py'
       - 'governance/interpretability-harness-canonical-sources.yaml'
       - 'tools/validate_interpretability_harness_registration.py'
       - '.github/workflows/interpretability-harness-registration.yml'
@@ -14,6 +16,8 @@ on:
     paths:
       - 'registry/interpretability-harness-registration.yaml'
       - 'registry/interpretability-harness-dependency-edges.yaml'
+      - 'registry/interpretability-harness.vocab.ttl'
+      - 'tools/check_interpretability_harness_vocabulary.py'
       - 'governance/interpretability-harness-canonical-sources.yaml'
       - 'tools/validate_interpretability_harness_registration.py'
       - '.github/workflows/interpretability-harness-registration.yml'
@@ -33,7 +37,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install YAML dependency
-        run: python -m pip install pyyaml
+        run: python -m pip install pyyaml rdflib
 
       - name: Validate interpretability harness estate registration
         run: python tools/validate_interpretability_harness_registration.py
+
+      # Binds the vocabulary to the registration: the 14 fragment kinds must match
+      # the tier-2 binding, and produces/cannot_produce must partition them.
+      - name: Validate interpretability harness vocabulary
+        run: python tools/check_interpretability_harness_vocabulary.py

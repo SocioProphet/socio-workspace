@@ -350,6 +350,8 @@ def run_detectors(inbox: Optional[DurableQueue] = None,
     called with no arguments). `detectors` overrides the default registry — used by tests to
     run one detector in isolation so an unrelated real-tree detector is not triggered.
     """
+    from automation import envelope
+
     inbox = inbox if inbox is not None else DurableQueue(state_dir() / "beacons")
     emitted: List[dict] = []
     for detector in (detectors if detectors is not None else DETECTORS):
@@ -360,6 +362,7 @@ def run_detectors(inbox: Optional[DurableQueue] = None,
         if result is None:
             continue
         for beacon in (result if isinstance(result, list) else [result]):
+            beacon = envelope.stamp(beacon)  # canonical envelope: message_id/trace_id/span_id/...
             inbox.put(beacon)
             emitted.append(beacon)
     return emitted

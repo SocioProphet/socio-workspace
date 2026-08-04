@@ -85,6 +85,18 @@ class Placement:
         survive_p = 1.0 - (frac ** self.shard_replicas)
         return self.rs_n * survive_p >= self.rs_k
 
+    def survival_probability(self, frac: float) -> float:
+        """P(the leaf is reconstructable) under independent per-node seizure prob ``frac``.
+
+        Each shard survives independently w.p. p = 1 - frac**R; the leaf survives iff >= k of the n
+        shards do, so this is the binomial upper tail P(X >= k), X ~ Binomial(n, p). Unlike
+        ``expected_durable_under_seizure`` (a mean-field yes/no) this is a continuous probability —
+        the input the risk/reward tier optimizer prices each placement with."""
+        from math import comb
+        p = 1.0 - (frac ** self.shard_replicas)
+        n, k = self.rs_n, self.rs_k
+        return sum(comb(n, j) * (p ** j) * ((1 - p) ** (n - j)) for j in range(k, n + 1))
+
 
 # ── the resilience predicates (pure, testable) ───────────────────────────────────────────────
 

@@ -41,3 +41,23 @@ tiers:
     rs_m: 3
     shard_replicas: 2  # each of the 9 shards has 2 copies -> 3.0x storage; P(shard lost)=frac^2
     encrypted_at_rest: true
+
+# Adaptive, threat-aware control (automation/mesh_threat.py). The mesh senses its threat level
+# HOLOGRAPHICALLY (resolved from a quorum of per-vantage reports, robust to a lying/partitioned
+# few) and adapts the placement tier. Asymmetric on purpose: escalate automatically (more
+# resilience is always safe), de-escalate only on review after `deescalate_dwell` calm epochs,
+# and fail toward hostile when blind. This adaptation RULE is governed here, not buried in code.
+threat_policy:
+  tier_by_level:
+    calm: baseline
+    elevated: hardened
+    hostile: hostile
+  escalate_if:
+    elevated: { min_unreachable: 0.10, min_anomalies: 1 }
+    hostile:  { min_unreachable: 0.25, min_anomalies: 3 }   # partition alone also -> hostile
+  deescalate_dwell: 6        # consecutive calm epochs before a resilience DROP may be proposed
+  # Risk/reward tier optimizer (the Economic Prophet money-flow parallel): storage overhead is
+  # capital, threat is risk; allocate to the tier maximizing V·P(survive) − overhead·unit_cost.
+  economics:
+    value_of_state: 1000.0   # value at risk if the state is lost (arbitrary units)
+    unit_storage_cost: 1.0   # cost per × of storage overhead

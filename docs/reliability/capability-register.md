@@ -159,8 +159,19 @@ The reasoning core is real and connected to live estate state (`detect_stale_ven
 actual stale vendored deps right now). But being *tested green* is not being *running in the
 estate*. Open, in order of how badly they bite:
 
-- **No image build/push pipeline.** The manifest references `sociosphere/automation:latest`, but
-  **no workflow builds or pushes that image**. Until it does, the manifest cannot deploy.
+- **Image build/push — CLOSED, via the estate's shared lane.** `automation-image.yml` no longer
+  hand-rolls a build: it calls `SocioProphet/.github` `build-image.yml` (the same reusable
+  workflow every other estate image uses), so it inherits the SHA/latest tagging contract the
+  Argo ApplicationSets promote and **keyless cosign signing**. Push credentials are the
+  `ZOT_CI_*` **org** secrets, scoped to `prophet-platform` + `sociosphere` only — one credential
+  for the estate, one rotation point, not a per-repo copy. A credential-free `verify` job builds
+  the image and runs `scheduler.preflight()` *inside it* first, so a PR from a fork still proves
+  the artifact boots without ever seeing a secret.
+- **Manifest still pins `:latest` — deploy from the DIGEST.** `deployment/kubernetes.yaml` now
+  points at `registry.socioprophet.ai/sociosphere-automation`, but on the moving `latest` tag.
+  With the default `imagePullPolicy: IfNotPresent`, a node that already cached `latest` never
+  pulls again and silently runs stale code. The publish job prints the digest to pin; do that
+  before the daemon is actually deployed.
 - **No running instance.** There is no evidence any `automation.scheduler`/`webhooks` daemon is
   deployed and beating. The loop is dormant code + a manifest, not a live control plane.
 - **Liveness reflects job health — done.** `scheduler.preflight` crashes a *broken image* loudly

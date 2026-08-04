@@ -18,7 +18,9 @@ from __future__ import annotations
 
 import re
 from datetime import datetime, timezone
-from typing import Optional
+from typing import List, Optional
+
+from automation.macro_triad import TriadAssessment, assess_triad
 
 
 def _now() -> str:
@@ -131,3 +133,87 @@ def propose_deploy_revert(
         },
         "observed_at": _now(),
     }
+
+
+def propose_state_failback(
+    receipts: list,
+    *,
+    repo: str,
+    quorum: int = 2,
+    kind_class: str = "deploy_regression",
+    base: str = "main",
+) -> List[dict]:
+    """Beacons that fail a SICK k3s master-cluster back to the last state its peers still stand behind.
+
+    This is the macro-triad closing the loop the design asked for: the three k3s masters each publish
+    a Lazerus Integrity Receipt; :func:`automation.macro_triad.assess_triad` finds the canonical state
+    a quorum agrees on (the last receipt-passing state) and names any master that diverged from it; and
+    for each such master this producer emits a **failback** — a revert of the range from that canonical
+    commit up to the commit the sick master is serving, so the cluster is amplified back to the
+    quorum-blessed state. Reuses the #585 revert path (``proposal.revert``), because Argo CD
+    ``selfHeal: true`` re-applies git and only a git revert sticks.
+
+    Fail-closed and quorum-gated: returns ``[]`` unless a real 2-of-3 (``quorum``) healthy majority
+    exists — with no trusted target, naming a "sick" cluster would be a guess, so nothing is proposed.
+    A sick master with no divergent commit to revert (e.g. quarantined on the *same* commit — data
+    corruption, not a bad deploy) yields no beacon here; that path is re-sync/quarantine, not revert.
+    """
+    assessment: TriadAssessment = assess_triad(receipts, quorum=quorum)
+    if not assessment.needs_failback:
+        return []  # no trusted majority, or a majority with nothing sick against it
+
+    good_commit = assessment.canonical_commit
+    beacons: List[dict] = []
+    for sick in assessment.sick_clusters:
+        head = sick.head_commit
+        if not head or head == good_commit:
+            # Nothing to revert TO a different commit — not a bad-deploy failback. Left for the
+            # re-sync/quarantine path (a divergence in data, not in the deployed git state).
+            continue
+        # Fail back the range (good, head] — revert every commit the sick master took past the
+        # last state the quorum signed. `git revert A..B` reverts each commit in reverse order.
+        revert_range = f"{good_commit}..{head}"
+        short_head = str(head)[:12]
+        short_good = str(good_commit)[:12]
+        cluster = sick.cluster
+        branch = f"self-heal/{kind_class}/failback-{short_head}"
+        title = f"revert(self-heal): fail {cluster} back to {short_good} (quorum-blessed state)"
+        fence = f" Lazerus quarantine `{sick.koe_id}`." if sick.koe_id else ""
+        body = (
+            f"The k3s master triad diverged. A quorum of {len(assessment.healthy_clusters)} masters "
+            f"agree on state `{assessment.canonical_state_root}` (commit `{good_commit}`); master "
+            f"`{cluster}` diverged to commit `{head}`.{fence}\n\n"
+            f"- **failback:** revert `{revert_range}` — amplify the sick cluster back to the last "
+            f"state the master quorum stands behind.\n"
+            f"- **why a revert (not a patch):** Argo CD `selfHeal: true` re-applies git, so only a "
+            f"git revert of the divergent range sticks.\n"
+            f"- **why a PR (not auto-merge):** a production failback is reviewed.\n"
+            f"- **quorum:** {len(assessment.healthy_clusters)}/{len(receipts)} masters "
+            f"(≥ {quorum}) — a trusted target exists, so this is a decision, not a guess.\n\n"
+            f"Opened by the macro-triad self-heal responder (class `{kind_class}`)."
+        )
+        beacons.append({
+            "kind_class": kind_class,
+            "system": f"{repo}::{cluster}",
+            "evidence": {"detector": "lazerus_macro_triad", "reproducible": True, "stale": False},
+            "evidence_ref": sick.koe_id or f"lazerus://triad/{cluster}",
+            "plan": {},  # reverting an in-repo commit range breaches no Ring-1 boundary axis
+            "detail": {
+                "cluster": cluster,
+                "canonical_commit": good_commit,
+                "sick_commit": head,
+                "koe_id": sick.koe_id,
+                "reason": sick.reason,
+                "healthy_quorum": list(assessment.healthy_clusters),
+            },
+            "proposal": {
+                "repo": repo,
+                "base": base,
+                "branch": branch,
+                "title": title,
+                "revert": revert_range,
+                "body": body,
+            },
+            "observed_at": _now(),
+        })
+    return beacons

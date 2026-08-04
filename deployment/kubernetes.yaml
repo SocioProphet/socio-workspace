@@ -39,6 +39,26 @@ data:
   github-token: ""
 
 ---
+# Secret – Crystal Atlas graph endpoint credentials. The scheduler records graph-upserts
+# with NO credentials; only the crystal-atlas-poster CronJob (below) holds this token and
+# the endpoint URL, so the daemon can never reach the shared graph directly. Leave the
+# endpoint blank to disable POSTing entirely — the poster then no-ops (never a failure).
+#   kubectl create secret generic crystal-atlas-secrets \
+#     --from-literal=graph-upsert-url=<URL> \
+#     --from-literal=token=<TOKEN> \
+#     -n sociosphere-automation
+apiVersion: v1
+kind: Secret
+metadata:
+  name: crystal-atlas-secrets
+  namespace: sociosphere-automation
+type: Opaque
+data:
+  # base64-encoded placeholders – replace before deploying (blank url = poster disabled)
+  graph-upsert-url: ""
+  token: ""
+
+---
 # PersistentVolumeClaim – APScheduler job store.
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -303,6 +323,70 @@ spec:
                 limits:
                   cpu: "1000m"
                   memory: "1Gi"
+              volumeMounts:
+                - name: automation-state
+                  mountPath: /app/state
+          volumes:
+            - name: automation-state
+              persistentVolumeClaim:
+                claimName: automation-state
+
+---
+# CronJob – Crystal Atlas graph-upsert poster. The scheduler records each self-heal
+# decision as a graph-upsert-request.v0 (claim + evidence) to the shared state volume
+# with NO credentials (crystal_atlas.emit_graph_upsert). This job runs on a schedule
+# WITH the graph token, drains those upserts, and POSTs each to the shared MLN ground
+# network (automation.post_graph_upserts -> Crystal Atlas graph-upsert endpoint). Bounded
+# retry + dead-letter — never silent infinite retry. If the endpoint secret is blank the
+# job no-ops (self-heal keeps working; nothing is posted). Same produce/deliver split and
+# SHARED RWX state mount as the proposal-opener, so it drains exactly what the daemon wrote.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: crystal-atlas-poster
+  namespace: sociosphere-automation
+  labels:
+    app: crystal-atlas-poster
+spec:
+  schedule: "31 * * * *"     # hourly, offset off the hour
+  concurrencyPolicy: Forbid  # never two posters racing the same upserts
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0          # the drainer does its own bounded retry + dead-letter
+      template:
+        metadata:
+          labels:
+            app: crystal-atlas-poster
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: crystal-atlas-poster
+              image: sociosphere/automation:latest
+              command: ["python", "-m", "automation.post_graph_upserts"]
+              env:
+                - name: CRYSTAL_ATLAS_GRAPH_UPSERT_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: crystal-atlas-secrets
+                      key: graph-upsert-url
+                      optional: true
+                - name: CRYSTAL_ATLAS_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: crystal-atlas-secrets
+                      key: token
+                      optional: true
+                - name: SOCIOSPHERE_STATE_DIR
+                  value: /app/state
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "512Mi"
               volumeMounts:
                 - name: automation-state
                   mountPath: /app/state

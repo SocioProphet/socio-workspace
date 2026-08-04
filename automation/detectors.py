@@ -245,12 +245,90 @@ def detect_workspace_lock_drift(*, resolver_args: Optional[List[str]] = None,
     }
 
 
+_SOURCE_EXPOSURE_REPORT = _ROOT / "artifacts" / "source-exposure" / "source-exposure-report.json"
+
+
+def detect_policy_violations(*, report_path: Optional[Path] = None) -> List[dict]:
+    """Emit a policy_violation beacon when the source-exposure gate reports a blocking finding.
+
+    Reads the gate's committed report (block count) rather than re-scanning every cycle — cheap
+    and non-destructive. A violation is a policy breach: the responder caps policy_violation at
+    quarantine (isolate + record), never a fix. No report -> cannot assess -> nothing.
+    """
+    path = Path(report_path) if report_path is not None else _SOURCE_EXPOSURE_REPORT
+    try:
+        report = json.loads(path.read_text("utf-8"))
+    except (FileNotFoundError, ValueError):
+        return []
+    block = int(report.get("block", 0) or 0)
+    if report.get("result") == "pass" and block == 0:
+        return []
+    return [{
+        "kind_class": "policy_violation",
+        "system": "policy:source-exposure",
+        "evidence": {"detector": "check_source_exposure", "reproducible": True, "stale": False},
+        "evidence_ref": f"file://{path}",
+        "detail": {
+            "check": "source-exposure",
+            "result": report.get("result"),
+            "block": block,
+            "warn": report.get("warn"),
+            "reason": f"source-exposure gate reports {block} blocking finding(s)",
+        },
+        "observed_at": _now(),
+    }]
+
+
+def _latest_failed_workflows_on_main() -> List[dict]:
+    """Latest run per workflow on main, keeping only those whose newest run FAILED (via gh)."""
+    proc = subprocess.run(
+        ["gh", "run", "list", "--branch", "main", "--limit", "40",
+         "--json", "name,conclusion,headSha,createdAt,url"],
+        cwd=str(_ROOT), capture_output=True, text=True,
+    )
+    if proc.returncode != 0:
+        return []  # gh unavailable / no token -> network-gated -> no beacons
+    try:
+        runs = json.loads(proc.stdout or "[]")
+    except ValueError:
+        return []
+    latest: dict = {}
+    for run in sorted(runs, key=lambda r: r.get("createdAt", ""), reverse=True):
+        name = run.get("name")
+        if name and name not in latest:
+            latest[name] = run
+    return [r for r in latest.values() if r.get("conclusion") == "failure"]
+
+
+def detect_build_failures(*, runs_source=None) -> List[dict]:
+    """Emit a build_failure beacon per workflow whose latest run on main failed.
+
+    Network-gated (default source queries `gh`). A build failure is not locally fixable, so it
+    caps at canary_fix with no mechanism -> escalates to a human with the failing run.
+    """
+    runs = (runs_source or _latest_failed_workflows_on_main)()
+    beacons: List[dict] = []
+    for run in runs:
+        name = run.get("name", "?")
+        beacons.append({
+            "kind_class": "build_failure",
+            "system": f"ci:{name}",
+            "evidence": {"detector": "gh_run_list", "reproducible": True, "stale": False},
+            "evidence_ref": run.get("url"),
+            "detail": {"workflow": name, "conclusion": "failure", "run_url": run.get("url")},
+            "observed_at": _now(),
+        })
+    return beacons
+
+
 # Registered detectors: each is a keyword-arg callable returning None, a beacon, or a list.
 DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
     detect_mirror_drift,
     detect_vendored_graph_drift,
     detect_stale_vendors,
     detect_workspace_lock_drift,
+    detect_policy_violations,
+    detect_build_failures,
 ]
 
 

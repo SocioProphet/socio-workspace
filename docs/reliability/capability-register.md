@@ -43,6 +43,8 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **quarantine executor** (`executors.quarantine`) | ✅ | ✅ action-level dispatch | ✅ isolate+record **and** subjectless→escalate | ✅ | `tests/test_canary_quarantine.py` |
 | **canary_fix executor** (`executors.canary_fix`) | ✅ | ✅ action-level dispatch | ✅ canary-then-heal **and** failed-canary→untouched+escalate | ✅ | `tests/test_canary_quarantine.py` |
 | **workspace-lock detector** (`detectors.detect_workspace_lock_drift`) | ✅ | ✅ scheduler `detectors` job (network-gated) | ✅ drift→propose; in-sync/no-resolver→none | ✅ | `tests/test_workspace_lock_detector.py` |
+| **policy_violation detector** (`detectors.detect_policy_violations`) | ✅ | ✅ scheduler `detectors` job | ✅ blocking finding→quarantine; clean/no-report→none | ✅ | `tests/test_build_policy_detectors.py` |
+| **build_failure detector** (`detectors.detect_build_failures`) | ✅ | ✅ scheduler `detectors` job (network-gated) | ✅ failed run→escalate; none/no-gh→none | ✅ | `tests/test_build_policy_detectors.py` |
 | **Telemetry + alerting** (`telemetry.py`) | ✅ | ✅ scheduler `telemetry` job → metrics.prom + alert logs | ✅ alerts fire on real conditions **and** silent when clean | ✅ | `tests/test_telemetry.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
@@ -105,10 +107,11 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
 
 ## Not yet on the board (honest gaps, ranked by leverage)
 
-1. **Detector breadth for the remaining classes (SENSE).** `stale_vendor` (detect→escalate) and
-   `workspace_lock_drift` (network-gated detect→propose the freshly resolved lock) now flow
-   end-to-end. Still without detectors: `build_failure` (observe CI) and `policy_violation` —
-   nothing emits their beacons yet.
+1. **Detector breadth (SENSE) — complete.** Every policy class now has a detector:
+   `mirror_drift`/`vendored_graph_drift` (auto-heal), `stale_vendor` (escalate w/ report),
+   `workspace_lock_drift` (network-gated propose), `policy_violation` (source-exposure
+   gate → quarantine), `build_failure` (network-gated failed-run → escalate). Every SENSE
+   class flows end-to-end.
 2. **Executor breadth (ACT) — complete.** Every action now has an executor: `auto_fix`
    (`resync`/`reconcile`), `propose_pr` (record; open via an injected credentialed opener),
    `canary_fix` (prove the mechanism on a guaranteed-input→provable-output canary, then apply;

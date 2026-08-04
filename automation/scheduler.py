@@ -182,6 +182,15 @@ class RegistryScheduler:
             misfire_grace_time=30,
         )
 
+        # OBSERVE: aggregate receipts into a scrapeable metrics file and log SRE alerts.
+        self._scheduler.add_job(
+            self._run_telemetry,
+            "interval",
+            minutes=1,
+            id="telemetry",
+            misfire_grace_time=30,
+        )
+
     # ------------------------------------------------------------------
     # Job implementations
     # ------------------------------------------------------------------
@@ -243,6 +252,20 @@ class RegistryScheduler:
         except Exception as exc:
             self._metrics["jobs_failed"] += 1
             logger.exception("Registry rebuild failed: %s", exc)
+
+    def _run_telemetry(self) -> None:
+        """Aggregate receipts -> metrics.prom (scrapeable) and log any firing SRE alert."""
+        self._metrics["jobs_run"] += 1
+        try:
+            from automation import telemetry
+            metrics = telemetry.collect()
+            telemetry.write_metrics_file(telemetry.render_prometheus(metrics))
+            for alert in telemetry.alerts(metrics):
+                logger.warning("SELF-HEAL ALERT [%s] %s: %s",
+                               alert["severity"], alert["kind"], alert["message"])
+        except Exception as exc:
+            self._metrics["jobs_failed"] += 1
+            logger.exception("Telemetry run failed: %s", exc)
 
     def _run_detectors(self) -> None:
         """Run the SENSE stage: emit evidence-bearing beacons for detected failures.

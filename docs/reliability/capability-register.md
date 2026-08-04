@@ -43,6 +43,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **quarantine executor** (`executors.quarantine`) | ✅ | ✅ action-level dispatch | ✅ isolate+record **and** subjectless→escalate | ✅ | `tests/test_canary_quarantine.py` |
 | **canary_fix executor** (`executors.canary_fix`) | ✅ | ✅ action-level dispatch | ✅ canary-then-heal **and** failed-canary→untouched+escalate | ✅ | `tests/test_canary_quarantine.py` |
 | **workspace-lock detector** (`detectors.detect_workspace_lock_drift`) | ✅ | ✅ scheduler `detectors` job (network-gated) | ✅ drift→propose; in-sync/no-resolver→none | ✅ | `tests/test_workspace_lock_detector.py` |
+| **Telemetry + alerting** (`telemetry.py`) | ✅ | ✅ scheduler `telemetry` job → metrics.prom + alert logs | ✅ alerts fire on real conditions **and** silent when clean | ✅ | `tests/test_telemetry.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -116,8 +117,10 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
 3. **Learning loop ↔ kernel.** `lawful_learning/loop.py` is validated but disjoint from the
    responder. It becomes meaningful now that the slice produces a real receipt stream to learn
    from — improve Law/threshold choices from observed outcomes.
-4. **Telemetry / alerting.** Receipts land in `state/decisions/` as files; no Prometheus/Loki
-   consumer or alert on escalations. We can heal silently but cannot yet *observe* healing.
+4. **Telemetry / alerting — done.** `telemetry.py` aggregates the receipt streams
+   (non-destructively) into a scrapeable `state/metrics.prom` and fires SRE alerts (a quarantine
+   occurred; an executor did not resolve; escalations over threshold). The scheduler runs it each
+   cycle and logs alerts; `python -m automation.telemetry --alerts` is a probe with teeth.
 5. **Cross-pod queue in k8s.** Compose shares state via a volume; the k8s manifest still needs
    an RWX PV or a Redis backend for the webhook and scheduler pods to share the queue. Required
    to *deploy* multi-pod, not to *prove* the loop.

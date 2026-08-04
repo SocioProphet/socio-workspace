@@ -32,6 +32,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Shared reasoning runtime** (`automation/reasoning/`) | ✅ | ✅ self-heal is its first adapter | ✅ decoupling proven in a fresh interpreter | ✅ | `tests/test_reasoning_core_decoupled.py` |
 | **Crystal Atlas graph-upsert** (`crystal_atlas.py`) | ✅ | ✅ decision→claim+evidence, durable emit | ✅ conforms to vendored graph-upsert-request.v0 (jsonschema) | ✅ | `tests/test_crystal_atlas_conformance.py` |
 | **Crystal Atlas live POST** (`post_graph_upserts.py`) | ✅ | ✅ `run_once(emit_graph=True)` records; `crystal-atlas-poster` CronJob drains+POSTs | ✅ bounded retry→dead-letter; blank endpoint no-ops | ✅ | `tests/test_post_graph_upserts.py` |
+| **Reconstruction bridge** (`reconstruction_bridge.py`) | ✅ | ✅ three-space topic-records→graph-upsert, same drain/POST path | ✅ grounded-only→claims; ungrounded skipped; conforms to vendored graph-upsert-request.v0 | ✅ | `tests/test_reconstruction_bridge.py` |
 | **WordOps incident router** (`wordops.py`) | ✅ | ✅ daemon routes escalations to outbox | ✅ escalate→A0/quarantine→A4; heals open no room | ✅ | `tests/test_wordops.py` |
 | End-to-end inbox→responder→kernel→decisions | ✅ | ✅ | ✅ | ✅ | `test_end_to_end_inbox_to_decisions` |
 | Responder canary (guaranteed in → provable verdict) | ✅ | ✅ | ✅ | ✅ | `test_canary_guaranteed_input…` |

@@ -46,6 +46,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **policy_violation detector** (`detectors.detect_policy_violations`) | ✅ | ✅ scheduler `detectors` job | ✅ blocking finding→quarantine; clean/no-report→none | ✅ | `tests/test_build_policy_detectors.py` |
 | **build_failure detector** (`detectors.detect_build_failures`) | ✅ | ✅ scheduler `detectors` job (network-gated) | ✅ failed run→escalate; none/no-gh→none | ✅ | `tests/test_build_policy_detectors.py` |
 | **Telemetry + alerting** (`telemetry.py`) | ✅ | ✅ scheduler `telemetry` job → metrics.prom + alert logs | ✅ alerts fire on real conditions **and** silent when clean | ✅ | `tests/test_telemetry.py` |
+| **Learning recommendations** (`learning.py`) | ✅ | ✅ scheduler `learning` job (hourly, advisory) | ✅ demote on failures; none below-n/success/floor | ✅ | `tests/test_learning.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -117,9 +118,13 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
    `canary_fix` (prove the mechanism on a guaranteed-input→provable-output canary, then apply;
    escalate if unproven), `quarantine` (isolate + record), and `block` (terminal — refusing is
    the action). No decision silently dead-ends: an executor that does not resolve escalates.
-3. **Learning loop ↔ kernel.** `lawful_learning/loop.py` is validated but disjoint from the
-   responder. It becomes meaningful now that the slice produces a real receipt stream to learn
-   from — improve Law/threshold choices from observed outcomes.
+3. **Learning loop ↔ kernel — done (advisory).** `learning.py` observes per-class outcomes in
+   the receipt stream and recommends DEMOTING a class's Law one step down the kernel verdict
+   lattice when its fixes are not verifying (with a minimum-sample gate) — so a class that can't
+   heal cleanly stops auto-acting and starts proposing/escalating. It learns only in the safe
+   direction (never promotes) and never mutates governance: recommendations are recorded and
+   logged for a human to apply by editing the declared policy. Auto-application is deliberately
+   NOT wired — governance stays human-owned.
 4. **Telemetry / alerting — done.** `telemetry.py` aggregates the receipt streams
    (non-destructively) into a scrapeable `state/metrics.prom` and fires SRE alerts (a quarantine
    occurred; an executor did not resolve; escalations over threshold). The scheduler runs it each

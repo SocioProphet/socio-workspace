@@ -372,6 +372,14 @@ class RegistryScheduler:
             )
             if receipts:
                 logger.info("Responder decided on %d beacon(s)", len(receipts))
+            # Route escalation-class decisions to the WordOps ChatOps fabric — out of the log-void
+            # into an operator's incident room (quarantine=A4 containment, escalate=A0 human).
+            from automation import wordops
+            for r in receipts:
+                incident = wordops.route(r)
+                if incident is not None:
+                    logger.warning("WORDOPS incident [%s/%s] %s",
+                                   incident["severity"], incident["autonomy_class"], incident["summary"])
             # The core decision cycle completed — record progress so health stays green.
             # If this job instead crashes every tick, progress goes stale and healthz degrades.
             liveness.progress()

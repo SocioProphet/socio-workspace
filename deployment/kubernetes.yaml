@@ -53,6 +53,29 @@ spec:
       storage: 1Gi
 
 ---
+# PersistentVolumeClaim – SHARED self-heal state (ReadWriteMany).
+# This is the wire the earlier NOTEs called for. The webhook pods (event producers),
+# the scheduler (consumer + decision/proposal writer), and the proposal-opener CronJob
+# (proposal reader) all mount THIS volume at /app/state and set SOCIOSPHERE_STATE_DIR to
+# it — so beacons, decisions, proposals and the heartbeat are one shared queue across pods
+# and nodes. Without it, webhook events landed in a per-pod temp dir the scheduler never saw.
+#
+# REQUIRES a StorageClass that supports ReadWriteMany (NFS / CephFS / EFS / Filestore /
+# Azure Files). If your cluster has none, use a single-node affinity for these pods, or move
+# the queue to a Redis/object-store backend (see automation/durable_queue.py scope notes).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: automation-state
+  namespace: sociosphere-automation
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
 # Service – exposes the webhook handler on port 5000.
 apiVersion: v1
 kind: Service
@@ -119,6 +142,10 @@ spec:
                 secretKeyRef:
                   name: github-secrets
                   key: webhook-secret
+            # Produce webhook events onto the SHARED state volume so the scheduler pod
+            # actually drains them. Previously unset -> events went to a per-pod temp dir.
+            - name: SOCIOSPHERE_STATE_DIR
+              value: /app/state
           resources:
             requests:
               cpu: "250m"
@@ -141,10 +168,15 @@ spec:
           volumeMounts:
             - name: registry
               mountPath: /app/registry
+            - name: automation-state
+              mountPath: /app/state
       volumes:
         - name: registry
           configMap:
             name: registry-config
+        - name: automation-state
+          persistentVolumeClaim:
+            claimName: automation-state
 
 ---
 # Deployment – APScheduler (single replica, no scaling).
@@ -175,14 +207,12 @@ spec:
                 secretKeyRef:
                   name: github-secrets
                   key: github-token
-            # Heartbeat + beacons on the scheduler's own PVC so the liveness probe
-            # can read a fresh heartbeat in-pod.
+            # All self-heal state (heartbeat, beacons, decisions, proposals) on the SHARED
+            # RWX volume so webhook-produced events reach this daemon and the proposal-opener
+            # CronJob sees the proposals it writes. The liveness probe reads the heartbeat
+            # from here in-pod.
             - name: SOCIOSPHERE_STATE_DIR
-              value: /app/jobstore/state
-            # NOTE: the event QUEUE must be shared with the webhook pod for events
-            # to actually flow. That requires an RWX PersistentVolume mounted at the
-            # same path in both Deployments, or a Redis-backed queue backend —
-            # neither is wired here. This change fixes the daemon + honest liveness.
+              value: /app/state
           resources:
             requests:
               cpu: "500m"
@@ -203,6 +233,8 @@ spec:
               mountPath: /app/jobstore
             - name: registry
               mountPath: /app/registry
+            - name: automation-state
+              mountPath: /app/state
       volumes:
         - name: jobstore
           persistentVolumeClaim:
@@ -210,6 +242,9 @@ spec:
         - name: registry
           configMap:
             name: registry-config
+        - name: automation-state
+          persistentVolumeClaim:
+            claimName: automation-state
 ---
 # CronJob – proposal opener. The reasoned responder records fix proposals to the
 # scheduler's state volume with NO credentials. This job runs on a schedule WITH a
@@ -218,10 +253,8 @@ spec:
 # PR — never merges — so every self-healed change still passes human review and the
 # CI-workflow / token-change review guardrail is preserved.
 #
-# NOTE (same caveat as the scheduler): reading the recorded proposals means sharing
-# the scheduler's PVC. scheduler-jobstore must be RWX (or this job must be scheduled
-# onto the scheduler's node) for the CronJob pod to see the proposals the daemon
-# wrote. Until the queue moves to a Redis/object-store backend, this is the wire.
+# It mounts the SHARED RWX automation-state volume at /app/state (same as the scheduler),
+# so it sees exactly the proposals the daemon wrote — no node-affinity hack required.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -254,7 +287,7 @@ spec:
                       name: github-secrets
                       key: github-token
                 - name: SOCIOSPHERE_STATE_DIR
-                  value: /app/jobstore/state
+                  value: /app/state
                 - name: GIT_AUTHOR_NAME
                   value: sociosphere-self-heal
                 - name: GIT_AUTHOR_EMAIL
@@ -271,9 +304,9 @@ spec:
                   cpu: "1000m"
                   memory: "1Gi"
               volumeMounts:
-                - name: jobstore
-                  mountPath: /app/jobstore
+                - name: automation-state
+                  mountPath: /app/state
           volumes:
-            - name: jobstore
+            - name: automation-state
               persistentVolumeClaim:
-                claimName: scheduler-jobstore
+                claimName: automation-state

@@ -18,13 +18,32 @@ A detector must be honest three ways:
 
 from __future__ import annotations
 
+import importlib.util
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
+
+import yaml
 
 from automation.durable_queue import DurableQueue, state_dir
 from automation.executors import is_in_sync, vendored_graph_in_sync
 from engines.mirror_drift_engine import REGISTRY_PATH, STATUS_PATH
+
+_ROOT = Path(__file__).resolve().parents[1]
+_VENDOR_REGISTER = _ROOT / "registry" / "vendor-freshness.yaml"
+_VENDOR_VALIDATOR = _ROOT / "tools" / "validate_vendor_freshness.py"
+_vendor_mod = None
+
+
+def _vendor_compute_state():
+    """Load and cache validate_vendor_freshness.compute_state (the register's own logic)."""
+    global _vendor_mod
+    if _vendor_mod is None:
+        spec = importlib.util.spec_from_file_location("_vf_validator", _VENDOR_VALIDATOR)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _vendor_mod = mod
+    return _vendor_mod.compute_state
 
 
 def _now() -> str:
@@ -102,8 +121,67 @@ def detect_vendored_graph_drift() -> Optional[dict]:
     }
 
 
-# Registered detectors: each is a zero/keyword-arg callable returning Optional[beacon].
-DETECTORS: List[Callable[..., Optional[dict]]] = [detect_mirror_drift, detect_vendored_graph_drift]
+def detect_stale_vendors(*, register_path: Optional[Path] = None) -> List[dict]:
+    """Emit a stale_vendor beacon for each vendored artifact that is behind upstream.
+
+    Uses the register's OWN logic (validate_vendor_freshness.compute_state) so the detector
+    and the gate can never disagree. The real fix is a cross-repo re-vendor, which is not
+    locally computable — so the beacon carries NO proposal: the responder caps stale_vendor at
+    propose_pr and, with nothing to file, escalates to a human with the staleness report.
+    `waived` artifacts (deliberately accepted staleness) are not flagged.
+    """
+    reg = Path(register_path) if register_path is not None else _VENDOR_REGISTER
+    data = yaml.safe_load(reg.read_text("utf-8")) or {}
+    sources = {
+        s.get("source_id"): s
+        for s in (data.get("sources") or [])
+        if isinstance(s, dict) and s.get("source_id")
+    }
+    compute_state = _vendor_compute_state()
+
+    beacons: List[dict] = []
+    for art in (data.get("artifacts") or []):
+        if not isinstance(art, dict):
+            continue
+        source = sources.get(art.get("source_id"))
+        if not source:
+            continue  # dangling source ref is the validator's problem, not ours
+        state, reason = compute_state(art, source)
+        if state != "stale":
+            continue
+        if art.get("disposition") == "waived":
+            continue  # deliberately accepted staleness — don't nag
+        beacons.append({
+            "kind_class": "stale_vendor",
+            "system": f"vendored:{art.get('artifact_id')}",
+            "evidence": {
+                "detector": "vendor_freshness.compute_state",
+                "reproducible": True,
+                "stale": False,  # the DETECTION is fresh; the SUBJECT is what's stale
+            },
+            "evidence_ref": "file://registry/vendor-freshness.yaml",
+            "detail": {
+                "artifact_id": art.get("artifact_id"),
+                "source_id": art.get("source_id"),
+                "consumer_repo": art.get("consumer_repo"),
+                "vendored_version": art.get("vendored_version"),
+                "upstream_latest_version": source.get("upstream_latest_version"),
+                "disposition": art.get("disposition"),
+                "state": state,
+                "reason": reason,
+                "remediation": "cross-repo re-vendor required (not locally computable) — human action",
+            },
+            "observed_at": _now(),
+        })
+    return beacons
+
+
+# Registered detectors: each is a keyword-arg callable returning None, a beacon, or a list.
+DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
+    detect_mirror_drift,
+    detect_vendored_graph_drift,
+    detect_stale_vendors,
+]
 
 
 def run_detectors(inbox: Optional[DurableQueue] = None,
@@ -119,10 +197,12 @@ def run_detectors(inbox: Optional[DurableQueue] = None,
     emitted: List[dict] = []
     for detector in (detectors if detectors is not None else DETECTORS):
         try:
-            beacon = detector(**(detector_paths or {}))
+            result = detector(**(detector_paths or {}))
         except TypeError:
-            beacon = detector()
-        if beacon is not None:
+            result = detector()
+        if result is None:
+            continue
+        for beacon in (result if isinstance(result, list) else [result]):
             inbox.put(beacon)
             emitted.append(beacon)
     return emitted

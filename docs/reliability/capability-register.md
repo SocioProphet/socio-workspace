@@ -38,6 +38,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | **Vendored-graph slice** (detector+executor, real tools) | ✅ | ✅ scheduler jobs | ✅ live break→heal **and** break→escalate | ✅ | `tests/test_vendored_graph_slice.py` |
 | **propose_pr executor** (`executors.propose_pr`) | ✅ | ✅ action-level dispatch | ✅ record/open **and** invalid→escalate | ✅ | `tests/test_propose_pr.py` |
 | **Policy-bound governance** (`policy.ResponsePolicy`) | ✅ | ✅ daemon loads declared policy | ✅ governs decide **and** rejects invalid | ✅ | `tests/test_policy.py` |
+| **stale_vendor detector** (`detectors.detect_stale_vendors`) | ✅ | ✅ scheduler `detectors` job | ✅ detect+escalate w/ report; waived not flagged | ✅ | `tests/test_stale_vendor_detector.py` |
 
 ## What "integrated" means here (and what it did NOT mean before)
 
@@ -99,11 +100,11 @@ artifact is now a `Reconciler` registration plus a detector, not new verify/roll
 
 ## Not yet on the board (honest gaps, ranked by leverage)
 
-1. **Detector breadth for the propose_pr classes (SENSE).** `propose_pr` now has ACT machinery
-   (gap 2 below), so a `stale_vendor` detector would finally make that class flow end-to-end:
-   observe a stale vendored dep, emit a beacon carrying a `proposal` (branch + files + title),
-   and the responder records a reviewable PR proposal. `build_failure` (observe CI) and
-   `policy_violation` still need their own action machinery before their detectors pay off.
+1. **Detector breadth for the remaining classes (SENSE).** `stale_vendor` now flows end-to-end
+   as detect→escalate (its real fix is a cross-repo re-vendor, not locally computable, so it
+   surfaces a staleness report to a human rather than auto-acting). Still without detectors:
+   `build_failure` (observe CI) and `policy_violation` — and both also need their own action
+   machinery (gap 2) before a detector pays off.
 2. **Executor breadth (ACT).** `auto_fix→resync`/`reconcile` and now `propose_pr` (record a
    reviewable proposal; open via an injected credentialed opener) are wired. Still missing:
    `canary_fix` (canary then apply) and `quarantine` (isolate). `propose_pr` is safe by design —

@@ -97,7 +97,7 @@ def _receipt(beacon: dict, *, verdict, action: str, reason: str) -> dict:
         mood="assert",
         evidence_ref=beacon.get("evidence_ref"),
     )
-    return {
+    receipt = {
         "beacon_kind": beacon.get("kind_class", "unknown"),
         "verdict": "BOTTOM" if verdict is BOTTOM else verdict,
         "action": action,
@@ -105,6 +105,11 @@ def _receipt(beacon: dict, *, verdict, action: str, reason: str) -> dict:
         "address": addr.to_json(),
         "decided_at": datetime.now(timezone.utc).isoformat(),
     }
+    # Carry the beacon's detail so an escalation is actionable (e.g. which vendored
+    # dependency is stale, by how much) without re-reading the consumed beacon.
+    if beacon.get("detail") is not None:
+        receipt["detail"] = beacon["detail"]
+    return receipt
 
 
 def decide(beacon: dict, *, policy: Optional[ResponsePolicy] = None) -> dict:

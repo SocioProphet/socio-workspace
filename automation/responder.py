@@ -214,11 +214,24 @@ def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> Non
     Attaches `receipt["execution"]`. The situation is RESOLVED iff the executor healed the
     artifact or recorded a proposal; otherwise the decision is downgraded to a human
     escalation — an unverified fix, or an unfiled proposal, is not a resolution.
+
+    A class-specific ``auto_fix`` whose kind_class has a registered convergence invariant
+    (`automation.control_loop.INVARIANTS`; today only `mirror_drift`) is driven through
+    `automation.self_heal.remediate()` — the ControlLoop closes the loop: RE-OBSERVE after
+    acting, keep acting until the invariant holds or the loop fails closed to
+    `quarantine-escalate` — instead of firing the executor once and trusting its return value.
+    Everything else (canary_fix, quarantine, propose_pr-record, and any auto_fix class with no
+    registered invariant such as `vendored_graph_drift`) keeps the existing single-shot call:
+    those already have their own bounded mechanism (canary-then-apply, isolate-once,
+    record-only) or, for an unregistered invariant, ControlLoop cannot verify convergence
+    anyway (`heal()` would immediately fail-closed) — so routing them through it would only
+    add a fail-closed detour, not a real closed loop.
     """
     import inspect
 
     action = receipt.get("action")
-    fn_name = EXECUTORS.get((beacon.get("kind_class"), action)) or ACTION_EXECUTORS.get(action)
+    kind_class = beacon.get("kind_class")
+    fn_name = EXECUTORS.get((kind_class, action)) or ACTION_EXECUTORS.get(action)
     if not fn_name:
         return
     from automation import executors  # lazy: keeps yaml/engine import off the decision path
@@ -228,15 +241,35 @@ def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> Non
     kwargs = dict(executor_paths or {})
     if "beacon" in inspect.signature(fn).parameters:
         kwargs["beacon"] = beacon
-    try:
-        outcome = fn(**kwargs)
-    except Exception as exc:  # pragma: no cover - defensive
-        outcome = {"executor": fn_name, "healed": False, "proposed": False, "error": str(exc)}
+
+    from automation.control_loop import INVARIANTS
+
+    is_class_auto_fix = (kind_class, action) in EXECUTORS and action == "auto_fix"
+    if is_class_auto_fix and kind_class in INVARIANTS:
+        # Closed-loop path: heal() re-observes the invariant after each act() and only
+        # stops on convergence or a bounded, fail-closed give-up. The default deadline
+        # (30s) and max_iterations (5) comfortably fit inside the responder's 1-minute
+        # scheduler interval (automation/scheduler.py `_register_jobs`, job id
+        # "responder"), so no per-call override is needed here.
+        from automation.self_heal import remediate
+
+        outcome = remediate(beacon, receipt, executor_fn=fn, executor_paths=kwargs)
+        outcome.setdefault("executor", fn_name)
+        # Back-compat / uniform resolution signal alongside the sealed LoopResult fields
+        # (converged, iterations, trace, trace_hash, fail_closed_state, reason) that
+        # `remediate()` already attaches — the receipt keeps recording the full trace.
+        outcome["healed"] = bool(outcome.get("converged"))
+    else:
+        try:
+            outcome = fn(**kwargs)
+        except Exception as exc:  # pragma: no cover - defensive
+            outcome = {"executor": fn_name, "healed": False, "proposed": False, "error": str(exc)}
 
     receipt["execution"] = outcome
     # Resolved iff the executor healed the artifact, filed a proposal, or quarantined the
     # subject. Anything else (a failed canary, a proposal with nothing to file, a subjectless
-    # quarantine) is unresolved and escalates — no decision silently dead-ends.
+    # quarantine, or a control loop that never converged) is unresolved and escalates — no
+    # decision silently dead-ends.
     resolved = bool(outcome.get("healed") or outcome.get("proposed") or outcome.get("quarantined"))
     if not resolved:
         receipt["action"] = "escalate_human"

@@ -11,7 +11,7 @@ ARTIFACT_ROOT = ROOT / "architecture" / "service-register"
 REGISTER = ARTIFACT_ROOT / "service-architecture-register.v1.0.csv"
 CANONICAL_REPOS = ARTIFACT_ROOT / "canonical-repo-estate.v1.0.csv"
 EXPECTED_SERVICE_ROWS = 46
-EXPECTED_REPO_COUNT = 122
+EXPECTED_REPO_COUNT = 121
 RETIRED_ATLAS_REPOS = {
     "SocioProphet/atlas_master_bundle_autopilot_fullorchestration",
     "SocioProphet/atlas_master_bundle_complete",

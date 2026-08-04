@@ -5,8 +5,8 @@
   "source_artifact_path": "exports/canonical-repo-estate.v1.0.csv",
   "source_manifest_path": "exports/canonical-repo-estate.v1.0.json",
   "local_artifact_path": "architecture/service-register/canonical-repo-estate.v1.0.csv",
-  "expected_git_blob_sha": "45c789828325871fefe7450189cad4d26c5978db",
-  "expected_row_count": 122,
+  "expected_git_blob_sha": "65ea58eae2c8a25eb80e14de6bd5a0ebd4eb1577",
+  "expected_row_count": 121,
   "expected_columns": [
     "repo_full_name",
     "owned_services",
@@ -16,5 +16,5 @@
   ],
   "pinning_mode": "git-blob-sha",
   "validation_tool": "tools/check_canonical_repo_mirror_pin.py",
-  "notes": "This manifest pins SocioSphere's deterministic local mirror of the Workspace Inventory canonical repo-estate export after architecture-policy retirement of the three Atlas bundle repos. The Git blob SHA is computed over 'blob <byte_length>\\0<file_bytes>'."
+  "notes": "Pins SocioSphere's deterministic local mirror of the Workspace Inventory canonical repo-estate export. Re-pinned to SocioProphet/workspace-inventory#21: adds SocioProphet/socbase and completes smart-tree severance (net 121 rows). Git blob SHA computed over 'blob <byte_length>\\0<file_bytes>'."
 }

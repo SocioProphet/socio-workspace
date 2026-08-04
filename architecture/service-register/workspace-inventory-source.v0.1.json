@@ -11,12 +11,12 @@
     "architecture/service-register/service-architecture-register.v1.0.csv",
     "architecture/service-register/canonical-repo-estate.v1.0.csv"
   ],
-  "expected_canonical_repo_count": 122,
+  "expected_canonical_repo_count": 121,
   "expected_source_manifest": {
     "artifact_id": "workspace_inventory.canonical_repo_estate.v1.0",
     "status": "canonical-export",
     "export_path": "exports/canonical-repo-estate.v1.0.csv",
-    "repo_count": 122
+    "repo_count": 121
   },
   "expected_source_columns": [
     "repo_full_name",

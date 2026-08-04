@@ -21,7 +21,6 @@ SociOS-Linux/timeserieslab,-,svc.managed.labs,-,primary
 SociOS-Linux/translationlab,-,svc.managed.labs,-,primary
 SociOS-Linux/videolab,-,svc.managed.labs,-,primary
 SociOS-Linux/workstation-contracts,-,svc.managed.boot-evidence,"svc.managed.workstation-automation,svc.managed.boot-evidence,svc.managed.desktop-shell,svc.app.socios-web",primary
-SocioProphet/AgenticaForge,-,svc.platform.agent-runtime,-,primary
 SocioProphet/Heller-Dirac,-,svc.product.research-program,-,primary
 SocioProphet/Heller-Einstein,-,svc.product.research-program,-,primary
 SocioProphet/Heller-Godel,-,svc.product.research-program,-,primary
@@ -93,7 +92,7 @@ SocioProphet/regis-entity-graph,svc.platform.identity-trust,-,-,primary
 SocioProphet/semantic-serdes,-,"svc.platform.protocol-contract,svc.platform.ontology-semantics,svc.product.prophet-lattice",-,primary
 SocioProphet/sherlock-search,"svc.platform.query-search,svc.product.search-feed",svc.substrate.lampstand-search,-,primary
 SocioProphet/slash-topics,-,"svc.platform.query-search,svc.product.search-feed",-,primary
-SocioProphet/smart-tree,-,svc.platform.query-search,-,primary
+SocioProphet/socbase,svc.platform.identity-trust,"svc.substrate.agent-machine,svc.platform.cybernetic-governance",-,primary
 SocioProphet/socioprophet,"svc.product.workroom,svc.app.socioprophet-ui",-,svc.app.socioprophet-ui,primary
 SocioProphet/socioprophet-agent-standards,-,svc.workspace.standards,"svc.workspace.inventory,svc.platform.agent-runtime,svc.product.workroom",primary
 SocioProphet/socioprophet-standards-knowledge,-,"svc.workspace.standards,svc.platform.ontology-semantics","svc.platform.ontology-semantics,svc.product.academy",primary

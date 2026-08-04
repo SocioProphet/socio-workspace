@@ -27,6 +27,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | Boundary fence (8 octonion axes) | ✅ | ✅ in `decide` | ✅ breach → human | ✅ | `test_boundary_breach_force_escalates…` |
 | IRI / identity-risk gate | ✅ | ✅ in `decide` | ✅ high-IRI → human | ✅ | `test_high_iri_force_escalates` |
 | Verdict = kernel `meet(Law, Evidence)` | ✅ | ✅ delegated, not reimplemented | ✅ equals kernel meet | ✅ | `test_verdict_is_the_vendored_kernel_meet` |
+| **Evidence composition** (`decide_composed`, per-subject) | ✅ | ✅ `run_once` groups by subject | ✅ weak-compose **and** strict-Law fences | ✅ | `tests/test_evidence_composition.py` |
 | End-to-end inbox→responder→kernel→decisions | ✅ | ✅ | ✅ | ✅ | `test_end_to_end_inbox_to_decisions` |
 | Responder canary (guaranteed in → provable verdict) | ✅ | ✅ | ✅ | ✅ | `test_canary_guaranteed_input…` |
 | **Mirror-drift executor** (`executors.resync_mirror_drift`) | ✅ | ✅ scheduler runs `run_once(execute=True)` | ✅ heal **and** abort | ✅ | `tests/test_executor_integration.py` |
@@ -88,6 +89,15 @@ the committed file equals the code default, so declared governance and the defau
   detector only = `probable`; bare signal = `weak`; nothing = BOTTOM).
 - The meet cannot exceed either arm — weak evidence can *never* be talked up into an auto-fix,
   and a low-trust failure class can *never* be auto-fixed however strong the evidence.
+
+**Evidence is composed per SUBJECT, not per beacon** (the graph-brain MLN's MAP-threshold model,
+quantized to the verdict lattice). `run_once` groups the drained beacons by `system` and
+`decide_composed` decides each subject once over its composed signals: **weak signals compose**
+(three weak reach `sealed`-strength where one would only `propose_pr`), and the **effective Law
+is the `meet` (most restrictive) across the kinds present**, so a strict class fences the whole
+subject — a `mirror_drift` (sealed) that is *also* a `policy_violation` (quarantine) can never
+auto-fix. A single-signal subject reduces exactly to per-beacon `meet(Law, Evidence)`. This is
+convergence step 1 toward the shared Debater 2.0 / MLN reasoning core.
 
 ## The spine, and where it is whole
 

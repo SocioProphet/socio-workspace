@@ -114,34 +114,91 @@ def _receipt(beacon: dict, *, verdict, action: str, reason: str) -> dict:
     return receipt
 
 
-def decide(beacon: dict, *, policy: Optional[ResponsePolicy] = None) -> dict:
-    """boundary -> IRI -> meet(Law, Evidence) -> action. Fail-closed at every gate.
+# Evidence strength as an additive weight on the verdict lattice — the quantized form of the
+# graph-brain MLN's real-valued implication weight (Result A). Composition is summing these.
+_EVIDENCE_WEIGHT = {"weak": 1, "probable": 2, "sealed": 3}
 
-    Governed by `policy` (default: the opinionated DEFAULT_POLICY). Pass a loaded policy to
-    have the declared governance (registry/self-heal-policy.yaml) drive the decision.
+
+def compose_evidence(beacons: List[dict]) -> Optional[str]:
+    """Compose multiple detector signals about ONE subject into a single evidence verdict.
+
+    Additive on the lattice (the MLN's "weak detectors compose": three weak signals reach
+    sealed-strength where none would alone), capped at sealed. None = no beacon carried a
+    warrant. This is the evidence-composition the per-beacon model lacked.
+    """
+    total = sum(_EVIDENCE_WEIGHT.get(evidence_verdict(b), 0) for b in beacons)
+    if total <= 0:
+        return None
+    if total >= 3:
+        return "sealed"
+    if total == 2:
+        return "probable"
+    return "weak"
+
+
+def effective_law(beacons: List[dict], policy: ResponsePolicy) -> str:
+    """The Law ceiling for a subject = the MOST RESTRICTIVE Law among the kinds present.
+
+    `meet` is the lattice-min, so a subject that is both mirror_drift (sealed) and
+    policy_violation (quarantine) may never rise above quarantine. Fail-closed and
+    contradiction-tolerant: a strong class cannot license auto-acting on a subject a stricter
+    class fences — the composition analogue of "one detector cannot nuke a well-grounded claim".
+    """
+    laws = [policy.law_for(b.get("kind_class", "unknown")) for b in beacons]
+    return meet(*laws) if laws else policy.default_law
+
+
+def _compose_receipt(primary: dict, beacons: List[dict], *, verdict, action: str, reason: str) -> dict:
+    receipt = _receipt(primary, verdict=verdict, action=action, reason=reason)
+    if len(beacons) > 1:
+        receipt["composed_from"] = [
+            {"kind_class": b.get("kind_class"), "system": b.get("system"),
+             "evidence": evidence_verdict(b)} for b in beacons
+        ]
+        receipt["n_signals"] = len(beacons)
+    return receipt
+
+
+def decide_composed(beacons: List[dict], *, policy: Optional[ResponsePolicy] = None) -> dict:
+    """Decide ONE subject over its COMPOSED evidence: boundary -> IRI -> meet(Law, ΣEvidence).
+
+    The subject's signals are gathered, composed, and thresholded once — the MAP-threshold
+    model of the MLN integration layer, quantized to the kernel's verdict lattice. Fail-closed
+    at every gate (any beacon's boundary breach or max-IRI escalates the whole subject).
+    A single-beacon subject reduces exactly to the old per-beacon `decide`.
     """
     policy = policy or DEFAULT_POLICY
-    # 1. boundary fence (first, fail-closed)
-    breached = boundary_breaches(beacon, policy.boundary_axes)
+    primary = max(beacons, key=lambda b: _EVIDENCE_WEIGHT.get(evidence_verdict(b), 0)) if beacons else {}
+
+    # 1. boundary fence (union, fail-closed)
+    breached = sorted({ax for b in beacons for ax in boundary_breaches(b, policy.boundary_axes)})
     if breached:
-        return _receipt(beacon, verdict=BOTTOM, action="escalate_human",
-                        reason=f"octonion boundary breached: {breached}")
-    # 2. IRI gate
-    iri = compute_iri(beacon)
+        return _compose_receipt(primary, beacons, verdict=BOTTOM, action="escalate_human",
+                                reason=f"octonion boundary breached: {breached}")
+    # 2. IRI gate (max across signals, fail-closed)
+    iri = max((compute_iri(b) for b in beacons), default=0.0)
     if iri >= policy.iri_block:
-        return _receipt(beacon, verdict=BOTTOM, action="escalate_human",
-                        reason=f"IRI {iri:.2f} >= block {policy.iri_block}")
-    # 3. no evidence -> cannot decide -> human
-    ev = evidence_verdict(beacon)
+        return _compose_receipt(primary, beacons, verdict=BOTTOM, action="escalate_human",
+                                reason=f"IRI {iri:.2f} >= block {policy.iri_block}")
+    # 3. composed evidence (no warrant anywhere -> BOTTOM -> human)
+    ev = compose_evidence(beacons)
     if ev is None:
-        return _receipt(beacon, verdict=BOTTOM, action="escalate_human",
-                        reason="no evidence to assess (consent-hole)")
-    # 4. the reasoned verdict: kernel meet of Law and Evidence
-    law = policy.law_for(beacon.get("kind_class", "unknown"))
+        return _compose_receipt(primary, beacons, verdict=BOTTOM, action="escalate_human",
+                                reason="no evidence to assess (consent-hole)")
+    # 4. the reasoned verdict: kernel meet of the effective Law and the composed Evidence
+    law = effective_law(beacons, policy)
     verdict = meet(law, ev)
     action = policy.action_for(verdict)
-    return _receipt(beacon, verdict=verdict, action=action,
-                    reason=f"meet(law={law}, evidence={ev})={verdict}; IRI={iri:.2f}")
+    reason = f"meet(law={law}, evidence={ev})={verdict}; IRI={iri:.2f}"
+    if len(beacons) > 1:
+        kinds = sorted({b.get("kind_class", "unknown") for b in beacons})
+        reason += f"; composed {len(beacons)} signals over {kinds}"
+    return _compose_receipt(primary, beacons, verdict=verdict, action=action, reason=reason)
+
+
+def decide(beacon: dict, *, policy: Optional[ResponsePolicy] = None) -> dict:
+    """Decide a single beacon. Thin wrapper over `decide_composed` (a subject of one signal)."""
+    return decide_composed([beacon], policy=policy)
 
 
 def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> None:
@@ -196,12 +253,16 @@ def run_once(inbox: Optional[DurableQueue] = None,
     ``suppressor`` is provided, a condition already decided within the policy cooldown is
     skipped, so a persistent (e.g. cross-repo) failure is not re-escalated every cycle.
     """
+    from collections import OrderedDict
+
     from automation.suppression import fingerprint
 
     active_policy = policy or DEFAULT_POLICY
     inbox = inbox if inbox is not None else DurableQueue(state_dir() / "beacons")
     decisions = decisions if decisions is not None else DurableQueue(state_dir() / "decisions")
-    out: List[dict] = []
+
+    # 1. Drain and suppress-filter (a condition decided within the cooldown is skipped).
+    survivors: List[dict] = []
     while not inbox.empty():
         try:
             beacon = inbox.get_nowait()
@@ -210,10 +271,21 @@ def run_once(inbox: Optional[DurableQueue] = None,
         if suppressor is not None and not suppressor.should_process(
             fingerprint(beacon), cooldown_seconds=active_policy.suppression_cooldown_seconds
         ):
-            continue  # this condition was decided within the cooldown window
-        receipt = decide(beacon, policy=active_policy)
+            continue
+        survivors.append(beacon)
+
+    # 2. Group by SUBJECT so multiple signals about one thing compose into one decision.
+    groups: "OrderedDict[str, List[dict]]" = OrderedDict()
+    for beacon in survivors:
+        groups.setdefault(str(beacon.get("system", "unknown")), []).append(beacon)
+
+    # 3. Decide once per subject over the composed evidence; execute via the primary signal.
+    out: List[dict] = []
+    for group in groups.values():
+        receipt = decide_composed(group, policy=active_policy)
         if execute:
-            _execute(beacon, receipt, executor_paths)
+            primary = max(group, key=lambda b: _EVIDENCE_WEIGHT.get(evidence_verdict(b), 0))
+            _execute(primary, receipt, executor_paths)
         decisions.put(receipt)
         out.append(receipt)
     return out

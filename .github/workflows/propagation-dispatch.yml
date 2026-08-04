@@ -7,6 +7,12 @@ name: propagation-dispatch
 # logged "status": "success" with an empty action list. The webhook has never propagated
 # anything and reported success each time. It now reads the real rules.
 #
+# Two independent switches, both off by default:
+#   vars.PROPAGATION_EXECUTE        act at all, rather than dry-run
+#   PROPAGATION_ALLOW_DISPATCH      permit trigger_ci (needs Contents: Write on targets)
+# The second is refused in code, not merely unfunded by the token, so an over-granted
+# App cannot silently turn cross-repo writes back on.
+#
 # It runs DRY by default. Executing means opening issues and firing repository_dispatch
 # in other repositories, which is a standing outward-facing capability -- switching that
 # on is a deliberate decision with a token behind it, not something a validation job

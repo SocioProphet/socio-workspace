@@ -6,6 +6,12 @@ updated_at: "2026-05-05"
 # When a repository is updated, these rules determine which downstream
 # repositories should be notified or auto-updated.
 
+# `notify` opens an issue (needs Issues: Write on the target). `trigger_ci` fires
+# repository_dispatch, which needs CONTENTS: WRITE -- i.e. the ability to push to the
+# target repo. A governance beacon's job is to tell people, not to change their repos,
+# so the interpretability rules use `notify` even where a CI run is what is wanted.
+# The remaining trigger_ci actions below predate this and are left for their owners to
+# decide; they are BLOCKED at dispatch time unless PROPAGATION_ALLOW_DISPATCH is set.
 defaults:
   notification_channel: github_issue
   auto_pr: false
@@ -237,7 +243,7 @@ rules:
         auto_pr: true
         pr_title: "chore(vendor): re-vendor superconscious interpretability schemas"
       - repo: noetica-impair
-        action: trigger_ci
+        action: notify
         message: "superconscious schemas changed — run the conformance suite; drift_against_upstream must be clean before any emitted fragment is trusted"
     max_cascade_depth: 2
 
@@ -254,10 +260,10 @@ rules:
         action: notify
         message: "noetica-impair updated — the tier-2 release bundle's producer changed; confirm the 14 fragment kinds and 10 non_claims are still satisfied by what it emits"
       - repo: prophet-platform
-        action: trigger_ci
+        action: notify
         message: "noetica-impair updated — rebuild the noetica-impair and noetica-impair-cpu images from the images.yml matrix"
       - repo: sociosphere
-        action: trigger_ci
+        action: notify
         message: "noetica-impair updated — revalidate the interpretability-harness lane registration and vocabulary"
     max_cascade_depth: 2
 

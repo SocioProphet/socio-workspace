@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from automation.holographic_ida import merkle_root  # noqa: E402
 from automation.leaf_propagation import LeafUnavailable, fetch, propagate  # noqa: E402
-from automation.manifest_store import ManifestUnavailable, publish_manifest, resolve_manifest  # noqa: E402
+from automation.manifest_store import publish_manifest, resolve_manifest  # noqa: E402
 from automation.mesh_fs_store import MeshFsStore  # noqa: E402
 from automation.storage_resilience import Placement
 

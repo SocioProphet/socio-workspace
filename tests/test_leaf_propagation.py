@@ -2,7 +2,6 @@
 HAPPEN on every leaf: adaptive write, CAP read, Byzantine route-around, fail-closed below quorum."""
 import os
 import sys
-import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

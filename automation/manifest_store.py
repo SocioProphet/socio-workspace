@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Callable, List, Optional, Sequence
 
 from automation.leaf_propagation import PropagationManifest
 

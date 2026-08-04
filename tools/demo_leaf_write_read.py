@@ -10,7 +10,6 @@ Run: python3 tools/demo_leaf_write_read.py
 from __future__ import annotations
 
 import os
-import random
 import sys
 from pathlib import Path
 
@@ -21,7 +20,6 @@ from automation.storage_placement import load_placement  # noqa: E402
 
 
 def main():
-    rng = random.Random(2024)
     nodes = [f"n{i:02d}" for i in range(27)]
     put, get, _ = in_memory_store()
 

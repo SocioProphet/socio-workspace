@@ -149,6 +149,8 @@ def effective_law(beacons: List[dict], policy: ResponsePolicy) -> str:
 
 
 def _compose_receipt(primary: dict, beacons: List[dict], *, verdict, action: str, reason: str) -> dict:
+    from automation import envelope
+
     receipt = _receipt(primary, verdict=verdict, action=action, reason=reason)
     if len(beacons) > 1:
         receipt["composed_from"] = [
@@ -156,6 +158,10 @@ def _compose_receipt(primary: dict, beacons: List[dict], *, verdict, action: str
              "evidence": evidence_verdict(b)} for b in beacons
         ]
         receipt["n_signals"] = len(beacons)
+    # The receipt IS the estate's ProofArtifact: stamp the canonical envelope (propagating the
+    # beacon's trace_id) and grade it on the EpistemicLevel scale. Re-graded after execution.
+    receipt = envelope.stamp(receipt, trace_id=primary.get("trace_id"))
+    receipt["epistemic_level"] = envelope.epistemic_level_for(receipt)
     return receipt
 
 
@@ -235,6 +241,9 @@ def _execute(beacon: dict, receipt: dict, executor_paths: Optional[dict]) -> Non
     if not resolved:
         receipt["action"] = "escalate_human"
         receipt["reason"] = f"{receipt.get('reason', '')} | executor '{fn_name}' did not resolve"
+    # Re-grade the EpistemicLevel now that we know the outcome (healed→proved, rolled_back→rejected…).
+    from automation import envelope
+    receipt["epistemic_level"] = envelope.epistemic_level_for(receipt)
 
 
 def run_once(inbox: Optional[DurableQueue] = None,

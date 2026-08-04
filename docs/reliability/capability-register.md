@@ -28,6 +28,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | IRI / identity-risk gate | ✅ | ✅ in `decide` | ✅ high-IRI → human | ✅ | `test_high_iri_force_escalates` |
 | Verdict = kernel `meet(Law, Evidence)` | ✅ | ✅ delegated, not reimplemented | ✅ equals kernel meet | ✅ | `test_verdict_is_the_vendored_kernel_meet` |
 | **Evidence composition** (`decide_composed`, per-subject) | ✅ | ✅ `run_once` groups by subject | ✅ weak-compose **and** strict-Law fences | ✅ | `tests/test_evidence_composition.py` |
+| **Canonical envelope + EpistemicLevel** (`envelope.py`) | ✅ | ✅ beacons + receipts stamped | ✅ trace propagates; graded by outcome | ✅ | `tests/test_envelope.py` |
 | End-to-end inbox→responder→kernel→decisions | ✅ | ✅ | ✅ | ✅ | `test_end_to_end_inbox_to_decisions` |
 | Responder canary (guaranteed in → provable verdict) | ✅ | ✅ | ✅ | ✅ | `test_canary_guaranteed_input…` |
 | **Mirror-drift executor** (`executors.resync_mirror_drift`) | ✅ | ✅ scheduler runs `run_once(execute=True)` | ✅ heal **and** abort | ✅ | `tests/test_executor_integration.py` |

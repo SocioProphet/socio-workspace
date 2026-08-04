@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from automation.vantage_reports import build_report, collect_reports  # noqa: E402
+from automation.vantage_reports import build_report, collect_reports, probe_and_report  # noqa: E402
 from automation.detectors import detect_mesh_threat  # noqa: E402
 from automation.mesh_threat import _rank  # noqa: E402
 
@@ -50,6 +50,30 @@ def test_build_report_rejects_bad_counts():
             pass
         else:
             raise AssertionError(f"bad counts must raise: {kw}")
+
+
+# ── probe_and_report (injected reachability seam) ─────────────────────────────────────────────
+
+def test_probe_counts_unreachable_peers():
+    peers = ["p1", "p2", "p3", "p4"]
+    down = {"p2", "p3"}
+    r = probe_and_report("m0", peers, reach=lambda p: p not in down)
+    assert r["unreachable_fraction"] == 0.5 and r["partition_suspected"] is False  # 2 of 4, not majority
+
+
+def test_probe_majority_down_suspects_partition():
+    peers = ["p1", "p2", "p3"]
+    r = probe_and_report("m0", peers, reach=lambda p: p == "p1")  # 2 of 3 down
+    assert r["partition_suspected"] is True
+
+
+def test_probe_error_counts_as_unreachable():
+    def flaky(p):
+        if p == "p2":
+            raise ConnectionError("timeout")
+        return True
+    r = probe_and_report("m0", ["p1", "p2"], reach=flaky)
+    assert r["unreachable_fraction"] == 0.5  # the erroring peer is unreachable, not healthy
 
 
 # ── collector (fail-closed fan-in) ────────────────────────────────────────────────────────────

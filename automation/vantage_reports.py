@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import Callable, Iterable, List, Optional, Sequence
 
 
 def _now() -> str:
@@ -49,6 +49,28 @@ def build_report(vantage: str, *, peers_total: int, peers_unreachable: int,
         "partition_suspected": bool(partition_suspected),
         "observed_at": _now(),
     }
+
+
+def probe_and_report(vantage: str, peers: Sequence[str], *, reach: Callable[[str], bool],
+                     anomalies_seen: int = 0) -> dict:
+    """Probe each peer for reachability and emit this node's report.
+
+    ``reach(peer) -> bool`` is INJECTED — the live implementation (a TCP dial, a health-endpoint
+    GET, a gossip heartbeat) is node-runtime and environment-specific, so the library takes it as a
+    seam and stays fully testable with a fake prober. A peer whose probe RAISES is treated as
+    unreachable (fail-closed: an errored probe is not evidence of health). The count feeds
+    build_report, which derives ``unreachable_fraction`` and ``partition_suspected``.
+    """
+    unreachable = 0
+    for peer in peers:
+        try:
+            ok = reach(peer)
+        except Exception:  # noqa: BLE001 — an errored probe counts as unreachable, never as healthy
+            ok = False
+        if not ok:
+            unreachable += 1
+    return build_report(vantage, peers_total=len(peers), peers_unreachable=unreachable,
+                        anomalies_seen=anomalies_seen)
 
 
 def _valid_report(r: object) -> Optional[str]:

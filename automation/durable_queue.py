@@ -116,3 +116,18 @@ class DurableQueue:
 
     def qsize(self) -> int:
         return len(self._pending())
+
+    def peek_all(self) -> list[Dict[str, Any]]:
+        """Read every pending entry WITHOUT removing it (for telemetry / inspection).
+
+        Non-destructive: unlike ``get_nowait`` it never claims a file, so a scraper can read
+        the accumulated receipts while the queue keeps its contents. Entries removed or written
+        concurrently are skipped rather than raising.
+        """
+        out: list[Dict[str, Any]] = []
+        for path in self._pending():
+            try:
+                out.append(json.loads(path.read_text(encoding="utf-8")))
+            except (FileNotFoundError, ValueError):
+                continue
+        return out

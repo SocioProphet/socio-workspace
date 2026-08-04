@@ -1,5 +1,5 @@
 {
-  "atlas_entries": 19,
+  "atlas_entries": 20,
   "catalog_commit": "3d724f2e198df3a0d0322be32eff329081499ce0",
   "catalog_repo": "SocioProphet/prophet-core-catalog",
   "composed_by": "tools/compose_self_documentation.py",

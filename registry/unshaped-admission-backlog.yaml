@@ -29,3 +29,33 @@ entries:
       model-governance, community-learning, serve, framework-catalog) and either add a
       lane registration with dependency edges, or record that it has no downstream
       consumers explicitly.
+
+# ── Propagation rules whose trigger cannot be observed ───────────────────────
+#
+# Surfaced by tools/detect_main_merges.py on 2026-08-04. These are NOT admissions;
+# they are recorded here so the debt is tracked rather than living only as a runtime
+# alert nobody owns. The rules are deliberately not deleted: six of these lanes are
+# not ours, and removing another team's rule on the strength of a 404 is their call.
+#
+# The poller exits non-zero while any of these stand, so this list should shrink.
+
+stale_propagation_rules:
+  reviewed_at: "2026-08-04"
+  review_by: "2026-09-15"
+  no_such_repo:
+    # Rule triggers on a repository that does not exist in the org. It can never fire.
+    # Either the repo was renamed, never created, or the rule outlived its subject.
+    - {rule: fips-compliance-change,        repo: fips-compliance}
+    - {rule: trust-registry-change,         repo: trust-registry}
+    - {rule: event-bus-change,              repo: event-bus}
+    - {rule: workspace-event-schema-change, repo: workspace-event-schema}
+    - {rule: adapter-contracts-change,      repo: adapter-contracts}
+    - {rule: k8s-manifests-change,          repo: k8s-manifests}
+  wrong_branch:
+    # The repo is REAL. The rule asks for a branch it does not have, so the fix is to
+    # correct the branch and keep the rule -- the opposite of the cases above.
+    - rule: design-system-change
+      repo: design-system
+      rule_targets: main
+      actual_default_branch: master
+      note: "last pushed 2021-01-13; confirm the lane is still live before repointing"

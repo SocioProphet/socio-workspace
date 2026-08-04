@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import subprocess
 import sys
 from collections import defaultdict, deque
 from datetime import datetime, timezone
@@ -56,6 +58,17 @@ def get_dependents(repo_name: str, dep_graph: dict[str, Any]) -> list[str]:
 
 
 def get_propagation_rules(repo_name: str, rules: dict[str, Any]) -> dict[str, Any]:
+    """Legacy `propagation_rules: {repo: {on_main_merge: ...}}` shape.
+
+    registry/change-propagation-rules.yaml has NOT used this shape for a long time --
+    it is a top-level `rules:` list keyed on `trigger.repo`. So this returned {} for
+    every repository in the estate, and `propagate()` then wrote a log line saying
+    "status": "success" with an empty actions list. The propagation webhook has never
+    propagated anything, for any repo, and said it succeeded each time.
+
+    Kept only so a caller still passing the old file shape keeps working; propagate()
+    now reads the modern rules through PropagationEngine and falls back to this.
+    """
     return rules.get("propagation_rules", {}).get(repo_name, {}).get("on_main_merge", {})
 
 
@@ -66,45 +79,185 @@ def _log_event(event: dict[str, Any]) -> None:
 
 
 def simulate_automation(action_type: str, targets: list[str], repo: str) -> dict[str, Any]:
+    """Records an action as "triggered" without triggering it. DRY RUN ONLY.
+
+    The name is the bug: this was the only thing propagate() ever called, so a cascade
+    was "triggered" in the log and nowhere else. Real dispatch is _dispatch().
+    """
     return {
         "action": action_type,
         "targets": targets,
         "triggered_by": repo,
-        "status": "triggered",
+        "status": "simulated",
         "timestamp": datetime.now(tz=timezone.utc).isoformat(),
     }
 
 
-def propagate(repo_name: str, ref: str = "refs/heads/main") -> int:
+ORG = os.environ.get("SOCIOSPHERE_ORG", "SocioProphet")
+#: Marks issues this engine opened, so a repeated merge updates rather than duplicates.
+PROPAGATION_MARKER = "<!-- sociosphere:propagation -->"
+
+
+def _gh(args: list[str], *, check: bool = True) -> tuple[int, str]:
+    proc = subprocess.run(["gh", *args], capture_output=True, text=True)
+    if check and proc.returncode != 0:
+        return proc.returncode, proc.stderr.strip()
+    return proc.returncode, proc.stdout.strip()
+
+
+def _existing_issue(target: str, title: str) -> str | None:
+    """An open issue with this exact title, if one is already there.
+
+    Without this, every merge to a busy trigger repo opens another copy of the same
+    notification. An actuator that spams is switched off within a week, and then the
+    estate is back where it started.
+    """
+    rc, out = _gh(["issue", "list", "--repo", f"{ORG}/{target}", "--state", "open",
+                   "--search", f"in:title {title}", "--json", "number,title",
+                   "--limit", "20"], check=False)
+    if rc != 0 or not out:
+        return None
+    try:
+        for issue in json.loads(out):
+            if issue.get("title") == title:
+                return str(issue.get("number"))
+    except json.JSONDecodeError:
+        return None
+    return None
+
+
+def _dispatch(step: dict[str, Any], source: str, ref: str) -> dict[str, Any]:
+    """Actually act on one cascade step. Returns what happened, honestly."""
+    target = step["repo"]
+    action = step.get("action", "notify")
+    rule = step.get("source_rule", "?")
+    result: dict[str, Any] = {"repo": target, "action": action, "rule": rule,
+                              "depth": step.get("depth")}
+
+    if action == "trigger_ci":
+        rc, out = _gh(["api", f"repos/{ORG}/{target}/dispatches", "-X", "POST",
+                       "-f", "event_type=sociosphere-propagation",
+                       "-f", f"client_payload[source_repo]={source}",
+                       "-f", f"client_payload[rule]={rule}",
+                       "-f", f"client_payload[ref]={ref}"], check=False)
+        result["status"] = "dispatched" if rc == 0 else "failed"
+        if rc != 0:
+            result["error"] = out
+        return result
+
+    title = f"[propagation] {source} changed — {rule}"
+    body = (
+        f"{PROPAGATION_MARKER}\n\n"
+        f"{step.get('message', '')}\n\n"
+        f"---\n"
+        f"- source: `{source}` @ `{ref}`\n"
+        f"- rule: `{rule}` (depth {step.get('depth')})\n"
+    )
+    if step.get("auto_pr"):
+        # Honest about the limit: the rule asks for a PR, and this engine does not know
+        # what change to make in the target. It says so rather than claiming a PR.
+        body += (f"- the rule requests an automatic PR (`{step.get('pr_title')}`); this "
+                 "notification does not open one, because the required change is "
+                 "repo-specific\n")
+    body += "\nOpened automatically by sociosphere change propagation."
+
+    existing = _existing_issue(target, title)
+    if existing:
+        result["status"] = "already_open"
+        result["issue"] = existing
+        return result
+
+    rc, out = _gh(["issue", "create", "--repo", f"{ORG}/{target}",
+                   "--title", title, "--body", body], check=False)
+    result["status"] = "notified" if rc == 0 else "failed"
+    result["detail"] = out
+    return result
+
+
+#: How deep a cascade is DISPATCHED, as opposed to computed.
+#:
+#: Depth 1 is the repos a rule names explicitly, each with a message a human wrote for
+#: that seam. Depth 2+ is derived by walking the graph, and every such step carries the
+#: generic "Cascade from <hub>". Because sociosphere is a hub, dispatching depth 2 from
+#: an interpretability change notifies heller-winters-theorem, yang-mills and two other
+#: unrelated maths repos -- with no message explaining why. That is exactly the noise
+#: that gets an actuator muted, and a muted actuator returns the estate to silence.
+#: The deeper steps are still computed and logged; they are just not sent.
+DEFAULT_DISPATCH_DEPTH = 1
+
+
+def propagate(repo_name: str, ref: str = "refs/heads/main",
+              *, execute: bool = False,
+              dispatch_depth: int = DEFAULT_DISPATCH_DEPTH) -> int:
+    """Fan a merge out to the repos the rules say should hear about it.
+
+    Dry run unless ``execute`` is set: this opens issues and fires repository_dispatch
+    in other repositories, which is not something to do as a side effect of importing a
+    module or running a validation job.
+    """
     if not ref.endswith("/main"):
         print(f"INFO: skipping propagation for non-main ref '{ref}'")
         return 0
 
     dep_graph = _load_yaml(DEP_GRAPH_FILE)
-    rules = _load_yaml(PROP_RULES_FILE)
-
     dependents = get_dependents(repo_name, dep_graph)
-    automation = get_propagation_rules(repo_name, rules)
+
+    engine = PropagationEngine()
+    engine.load()
+    policy = (_load_yaml(PROP_RULES_FILE).get("cascade_policy") or {})
+    max_depth = int(policy.get("max_notification_depth", 3))
+    steps = engine.compute_cascade(repo_name, max_depth=max_depth)
 
     event: dict[str, Any] = {
         "repo": repo_name,
         "ref": ref,
         "timestamp": datetime.now(tz=timezone.utc).isoformat(),
         "dependents": dependents,
-        "automation_trigger": automation.get("trigger", ""),
-        "affected_repos": automation.get("affected_repos", []),
+        "references": engine.referrers_of(repo_name),
+        "cascade_steps": len(steps),
+        "executed": execute,
         "actions_triggered": [],
-        "status": "success",
     }
 
+    if not steps:
+        # NOT success. No rule matching a repo is the condition that let a new repo sit
+        # in the registry while every merge cascaded to nothing -- reporting it as a
+        # successful propagation is how that stayed invisible.
+        event["status"] = "no_rule"
+        _log_event(event)
+        print(f"WARN: no propagation rule triggers on '{repo_name}'. Changes to it "
+              f"reach no one. Add a rule to {PROP_RULES_FILE.name}.", file=sys.stderr)
+        return 0
+
     actions_triggered: list[dict[str, Any]] = []
-    for action in automation.get("automation", []):
-        action_type = action.get("type", "unknown")
-        targets = action.get("targets", [])
-        actions_triggered.append(simulate_automation(action_type, targets, repo_name))
+    for step in steps:
+        if int(step.get("depth", 1)) > dispatch_depth:
+            actions_triggered.append({
+                "repo": step["repo"], "action": step.get("action", "notify"),
+                "rule": step.get("source_rule"), "depth": step.get("depth"),
+                "status": "computed_not_sent",
+            })
+            continue
+        if execute:
+            actions_triggered.append(_dispatch(step, repo_name, ref))
+        else:
+            actions_triggered.append(
+                simulate_automation(step.get("action", "notify"), [step["repo"]], repo_name))
 
     event["actions_triggered"] = actions_triggered
+    failed = [a for a in actions_triggered if a.get("status") == "failed"]
+    event["status"] = "failed" if failed else ("executed" if execute else "dry_run")
     _log_event(event)
+
+    verb = "dispatched" if execute else "would dispatch (dry run; pass --execute)"
+    print(f"{repo_name} -> {verb} {len(steps)} step(s):")
+    for a in actions_triggered:
+        tgt = a.get("repo") or (a.get("targets") or ["?"])[0]
+        print(f"  [{a.get('status')}] {a.get('action')} -> {tgt}"
+              + (f"  ({a['error']})" if a.get("error") else ""))
+    if failed:
+        print(f"ERROR: {len(failed)} propagation action(s) failed", file=sys.stderr)
+        return 1
     return 0
 
 
@@ -452,13 +605,23 @@ def main() -> int:
     parser.add_argument("--ref", default="refs/heads/main")
     parser.add_argument("--max-depth", type=int, default=3)
     parser.add_argument("--format", choices=["text", "json"], default="text")
+    parser.add_argument(
+        "--execute", action="store_true",
+        help="actually open issues and fire repository_dispatch in target repos. "
+             "Without it `webhook` is a dry run -- this reaches into other "
+             "repositories, so it is never the default.")
+    parser.add_argument(
+        "--dispatch-depth", type=int, default=DEFAULT_DISPATCH_DEPTH,
+        help="how deep to actually SEND. Deeper steps are still computed and "
+             "logged as computed_not_sent.")
     args = parser.parse_args()
 
     if args.cmd == "webhook":
         if not args.repo:
             print("ERROR: --repo is required", file=sys.stderr)
             return 2
-        return propagate(args.repo, args.ref)
+        return propagate(args.repo, args.ref, execute=args.execute,
+                         dispatch_depth=args.dispatch_depth)
 
     engine = PropagationEngine()
     engine.load()

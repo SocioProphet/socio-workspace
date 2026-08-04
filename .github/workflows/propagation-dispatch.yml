@@ -1,0 +1,88 @@
+name: propagation-dispatch
+
+# The actuator half of change propagation.
+#
+# `propagate()` previously read a rule shape that registry/change-propagation-rules.yaml
+# has not used in a long time, so it found nothing for EVERY repo in the estate and then
+# logged "status": "success" with an empty action list. The webhook has never propagated
+# anything and reported success each time. It now reads the real rules.
+#
+# It runs DRY by default. Executing means opening issues and firing repository_dispatch
+# in other repositories, which is a standing outward-facing capability -- switching that
+# on is a deliberate decision with a token behind it, not something a validation job
+# should acquire by accident. Set the repository variable PROPAGATION_EXECUTE to 'true'
+# (or run this manually with execute: true) when the estate is ready for that.
+#
+# Cross-repo triggering is NOT wired here: this fires on sociosphere's own merges and on
+# manual dispatch. Making every repo's merge reach this is the remaining half, and it
+# needs either a shared workflow those repos call or an org webhook.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Repository whose merge should be propagated'
+        required: true
+        type: string
+      execute:
+        description: 'Actually open issues / fire dispatches (default: dry run)'
+        required: false
+        default: false
+        type: boolean
+      dispatch_depth:
+        description: 'How deep to actually send. Deeper steps are computed and logged only.'
+        required: false
+        default: '1'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  propagate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python -m pip install pyyaml
+
+      - name: Resolve mode
+        id: mode
+        env:
+          INPUT_EXECUTE: ${{ inputs.execute }}
+          VAR_EXECUTE: ${{ vars.PROPAGATION_EXECUTE }}
+          INPUT_REPO: ${{ inputs.repo }}
+        run: |
+          set -euo pipefail
+          # A manual run may ask to execute; a push only executes if the repository
+          # variable says the estate has opted in. Default is always dry.
+          if [ "${INPUT_EXECUTE:-false}" = "true" ] || [ "${VAR_EXECUTE:-false}" = "true" ]; then
+            echo "execute=--execute" >> "$GITHUB_OUTPUT"
+          else
+            echo "execute=" >> "$GITHUB_OUTPUT"
+          fi
+          echo "repo=${INPUT_REPO:-sociosphere}" >> "$GITHUB_OUTPUT"
+
+      - name: Propagate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 engines/propagation_engine.py webhook \
+            --repo '${{ steps.mode.outputs.repo }}' \
+            --dispatch-depth '${{ inputs.dispatch_depth || 1 }}' \
+            ${{ steps.mode.outputs.execute }}
+
+      - name: Upload propagation log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: propagation-log
+          path: metrics/propagation-log.jsonl
+          if-no-files-found: ignore

@@ -89,8 +89,15 @@ def assess_triad(receipts: list, *, quorum: int = 2) -> TriadAssessment:
             winner_root = None
 
     if winner_root is None:
+        # Split-brain: no state reached quorum. Every well-formed master is unreconciled (none is
+        # canonical), so name them all sick — a caller can surface the split for a human even
+        # though there is no trusted target to fail anything back to (quorum_ok stays False).
         for root, recs in sorted(by_state.items()):
             reasons.append(f"state {root[:19]}… has {len(recs)} vote(s) — short of quorum {quorum}")
+            for rec in recs:
+                sick.append(SickCluster(cluster=rec.cluster,
+                                        reason=f"unreconciled: no quorum, committed to {root[:19]}…",
+                                        head_commit=rec.commit))
         reasons.append(f"NO quorum: no state reached {quorum} agreeing masters — no trusted failback target")
         return TriadAssessment(quorum_ok=False, sick_clusters=tuple(sick), reasons=tuple(reasons))
 

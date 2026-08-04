@@ -4,7 +4,9 @@ Covers the three seams: (1) the Lazerus receipt linter is fail-closed on the pub
 grammar; (2) the macro-triad quorum names the sick k3s master only when a real majority exists;
 (3) the failback producer emits a quorum-gated revert that the #585 pr_opener path accepts.
 """
+import json
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 from automation.lazerus import lint_receipt  # noqa: E402
 from automation.macro_triad import assess_triad  # noqa: E402
 from automation.beacon_producers import propose_state_failback  # noqa: E402
+from automation.detectors import detect_macro_triad_divergence  # noqa: E402
 from automation.pr_opener import _valid  # noqa: E402
 
 SHA = "sha256:" + "a" * 64          # a valid state_root
@@ -165,6 +168,48 @@ def test_failback_skips_quarantine_on_same_commit():
         repo="SocioProphet/infra",
     )
     assert beacons == []  # nothing to revert TO a different commit; re-sync path, not revert
+
+
+# --- detector (the SENSE stage that fires the actuator in the live loop) ----------------------
+
+def _receipts_file(doc) -> Path:
+    d = Path(tempfile.mkdtemp())
+    p = d / "lazerus-triad-receipts.json"
+    p.write_text(json.dumps(doc), encoding="utf-8")
+    return p
+
+
+def test_detector_no_file_emits_nothing():
+    missing = Path(tempfile.mkdtemp()) / "absent.json"
+    assert detect_macro_triad_divergence(receipts_path=missing) == []
+
+
+def test_detector_healthy_triad_emits_nothing():
+    p = _receipts_file({"repo": "SocioProphet/infra",
+                        "receipts": [receipt("a"), receipt("b"), receipt("c")]})
+    assert detect_macro_triad_divergence(receipts_path=p) == []
+
+
+def test_detector_divergence_emits_failback():
+    p = _receipts_file({"repo": "SocioProphet/infra", "receipts": [
+        receipt("a"), receipt("b"), receipt("c", state_root=SHA_B, commit=BAD)]})
+    beacons = detect_macro_triad_divergence(receipts_path=p)
+    assert len(beacons) == 1
+    assert beacons[0]["proposal"]["revert"] == f"{GOOD}..{BAD}"
+    assert _valid(beacons[0]["proposal"])
+
+
+def test_detector_split_brain_emits_warrantless_for_human():
+    p = _receipts_file({"repo": "SocioProphet/infra", "receipts": [
+        receipt("a"),
+        receipt("b", state_root=SHA_B, commit=BAD),
+        receipt("c", state_root="sha256:" + "d" * 64, commit="3" * 40)]})
+    beacons = detect_macro_triad_divergence(receipts_path=p)
+    assert len(beacons) == 1
+    b = beacons[0]
+    # warrantless: no evidence, no proposal -> responder escalates to a human, never auto-acts
+    assert "evidence" not in b and "proposal" not in b
+    assert "split-brain" in b["detail"]["condition"]
 
 
 def _run_all():

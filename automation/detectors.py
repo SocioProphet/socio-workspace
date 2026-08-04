@@ -28,8 +28,10 @@ from typing import Callable, List, Optional, Union
 
 import yaml
 
+from automation.beacon_producers import propose_state_failback
 from automation.durable_queue import DurableQueue, state_dir
 from automation.executors import is_in_sync, vendored_graph_in_sync
+from automation.macro_triad import assess_triad
 from engines.mirror_drift_engine import REGISTRY_PATH, STATUS_PATH
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -330,6 +332,73 @@ def detect_build_failures(*, runs_source=None) -> List[dict]:
     return beacons
 
 
+_LAZERUS_TRIAD_RECEIPTS = _ROOT / "status" / "lazerus-triad-receipts.json"
+_DEFAULT_INFRA_REPO = "SocioProphet/prophet-platform"
+
+
+def detect_macro_triad_divergence(*, receipts_path: Optional[Path] = None) -> List[dict]:
+    """SENSE the k3s master triad: emit a failback beacon when a master diverged from the quorum.
+
+    Reads the masters' published Lazerus Integrity Receipts (a producer writes this file — the
+    three k3s HA masters each attest the state they serve) and drives the macro-triad closure:
+
+      - file absent / unreadable    -> emit NOTHING (no receipts published yet = cannot assess;
+                                       producer-gated, exactly like the network-gated detectors)
+      - healthy triad               -> propose_state_failback returns [] -> emit NOTHING
+      - a master diverged + quorum   -> the quorum-gated failback beacon(s) (a reviewed revert of
+                                       the sick master back to the last quorum-blessed state)
+      - split-brain, NO quorum       -> a WARRANTLESS beacon (no evidence, no proposal): a real,
+                                       serious condition we can SEE but cannot warrant a fix for
+                                       (no quorum = no trusted target) -> responder escalates to a
+                                       human. Fail-closed: we never guess a target.
+
+    This is the piece that makes the #587 actuator actually fire in the live loop. Until a
+    producer publishes the receipts file it is a safe no-op — wired and dormant, not inert.
+    """
+    path = Path(receipts_path) if receipts_path is not None else _LAZERUS_TRIAD_RECEIPTS
+    try:
+        doc = json.loads(path.read_text("utf-8"))
+    except (FileNotFoundError, ValueError):
+        return []  # no receipts published -> cannot assess -> nothing (producer-gated)
+    if not isinstance(doc, dict):
+        return []
+    receipts = doc.get("receipts")
+    if not isinstance(receipts, list) or not receipts:
+        return []
+    repo = doc.get("repo") or _DEFAULT_INFRA_REPO
+    try:
+        quorum = int(doc.get("quorum", 2) or 2)
+    except (TypeError, ValueError):
+        quorum = 2
+
+    # ACTUATE: quorum-gated failback(s) for any master that diverged from the canonical state.
+    beacons = propose_state_failback(receipts, repo=repo, quorum=quorum)
+    if beacons:
+        return beacons
+
+    # No failback proposed. Either the triad is healthy (nothing to do) OR it is split-brain with
+    # no quorum — a condition propose_state_failback correctly refuses to act on (no trusted
+    # target). Surface the latter warrantlessly so a human is paged instead of silence.
+    assessment = assess_triad(receipts, quorum=quorum)
+    # Page a human only when enough masters reported that a quorum SHOULD have formed but did not
+    # (a genuine split-brain), not when the report is merely incomplete (fewer than `quorum`
+    # masters have checked in yet — a liveness/producer concern, handled elsewhere).
+    if not assessment.quorum_ok and len(receipts) >= quorum:
+        return [{
+            "kind_class": "deploy_regression",
+            "system": f"{repo}::macro-triad",
+            # NO evidence + NO proposal on purpose: we see the split-brain but cannot warrant a
+            # failback (no quorum) -> the responder routes this to a human, never auto-acts.
+            "detail": {
+                "condition": "split-brain: no k3s master quorum -> no trusted failback target",
+                "sick": [s.cluster for s in assessment.sick_clusters],
+                "reasons": list(assessment.reasons),
+            },
+            "observed_at": _now(),
+        }]
+    return []  # healthy triad — nothing to heal
+
+
 # Registered detectors: each is a keyword-arg callable returning None, a beacon, or a list.
 DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
     detect_mirror_drift,
@@ -338,6 +407,7 @@ DETECTORS: List[Callable[..., Union[None, dict, List[dict]]]] = [
     detect_workspace_lock_drift,
     detect_policy_violations,
     detect_build_failures,
+    detect_macro_triad_divergence,
 ]
 
 

@@ -94,11 +94,34 @@ def simulate_automation(action_type: str, targets: list[str], repo: str) -> dict
 
 
 ORG = os.environ.get("SOCIOSPHERE_ORG", "SocioProphet")
+
 #: Opt-in for repository_dispatch, which needs Contents: Write on the target.
 ALLOW_DISPATCH = os.environ.get("PROPAGATION_ALLOW_DISPATCH", "").lower() in ("1", "true", "yes")
 
 #: Marks issues this engine opened, so a repeated merge updates rather than duplicates.
 PROPAGATION_MARKER = "<!-- sociosphere:propagation -->"
+
+
+# ── SCM backend ──────────────────────────────────────────────────────────────
+#
+# The dispatcher needs exactly three verbs: list open issue titles, create an issue,
+# and fire a repository dispatch. Everything else about propagation is registry maths.
+#
+# They are behind a backend because the estate is migrating to a sovereign Gitea and the
+# engine should not have to be rewritten when that lands -- the seam is the point. This
+# is deliberately NOT a `gh` clone: the estate rule is a small wrapper over the verbs
+# actually used, because a hundred-command compatibility layer drifts and then lies
+# exactly where the two APIs diverge. Three verbs is maintainable.
+#
+# GitHub remains the default and is the only backend exercised today. The mirrors in
+# Gitea are PULL mirrors (read-only; a push returns 403), so GitHub is still the only
+# writable copy and sovereign cannot yet be canonical. The Gitea backend below is
+# written against the documented REST API but is UNVERIFIED against a live instance --
+# it is the seam being ready, not a claim that the cutover is done.
+
+SCM_BACKEND = os.environ.get("SCM_BACKEND", "github").lower()
+GITEA_URL = os.environ.get("GITEA_URL", "").rstrip("/")
+GITEA_TOKEN = os.environ.get("GITEA_TOKEN", "")
 
 
 def _gh(args: list[str], *, check: bool = True) -> tuple[int, str]:
@@ -108,6 +131,67 @@ def _gh(args: list[str], *, check: bool = True) -> tuple[int, str]:
     return proc.returncode, proc.stdout.strip()
 
 
+def _gitea(method: str, path: str, payload: dict[str, Any] | None = None) -> tuple[int, str]:
+    """Minimal Gitea REST call. Fails LOUDLY when unconfigured rather than returning
+    an empty result that would read as 'nothing there'."""
+    import urllib.error
+    import urllib.request
+
+    if not GITEA_URL or not GITEA_TOKEN:
+        return 1, ("SCM_BACKEND=gitea but GITEA_URL/GITEA_TOKEN are unset; refusing to "
+                   "report an empty result that would look like 'nothing found'")
+    req = urllib.request.Request(
+        f"{GITEA_URL}/api/v1{path}", method=method,
+        data=json.dumps(payload).encode() if payload is not None else None,
+        headers={"Authorization": f"token {GITEA_TOKEN}",
+                 "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return 0, resp.read().decode()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode()[:400]
+    except Exception as e:  # network, DNS, TLS
+        return 1, str(e)[:400]
+
+
+def scm_open_issue_titles(repo: str) -> list[str] | None:
+    """Open issue titles in ``repo``. None means the lookup FAILED, which is not the
+    same as an empty list -- treating a failed lookup as 'no duplicates' would reopen
+    the same issue on every run."""
+    if SCM_BACKEND == "gitea":
+        rc, out = _gitea("GET", f"/repos/{ORG}/{repo}/issues?state=open&limit=50")
+    else:
+        rc, out = _gh(["issue", "list", "--repo", f"{ORG}/{repo}", "--state", "open",
+                       "--json", "title", "--limit", "50"], check=False)
+    if rc != 0 or not out:
+        return None
+    try:
+        return [i.get("title", "") for i in json.loads(out)]
+    except json.JSONDecodeError:
+        return None
+
+
+def scm_create_issue(repo: str, title: str, body: str) -> tuple[int, str]:
+    if SCM_BACKEND == "gitea":
+        return _gitea("POST", f"/repos/{ORG}/{repo}/issues",
+                      {"title": title, "body": body})
+    return _gh(["issue", "create", "--repo", f"{ORG}/{repo}",
+                "--title", title, "--body", body], check=False)
+
+
+def scm_dispatch(repo: str, payload: dict[str, str]) -> tuple[int, str]:
+    if SCM_BACKEND == "gitea":
+        # Gitea has no repository_dispatch equivalent; its workflow_dispatch is not the
+        # same shape. Saying so beats emitting a call that 404s and reads as a transient.
+        return 1, ("gitea has no repository_dispatch equivalent; convert the rule to "
+                   "`notify` or run the target's workflow directly")
+    args = ["api", f"repos/{ORG}/{repo}/dispatches", "-X", "POST",
+            "-f", "event_type=sociosphere-propagation"]
+    for k, v in sorted(payload.items()):
+        args += ["-f", f"client_payload[{k}]={v}"]
+    return _gh(args, check=False)
+
+
 def _existing_issue(target: str, title: str) -> str | None:
     """An open issue with this exact title, if one is already there.
 
@@ -115,18 +199,12 @@ def _existing_issue(target: str, title: str) -> str | None:
     notification. An actuator that spams is switched off within a week, and then the
     estate is back where it started.
     """
-    rc, out = _gh(["issue", "list", "--repo", f"{ORG}/{target}", "--state", "open",
-                   "--search", f"in:title {title}", "--json", "number,title",
-                   "--limit", "20"], check=False)
-    if rc != 0 or not out:
-        return None
-    try:
-        for issue in json.loads(out):
-            if issue.get("title") == title:
-                return str(issue.get("number"))
-    except json.JSONDecodeError:
-        return None
-    return None
+    titles = scm_open_issue_titles(target)
+    if titles is None:
+        # Lookup failed. Returning None here would mean "no duplicate", so the caller
+        # would open another copy on every run -- the spam that gets an actuator muted.
+        return "unknown"
+    return "duplicate" if title in titles else None
 
 
 def _dispatch(step: dict[str, Any], source: str, ref: str) -> dict[str, Any]:
@@ -154,11 +232,7 @@ def _dispatch(step: dict[str, Any], source: str, ref: str) -> dict[str, Any]:
                 "PROPAGATION_ALLOW_DISPATCH is not set. Change the rule to `notify` if "
                 "an issue is enough, or set the flag deliberately.")
             return result
-        rc, out = _gh(["api", f"repos/{ORG}/{target}/dispatches", "-X", "POST",
-                       "-f", "event_type=sociosphere-propagation",
-                       "-f", f"client_payload[source_repo]={source}",
-                       "-f", f"client_payload[rule]={rule}",
-                       "-f", f"client_payload[ref]={ref}"], check=False)
+        rc, out = scm_dispatch(target, {"source_repo": source, "rule": rule, "ref": ref})
         result["status"] = "dispatched" if rc == 0 else "failed"
         if rc != 0:
             result["error"] = out
@@ -181,13 +255,16 @@ def _dispatch(step: dict[str, Any], source: str, ref: str) -> dict[str, Any]:
     body += "\nOpened automatically by sociosphere change propagation."
 
     existing = _existing_issue(target, title)
+    if existing == "unknown":
+        result["status"] = "skipped_lookup_failed"
+        result["detail"] = ("could not list open issues, so a duplicate cannot be ruled "
+                            "out; skipping rather than risking a repeat notification")
+        return result
     if existing:
         result["status"] = "already_open"
-        result["issue"] = existing
         return result
 
-    rc, out = _gh(["issue", "create", "--repo", f"{ORG}/{target}",
-                   "--title", title, "--body", body], check=False)
+    rc, out = scm_create_issue(target, title, body)
     result["status"] = "notified" if rc == 0 else "failed"
     result["detail"] = out
     return result

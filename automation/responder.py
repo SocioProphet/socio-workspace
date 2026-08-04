@@ -180,14 +180,20 @@ def run_once(inbox: Optional[DurableQueue] = None,
              *,
              execute: bool = False,
              executor_paths: Optional[dict] = None,
-             policy: Optional[ResponsePolicy] = None) -> List[dict]:
+             policy: Optional[ResponsePolicy] = None,
+             suppressor=None) -> List[dict]:
     """Drain the beacon inbox, decide each, emit decision receipts. Returns the receipts.
 
     With ``execute=True`` a decided auto_fix is carried out by its registered executor
     (verify-and-rollback); the daemon opts in, while pure decision paths stay side-effect
     free. ``executor_paths`` is forwarded to the executor (used by tests to target tmp dirs).
-    ``policy`` governs the decision (default: the opinionated DEFAULT_POLICY).
+    ``policy`` governs the decision (default: the opinionated DEFAULT_POLICY). When a
+    ``suppressor`` is provided, a condition already decided within the policy cooldown is
+    skipped, so a persistent (e.g. cross-repo) failure is not re-escalated every cycle.
     """
+    from automation.suppression import fingerprint
+
+    active_policy = policy or DEFAULT_POLICY
     inbox = inbox if inbox is not None else DurableQueue(state_dir() / "beacons")
     decisions = decisions if decisions is not None else DurableQueue(state_dir() / "decisions")
     out: List[dict] = []
@@ -196,7 +202,11 @@ def run_once(inbox: Optional[DurableQueue] = None,
             beacon = inbox.get_nowait()
         except Exception:
             break
-        receipt = decide(beacon, policy=policy)
+        if suppressor is not None and not suppressor.should_process(
+            fingerprint(beacon), cooldown_seconds=active_policy.suppression_cooldown_seconds
+        ):
+            continue  # this condition was decided within the cooldown window
+        receipt = decide(beacon, policy=active_policy)
         if execute:
             _execute(beacon, receipt, executor_paths)
         decisions.put(receipt)

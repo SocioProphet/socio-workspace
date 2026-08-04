@@ -45,6 +45,9 @@ class ResponsePolicy:
         "legality", "containment", "provenance", "privacy",
         "performance", "reproducibility", "licensing", "governance",
     )
+    # A condition already decided within this window is suppressed, so a persistent
+    # (e.g. cross-repo) failure is escalated once per window, not every scheduler cycle.
+    suppression_cooldown_seconds: float = 3600.0
 
     def law_for(self, kind: str) -> str:
         """The Law ceiling for a class; unknown classes fall to default_law (fail-closed)."""
@@ -61,6 +64,7 @@ class ResponsePolicy:
             "default_law": self.default_law,
             "iri_block": self.iri_block,
             "boundary_axes": list(self.boundary_axes),
+            "suppression_cooldown_seconds": self.suppression_cooldown_seconds,
         }
 
 
@@ -104,6 +108,8 @@ def validate_policy(p: ResponsePolicy) -> None:
         raise ValueError(f"iri_block={p.iri_block} must be in [0, 1]")
     if not p.boundary_axes:
         raise ValueError("boundary_axes must be non-empty (fail-closed needs a fence)")
+    if p.suppression_cooldown_seconds < 0:
+        raise ValueError(f"suppression_cooldown_seconds={p.suppression_cooldown_seconds} must be >= 0")
 
 
 validate_policy(DEFAULT_POLICY)
@@ -119,6 +125,9 @@ def policy_from_mapping(data: Optional[dict]) -> ResponsePolicy:
         default_law=data.get("default_law", DEFAULT_POLICY.default_law),
         iri_block=float(data.get("iri_block", DEFAULT_POLICY.iri_block)),
         boundary_axes=tuple(data.get("boundary_axes") or DEFAULT_POLICY.boundary_axes),
+        suppression_cooldown_seconds=float(
+            data.get("suppression_cooldown_seconds", DEFAULT_POLICY.suppression_cooldown_seconds)
+        ),
     )
     validate_policy(merged)
     return merged

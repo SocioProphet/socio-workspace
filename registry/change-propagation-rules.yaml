@@ -265,6 +265,14 @@ rules:
       - repo: sociosphere
         action: notify
         message: "noetica-impair updated — revalidate the interpretability-harness lane registration and vocabulary"
+      # Both are ACTIVE co-parties the pairwise rules missed; the hyperedge beacon is
+      # what surfaced them. Deferred lane members are deliberately NOT here.
+      - repo: sourceos-continuum
+        action: notify
+        message: "noetica-impair updated — it composes with caps.infra.paas.continuum-local@0.1.0; confirm the local/twin Job path still holds"
+      - repo: ProCybernetica
+        action: notify
+        message: "noetica-impair updated — the lawful-learning executor changed; confirm claim tags, circuit entries and forbidden-circuit enforcement still conform to doctrine"
     max_cascade_depth: 2
 
   # ── Adapter contract changes cascade to all adapters ───────────────────────

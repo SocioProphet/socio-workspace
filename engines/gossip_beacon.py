@@ -91,6 +91,10 @@ class Hypergraph:
         self.into: dict[str, set[str]] = defaultdict(set)
         #: members a registration declares but no edge connects
         self.unconnected: dict[str, set[str]] = defaultdict(set)
+        #: lane -> members whose ONLY provenance is a future_* relationship or a
+        #: deferred/pre_promotion edge. Declared into the lane, not yet party to it.
+        self.deferred: dict[str, set[str]] = defaultdict(set)
+        self.active_lanes: dict[str, set[str]] = defaultdict(set)
         self._loaded = False
 
     # ── loading ──────────────────────────────────────────────────────────────
@@ -117,11 +121,17 @@ class Hypergraph:
                     self._add_edge(repo, dep.get("name") if isinstance(dep, dict) else dep)
 
         edge_members: dict[str, set[str]] = defaultdict(set)
+        active_edge_members: dict[str, set[str]] = defaultdict(set)
         for pack in sorted(self._dir.glob("*-dependency-edges.yaml")):
             for e in (_load_yaml(pack).get("edges") or []):
                 if not isinstance(e, dict):
                     continue
                 if str(e.get("state", "active")).lower() not in ("active", "in_use"):
+                    lane = e.get("lane")
+                    if lane:
+                        for r in (norm(e.get("from")), norm(e.get("to"))):
+                            if r:
+                                edge_members[lane].add(r)
                     continue
                 self._add_edge(e.get("from"), e.get("to"))
                 lane = e.get("lane")
@@ -129,6 +139,7 @@ class Hypergraph:
                     for r in (norm(e.get("from")), norm(e.get("to"))):
                         if r:
                             edge_members[lane].add(r)
+                            active_edge_members[lane].add(r)
 
         # Hyperedges: a lane's membership is everything its registration names as a
         # surface or canonical relationship, plus everything its edges touch.
@@ -141,15 +152,28 @@ class Hypergraph:
             for surface in (reg.get("surfaces") or {}).values():
                 if isinstance(surface, dict) and (r := norm(surface.get("repo"))):
                     declared.add(r)
-            for val in (reg.get("canonical_relationships") or {}).values():
-                if isinstance(val, str) and (r := norm(val)):
-                    declared.add(r)
+            active_declared: set[str] = set(declared)
+            for key, val in (reg.get("canonical_relationships") or {}).items():
+                if not isinstance(val, str) or not (r := norm(val)):
+                    continue
+                declared.add(r)
+                # `future_*` names a relationship the lane INTENDS. Counting a future
+                # owner as a co-party inflates every coverage gap with work nobody has
+                # started, and drowns the genuine misses next to it.
+                if not str(key).startswith("future_"):
+                    active_declared.add(r)
             if owner := norm((reg.get("lane") or {}).get("owner_repo")):
                 declared.add(owner)
+                active_declared.add(owner)
             self.lanes[lane] |= declared
+            self.active_lanes[lane] |= active_declared
 
         for lane, members in edge_members.items():
             self.lanes[lane] |= members
+        for lane, members in active_edge_members.items():
+            self.active_lanes[lane] |= members
+        for lane, members in self.lanes.items():
+            self.deferred[lane] = members - self.active_lanes.get(lane, set())
 
         for lane, members in self.lanes.items():
             for m in members:
@@ -210,7 +234,8 @@ class Hypergraph:
         }
 
     def emit(self, source: str, *, ttl: int = DEFAULT_TTL,
-             directions: tuple[str, ...] = DIRECTIONS) -> list[dict[str, Any]]:
+             directions: tuple[str, ...] = DIRECTIONS,
+             include_deferred: bool = False) -> list[dict[str, Any]]:
         """Percolate from ``source``, returning every hop in deterministic order.
 
         Convergence is by seen-set: a repo is recorded once, at the shortest hop that
@@ -238,7 +263,12 @@ class Hypergraph:
             for node in frontier:
                 if "lateral" in directions:
                     for lane in sorted(self.lanes_of.get(node, ())):
-                        for peer in sorted(self.lanes[lane]):
+                        # Deferred members are declared into the lane but not yet party
+                        # to it; beaconing them announces a relationship that does not
+                        # exist. include_deferred surfaces them when auditing the lane.
+                        members = (self.lanes[lane] if include_deferred
+                                   else self.active_lanes.get(lane, self.lanes[lane]))
+                        for peer in sorted(members):
                             if peer in seen:
                                 continue
                             seen.add(peer)

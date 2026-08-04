@@ -96,6 +96,12 @@ def coverage() -> list[dict[str, Any]]:
         # "Co-party to the relation" means cycle 1: lane siblings plus repos on a direct
         # edge. That is the set a change genuinely concerns.
         peers = {h["repo"] for h in g.emit(src, ttl=1)} - {src}
+        # Deferred lane members (future_* owners, deferred/pre_promotion edges) are
+        # excluded by emit(). Counting them as unnotified charged every lane for work
+        # nobody has started: 4 of noetica-impair's 6 "misses" were future owners whose
+        # only edges are deferred, which buried the 2 real ones next to them.
+        deferred = sorted({m for lane in g.lanes_of.get(src, ())
+                           for m in g.deferred.get(lane, ())} - {src})
         actuated = by_trigger[src]
         missed = sorted(peers - actuated)
         # A trigger repo with NO peers is not fully covered, it is unplaced: it has a
@@ -111,6 +117,7 @@ def coverage() -> list[dict[str, Any]]:
             "coverage": round(len(actuated & peers) / len(peers), 3) if peers else None,
             "unplaced": not peers,
             "unreached": missed,
+            "deferred": deferred,
         })
     return rows
 

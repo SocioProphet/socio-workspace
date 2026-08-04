@@ -1,0 +1,117 @@
+name: propagation-poll
+
+# The signal side of change propagation.
+#
+# The rules describe what should happen when a trigger repo merges to main. Nothing ever
+# told the engine that a merge had happened, so they described a signal that never
+# arrived. This asks.
+#
+# Direction is deliberate. The obvious wiring -- a workflow in each of the 14 trigger
+# repos dispatching here -- needs a token with write access to sociosphere held in those
+# repos, i.e. a PAT in 14 places. The estate rule is that secrets are minted in CI, not
+# carried as PATs, so the registry owner does the asking instead. No other repo changes.
+#
+# Stateless by design: it looks back over a window rather than keeping a watermark. There
+# is no state to lose, and repeated detection is safe because the dispatcher deduplicates
+# by issue title. WINDOW must exceed the cron interval.
+#
+# ── credentials ──────────────────────────────────────────────────────────────
+# Reading commits in other private org repos needs more than this repo's GITHUB_TOKEN,
+# which is scoped to sociosphere alone. Configure a GitHub App with read access to the
+# org's contents and set:
+#     vars.PROPAGATION_APP_ID  +  secrets.PROPAGATION_APP_PRIVATE_KEY
+# Until then the job runs with GITHUB_TOKEN, can only observe sociosphere itself, and
+# SAYS SO. It does not fail -- an unconfigured capability is a skip, not a breakage --
+# but it must never look like a clean sweep, because "detected nothing, reported
+# success" is the exact bug this whole effort exists to remove.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      window:
+        description: 'Lookback window in minutes'
+        required: false
+        default: '90'
+        type: string
+      execute:
+        description: 'Actually open issues / fire dispatches (default: dry run)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  # Overlapping polls would double-detect the same merges. Harmless thanks to dedup,
+  # but pointless API spend.
+  group: propagation-poll
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python -m pip install pyyaml
+
+      - name: Mint org-read token
+        id: token
+        if: vars.PROPAGATION_APP_ID != ''
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROPAGATION_APP_ID }}
+          private-key: ${{ secrets.PROPAGATION_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Report credential scope
+        run: |
+          if [ -n "${{ vars.PROPAGATION_APP_ID }}" ]; then
+            echo "::notice::org-read token minted; all 14 trigger repos observable"
+          else
+            echo "::warning::PROPAGATION_APP_ID is not set. Falling back to GITHUB_TOKEN, \
+          which can only read sociosphere — the other 13 trigger repos are INVISIBLE to \
+          this run. An empty result below means 'could not look', not 'nothing merged'."
+          fi
+
+      - name: Detect merges
+        id: detect
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          python3 tools/detect_main_merges.py \
+            --window '${{ inputs.window || 90 }}' --json > fired.json
+          python3 tools/detect_main_merges.py --window '${{ inputs.window || 90 }}'
+          echo "count=$(python3 -c "import json;print(len(json.load(open('fired.json'))['fired']))")" >> "$GITHUB_OUTPUT"
+
+      - name: Propagate each merged repo
+        if: steps.detect.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token || secrets.GITHUB_TOKEN }}
+          EXECUTE: ${{ (inputs.execute == true || vars.PROPAGATION_EXECUTE == 'true') && '--execute' || '' }}
+        run: |
+          set -euo pipefail
+          fail=0
+          for repo in $(python3 -c "import json;[print(f['repo']) for f in json.load(open('fired.json'))['fired']]"); do
+            echo "── $repo ──"
+            python3 engines/propagation_engine.py webhook --repo "$repo" ${EXECUTE} || fail=1
+          done
+          exit $fail
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: propagation-poll
+          path: |
+            fired.json
+            metrics/propagation-log.jsonl
+          if-no-files-found: ignore

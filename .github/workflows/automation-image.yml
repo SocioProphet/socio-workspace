@@ -65,13 +65,21 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      # On a push to main we always publish; workflow_dispatch is gated on the input so a
-      # human can dry-run a build without pushing.
+      # Decide whether to push. Fail-SAFE, never fail-red: if the zot credential is absent
+      # (the pipeline isn't wired up yet), SKIP the push and still build+verify — the same
+      # skip-clean-when-unconfigured contract as the crystal-atlas-poster / proposal-opener
+      # jobs. A missing secret must NEVER turn every push to main red. Push only when a real
+      # credential exists AND (it's a push to main, or a dispatch that opted in).
       - name: Decide whether to push
         id: gate
+        env:
+          OCI_USERNAME: ${{ secrets.ZOT_CI_USERNAME }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "push" ]; then
+          if [ -z "${OCI_USERNAME:-}" ]; then
+            echo "::notice::ZOT_CI_USERNAME not set — build + verify only, no push (grant the ci user push on ${IMAGE_REPO} to enable)."
+            echo "push=false" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "push" ]; then
             echo "push=true" >> "$GITHUB_OUTPUT"
           else
             echo "push=${{ inputs.push }}" >> "$GITHUB_OUTPUT"
@@ -84,12 +92,6 @@ jobs:
           OCI_PASSWORD: ${{ secrets.ZOT_CI_PASSWORD }}
         run: |
           set -euo pipefail
-          if [ -z "${OCI_USERNAME:-}" ]; then
-            echo "::error::ZOT_CI_USERNAME/PASSWORD are not set in this repository."
-            echo "They exist in prophet-platform for the image pipeline. This workflow mints"
-            echo "no secrets — grant the existing ci user push on ${IMAGE_REPO} instead."
-            exit 1
-          fi
           echo "$OCI_PASSWORD" | docker login "$OCI_REGISTRY" -u "$OCI_USERNAME" --password-stdin
 
       - name: Build and (optionally) push

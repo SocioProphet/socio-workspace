@@ -1,0 +1,174 @@
+# repo-discovery — the discovery half of estate registration.
+#
+# The service-register and repo-governance-matrix gates only VALIDATE repos already in
+# the register; nothing DISCOVERS a new org repo. So a repo created in the org stays
+# invisible to governance until a human happens to add it by hand — exactly how
+# SocioProphet/socbase sat absent from every registry surface. This is the machine that
+# looks, daily, so "a human last looked" stops being the mechanism.
+#
+# It does TWO things, deliberately separate:
+#
+#  1. Emits a governance beacon every run: the full discovery report as a step summary
+#     and an uploaded artifact. If this job stops running, the beacon stops arriving —
+#     the automation cannot fail silently, because its silence IS the signal.
+#
+#  2. When it finds unregistered repos, it refreshes a machine-owned backlog register
+#     (registry/unregistered-repos.yaml, one stub entry per repo) and opens a
+#     registration PR HERE for a human to triage and promote into the real surfaces.
+#     It NEVER edits the hand-authored governance surfaces directly and NEVER merges.
+#
+# ── credentials ────────────────────────────────────────────────────────────────
+# Listing repos and opening the PR both run against sociosphere's own GITHUB_TOKEN,
+# which is scoped to the SocioProphet org that owns this repo — no new secret. Private
+# repos in the org may be invisible to GITHUB_TOKEN; to see the whole org, reuse the
+# SAME org-read GitHub App the propagation lane already documents
+# (vars.PROPAGATION_APP_ID + secrets.PROPAGATION_APP_PRIVATE_KEY). Until that App is
+# configured the job runs with GITHUB_TOKEN, SAYS SO, and does not fail — an
+# unconfigured capability is a skip, not a breakage. No PATs are introduced.
+#
+# ⚠️ HUMAN REVIEW REQUIRED (estate policy: .github/workflows/** needs human review):
+# the write permissions and the PR-opening step below are the security-sensitive half.
+# Review the token/permission posture before enabling on a schedule.
+name: repo-discovery
+
+on:
+  schedule:
+    # Daily, early UTC. Frequency is a floor on how long a new org repo can be
+    # invisible to governance.
+    - cron: '41 5 * * *'
+  workflow_dispatch:
+    inputs:
+      open_pr:
+        description: 'Open the registration-backlog PR (off = observe and report only)'
+        type: boolean
+        default: true
+      limit:
+        description: 'Max repos to list per org (gh --limit)'
+        type: string
+        default: '500'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repo-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # push the registration-backlog branch
+      pull-requests: write   # open the PR for it
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install pyyaml
+
+      # Reuse the propagation lane's org-read App when configured; otherwise fall back
+      # to GITHUB_TOKEN and report the reduced scope. No new secret is introduced.
+      - name: Mint org-read token
+        id: token
+        if: vars.PROPAGATION_APP_ID != ''
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROPAGATION_APP_ID }}
+          private-key: ${{ secrets.PROPAGATION_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Report credential scope
+        run: |
+          if [ -n "${{ vars.PROPAGATION_APP_ID }}" ]; then
+            echo "::notice::org-read token minted; private org repos are visible to discovery"
+          else
+            echo "::warning::PROPAGATION_APP_ID is not set. Falling back to GITHUB_TOKEN, \
+          which may not see private org repos. An empty result means 'could not fully look', \
+          not necessarily 'nothing unregistered'."
+          fi
+
+      - name: Discover unregistered repos
+        id: detect
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token || secrets.GITHUB_TOKEN }}
+          LIMIT: ${{ inputs.limit || '500' }}
+        run: |
+          set -uo pipefail
+          # The tool exits non-zero WHEN unregistered repos exist — that is the drift
+          # signal, not a job error. Capture it rather than let set -e abort the run.
+          set +e
+          python3 tools/discover_unregistered_repos.py \
+            --org SocioProphet \
+            --limit "$LIMIT" \
+            --out discovery.json \
+            --emit-register registry/unregistered-repos.yaml \
+            | tee detect-summary.txt
+          code=$?
+          set -e
+          {
+            echo '## Unregistered-repo discovery'
+            echo ''
+            echo '```'
+            cat detect-summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          UNREG=$(python3 -c "import json;print(json.load(open('discovery.json'))['counts']['unregistered'])")
+          echo "unregistered=$UNREG" >> "$GITHUB_OUTPUT"
+          if [ "$code" -gt 1 ]; then
+            echo "::error::discovery tool errored (exit $code)"; exit "$code"
+          fi
+
+      # The beacon: retained so a reviewer can inspect the full report regardless of
+      # whether a PR was opened.
+      - name: Upload discovery beacon
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-discovery
+          path: |
+            discovery.json
+            registry/unregistered-repos.yaml
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Open the registration-backlog PR
+        if: steps.detect.outputs.unregistered != '0' && (github.event_name != 'workflow_dispatch' || inputs.open_pr)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="repo-discovery/unregistered-$(date -u +%Y%m%d)"
+          git config user.name "repo-discovery[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # One branch per day, force-updated: a re-run converges on the same PR rather
+          # than opening a second one for the same observation.
+          git checkout -B "$BRANCH"
+          git add registry/unregistered-repos.yaml
+          git commit -m "repo-discovery: refresh unregistered-repo backlog $(date -u +%Y-%m-%d)"
+          git push --force origin "$BRANCH"
+          BODY=$(cat <<'EOF'
+          Automated discovery found SocioProphet org repos that are absent from every
+          registry surface (Boundary Atlas, governance matrix, canonical-repos,
+          service-register estate, submodules).
+
+          This PR refreshes the machine-owned backlog at
+          `registry/unregistered-repos.yaml` — one stub entry per unregistered repo. A
+          human promotes each into the real surfaces (and, for the service-register
+          estate, upstream via SocioProphet/workspace-inventory).
+
+          ⚠️ This workflow (`.github/workflows/repo-discovery.yml`) needs human review
+          per estate policy: it holds `contents: write` + `pull-requests: write` and
+          opens PRs. Confirm the token/permission posture (GITHUB_TOKEN, or the reused
+          PROPAGATION_APP org-read App) before relying on the schedule.
+          EOF
+          )
+          if ! gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number' | grep -q .; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "repo-discovery: unregistered-repo backlog ($(date -u +%Y-%m-%d))" \
+              --body "$BODY"
+          else
+            gh pr edit "$BRANCH" --body "$BODY"
+          fi

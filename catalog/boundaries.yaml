@@ -470,3 +470,25 @@ entries:
     maturity: L0
     current_status: Boundary record not yet native in repo.
     next_step: Add local-first state integrity boundary declaration.
+
+  - repo: SocioProphet/socbase
+    boundary_class: sovereign_base_producer
+    jurisdiction: Sovereign base platform — authentication/data gateway and governed acquisition backend; base/producer boundary supplying identity, data-access, and governed-acquisition primitives to downstream estate consumers.
+    owned_artifacts:
+      - auth/data gateway contracts
+      - governed acquisition backend schemas
+      - producer boundary declarations
+    claim_modes:
+      - formal_construction
+      - illustrative_schema
+      - fixture_validated
+    sufficiency_types:
+      - governance_sufficient
+      - audit_sufficient
+    trust_roots:
+      - gateway contract hashes
+      - acquisition policy review
+      - schema version pinning
+    maturity: L0
+    current_status: New sovereign base/producer repo (github.com/SocioProphet/socbase); boundary record newly represented in Sociosphere atlas; surfaced as unregistered by tools/discover_unregistered_repos.py.
+    next_step: Add native BOUNDARY.md and gateway/acquisition contract fixtures, and flow the service-register registration upstream via SocioProphet/workspace-inventory.

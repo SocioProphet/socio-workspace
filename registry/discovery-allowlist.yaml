@@ -1,0 +1,16 @@
+# registry/discovery-allowlist.yaml
+#
+# Repos in the SocioProphet org that tools/discover_unregistered_repos.py must NOT
+# flag as unregistered, because they are deliberately governed OUTSIDE the estate
+# registry surfaces (org meta repos, mirrors owned by another lane, etc).
+#
+# This is an explicit, reviewable exception list — NOT a place to silence real
+# registration debt. An entry here is a claim that "this repo is governed elsewhere";
+# add one only with that justification. Archived repos and forks are excluded by the
+# tool automatically and do not belong here.
+#
+# Matched by canonical short key (lowercase repo name), so `SocioProphet/.github`,
+# a git URL, or a bare `.github` all match the same entry.
+schema_version: "0.1"
+allow:
+  - .github            # org profile / community-health repo; not an estate service

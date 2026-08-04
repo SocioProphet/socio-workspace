@@ -101,6 +101,11 @@ repositories:
     function: governed_topic_packs_semantic_bi_outputs
     promotion_condition: Outputs feed live surface ontology search or analytics.
     risk: topic_taxonomy_drift_from_config_surfaces_json
+  - name: SocioProphet/socbase
+    class: promotion_candidate
+    function: sovereign_base_platform_auth_data_gateway_governed_acquisition_backend
+    promotion_condition: Canonical repos consume its auth/data gateway and governed acquisition contracts as the authoritative base/producer surface.
+    risk: base_producer_semantics_fragment_between_gateway_and_acquisition_consumers
   - name: mdheller/socioprophet-old
     class: archive_retire
     function: superseded_historical_implementation

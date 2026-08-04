@@ -372,6 +372,9 @@ class RegistryScheduler:
             )
             if receipts:
                 logger.info("Responder decided on %d beacon(s)", len(receipts))
+            # The core decision cycle completed — record progress so health stays green.
+            # If this job instead crashes every tick, progress goes stale and healthz degrades.
+            liveness.progress()
         except Exception as exc:
             self._metrics["jobs_failed"] += 1
             logger.exception("Responder run failed: %s", exc)
@@ -498,7 +501,8 @@ def run(heartbeat_interval: float = 30.0) -> None:
 
     scheduler = build_scheduler()
     scheduler.start()
-    liveness.beat()  # first heartbeat before we start waiting
+    liveness.beat()       # first heartbeat before we start waiting
+    liveness.progress()   # optimistic first progress; the responder job refreshes it each tick
     logger.info("Scheduler daemon started (heartbeat every %.0fs)", interval)
 
     stop = threading.Event()

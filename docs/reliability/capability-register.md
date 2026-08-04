@@ -19,7 +19,7 @@ truth columns. A claim only counts in the rightmost column it can honestly reach
 | Capability | BUILT | WIRED | TESTED×2 | ON CI | Evidence |
 |---|:---:|:---:|:---:|:---:|---|
 | Durable cross-process queue (`durable_queue.py`) | ✅ | ✅ webhooks + scheduler | ✅ | ✅ | `tests/test_durable_queue.py` |
-| Honest liveness / heartbeat (`liveness.py`, `healthz.py`) | ✅ | ✅ compose + k8s probes | ✅ dead-daemon fails | ✅ | `tests/test_liveness_healthz.py` |
+| Honest liveness — heartbeat **+ progress** (`liveness.py`, `healthz.py`) | ✅ | ✅ compose + k8s probes | ✅ dead-daemon fails **and** alive-but-jobs-failing degrades | ✅ | `tests/test_liveness_healthz.py` |
 | Real scheduler daemon (`scheduler.run`) | ✅ | ✅ `python -m automation.scheduler` | ✅ | ✅ (apscheduler-guarded) | `tests/test_scheduler_daemon.py` |
 | Observe-and-beacon (`observe_and_beacon`) | ✅ | ✅ default handler | ✅ | ✅ | `tests/test_scheduler_daemon.py` |
 | **Vendored semantic kernel** (`third_party/procyber/…`) | ✅ upstream | ✅ imported by responder | ✅ pin + tamper | ✅ | `tests/test_vendor_pin.py` |
@@ -159,11 +159,11 @@ estate*. Open, in order of how badly they bite:
   **no workflow builds or pushes that image**. Until it does, the manifest cannot deploy.
 - **No running instance.** There is no evidence any `automation.scheduler`/`webhooks` daemon is
   deployed and beating. The loop is dormant code + a manifest, not a live control plane.
-- **Liveness still only checks the heartbeat.** `scheduler.preflight` now makes a *broken image*
-  crash loudly at boot (fixed the worst silent failure), but a running daemon whose individual
-  jobs start failing only logs + increments `jobs_failed` — `healthz` won't go red. Health should
-  degrade (or alert) when jobs fail persistently; not yet wired.
-- **Metrics/alerts unobserved** (gap 4 above).
+- **Liveness reflects job health — done.** `scheduler.preflight` crashes a *broken image* loudly
+  at boot; and now the responder job records **progress** each cycle, so a daemon that beats but
+  whose decision cycle crashes every tick reads **degraded** (`healthz` fails), not green — the
+  residual "instruments lie" gap is closed (`tests/test_liveness_healthz.py`).
+- **Metrics/alerts unobserved** (gap 4 above) — still open; routing to WordOps is the fix.
 
 Each gap is a row that has not yet earned its rightmost column. When it does, it moves — and a
 test moves with it. The `Deploy integrity` row above earned its column by *failing on the actual

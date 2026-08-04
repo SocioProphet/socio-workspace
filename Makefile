@@ -297,7 +297,7 @@ svf-workspace-validate: svf-registry-validate svf-runner-list svf-runner-select-
 	@echo "OK: svf-workspace-validate"
 
 # --- registry targets ---
-.PHONY: registry-validate registry-admissions-validate admission-governance-shape-validate interpretability-harness-vocabulary-validate effective-canonical-registry-validate ontology-validate dep-cycles mirror-drift-check build-intelligence-validate deployment-topology-validate contract-lock-validate
+.PHONY: registry-validate registry-admissions-validate admission-governance-shape-validate interpretability-harness-vocabulary-validate propagation-detect effective-canonical-registry-validate ontology-validate dep-cycles mirror-drift-check build-intelligence-validate deployment-topology-validate contract-lock-validate
 
 mirror-drift-check:
 	python3 engines/mirror_drift_engine.py check
@@ -314,6 +314,11 @@ admission-governance-shape-validate:
 
 interpretability-harness-vocabulary-validate:
 	python3 tools/check_interpretability_harness_vocabulary.py
+
+# Which trigger repos merged to main recently. Read-only; needs an org-read token
+# to see past sociosphere itself.
+propagation-detect:
+	python3 tools/detect_main_merges.py
 
 effective-canonical-registry-validate:
 	python3 tools/build_effective_canonical_registry.py

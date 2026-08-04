@@ -2,8 +2,19 @@ name: workspace-spine
 
 on:
   push:
+    paths:
+      - 'registry/workspace**'
+      - 'manifest/workspace**'
+      - 'spec/**'
+      - 'tools/runner/**'
+      - '.github/workflows/workspace-spine.yml'
   pull_request:
-
+    paths:
+      - 'registry/workspace**'
+      - 'manifest/workspace**'
+      - 'spec/**'
+      - 'tools/runner/**'
+      - '.github/workflows/workspace-spine.yml'
 permissions:
   contents: read
 

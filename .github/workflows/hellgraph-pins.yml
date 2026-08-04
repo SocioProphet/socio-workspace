@@ -5,8 +5,20 @@
 name: hellgraph-pins
 on:
   pull_request:
+    paths:
+      - 'tools/check_hellgraph_pins.py'
+      - 'registry/**'
+      - 'manifest/**'
+      - '**/*hellgraph*'
+      - '.github/workflows/hellgraph-pins.yml'
   push:
     branches: [main]
+    paths:
+      - 'tools/check_hellgraph_pins.py'
+      - 'registry/**'
+      - 'manifest/**'
+      - '**/*hellgraph*'
+      - '.github/workflows/hellgraph-pins.yml'
 jobs:
   hellgraph-pins:
     runs-on: ubuntu-latest

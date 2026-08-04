@@ -39,8 +39,17 @@ name: vendor-freshness
 
 on:
   push:
+    paths:
+      - 'registry/vendor-freshness.yaml'
+      - 'tools/validate_vendor_freshness.py'
+      - 'fixtures/vendor-freshness/**'
+      - '.github/workflows/vendor-freshness.yml'
   pull_request:
-
+    paths:
+      - 'registry/vendor-freshness.yaml'
+      - 'tools/validate_vendor_freshness.py'
+      - 'fixtures/vendor-freshness/**'
+      - '.github/workflows/vendor-freshness.yml'
 permissions:
   contents: read
 

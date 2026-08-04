@@ -3,9 +3,22 @@ name: SVF Validation
 on:
   push:
     branches: [main]
+    paths:
+      - 'tools/check_svf_workspace_state.py'
+      - 'tools/validate_environment_sandbox_profiles.py'
+      - 'registry/**'
+      - 'spec/**'
+      - 'fixtures/**'
+      - '.github/workflows/svf-validation.yml'
   pull_request:
+    paths:
+      - 'tools/check_svf_workspace_state.py'
+      - 'tools/validate_environment_sandbox_profiles.py'
+      - 'registry/**'
+      - 'spec/**'
+      - 'fixtures/**'
+      - '.github/workflows/svf-validation.yml'
   workflow_dispatch:
-
 jobs:
   sociosphere-svf:
     runs-on: ubuntu-latest

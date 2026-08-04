@@ -3,9 +3,20 @@ name: lattice-federated-query-spine
 on:
   push:
     branches: [main]
+    paths:
+      - 'registry/lattice-**'
+      - 'spec/lattice/**'
+      - 'tools/**lattice**'
+      - 'tools/runner/**'
+      - '.github/workflows/lattice-federated-query-spine.yml'
   pull_request:
     branches: [main]
-
+    paths:
+      - 'registry/lattice-**'
+      - 'spec/lattice/**'
+      - 'tools/**lattice**'
+      - 'tools/runner/**'
+      - '.github/workflows/lattice-federated-query-spine.yml'
 permissions:
   contents: read
 

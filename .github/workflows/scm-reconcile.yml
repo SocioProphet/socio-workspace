@@ -1,0 +1,37 @@
+name: scm-reconcile
+
+# Heal GitHub -> Gitea drift automatically. Running on every merge to main PREVENTS the drift that
+# #624 only detects (Gitea is canonical but no longer pulls). Fast-forward only; a true divergence
+# stops and pages a human. Unconfigured (no GITEA secrets) SKIPS CLEAN — it never turns red.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 */6 * * *'   # every 6h, catch anything a merge missed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scm-reconcile
+  cancel-in-progress: false   # never cancel a heal mid-push
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: heal GitHub -> Gitea (fast-forward only)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITEA_URL: ${{ secrets.GITEA_URL }}
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          ORG: SocioProphet
+        run: |
+          git config --global user.email "scm-reconcile@socioprophet.ai"
+          git config --global user.name "scm-reconcile"
+          python3 tools/reconcile_scm.py sociosphere

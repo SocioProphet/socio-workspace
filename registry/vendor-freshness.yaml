@@ -41,7 +41,7 @@ sources:
     upstream_ref: main
     upstream_latest_version: 0.4.45
     upstream_latest_ref: v0.4.45
-    observed_at: '2026-08-03'
+    observed_at: '2026-08-22'
     observation_method: >-
       git ls-remote --tags https://github.com/SocioProphet/hellgraph -> newest semver tag v0.4.45 (dbe854faf5b8)
     # Load-bearing contracts THIS upstream can move, as first-class nodes. A release
@@ -362,10 +362,10 @@ sources:
     version_scheme: commit
     upstream_ref: main
     upstream_latest_digest: unknown
-    observed_at: '2026-08-03'
+    observed_at: '2026-08-22'
     observation_method: >-
-      git ls-remote https://github.com/SourceOS-Linux/sourceos-spec main -> 90c1384032cc
-    upstream_latest_commit: 90c1384032cc069738d273df8e9877d46ec2820f
+      git ls-remote https://github.com/SourceOS-Linux/sourceos-spec main -> 71d3f7d1b823
+    upstream_latest_commit: 71d3f7d1b823bdcb23d039da2f6271076aad8ce2
 
   - source_id: kbpedia-kko
     repo: SocioProphet/kbpedia
@@ -421,10 +421,10 @@ sources:
     artifact_kind: derived-output
     version_scheme: commit
     upstream_ref: main
-    observed_at: '2026-08-03'
+    observed_at: '2026-08-22'
     observation_method: >-
-      git ls-remote https://github.com/SocioProphet/ontogenesis main -> fbaa72acd07e
-    upstream_latest_commit: fbaa72acd07eed808262d53b0764fb0655f1ea50
+      git ls-remote https://github.com/SocioProphet/ontogenesis main -> 099f2f75eb59
+    upstream_latest_commit: 099f2f75eb59aad6b6ceb0a7b8f02b95165bd9c5
 
   - source_id: tritrpc-go-bindings
     repo: SocioProphet/TriTRPC
@@ -432,10 +432,10 @@ sources:
     artifact_kind: source-port
     version_scheme: commit
     upstream_ref: main
-    observed_at: '2026-08-03'
+    observed_at: '2026-08-22'
     observation_method: >-
-      git ls-remote https://github.com/SocioProphet/TriTRPC main -> 49055bc50480
-    upstream_latest_commit: 49055bc504803c88f44c268e07b3099e4575294b
+      git ls-remote https://github.com/SocioProphet/TriTRPC main -> b7d6e43dd876
+    upstream_latest_commit: b7d6e43dd8760ca9414dfab27dbfdc91796e4e7b
 
   - source_id: regis-entity-graph-schemas
     repo: SocioProphet/regis-entity-graph

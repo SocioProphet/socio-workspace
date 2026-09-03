@@ -1,0 +1,250 @@
+schema_version: '0.1'
+generated_by: tools/discover_unregistered_repos.py
+generated_at: '2026-09-03T10:04:43.025126Z'
+note: Auto-generated backlog of SocioProphet org repos absent from every registry
+  surface. Each entry is a stub to be promoted into the Boundary Atlas (catalog/boundaries.yaml),
+  the governance matrix (registry/repo-governance-matrix-v0.yaml), and — via SocioProphet/workspace-inventory
+  upstream — the service-register estate.
+orgs:
+- SocioProphet
+repos:
+- repo: SocioProphet/atlas_master_bundle_autopilot_fullorchestration
+  url: https://github.com/SocioProphet/atlas_master_bundle_autopilot_fullorchestration
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/atlas_master_bundle_complete
+  url: https://github.com/SocioProphet/atlas_master_bundle_complete
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/atlas_os_service_full
+  url: https://github.com/SocioProphet/atlas_os_service_full
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/atomspace-cypher-gateway
+  url: https://github.com/SocioProphet/atomspace-cypher-gateway
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/CDataSoftwaredocs
+  url: https://github.com/SocioProphet/CDataSoftwaredocs
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/clymer_research
+  url: https://github.com/SocioProphet/clymer_research
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/cybernetic-genesis
+  url: https://github.com/SocioProphet/cybernetic-genesis
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/ghostspace-spec
+  url: https://github.com/SocioProphet/ghostspace-spec
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/git-ops-standards
+  url: https://github.com/SocioProphet/git-ops-standards
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/gitea-sovereign
+  url: https://github.com/SocioProphet/gitea-sovereign
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/guild-knowledge-network
+  url: https://github.com/SocioProphet/guild-knowledge-network
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/hatchet-quickstart
+  url: https://github.com/SocioProphet/hatchet-quickstart
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/hdt-app
+  url: https://github.com/SocioProphet/hdt-app
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/hellgraph-bench
+  url: https://github.com/SocioProphet/hellgraph-bench
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/idea-ontology
+  url: https://github.com/SocioProphet/idea-ontology
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/metadata-standards
+  url: https://github.com/SocioProphet/metadata-standards
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/noetica-mcp
+  url: https://github.com/SocioProphet/noetica-mcp
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/planetary-recovery-os
+  url: https://github.com/SocioProphet/planetary-recovery-os
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/prophet-aggregate
+  url: https://github.com/SocioProphet/prophet-aggregate
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/prophet-mesh
+  url: https://github.com/SocioProphet/prophet-mesh
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/prophet-sheaf
+  url: https://github.com/SocioProphet/prophet-sheaf
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/prophet-truth
+  url: https://github.com/SocioProphet/prophet-truth
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/quantum-prophet
+  url: https://github.com/SocioProphet/quantum-prophet
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/semantic-runtime
+  url: https://github.com/SocioProphet/semantic-runtime
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/sliders
+  url: https://github.com/SocioProphet/sliders
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/socioprophet-docs
+  url: https://github.com/SocioProphet/socioprophet-docs
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/socioprophet-seed-deck
+  url: https://github.com/SocioProphet/socioprophet-seed-deck
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/sourceos-a2a-mcp-bootstrap
+  url: https://github.com/SocioProphet/sourceos-a2a-mcp-bootstrap
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/spine-integration-pack
+  url: https://github.com/SocioProphet/spine-integration-pack
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
+- repo: SocioProphet/usol-space-library
+  url: https://github.com/SocioProphet/usol-space-library
+  status: unregistered
+  discovered_at: '2026-09-03T10:04:43.025126Z'
+  proposed_surfaces:
+  - catalog/boundaries.yaml
+  - registry/repo-governance-matrix-v0.yaml
+  - SocioProphet/workspace-inventory (service-register upstream)
